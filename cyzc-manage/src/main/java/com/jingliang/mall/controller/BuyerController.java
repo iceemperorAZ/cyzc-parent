@@ -2,10 +2,9 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.resp.BuyerResp;
-import com.jingliang.mall.server.FastdfsService;
+import com.jingliang.mall.service.BuyerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +61,7 @@ public class BuyerController {
         if (Objects.isNull(buyer)) {
             return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
         }
-        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save( MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         log.debug("返回结果：{}", buyerResp);
         return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
     }
@@ -76,18 +75,18 @@ public class BuyerController {
         log.debug("请求参数：{}", buyerReq);
         PageRequest pageRequest = PageRequest.of(buyerReq.getPage(), buyerReq.getPageSize());
         if (StringUtils.isNotBlank(buyerReq.getClause())) {
-            pageRequest = PageRequest.of(buyerReq.getPage(), buyerReq.getPageSize(), Sort.by(MallUtils.separateOrder(buyerReq.getClause())));
+            pageRequest = PageRequest.of(buyerReq.getPage(), buyerReq.getPageSize(), Sort.by(BaseMallUtils.separateOrder(buyerReq.getClause())));
         }
         Specification<Buyer> buyerSpecification = (Specification<Buyer>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
             if (StringUtils.isNotBlank(buyerReq.getPhone())) {
-                predicateList.add(cb.like(root.get("phone"),  buyerReq.getPhone() + "%"));
+                predicateList.add(cb.like(root.get("phone"), buyerReq.getPhone() + "%"));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             return predicateList.isEmpty() ? null : cb.and(predicateList.toArray(new Predicate[0]));
         };
         Page<Buyer> buyerPage = buyerService.findAll(buyerSpecification, pageRequest);
-        MallPage<BuyerResp> buyerRespMallPage = MallUtils.toMallPage(buyerPage, BuyerResp.class);
+        MallPage<BuyerResp> buyerRespMallPage = BaseMallUtils.toMallPage(buyerPage, BuyerResp.class);
         log.debug("返回结果：{}", buyerRespMallPage);
         return MallResult.buildQueryOk(buyerRespMallPage);
     }

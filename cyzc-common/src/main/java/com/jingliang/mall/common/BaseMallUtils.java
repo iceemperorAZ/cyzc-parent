@@ -1,6 +1,5 @@
 package com.jingliang.mall.common;
 
-import com.rabbitmq.tools.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -18,16 +17,18 @@ import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
 import java.security.Security;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * 工具类
+ * 抽象工具类
  *
  * @author Zhenfeng Li
  * @version 1.0
  * @date 2019-09-19 15:19
  */
 @Slf4j
-public class MallUtils {
+public abstract class BaseMallUtils {
 
     /**
      * 拆分排序
@@ -215,11 +216,17 @@ public class MallUtils {
         return null;
     }
 
-    public static String passwordEncryption(String password){
-       return DigestUtils.md5DigestAsHex(password.getBytes());
-    }
-
-    public static void main(String[] args) {
-        System.out.println( MallUtils.passwordEncryption("xxxxxx"));
+    /**
+     * 验证手机号
+     *
+     * @param phone 手机号
+     * @return 验证通过返回<code>true</code>,失败<code>false</code>
+     */
+    public static Boolean phoneCheck(String phone) {
+        String s2 = "^[1](([3|5|8][\\d])|([4][5,6,7,8,9])|([6][5,6])|([7][3,4,5,6,7,8])|([9][8,9]))[\\d]{8}$";
+        // 验证手机号
+        Pattern p = Pattern.compile(s2);
+        Matcher m = p.matcher(phone);
+        return m.matches();
     }
 }

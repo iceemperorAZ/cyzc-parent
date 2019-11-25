@@ -120,6 +120,10 @@ public class UserController {
         if (Objects.nonNull(userReq.getBuyerId()) && Objects.isNull(buyerService.findById(userReq.getBuyerId()))) {
             return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
         }
+        if (StringUtils.isNotBlank(userReq.getPhone()) && !MallUtils.phoneCheck(userReq.getPhone())) {
+            //手机号格式不正确
+            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_PHONE_FAIL);
+        }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(userReq, user);
         //未设置提成则默认提成为0

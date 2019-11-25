@@ -1,6 +1,6 @@
 package com.jingliang.mall.wx.service.impl;
 
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.BaseMallUtils;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.wx.service.WechatService;
 import lombok.extern.slf4j.Slf4j;
@@ -75,7 +75,7 @@ public class WechatServiceImpl implements WechatService {
         map.put("fee_type", "CNY");
         //价格元转为分
         map.put("total_fee", ((int) (order.getPayableFee() * 100)) + "");
-        map.put("spbill_create_ip", MallUtils.getLocalIp());
+        map.put("spbill_create_ip", BaseMallUtils.getLocalIp());
         long currentTimeMillis = System.currentTimeMillis();
         long currentTime = currentTimeMillis + payOvertime * 1000;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -86,14 +86,14 @@ public class WechatServiceImpl implements WechatService {
         map.put("openid", openId);
         map.put("receipt", "Y");
         map.put("out_trade_no", order.getOrderNo());
-        map.put("nonce_str", MallUtils.generateString(32));
-        map.put("sign", MallUtils.sign(map, payKey));
+        map.put("nonce_str", BaseMallUtils.generateString(32));
+        map.put("sign", BaseMallUtils.sign(map, payKey));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_XML);
         headers.set(HttpHeaders.ACCEPT_CHARSET, StandardCharsets.UTF_8.toString());
-        HttpEntity<String> request = new HttpEntity<>(MallUtils.mapToXml(map), headers);
+        HttpEntity<String> request = new HttpEntity<>(BaseMallUtils.mapToXml(map), headers);
         String xml = restTemplate.postForObject(payUrl, request, String.class);
-        Map<String, String> resultMap = MallUtils.xmlToMap(xml);
+        Map<String, String> resultMap = BaseMallUtils.xmlToMap(xml);
         log.debug("{}", resultMap);
         if (Objects.isNull(resultMap) || Objects.isNull(resultMap.get("prepay_id"))) {
             return null;
@@ -103,11 +103,11 @@ public class WechatServiceImpl implements WechatService {
         //二次签名
         Map<String, String> newMap = new TreeMap<>();
         newMap.put("appId", appId);
-        newMap.put("nonceStr", MallUtils.generateString(32));
+        newMap.put("nonceStr", BaseMallUtils.generateString(32));
         newMap.put("package", "prepay_id=" + prepayId);
         newMap.put("signType", "MD5");
         newMap.put("timeStamp", System.currentTimeMillis() + "");
-        newMap.put("paySign", MallUtils.sign(newMap, payKey));
+        newMap.put("paySign", BaseMallUtils.sign(newMap, payKey));
         //appId不进行传输
         newMap.remove("appId");
         return newMap;
@@ -120,20 +120,20 @@ public class WechatServiceImpl implements WechatService {
         map.put("mch_id", payMchId);
         map.put("out_trade_no", orderNo);
         map.put("sign_type", "MD5");
-        map.put("nonce_str", MallUtils.generateString(32));
-        String sign = MallUtils.sign(map, payKey);
+        map.put("nonce_str", BaseMallUtils.generateString(32));
+        String sign = BaseMallUtils.sign(map, payKey);
         map.put("sign", sign);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_XML);
         headers.set(HttpHeaders.ACCEPT_CHARSET, StandardCharsets.UTF_8.toString());
-        HttpEntity<String> request = new HttpEntity<>(MallUtils.mapToXml(map), headers);
+        HttpEntity<String> request = new HttpEntity<>(BaseMallUtils.mapToXml(map), headers);
         String xml = restTemplate.postForObject(payUrl, request, String.class);
-        Map<String, String> resultMap = MallUtils.xmlToMap(xml);
+        Map<String, String> resultMap = BaseMallUtils.xmlToMap(xml);
         log.debug("{}", resultMap);
         if (Objects.isNull(resultMap) || Objects.isNull(resultMap.get("return_code"))) {
             return null;
         }
-        return MallUtils.xmlToMap(xml);
+        return BaseMallUtils.xmlToMap(xml);
     }
 
     @Override
@@ -141,11 +141,11 @@ public class WechatServiceImpl implements WechatService {
         //二次签名
         Map<String, String> newMap = new TreeMap<>();
         newMap.put("appId", appId);
-        newMap.put("nonceStr", MallUtils.generateString(32));
+        newMap.put("nonceStr", BaseMallUtils.generateString(32));
         newMap.put("package", "prepay_id=" + payNo);
         newMap.put("signType", "MD5");
         newMap.put("timeStamp", System.currentTimeMillis() + "");
-        newMap.put("paySign", MallUtils.sign(newMap, payKey));
+        newMap.put("paySign", BaseMallUtils.sign(newMap, payKey));
         //appId不进行传输
         newMap.remove("appId");
         return newMap;
@@ -155,6 +155,6 @@ public class WechatServiceImpl implements WechatService {
     public String payNotifySign(Map<String, String> map) {
         //sign不参与
         map.remove("sign");
-        return MallUtils.sign(map, payKey);
+        return BaseMallUtils.sign(map, payKey);
     }
 }

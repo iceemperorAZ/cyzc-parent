@@ -27,6 +27,7 @@ public interface MallConstant {
     String TEXT_LOGOUT_FAIL = "注销失败";
     String TEXT_BUYER_FAIL = "绑定销售不存在";
     String TEXT_OLD_PASSWORD_FAIL = "原密码不正确";
+    String TEXT_PHONE_FAIL = "手机号格式错误";
 
     Integer PARAM_FAIL = 310;
     String TEXT_PARAM_FAIL = "参数不全";
