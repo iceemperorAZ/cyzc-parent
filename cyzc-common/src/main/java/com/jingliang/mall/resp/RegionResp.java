@@ -1,0 +1,68 @@
+package com.jingliang.mall.resp;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 区域表
+ * 
+ * @author Zhenfeng Li
+ * @version 1.0.0
+ * @date 2019-09-25 19:09:47
+ */
+@ApiModel(value = "Region", description = "区域")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@Data
+public class RegionResp implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 主键Id
+	 */
+	@ApiModelProperty(value = "主键Id")
+	@JsonSerialize(using = ToStringSerializer.class)
+	private Long id;
+
+	/**
+	 * 名称
+	 */
+	@ApiModelProperty(value = "名称")
+	private String name;
+
+	/**
+	 * 父级编码
+	 */
+	@ApiModelProperty(value = "父级编码")
+	private String parentCode;
+
+	/**
+	 * 编码
+	 */
+	@ApiModelProperty(value = "编码")
+	private String code;
+
+	/**
+	 * 是否可用
+	 */
+	@ApiModelProperty(value = "是否可用")
+	private Boolean isAvailable;
+
+	/**
+	 * 创建日期
+	 */
+	@ApiModelProperty(value = "创建日期")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date createTime;
+
+}

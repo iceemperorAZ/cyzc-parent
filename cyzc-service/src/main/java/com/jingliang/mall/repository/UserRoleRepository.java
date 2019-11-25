@@ -1,0 +1,23 @@
+package com.jingliang.mall.repository;
+
+import com.jingliang.mall.entity.UserRole;
+import com.jingliang.mall.repository.base.BaseRepository;
+
+import java.util.List;
+
+/**
+ * 用户角色表Repository
+ *
+ * @author Zhenfeng Li
+ * @version 1.0.0
+ * @date 2019-11-01 15:13:01
+ */
+public interface UserRoleRepository extends BaseRepository<UserRole, Long> {
+    /**
+     * 根据用户Id查询用户关联的角色
+     *
+     * @param userId 用户Id
+     * @return 返回关联角色的信息
+     */
+    List<UserRole> findAllByUserId(Long userId);
+}

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.jingliang</groupId>
+        <artifactId>cyzc-parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
+    <artifactId>cyzc-mobile</artifactId>
+    <version>1.0.0</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.jingliang</groupId>
+            <artifactId>cyzc-common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jingliang</groupId>
+            <artifactId>cyzc-service</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <!--对资源目录进行处理-->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <!--读取打包命令中指定的环境-->
+                    <include>application-${profiles.active}.properties</include>
+                    <include>application.properties</include>
+                    <include>logback-spring.xml</include>
+                    <include>dozerBeanMapping.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <!--不过滤模板文件-->
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>*/*.xlsx</include>
+                    <include>*/*.json</include>
+                    <include>banner.txt</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork> <!-- 如果没有该配置，devtools不会生效 -->
+                    <profiles>
+                        <!--解决 spring-boot:run控制开乱码  win10下目前暂时发现无效-->
+                        <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
+                        <!--
+                         开发环境使用mvn clean  spring-boot:run -Pdev
+                         测试环境使用mvn clean  spring-boot:run -Ptest
+                         生产环境使用mvn clean  spring-boot:run -Ppro
+                        -->
+                        <profile>${profiles.active}</profile>
+                    </profiles>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

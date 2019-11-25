@@ -1,0 +1,177 @@
+package com.jingliang.mall.req;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 部门表
+ * 
+ * @author Zhenfeng Li
+ * @version 1.0.0
+ * @date 2019-09-24 14:12:41
+ */
+@ApiModel(value = "DepartmentReq", description = "部门")
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class DepartmentReq extends BaseReq implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 主键
+	 */
+	@ApiModelProperty(value = "主键")
+	private Long id;
+
+	/**
+	 * 主键-开始
+	 */
+	@ApiModelProperty(value = "主键-开始")
+	private Long idStart;
+
+	/**
+	 * 主键-结束
+	 */
+	@ApiModelProperty(value = "主键-结束")
+	private Long idEnd;
+
+	/**
+	 * 组织机构Id预留字段  暂时设置为-1
+	 */
+	@ApiModelProperty(value = "组织机构Id预留字段  暂时设置为-1")
+	private Long orgId;
+
+	/**
+	 * 组织机构Id预留字段  暂时设置为-1-开始
+	 */
+	@ApiModelProperty(value = "组织机构Id预留字段  暂时设置为-1-开始")
+	private Long orgIdStart;
+
+	/**
+	 * 组织机构Id预留字段  暂时设置为-1-结束
+	 */
+	@ApiModelProperty(value = "组织机构Id预留字段  暂时设置为-1-结束")
+	private Long orgIdEnd;
+
+	/**
+	 * 部门编号
+	 */
+	@ApiModelProperty(value = "部门编号")
+	private String departmentNo;
+
+	/**
+	 * 部门名称
+	 */
+	@ApiModelProperty(value = "部门名称")
+	private String departmentName;
+
+	/**
+	 * 是否可用
+	 */
+	@ApiModelProperty(value = "是否可用")
+	private Boolean isAvailable;
+
+	/**
+	 * 创建人
+	 */
+	@ApiModelProperty(value = "创建人")
+	private String createUserName;
+
+	/**
+	 * 创建人Id
+	 */
+	@ApiModelProperty(value = "创建人Id")
+	private Long createUserId;
+
+	/**
+	 * 创建人Id-开始
+	 */
+	@ApiModelProperty(value = "创建人Id-开始")
+	private Long createUserIdStart;
+
+	/**
+	 * 创建人Id-结束
+	 */
+	@ApiModelProperty(value = "创建人Id-结束")
+	private Long createUserIdEnd;
+
+	/**
+	 * 创建时间
+	 */
+	@ApiModelProperty(value = "创建时间")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date createTime;
+
+	/**
+	 * 创建时间-开始
+	 */
+	@ApiModelProperty(value = "创建时间-开始")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date createTimeStart;
+
+	/**
+	 * 创建时间-结束
+	 */
+	@ApiModelProperty(value = "创建时间-结束")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date createTimeEnd;
+
+	/**
+	 * 修改人
+	 */
+	@ApiModelProperty(value = "修改人")
+	private String updateUserName;
+
+	/**
+	 * 修改人Id
+	 */
+	@ApiModelProperty(value = "修改人Id")
+	private Long updateUserId;
+
+	/**
+	 * 修改人Id-开始
+	 */
+	@ApiModelProperty(value = "修改人Id-开始")
+	private Long updateUserIdStart;
+
+	/**
+	 * 修改人Id-结束
+	 */
+	@ApiModelProperty(value = "修改人Id-结束")
+	private Long updateUserIdEnd;
+
+	/**
+	 * 修改时间
+	 */
+	@ApiModelProperty(value = "修改时间")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date updateTime;
+
+	/**
+	 * 修改时间-开始
+	 */
+	@ApiModelProperty(value = "修改时间-开始")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date updateTimeStart;
+
+	/**
+	 * 修改时间-结束
+	 */
+	@ApiModelProperty(value = "修改时间-结束")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	private Date updateTimeEnd;
+
+}

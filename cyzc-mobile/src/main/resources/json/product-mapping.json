@@ -1,0 +1,73 @@
+{
+    "tob_products": {
+      "properties": {
+        "id": {
+          "type": "long"
+        },
+        "productTypeId": {
+          "type": "long"
+        },
+        "productTypeName": {
+          "type": "text",
+          "analyzer": "ik_smart",
+          "search_analyzer": "ik_smart",
+          "fields": {
+            "simple_pinyin":{
+              "type":"text",
+              "analyzer": "ik_pinyin_simple_analyzer",
+              "search_analyzer": "ik_pinyin_simple_analyzer"
+            },
+            "full_pinyin":{
+              "type":"text",
+              "analyzer": "ik_pinyin_full_analyzer",
+              "search_analyzer": "ik_pinyin_full_analyzer"
+            }
+          }
+        },
+        "productName": {
+          "type": "text",
+          "analyzer": "ik_smart",
+          "search_analyzer": "ik_smart",
+          "fields": {
+            "simple_pinyin":{
+              "type":"text",
+              "analyzer": "ik_pinyin_simple_analyzer",
+              "search_analyzer": "ik_pinyin_simple_analyzer"
+            },
+            "full_pinyin":{
+              "type":"text",
+              "analyzer": "ik_pinyin_full_analyzer",
+              "search_analyzer": "ik_pinyin_full_analyzer"
+            }
+          }
+        },
+        "productNo": {
+          "type": "text"
+        },
+        "productImgUris": {
+          "type": "text"
+        },
+        "marketPrice": {
+          "type": "double"
+        },
+        "sellingPrice": {
+          "type": "double"
+        },
+        "isNew": {
+          "type": "boolean"
+        },
+        "isHot": {
+          "type": "boolean"
+        },
+        "isRecommend": {
+          "type": "boolean"
+        },
+        "productDescribe": {
+          "type": "text"
+        },
+        "attributes": {
+          "type": "text"
+        }
+      }
+    }
+}

@@ -1,0 +1,39 @@
+{
+  "index": {
+    "analysis": {
+      "analyzer": {
+        "ik_pinyin_simple_analyzer": {
+          "type": "custom",
+          "tokenizer": "ik_smart",
+          "filter": "pinyin_simple_filter"
+        },
+        "ik_pinyin_full_analyzer": {
+          "type": "custom",
+          "tokenizer": "ik_smart",
+          "filter": "pinyin_full_filter"
+        }
+      },
+      "filter": {
+        "pinyin_simple_filter": {
+          "type": "pinyin",
+          "keep_first_letter": false,
+          "keep_separate_first_letter" : true,
+          "keep_full_pinyin" : false,
+          "keep_original" : false,
+          "limit_first_letter_length" : 50,
+          "lowercase" : true
+        },
+        "pinyin_full_filter": {
+          "type" : "pinyin",
+          "keep_first_letter":false,
+          "keep_separate_first_letter" : false,
+          "keep_full_pinyin" : true,
+          "none_chinese_pinyin_tokenize":true,
+          "keep_original" : false,
+          "limit_first_letter_length" : 50,
+          "lowercase" : true
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+    "tob_keywords": {
+      "properties": {
+        "id": {
+          "type": "long"
+        },
+        "keyword": {
+          "type": "text",
+          "analyzer": "ik_smart",
+          "search_analyzer": "ik_smart",
+          "fields": {
+            "simple_pinyin":{
+              "type":"text",
+              "analyzer": "ik_pinyin_simple_analyzer",
+              "search_analyzer": "ik_pinyin_simple_analyzer"
+            },
+            "full_pinyin":{
+              "type":"text",
+              "analyzer": "ik_pinyin_full_analyzer",
+              "search_analyzer": "ik_pinyin_full_analyzer"
+            }
+          }
+        }
+      }
+    }
+}

@@ -1,0 +1,184 @@
+{
+  "properties": [
+    {
+      "name": "session.user.key",
+      "type": "java.lang.String",
+      "description": "Description for session.user.key."
+    },
+    {
+      "name": "token.timeout",
+      "type": "java.lang.String",
+      "description": "Description for token.timeout."
+    },
+    {
+      "name": "pk.id.redis.key.prefix",
+      "type": "java.lang.String",
+      "description": "Description for pk.id.redis.key.prefix."
+    },
+    {
+      "name": "product.no.redis.key.prefix",
+      "type": "java.lang.String",
+      "description": "Description for product.no.redis.key.prefix."
+    },
+    {
+      "name": "order.no.redis.key.prefix",
+      "type": "java.lang.String",
+      "description": "Description for order.no.redis.key.prefix."
+    },
+    {
+      "name": "prepay.id.redis.key.prefix",
+      "type": "java.lang.String",
+      "description": "Description for prepay.id.redis.key.prefix."
+    },
+    {
+      "name": "pay.overtime",
+      "type": "java.lang.Integer",
+      "description": "Description for pay.overtime."
+    },
+    {
+      "name": "sku.no.redis.key.prefix",
+      "type": "java.lang.String",
+      "description": "Description for sku.no.redis.key.prefix."
+    },
+    {
+      "name": "sku.batch_number.redis.key.prefix",
+      "type": "java.lang.String",
+      "description": "Description for sku.batch_number.redis.key.prefix."
+    },
+    {
+      "name": "product.sku.redis.key.prefix",
+      "type": "java.lang.String",
+      "description": "Description forproduct.sku.redis.key.prefix."
+    },
+    {
+      "name": "session.buyer.key",
+      "type": "java.lang.String",
+      "description": "Description for session.buyer.key."
+    },
+    {
+      "name": "free_shipping_quota",
+      "type": "java.lang.Double",
+      "description": "Description for free_shipping_quota."
+    },
+    {
+      "name": "deliver_fee",
+      "type": "java.lang.Double",
+      "description": "Description for deliver_Fee."
+    },
+    {
+      "name": "rabbitmq.sku.queue",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.sku.queue."
+    },
+    {
+      "name": "rabbitmq.order.queue",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.order.queue."
+    },
+    {
+      "name": "app.id",
+      "type": "java.lang.String",
+      "description": "Description for app.id."
+    },
+    {
+      "name": "app.secret",
+      "type": "java.lang.String",
+      "description": "Description for app.secret."
+    },
+    {
+      "name": "server.img.url",
+      "type": "java.lang.String",
+      "description": "Description for server.img.url."
+    },
+    {
+      "name": "app.login.url",
+      "type": "java.lang.String",
+      "description": "Description for app.login.url."
+    },
+    {
+      "name": "app.access_token.url",
+      "type": "java.lang.String",
+      "description": "Description for app.access_token.url."
+    },
+    {
+      "name": "app.pay.mch_id",
+      "type": "java.lang.String",
+      "description": "Description for app.pay.mch_id."
+    },
+    {
+      "name": "app.pay.url",
+      "type": "java.lang.String",
+      "description": "Description for app.pay.url."
+    },
+    {
+      "name": "app.pay.key",
+      "type": "java.lang.String",
+      "description": "Description for app.pay.key."
+    },
+    {
+      "name": "app.pay.query.url",
+      "type": "java.lang.String",
+      "description": "Description for app.pay.query.url."
+    },
+    {
+      "name": "rabbitmq.coupon.queue",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.coupon.queue."
+    },
+    {
+      "name": "rabbitmq.order.pay.dead.queue",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.order.pay.dead.queue."
+    },
+    {
+      "name": "rabbitmq.order.pay.dead.exchange",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.order.pay.dead.exchange."
+    },
+    {
+      "name": "rabbitmq.order.pay.dead.routing.key",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.order.pay.dead.routing.key."
+    },
+    {
+      "name": "rabbitmq.order.pay.dead.real.queue",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.order.pay.dead.real.queue."
+    },
+    {
+      "name": "rabbitmq.basic.exchange",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.basic.exchange."
+    },
+    {
+      "name": "rabbitmq.order.pay.dead.prod.routing.key",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.order.pay.dead.prod.routing.key."
+    },
+    {
+      "name": "coupon.redis.key.prefix",
+      "type": "java.lang.String",
+      "description": "Description for coupon.redis.key.prefix."
+    },
+    {
+      "name": "session.timeout",
+      "type": "java.lang.String",
+      "description": "Description for session.timeout."
+    },
+    {
+      "name": "rabbitmq.sku.routing.key",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.sku.routing.key."
+    },
+    {
+      "name": "rabbitmq.coupon.routing.key",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.coupon.routing.key."
+    },
+    {
+      "name": "default.redis.key",
+      "type": "java.lang.String",
+      "description": "Description for default.redis.key."
+    }
+  ]
+}
