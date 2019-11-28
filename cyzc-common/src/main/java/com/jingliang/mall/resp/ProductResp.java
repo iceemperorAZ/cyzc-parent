@@ -90,7 +90,7 @@ public class ProductResp implements Serializable {
      * 会员折扣率
      */
     @ApiModelProperty(value = "会员折扣率")
-    private Double discount;
+    private Integer discount;
 
     /**
      * 是否新品 0：否，1：是
@@ -232,5 +232,13 @@ public class ProductResp implements Serializable {
      */
     public void setProductImgUris(String productImgUris) {
         this.productImgUriList = StringUtils.isBlank(productImgUris) ? null : Arrays.asList(productImgUris.split(";"));
+    }
+
+    public Double getMarketPrice() {
+        return marketPrice / 100;
+    }
+
+    public Double getSellingPrice() {
+        return sellingPrice / 100;
     }
 }

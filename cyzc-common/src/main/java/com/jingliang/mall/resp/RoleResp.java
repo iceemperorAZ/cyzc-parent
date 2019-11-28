@@ -99,4 +99,9 @@ public class RoleResp implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date updateTime;
 
+	/**
+	 * 当前用户是否拥有此角色
+	 */
+	@ApiModelProperty(value = "当前用户是否拥有此角色")
+	private Boolean isHave = false;
 }

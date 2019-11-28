@@ -1,11 +1,14 @@
 package com.jingliang.mall.resp;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * 总汇详情
@@ -19,6 +22,13 @@ import java.io.Serializable;
 @Data
 public class ConfluenceDetailResp implements Serializable {
     private static final long serialVersionUID = 6957783700034131569L;
+
+    /**
+     * 主键Id
+     */
+    @ApiModelProperty(value = "主键Id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
 
     /**
      * 名称
@@ -37,4 +47,12 @@ public class ConfluenceDetailResp implements Serializable {
      */
     @ApiModelProperty(value = "提成")
     private Double royalty;
+
+    public Double getTotalPrice() {
+        return Objects.isNull(totalPrice) ? null : totalPrice / 100;
+    }
+
+    public Double getRoyalty() {
+        return Objects.isNull(royalty) ? null : royalty / 100;
+    }
 }

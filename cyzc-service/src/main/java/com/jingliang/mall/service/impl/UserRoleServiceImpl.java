@@ -27,6 +27,16 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public List<UserRole> findAllByUserId(Long userId) {
-        return userRoleRepository.findAllByUserId(userId);
+        return userRoleRepository.findAllByUserIdAndIsAvailable(userId, true);
+    }
+
+    @Override
+    public UserRole findAllByUserIdAndRoleId(Long userId, Long roleId) {
+        return userRoleRepository.findAllByUserIdAndRoleIdAndIsAvailable(userId, roleId, true);
+    }
+
+    @Override
+    public UserRole save(UserRole userRole) {
+        return userRoleRepository.save(userRole);
     }
 }

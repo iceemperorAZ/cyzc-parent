@@ -40,7 +40,7 @@ public class Coupon implements Serializable {
 	 * 金额
 	 */
 	@Column(name = "money")
-	private Double money;
+	private Long money;
 
 	/**
 	 * 优惠券剩余数量
@@ -58,7 +58,7 @@ public class Coupon implements Serializable {
 	 * 使用条件(最低使用价格)
 	 */
 	@Column(name = "use_condition")
-	private Double useCondition;
+	private Long useCondition;
 
 	/**
 	 * 优惠券类型  100:超级会员,200:普通用户，300:新建用户

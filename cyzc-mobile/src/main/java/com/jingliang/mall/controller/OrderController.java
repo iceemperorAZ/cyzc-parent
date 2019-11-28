@@ -2,11 +2,7 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
-import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.entity.BuyerCoupon;
-import com.jingliang.mall.entity.Order;
-import com.jingliang.mall.entity.Product;
-import com.jingliang.mall.req.OrderDetailReq;
+import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.resp.OrderResp;
 import com.jingliang.mall.server.RedisService;
@@ -73,71 +69,74 @@ public class OrderController {
     public MallResult<Map<String, String>> save(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
-        orderReq.setTotalPrice(0D);
-        orderReq.setPayableFee(0D);
-        orderReq.setDeliverFee(0D);
+        MallUtils.addDateAndBuyer(orderReq, buyer);
+        Order order = MallBeanMapper.map(orderReq, Order.class);
+        assert order != null;
+        order.setTotalPrice(0L);
+        order.setPayableFee(0L);
+        order.setDeliverFee(0L);
         int productNum = 0;
-        List<OrderDetailReq> orderDetailReqs = new ArrayList<>();
+        List<OrderDetail> orderDetails = new ArrayList<>();
+        Date date = new Date();
         //计算商品总价
-        for (OrderDetailReq orderDetailReq : orderReq.getOrderDetails()) {
-            orderDetailReq.setId(null);
+        for (OrderDetail orderDetail : order.getOrderDetails()) {
+            orderDetail.setId(null);
             //查询上架商品
-            Product product = productService.findShowProductById(orderDetailReq.getProductId());
+            Product product = productService.findShowProductById(orderDetail.getProductId());
             if (Objects.isNull(product)) {
-                for (OrderDetailReq detailReq : orderDetailReqs) {
+                for (OrderDetail detailReq : orderDetails) {
                     //如果本次有已经下架的商品就把减掉的库存加回去，并返回库存商品已下架
                     redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
                 }
                 return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_PRODUCT_FAIL);
             }
             //售价[商品价格*数量]
-            double sellingPrice = product.getSellingPrice() * orderDetailReq.getProductNum();
-            orderReq.setTotalPrice(MatchUtils.add(orderReq.getTotalPrice(), sellingPrice));
-            orderReq.setPayableFee(MatchUtils.add(orderReq.getPayableFee(), sellingPrice));
+            long sellingPrice = product.getSellingPrice() * orderDetail.getProductNum();
+            order.setTotalPrice(order.getTotalPrice() + sellingPrice);
+            order.setPayableFee(order.getPayableFee() + sellingPrice);
             //查询线上库存
-            Long skuNum = redisService.skuLineDecrement(String.valueOf(product.getId()), orderDetailReq.getProductNum());
-            orderDetailReq.setSellingPrice(product.getSellingPrice());
-            MallUtils.addDateAndBuyer(orderDetailReq, buyer);
-            orderDetailReqs.add(orderDetailReq);
+            Long skuNum = redisService.skuLineDecrement(String.valueOf(product.getId()), orderDetail.getProductNum());
+            orderDetail.setSellingPrice(product.getSellingPrice());
+            orderDetail.setCreateTime(date);
+            orderDetail.setIsAvailable(true);
+            orderDetails.add(orderDetail);
             if (skuNum < 0) {
-                for (OrderDetailReq detailReq : orderDetailReqs) {
+                for (OrderDetail detail : orderDetails) {
                     //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
-                    redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
+                    redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
                 }
                 return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_SKU_FAIL);
             }
-            productNum += orderDetailReq.getProductNum();
+            productNum += orderDetail.getProductNum();
         }
-        orderReq.setProductNum(productNum);
-        orderReq.setPreferentialFee(0D);
+        order.setProductNum(productNum);
+        order.setPreferentialFee(0L);
         //计算使用优惠券后的支付价
-        if (Objects.nonNull(orderReq.getCouponId())) {
-            BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(orderReq.getCouponId(), buyer.getId());
+        if (Objects.nonNull(order.getCouponId())) {
+            BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(order.getCouponId(), buyer.getId());
             if (Objects.isNull(buyerCoupon)) {
                 return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
             }
-            orderReq.setPayableFee(MatchUtils.sub(orderReq.getPayableFee(), buyerCoupon.getMoney()));
-            orderReq.setPreferentialFee(MatchUtils.add(orderReq.getPreferentialFee(), buyerCoupon.getMoney()));
+            order.setPayableFee(order.getPayableFee() - buyerCoupon.getMoney());
+            order.setPreferentialFee(order.getPreferentialFee() + buyerCoupon.getMoney());
             buyerCoupon.setIsUsed(true);
             //优惠券标记为已使用
             buyerCouponService.save(buyerCoupon);
         }
         //计算运费
-        if (orderReq.getPayableFee() > freeShippingQuota) {
-            orderReq.setDeliverFee(0D);
+        if (order.getPayableFee() > freeShippingQuota) {
+            order.setDeliverFee(0L);
         } else {
-            orderReq.setDeliverFee(deliverFee);
-            orderReq.setPayableFee(MatchUtils.add(orderReq.getPayableFee(), deliverFee));
+            order.setDeliverFee((long) (deliverFee * 100));
+            order.setPayableFee((long) (order.getPayableFee() + deliverFee * 100));
         }
         //生成订单号
-        orderReq.setOrderNo(redisService.getOrderNo());
-        orderReq.setOrderStatus(100);
-        orderReq.setPayStartTime(new Date());
+        order.setOrderNo(redisService.getOrderNo());
+        order.setOrderStatus(100);
+        order.setPayStartTime(date);
+        order.setUpdateTime(date);
         //微信支付
-        orderReq.setPayWay(100);
-        MallUtils.addDateAndBuyer(orderReq, buyer);
-        OrderResp orderResp;
-        Order order = MallBeanMapper.map(orderReq, Order.class);
+        order.setPayWay(100);
         //调起微信预支付
         Map<String, String> resultMap = wechatService.payUnifiedOrder(order, buyer.getUniqueId());
         order = orderService.save(order);
@@ -145,7 +144,7 @@ public class OrderController {
         //订单Id也返回
         resultMap.put("id", order.getId() + "");
         resultMap.put("orderNo", order.getOrderNo());
-        orderResp = MallBeanMapper.map(order, OrderResp.class);
+        OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("微信返回结果二次签名后的返回结果：{}", resultMap);
         log.debug("返回结果：{}", orderResp);
         return MallResult.buildSaveOk(resultMap);

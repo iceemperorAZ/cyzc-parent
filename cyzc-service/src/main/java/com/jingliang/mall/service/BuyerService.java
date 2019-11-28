@@ -64,5 +64,5 @@ public interface BuyerService {
      * @param pageRequest 分页条件
      * @return 返回查询到的商户列表
      */
-    Page<Buyer> findAllByPage(Long saleUserId, PageRequest pageRequest);
+    Page<Buyer> findAllBySaleUserId(Long saleUserId, PageRequest pageRequest);
 }

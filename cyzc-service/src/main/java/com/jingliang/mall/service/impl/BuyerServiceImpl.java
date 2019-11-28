@@ -54,7 +54,7 @@ public class BuyerServiceImpl implements BuyerService {
     }
 
     @Override
-    public Page<Buyer> findAllByPage(Long saleUserId, PageRequest pageRequest) {
+    public Page<Buyer> findAllBySaleUserId(Long saleUserId, PageRequest pageRequest) {
         return buyerRepository.findAllBySaleUserIdAndIsAvailable(saleUserId, true, pageRequest);
     }
 }

@@ -39,4 +39,11 @@ public interface MenuService {
      * @return 返回查询到的资源集合
      */
     Page<Menu> findAll(Specification<Menu> menuSpecification, PageRequest pageRequest);
+
+    /**
+     * 保存资源
+     * @param menu 资源
+     * @return 返回保存成功后的资源
+     */
+    Menu save(Menu menu);
 }

@@ -374,9 +374,56 @@ public class OrderReq extends BaseReq implements Serializable {
     private String deliveryPhone;
 
     /**
+     * 修改时间
+     */
+    @ApiModelProperty(value = "修改时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTime;
+
+    /**
      * 订单详情集合
      */
     @ApiModelProperty(value = "订单详情集合")
     private List<OrderDetailReq> orderDetails;
 
+    public void setTotalPrice(Double totalPrice) {
+        this.totalPrice = totalPrice * 100;
+    }
+
+    public void setTotalPriceStart(Double totalPriceStart) {
+        this.totalPriceStart = totalPriceStart * 100;
+    }
+
+    public void setTotalPriceEnd(Double totalPriceEnd) {
+        this.totalPriceEnd = totalPriceEnd * 100;
+    }
+
+    public void setPayableFee(Double payableFee) {
+        this.payableFee = payableFee * 100;
+    }
+
+    public void setPayableFeeStart(Double payableFeeStart) {
+        this.payableFeeStart = payableFeeStart * 100;
+    }
+
+    public void setPayableFeeEnd(Double payableFeeEnd) {
+        this.payableFeeEnd = payableFeeEnd * 100;
+    }
+
+    public void setPreferentialFee(Double preferentialFee) {
+        this.preferentialFee = preferentialFee * 100;
+    }
+
+    public void setDeliverFee(Double deliverFee) {
+        this.deliverFee = deliverFee * 100;
+    }
+
+    public void setDeliverFeeStart(Double deliverFeeStart) {
+        this.deliverFeeStart = deliverFeeStart * 100;
+    }
+
+    public void setDeliverFeeEnd(Double deliverFeeEnd) {
+        this.deliverFeeEnd = deliverFeeEnd * 100;
+    }
 }

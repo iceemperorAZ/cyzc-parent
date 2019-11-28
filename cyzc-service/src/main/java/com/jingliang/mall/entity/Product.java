@@ -70,19 +70,19 @@ public class Product implements Serializable {
      * 市场价
      */
     @Column(name = "market_price")
-    private Double marketPrice;
+    private Long marketPrice;
 
     /**
      * 销价
      */
     @Column(name = "selling_price")
-    private Double sellingPrice;
+    private Long sellingPrice;
 
     /**
      * 会员折扣率
      */
     @Column(name = "discount")
-    private Double discount;
+    private Integer discount;
 
     /**
      * 是否新品 0：否，1：是

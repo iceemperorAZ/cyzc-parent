@@ -179,6 +179,11 @@
       "name": "default.redis.key",
       "type": "java.lang.String",
       "description": "Description for default.redis.key."
+    },
+    {
+      "name": "server.domain",
+      "type": "java.lang.String",
+      "description": "Description for server.domain."
     }
   ]
 }

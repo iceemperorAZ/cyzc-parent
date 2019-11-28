@@ -1,27 +1,30 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.entity.Menu;
-import com.jingliang.mall.entity.RoleMenu;
-import com.jingliang.mall.req.MenuReq;
-import com.jingliang.mall.service.MenuService;
-import com.jingliang.mall.service.RoleMenuService;
-import com.jingliang.mall.resp.MenuResp;
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.MallBeanMapper;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.entity.Menu;
+import com.jingliang.mall.entity.RoleMenu;
+import com.jingliang.mall.entity.User;
+import com.jingliang.mall.req.MenuReq;
+import com.jingliang.mall.resp.MenuResp;
+import com.jingliang.mall.service.MenuService;
+import com.jingliang.mall.service.RoleMenuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -39,7 +42,11 @@ import java.util.stream.Collectors;
 @Api(tags = "资源表")
 @Slf4j
 public class MenuController {
-
+    /**
+     * session用户Key
+     */
+    @Value("${session.user.key}")
+    private String sessionUser;
     private final MenuService menuService;
     private final RoleMenuService roleMenuService;
 
@@ -47,6 +54,21 @@ public class MenuController {
         this.menuService = menuService;
         this.roleMenuService = roleMenuService;
     }
+
+    @PostMapping("/save")
+    @ApiOperation(value = "保存/更新资源")
+    public MallResult<MenuResp> save(@RequestBody MenuReq menuReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", menuReq);
+        if (StringUtils.isBlank(menuReq.getMenuName()) || StringUtils.isBlank(menuReq.getUrl())) {
+            return MallResult.buildParamFail();
+        }
+        User user = (User) session.getAttribute(sessionUser);
+        MallUtils.addDateAndUser(menuReq, user);
+        MenuResp menuResp = MallBeanMapper.map(menuService.save(MallBeanMapper.map(menuReq, Menu.class)), MenuResp.class);
+        log.debug("返回参数：{}", menuResp);
+        return MallResult.buildSaveOk(menuResp);
+    }
+
 
     /**
      * 分页查询全部资源
@@ -73,12 +95,11 @@ public class MenuController {
         if (Objects.nonNull(roleId)) {
             List<RoleMenu> roleMenus = roleMenuService.findAllByRoleId(roleId);
             List<Long> menuIds = roleMenus.stream().map(RoleMenu::getMenuId).collect(Collectors.toList());
-            menuRespMallPage.setContent(menuRespMallPage.getContent().stream().filter(menuResp -> {
+            menuRespMallPage.getContent().forEach(menuResp -> {
                 if (menuIds.contains(menuResp.getId())) {
                     menuResp.setIsHave(true);
                 }
-                return true;
-            }).collect(Collectors.toList()));
+            });
         }
         log.debug("返回结果：{}", menuRespMallPage);
         return MallResult.buildQueryOk(menuRespMallPage);

@@ -78,7 +78,7 @@ public class SkuDetail implements Serializable {
      * 进价
      */
     @Column(name = "purchase_price")
-    private Double purchasePrice;
+    private Long purchasePrice;
 
     /**
      * 生产时间

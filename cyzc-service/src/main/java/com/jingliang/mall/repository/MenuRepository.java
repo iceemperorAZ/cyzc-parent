@@ -17,7 +17,7 @@ import java.util.List;
 public interface MenuRepository extends BaseRepository<Menu, Long> {
 
     @Modifying
-    @Query("select r.roleName from Menu as m join RoleMenu as rm on m.id=rm.menuId join Role as r on r.id=rm.roleId where m.url=:url")
+    @Query("select r.roleName from Menu as m join RoleMenu as rm on m.id=rm.menuId and rm.isAvailable = true join Role as r on r.id=rm.roleId and r.isAvailable = true where m.url=:url and m.isAvailable=true")
     List<String> findAllRoleNameByUrl(String url);
 
 }

@@ -28,6 +28,8 @@ import java.util.TreeMap;
 @Service
 @Slf4j
 public class WechatServiceImpl implements WechatService {
+    @Value("${server.domain}")
+    private String serverDomain;
     @Value("${app.login.url}")
     private String appLoginUrl;
     @Value("${app.access_token.url}")
@@ -74,14 +76,14 @@ public class WechatServiceImpl implements WechatService {
         map.put("sign_type", "MD5");
         map.put("fee_type", "CNY");
         //价格元转为分
-        map.put("total_fee", ((int) (order.getPayableFee() * 100)) + "");
+        map.put("total_fee", order.getPayableFee() + "");
         map.put("spbill_create_ip", BaseMallUtils.getLocalIp());
         long currentTimeMillis = System.currentTimeMillis();
         long currentTime = currentTimeMillis + payOvertime * 1000;
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         map.put("time_start", dateFormat.format(new Date(currentTimeMillis)));
         map.put("time_expire", dateFormat.format(new Date(currentTime)));
-        map.put("notify_url", "https://shanghaijingliang.com/cy/mobile/front/pay/wechat/notify");
+        map.put("notify_url", serverDomain + "/cy/mobile/front/pay/wechat/notify");
         map.put("trade_type", "JSAPI");
         map.put("openid", openId);
         map.put("receipt", "Y");
@@ -96,6 +98,8 @@ public class WechatServiceImpl implements WechatService {
         Map<String, String> resultMap = BaseMallUtils.xmlToMap(xml);
         log.debug("{}", resultMap);
         if (Objects.isNull(resultMap) || Objects.isNull(resultMap.get("prepay_id"))) {
+            log.error("微信生成订单失败：{}",xml);
+            log.error("微信生成订单失败map：{}",resultMap);
             return null;
         }
         String prepayId = resultMap.get("prepay_id");

@@ -29,4 +29,14 @@ public class RoleMenuServiceImpl implements RoleMenuService {
     public List<RoleMenu> findAllByRoleId(Long roleId) {
         return roleMenuRepository.findAllByRoleIdAndIsAvailable(roleId, true);
     }
+
+    @Override
+    public RoleMenu findAllByRoleIdAndMenuId(Long roleId, Long menuId) {
+        return roleMenuRepository.findAllByRoleIdAndMenuIdAndIsAvailable(roleId, menuId,true);
+    }
+
+    @Override
+    public RoleMenu save(RoleMenu roleMenu) {
+        return roleMenuRepository.save(roleMenu);
+    }
 }

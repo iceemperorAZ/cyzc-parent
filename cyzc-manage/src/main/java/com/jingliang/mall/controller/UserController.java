@@ -117,19 +117,25 @@ public class UserController {
     @ApiOperation(value = "新增用户")
     public MallResult<UserResp> save(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
-        if (Objects.nonNull(userReq.getBuyerId()) && Objects.isNull(buyerService.findById(userReq.getBuyerId()))) {
+        Buyer buyer = buyerService.findById(userReq.getBuyerId());
+        if (Objects.nonNull(userReq.getBuyerId()) && Objects.isNull(buyer)) {
             return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+        }
+        User user = (User) session.getAttribute(sessionUser);
+        User user1 = userService.findByBuyerId(userReq.getBuyerId());
+        if(Objects.nonNull(user1)&&!Objects.equals(user.getId(),user.getId())){
+            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_REPEAT_FAIL);
         }
         if (StringUtils.isNotBlank(userReq.getPhone()) && !MallUtils.phoneCheck(userReq.getPhone())) {
             //手机号格式不正确
             return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_PHONE_FAIL);
         }
-        User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(userReq, user);
         //未设置提成则默认提成为0
         if (Objects.isNull(userReq.getRatio())) {
             userReq.setRatio(0);
         }
+        //加密密码
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         userReq.setPassword(passwordEncoder.encode(userReq.getLoginName()));
         UserResp userResp = MallBeanMapper.map(userService.save(MallBeanMapper.map(userReq, User.class)), UserResp.class);

@@ -93,4 +93,7 @@ public class OrderDetailResp implements Serializable {
         return sellingPrice * productNum;
     }
 
+    public Double getSellingPrice() {
+        return sellingPrice / 100;
+    }
 }

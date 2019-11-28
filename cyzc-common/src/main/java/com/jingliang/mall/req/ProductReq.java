@@ -367,4 +367,28 @@ public class ProductReq extends BaseReq implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date showTime;
+
+    public void setMarketPrice(Double marketPrice) {
+        this.marketPrice = marketPrice * 100;
+    }
+
+    public void setPurchasePriceStart(Double purchasePriceStart) {
+        this.purchasePriceStart = purchasePriceStart * 100;
+    }
+
+    public void setPurchasePriceEnd(Double purchasePriceEnd) {
+        this.purchasePriceEnd = purchasePriceEnd * 100;
+    }
+
+    public void setSellingPrice(Double sellingPrice) {
+        this.sellingPrice = sellingPrice * 100;
+    }
+
+    public void setSellingPriceStart(Double sellingPriceStart) {
+        this.sellingPriceStart = sellingPriceStart * 100;
+    }
+
+    public void setSellingPriceEnd(Double sellingPriceEnd) {
+        this.sellingPriceEnd = sellingPriceEnd * 100;
+    }
 }

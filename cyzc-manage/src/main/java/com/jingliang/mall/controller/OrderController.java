@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,6 +57,7 @@ public class OrderController {
         order.setDeliveryName(orderReq.getDeliveryName());
         order.setOrderStatus(400);
         order.setDeliveryPhone(orderReq.getDeliveryPhone());
+        order.setUpdateTime(new Date());
         order = orderService.update(order);
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
@@ -72,11 +74,14 @@ public class OrderController {
         if (Objects.isNull(orderReq.getId())) {
             return MallResult.buildParamFail();
         }
+        Date date = new Date();
         Order order = new Order();
         order.setId(orderReq.getId());
         order.setDeliveryName(orderReq.getDeliveryName());
         order.setOrderStatus(700);
         order.setDeliveryPhone(orderReq.getDeliveryPhone());
+        order.setFinishTime(date);
+        order.setUpdateTime(date);
         order = orderService.update(order);
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
@@ -93,11 +98,14 @@ public class OrderController {
         if (Objects.isNull(orderReq.getId())) {
             return MallResult.buildParamFail();
         }
+        Date date = new Date();
         Order order = new Order();
         order.setId(orderReq.getId());
         order.setDeliveryName(orderReq.getDeliveryName());
         order.setOrderStatus(800);
         order.setDeliveryPhone(orderReq.getDeliveryPhone());
+        order.setFinishTime(date);
+        order.setUpdateTime(date);
         order = orderService.update(order);
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);

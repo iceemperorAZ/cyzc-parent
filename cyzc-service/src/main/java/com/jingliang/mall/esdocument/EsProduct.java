@@ -60,13 +60,13 @@ public class EsProduct implements Serializable {
      * 市场价
      */
     @Field(type = FieldType.Double)
-    private Double marketPrice;
+    private Long marketPrice;
 
     /**
      * 销价
      */
     @Field(type = FieldType.Double)
-    private Double sellingPrice;
+    private Long sellingPrice;
 
     /**
      * 是否新品 0：否，1：是

@@ -30,7 +30,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menu> findAll() {
-        return menuRepository.findAll();
+        return menuRepository.findAllByIsAvailable(true);
     }
 
     @Override
@@ -41,5 +41,10 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public Page<Menu> findAll(Specification<Menu> menuSpecification, PageRequest pageRequest) {
         return menuRepository.findAll(menuSpecification, pageRequest);
+    }
+
+    @Override
+    public Menu save(Menu menu) {
+        return menuRepository.save(menu);
     }
 }

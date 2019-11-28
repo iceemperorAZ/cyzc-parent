@@ -20,12 +20,15 @@ public interface MallConstant {
     String TEXT_CONFIRM_OK = "订单完成";
     String TEXT_DELETE_OK = "删除成功";
     String TEXT_QUERY_OK = "查询成功";
+    String TEXT_AUTHORIZE_OK = "授权成功";
+    String TEXT_RECOVERY_AUTHORITY_OK = "权限回收成功";
     String TEXT_ORDER_OK = "下单成功";
     String TEXT_PAY_OK = "支付成功";
 
     Integer FAIL = 300;
     String TEXT_LOGOUT_FAIL = "注销失败";
     String TEXT_BUYER_FAIL = "绑定销售不存在";
+    String TEXT_BUYER_REPEAT_FAIL = "该微信号已被其他销售绑定";
     String TEXT_OLD_PASSWORD_FAIL = "原密码不正确";
     String TEXT_PHONE_FAIL = "手机号格式错误";
 

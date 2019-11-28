@@ -169,4 +169,11 @@ public class CouponResp implements Serializable {
         return 300;
     }
 
+    public Double getMoney() {
+        return money / 100;
+    }
+
+    public Double getUseCondition() {
+        return useCondition / 100;
+    }
 }

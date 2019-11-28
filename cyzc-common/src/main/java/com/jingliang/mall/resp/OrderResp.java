@@ -198,6 +198,14 @@ public class OrderResp implements Serializable {
     private String deliveryPhone;
 
     /**
+     * 修改时间
+     */
+    @ApiModelProperty(value = "修改时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTime;
+
+    /**
      * 订单详情列表
      */
     @ApiModelProperty(value = "订单详情列表")
@@ -225,5 +233,21 @@ public class OrderResp implements Serializable {
             default:
                 return "未知";
         }
+    }
+
+    public Double getTotalPrice() {
+        return totalPrice / 100;
+    }
+
+    public Double getPayableFee() {
+        return payableFee / 100;
+    }
+
+    public Double getPreferentialFee() {
+        return preferentialFee / 100;
+    }
+
+    public Double getDeliverFee() {
+        return deliverFee / 100;
     }
 }

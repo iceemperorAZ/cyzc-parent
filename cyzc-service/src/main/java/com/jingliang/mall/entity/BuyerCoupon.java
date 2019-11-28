@@ -46,13 +46,13 @@ public class BuyerCoupon implements Serializable {
 	 * 金额
 	 */
 	@Column(name = "money")
-	private Double money;
+	private Long money;
 
 	/**
 	 * 使用条件(最低使用价格)
 	 */
 	@Column(name = "use_condition")
-	private Double useCondition;
+	private Long useCondition;
 
 	/**
 	 * 开始时间

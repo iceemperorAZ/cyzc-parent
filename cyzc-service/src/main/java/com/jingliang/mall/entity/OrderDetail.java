@@ -52,7 +52,7 @@ public class OrderDetail implements Serializable {
 	 * 商品售价
 	 */
 	@Column(name = "selling_price")
-	private Double sellingPrice;
+	private Long sellingPrice;
 
 	/**
 	 * 商品数量

@@ -192,16 +192,16 @@ public class BuyerReq extends BaseReq implements Serializable {
 	 * 注册时间(创建时间)-开始
 	 */
 	@ApiModelProperty(value = "注册时间(创建时间)-开始")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 	private Date createTimeStart;
 
 	/**
 	 * 注册时间(创建时间)-结束
 	 */
 	@ApiModelProperty(value = "注册时间(创建时间)-结束")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 	private Date createTimeEnd;
 
 	/**

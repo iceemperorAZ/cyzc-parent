@@ -147,4 +147,7 @@ public class SkuDetailResp implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    public Double getPurchasePrice() {
+        return purchasePrice / 100;
+    }
 }
