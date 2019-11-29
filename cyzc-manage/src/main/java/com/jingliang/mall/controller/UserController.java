@@ -117,17 +117,21 @@ public class UserController {
     @ApiOperation(value = "新增用户")
     public MallResult<UserResp> save(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
-        User user = (User) session.getAttribute(sessionUser);
         if (Objects.nonNull(userReq.getBuyerId())) {
             Buyer buyer = buyerService.findById(userReq.getBuyerId());
             if (Objects.isNull(buyer)) {
                 return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
             }
-            User user1 = userService.findByBuyerId(userReq.getBuyerId());
-            if (Objects.nonNull(user1) && !Objects.equals(user.getId(), user1.getId())) {
+            //查询是否传过来的销售是否已经绑定员工
+            User user = userService.findByBuyerId(userReq.getBuyerId());
+            if (Objects.isNull(userReq.getId())) {
+                return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_REPEAT_FAIL);
+            }
+            if (Objects.nonNull(user) && !Objects.equals(user.getId(), userReq.getId())) {
                 return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_REPEAT_FAIL);
             }
         }
+        User user = (User) session.getAttribute(sessionUser);
         if (StringUtils.isNotBlank(userReq.getPhone()) && !MallUtils.phoneCheck(userReq.getPhone())) {
             //手机号格式不正确
             return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_PHONE_FAIL);

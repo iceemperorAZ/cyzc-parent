@@ -139,6 +139,9 @@ public class OrderController {
         order.setPayWay(100);
         //调起微信预支付
         Map<String, String> resultMap = wechatService.payUnifiedOrder(order, buyer.getUniqueId());
+        if(Objects.isNull(resultMap)){
+            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
+        }
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
         //订单Id也返回

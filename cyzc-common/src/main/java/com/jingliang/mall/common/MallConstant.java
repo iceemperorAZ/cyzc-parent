@@ -50,6 +50,7 @@ public interface MallConstant {
 
 
     Integer ORDER_FAIL = 350;
+    String TEXT_ORDER_FAIL = "下单失败";
     String TEXT_ORDER_NOT_EXIST_FAIL = "修改失败,当前订单不存在";
     String TEXT_ORDER_PRODUCT_FAIL = "下单失败,商品已下架";
     String TEXT_ORDER_SKU_FAIL = "下单失败,库存不足";
