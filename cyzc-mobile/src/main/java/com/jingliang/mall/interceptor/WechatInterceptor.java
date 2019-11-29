@@ -71,7 +71,7 @@ public class WechatInterceptor implements HandlerInterceptor {
             return false;
         }
         User user = redisService.get(map.get("userId") + "Front", User.class);
-        if (Objects.isNull(user) || user.getLevel() < 100) {
+        if (Objects.isNull(user) || Objects.isNull(user.getLevel()) || user.getLevel() < 100) {
             //重置response
             response.reset();
             //设置编码格式
