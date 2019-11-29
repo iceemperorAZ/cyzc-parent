@@ -1,12 +1,11 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.entity.User;
-import com.jingliang.mall.service.ProductTypeService;
-import com.jingliang.mall.common.*;
 import com.jingliang.mall.req.ProductTypeReq;
 import com.jingliang.mall.resp.ProductTypeResp;
+import com.jingliang.mall.service.ProductTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +22,7 @@ import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 商品分类表Controller
@@ -56,7 +56,7 @@ public class ProductTypeController {
     public MallResult<ProductTypeResp> saveProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productTypeReq);
         if (StringUtils.isBlank(productTypeReq.getProductTypeName())) {
-            log.debug("返回结果：{}",  MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
             return MallResult.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
@@ -65,7 +65,31 @@ public class ProductTypeController {
         productType = productTypeService.save(productType);
         ProductTypeResp productTypeResp = MallBeanMapper.map(productType, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeResp);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_SAVE_OK, productTypeResp);
+        return MallResult.buildSaveOk(productTypeResp);
+    }
+
+    /**
+     * 删除商品分类
+     */
+    @ApiOperation(value = "删除商品分类")
+    @PostMapping("/delete")
+    public MallResult<ProductTypeResp> deleteProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", productTypeReq);
+        if (Objects.isNull(productTypeReq.getId())) {
+            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            return MallResult.buildParamFail();
+        }
+        Long id = productTypeReq.getId();
+        productTypeReq = new ProductTypeReq();
+        productTypeReq.setId(id);
+        User user = (User) session.getAttribute(sessionUser);
+        MallUtils.addDateAndUser(productTypeReq, user);
+        productTypeReq.setIsAvailable(false);
+        ProductType productType = MallBeanMapper.map(productTypeReq, ProductType.class);
+        productType = productTypeService.save(productType);
+        ProductTypeResp productTypeResp = MallBeanMapper.map(productType, ProductTypeResp.class);
+        log.debug("返回结果：{}", productTypeResp);
+        return MallResult.buildDeleteOk(productTypeResp);
     }
 
     /**

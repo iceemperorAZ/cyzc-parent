@@ -84,9 +84,9 @@ public class PayController {
         String payNo = map.get("transaction_id");
         String timeEnd = map.get("time_end");
         Order order = orderService.findByOrderNo(orderNo);
-        int totalFee = Integer.parseInt(map.get("total_fee"));
+        Long totalFee = Long.parseLong(map.get("total_fee"));
         //判断支付金额和订单金额(单位：分)是否一致
-        if (!Objects.equals((long)order.getPayableFee(), totalFee)) {
+        if (!Objects.equals(order.getPayableFee(), totalFee)) {
             log.error("编号为：[{}]的订单应付金额[{}]和微信支付的金额[{}]不一致", orderNo, order.getPayableFee(), totalFee);
             //返回给微信失败的消息
             log.error("支付通知金额验证失败，返回结果：<xml><return_code><![CDATA[金额验证失败]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");

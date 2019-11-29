@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 用户优惠券
@@ -109,6 +110,10 @@ public class BuyerCouponResp implements Serializable {
     private Date createTime;
 
     public Double getMoney() {
-        return money / 100;
+        return Objects.isNull(money) ? null : money / 100;
+    }
+
+    public Double getUseCondition() {
+        return Objects.isNull(useCondition) ? null : useCondition / 100;
     }
 }

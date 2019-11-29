@@ -117,14 +117,16 @@ public class UserController {
     @ApiOperation(value = "新增用户")
     public MallResult<UserResp> save(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
-        Buyer buyer = buyerService.findById(userReq.getBuyerId());
-        if (Objects.nonNull(userReq.getBuyerId()) && Objects.isNull(buyer)) {
-            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
-        }
         User user = (User) session.getAttribute(sessionUser);
-        User user1 = userService.findByBuyerId(userReq.getBuyerId());
-        if(Objects.nonNull(user1)&&!Objects.equals(user.getId(),user.getId())){
-            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_REPEAT_FAIL);
+        if (Objects.nonNull(userReq.getBuyerId())) {
+            Buyer buyer = buyerService.findById(userReq.getBuyerId());
+            if (Objects.isNull(buyer)) {
+                return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+            }
+            User user1 = userService.findByBuyerId(userReq.getBuyerId());
+            if (Objects.nonNull(user1) && !Objects.equals(user.getId(), user1.getId())) {
+                return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_REPEAT_FAIL);
+            }
         }
         if (StringUtils.isNotBlank(userReq.getPhone()) && !MallUtils.phoneCheck(userReq.getPhone())) {
             //手机号格式不正确
