@@ -174,6 +174,7 @@ public class WechatManageController {
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
         userPage.getContent().forEach(user -> {
             ConfluenceDetail confluenceDetail = new ConfluenceDetail();
+            confluenceDetail.setId(user.getId());
             confluenceDetail.setName(user.getUserName());
             //查询绑定会员列表
             List<Buyer> buyers = buyerService.findAllBySaleUserId(user.getId());
