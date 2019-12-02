@@ -130,6 +130,9 @@ public class UserController {
             if (Objects.nonNull(user) && !Objects.equals(user.getId(), userReq.getId())) {
                 return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_REPEAT_FAIL);
             }
+            if (Objects.isNull(userReq.getLevel())) {
+                userReq.setLevel(100);
+            }
         }
         User user = (User) session.getAttribute(sessionUser);
         if (StringUtils.isNotBlank(userReq.getPhone()) && !MallUtils.phoneCheck(userReq.getPhone())) {

@@ -138,10 +138,16 @@ public class BuyerResp implements Serializable {
     private Long saleUserId;
 
     /**
-     * 销售员信息
+     * 商户绑定的销售员信息
      */
-    @ApiModelProperty(value = "销售员信息")
+    @ApiModelProperty(value = "商户绑定的销售员信息")
     private UserResp user;
+
+    /**
+     * 员工自己信息
+     */
+    @ApiModelProperty(value = "员工自己信息")
+    private UserResp sale;
 
     /**
      * 是否可用 0：否，1：是

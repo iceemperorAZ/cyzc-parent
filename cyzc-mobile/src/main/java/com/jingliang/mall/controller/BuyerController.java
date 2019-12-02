@@ -104,13 +104,12 @@ public class BuyerController {
         if (buyer.getIsSealUp()) {
             return MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_IS_SEAL_UP_FAIL);
         }
-
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("id", buyer.getId() + "");
         tokenMap.put("code", buyerReq.getCode());
+        BuyerResp buyerResp = MallBeanMapper.map(buyer, BuyerResp.class);
         User user = userService.findByBuyerId(buyer.getId());
         log.debug("WX登录信息{}", user);
-        BuyerResp buyerResp = MallBeanMapper.map(buyer, BuyerResp.class);
         assert buyerResp != null;
         if (Objects.nonNull(user)) {
             tokenMap.put("userId", user.getId() + "");
@@ -119,6 +118,7 @@ public class BuyerController {
             redisService.setExpire(user.getId() + "Front", user, tokenTimeOut);
             Integer level = user.getLevel();
             buyerResp.setLevel(level);
+            buyerResp.setUser(MallBeanMapper.map(user, UserResp.class));
         }
         //生成token
         String token = JwtUtil.genToken(tokenMap);

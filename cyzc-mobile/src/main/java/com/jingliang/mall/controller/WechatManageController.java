@@ -389,7 +389,7 @@ public class WechatManageController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(userReq.getCreateTimeEnd());
         calendar.add(Calendar.DAY_OF_MONTH, 1);
-        Page<Buyer> buyerPage = buyerService.findAllBySaleUserId(userReq.getId(), pageRequest);
+        Page<Buyer> buyerPage = buyerService.findAllBySaleUserId(user.getId(), pageRequest);
         MallPage<ConfluenceDetailResp> confluenceMallPage = new MallPage<>();
         confluenceMallPage.setContent(new ArrayList<>());
         confluenceMallPage.setFirst(buyerPage.isFirst());

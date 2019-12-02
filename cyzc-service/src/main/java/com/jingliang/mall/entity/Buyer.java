@@ -131,7 +131,7 @@ public class Buyer implements Serializable {
      */
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "sale_user_id", referencedColumnName = "id", insertable = false, updatable = false)
-    private User user;
+    private User sale;
 
     /**
      * 是否可用 0：否，1：是
