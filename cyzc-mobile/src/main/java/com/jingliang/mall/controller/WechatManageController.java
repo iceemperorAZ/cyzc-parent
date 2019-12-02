@@ -405,7 +405,11 @@ public class WechatManageController {
         for (Buyer buyer : buyerPage) {
             ConfluenceDetail confluenceDetail = new ConfluenceDetail();
             confluenceDetail.setId(buyer.getId());
-            confluenceDetail.setName(buyer.getUserName());
+            if (StringUtils.isNotBlank(buyer.getShopName())) {
+                confluenceDetail.setName(buyer.getShopName());
+            } else {
+                confluenceDetail.setName(buyer.getUserName());
+            }
             Long totalPrice = 0L;
             //查询会员在指定时间的所有已经完成支付的订单
             Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
@@ -495,7 +499,11 @@ public class WechatManageController {
         for (Buyer buyer : buyerPage) {
             ConfluenceDetail confluenceDetail = new ConfluenceDetail();
             confluenceDetail.setId(buyer.getId());
-            confluenceDetail.setName(buyer.getUserName());
+            if (StringUtils.isNotBlank(buyer.getShopName())) {
+                confluenceDetail.setName(buyer.getShopName());
+            } else {
+                confluenceDetail.setName(buyer.getUserName());
+            }
             Long totalPrice = 0L;
             //查询会员在指定时间的所有已经完成支付的订单
             Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
