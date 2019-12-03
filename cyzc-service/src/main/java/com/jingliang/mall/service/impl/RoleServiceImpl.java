@@ -30,4 +30,9 @@ public class RoleServiceImpl implements RoleService {
     public Page<Role> findAll(Specification<Role> roleSpecification, PageRequest pageRequest) {
         return roleRepository.findAll(roleSpecification,pageRequest);
     }
+
+    @Override
+    public Role save(Role role) {
+        return roleRepository.save(role);
+    }
 }

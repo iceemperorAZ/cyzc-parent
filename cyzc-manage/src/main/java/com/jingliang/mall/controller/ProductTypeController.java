@@ -109,7 +109,9 @@ public class ProductTypeController {
                 predicateList.add(cb.like(root.get("productTypeName"), "%" + productTypeReq.getProductTypeName() + "%"));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
-            return predicateList.isEmpty() ? null : cb.and(predicateList.toArray(new Predicate[0]));
+            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            query.orderBy(cb.asc(root.get("productTypeOrder")));
+            return query.getRestriction();
         };
         Page<ProductType> productTypeByPage = productTypeService.findAll(productTypeSpecification, pageRequest);
         MallPage<ProductTypeResp> productTypeRespPage = MallUtils.toMallPage(productTypeByPage, ProductTypeResp.class);

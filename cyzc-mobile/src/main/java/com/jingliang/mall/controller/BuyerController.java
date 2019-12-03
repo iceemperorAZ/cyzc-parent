@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.User;
@@ -13,13 +14,11 @@ import com.jingliang.mall.service.UserService;
 import com.jingliang.mall.wx.service.WechatService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
@@ -141,7 +140,30 @@ public class BuyerController {
         //暂未涉及
         return MallResult.buildOk(true);
     }
-
+    /**
+     * 解析微信手机号
+     */
+    @ApiOperation(value = "解析微信手机号")
+    @GetMapping("/analysis/phone")
+    public MallResult<String> analysisPhone(@RequestParam @ApiParam("手机号加密算法的初始向量") String iv,
+                                            @RequestParam @ApiParam("手机号包括敏感数据在内的完整用户信息的加密数据") String encryptedData,
+                                            @ApiIgnore HttpSession session) {
+        log.debug("请求参数：iv={},encryptedData={}", iv, encryptedData);
+        if (StringUtils.isBlank(iv) || StringUtils.isBlank(encryptedData)) {
+            return MallResult.buildParamFail();
+        }
+        Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
+        String sessionKey = buyer.getSessionKey();
+        //解密用户手机号
+        String decrypt = MallUtils.decrypt(sessionKey, iv, encryptedData);
+        if (StringUtils.isNotBlank(decrypt) && StringUtils.isNotBlank(JSONObject.parseObject(decrypt).getString("purePhoneNumber"))) {
+            String purePhoneNumber = JSONObject.parseObject(decrypt).getString("purePhoneNumber");
+            log.debug("返回解析后的手机号：{}", purePhoneNumber);
+            return MallResult.build(MallConstant.OK, MallConstant.TEXT_OK, purePhoneNumber);
+        }
+        log.debug("解析微信手机号失败");
+        return MallResult.build(MallConstant.WECHAT_FAIL, MallConstant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
+    }
     /**
      * 修改会员信息
      */
@@ -188,7 +210,6 @@ public class BuyerController {
         if (Objects.isNull(user)) {
             return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
         }
-
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         buyer = buyerService.findById(buyer.getId());
         if (Objects.isNull(buyer)) {
@@ -197,7 +218,7 @@ public class BuyerController {
         buyerReq.setId(buyer.getId());
         BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         assert buyerResp != null;
-        buyerResp.setUser(MallBeanMapper.map(user, UserResp.class));
+        buyerResp.setSale(MallBeanMapper.map(user, UserResp.class));
         log.debug("返回结果：{}", buyerResp);
         return MallResult.buildSaveOk(buyerResp);
     }

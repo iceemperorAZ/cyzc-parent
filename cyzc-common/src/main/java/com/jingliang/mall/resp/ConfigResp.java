@@ -1,28 +1,27 @@
 package com.jingliang.mall.resp;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.io.Serializable;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Date;
+import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModel;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 
 /**
- * 商品分类表
+ * 配置文件
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2019-09-24 15:07:32
+ * @date 2019-12-03 15:59:18
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@ApiModel(value = "ProductTypeResp", description = "商品分类")
-public class ProductTypeResp implements Serializable {
+@ApiModel(value = "ConfigResp", description = "配置文件")
+public class ConfigResp implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -34,28 +33,28 @@ public class ProductTypeResp implements Serializable {
 	private Long id;
 
 	/**
-	 * 序号
+	 * 编码
 	 */
-	@ApiModelProperty(value = "序号")
-	private Integer productTypeOrder;
+	@ApiModelProperty(value = "编码")
+	private String code;
 
 	/**
-	 * 分类名称
+	 * 名称
 	 */
-	@ApiModelProperty(value = "分类名称")
-	private String productTypeName;
+	@ApiModelProperty(value = "名称")
+	private String name;
 
 	/**
-	 * 是否可用 0：否，1：是
+	 * 值(多个之间用,分割)
 	 */
-	@ApiModelProperty(value = "是否可用 0：否，1：是")
-	private Boolean isAvailable;
+	@ApiModelProperty(value = "值(多个之间用,分割)")
+	private String configValues;
 
 	/**
-	 * 创建人
+	 * 描述
 	 */
-	@ApiModelProperty(value = "创建人")
-	private String createUserName;
+	@ApiModelProperty(value = "描述")
+	private String remark;
 
 	/**
 	 * 创建人Id
@@ -73,24 +72,24 @@ public class ProductTypeResp implements Serializable {
 	private Date createTime;
 
 	/**
-	 * 修改人
+	 * 更新人Id
 	 */
-	@ApiModelProperty(value = "修改人")
-	private String updateUserName;
-
-	/**
-	 * 修改人Id
-	 */
-	@ApiModelProperty(value = "修改人Id")
+	@ApiModelProperty(value = "更新人Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long updateUserId;
 
 	/**
-	 * 修改时间
+	 * 更新时间
 	 */
-	@ApiModelProperty(value = "修改时间")
+	@ApiModelProperty(value = "更新时间")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date updateTime;
+
+	/**
+	 * 是否可用
+	 */
+	@ApiModelProperty(value = "是否可用")
+	private Boolean isAvailable;
 
 }

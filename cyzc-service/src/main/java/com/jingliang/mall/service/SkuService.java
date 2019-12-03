@@ -36,5 +36,12 @@ public interface SkuService {
      *
      * @param sku 库存对象
      */
-    void updateSkuByProductId(Sku sku);
+    void updateLineSkuByProductId(Sku sku);
+
+    /**
+     * 根据库存Id减少实际库存
+     *
+     * @param sku 库存对象
+     */
+    public void updateRealitySkuByProductId(Sku sku);
 }

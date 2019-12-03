@@ -22,4 +22,12 @@ public interface RoleService {
      * @return 返回查询到的角色集合
      */
     Page<Role> findAll(Specification<Role> roleSpecification, PageRequest pageRequest);
+
+    /**
+     * 保存角色
+     *
+     * @param role 角色
+     * @return 返回保存后的角色
+     */
+    Role save(Role role);
 }

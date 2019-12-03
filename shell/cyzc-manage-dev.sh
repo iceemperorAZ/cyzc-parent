@@ -6,7 +6,7 @@ APP_PORT=8801
 # shellcheck disable=SC2209
 APP_ENV=dev
 # jar包名称
-API_NAME=cyzc-manage-1\.0\.0
+API_NAME=cyzc-manage-dev-1\.0\.0
 # java虚拟机,参数,多个请用"\ "隔开
 JVM_PARAM=-Xms1g\ -Xmx2g
 
@@ -23,7 +23,7 @@ usage() {
 #检查程序是否在运行
 is_exist(){
   pid=`ps -ef|grep $JAR_NAME|grep -v grep|awk '{print $2}' `
-  #如果不存在返回1，存在返回0     
+  #如果不存在返回1，存在返回0
   if [ -z "${pid}" ]; then
    return 1
   else

@@ -6,7 +6,7 @@ APP_PORT=8801
 # shellcheck disable=SC2209
 APP_ENV=test
 # jar包名称
-API_NAME=cyzc-manage-1\.0\.0
+API_NAME=cyzc-manage-test-1\.0\.0
 # java虚拟机,参数,多个请用"\ "隔开
 JVM_PARAM=-Xms1g\ -Xmx2g
 

@@ -68,6 +68,20 @@ public class MenuController {
         log.debug("返回参数：{}", menuResp);
         return MallResult.buildSaveOk(menuResp);
     }
+    @PostMapping("/delete")
+    @ApiOperation(value = "删除资源")
+    public MallResult<MenuResp> delete(@RequestBody MenuReq menuReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", menuReq);
+        if (Objects.isNull(menuReq.getId())) {
+            return MallResult.buildParamFail();
+        }
+        User user = (User) session.getAttribute(sessionUser);
+        MallUtils.addDateAndUser(menuReq, user);
+        menuReq.setIsAvailable(false);
+        MenuResp menuResp = MallBeanMapper.map(menuService.save(MallBeanMapper.map(menuReq, Menu.class)), MenuResp.class);
+        log.debug("返回参数：{}", menuResp);
+        return MallResult.buildDeleteOk(menuResp);
+    }
 
 
     /**
@@ -87,7 +101,9 @@ public class MenuController {
                 predicateList.add(cb.like(root.get("menuName"), "%" + menuReq.getMenuName() + "%"));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
-            return predicateList.isEmpty() ? null : cb.and(predicateList.toArray(new Predicate[0]));
+            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            query.orderBy(cb.desc(root.get("updateTime")));
+            return query.getRestriction();
         };
         Page<Menu> menuPage = menuService.findAll(menuSpecification, pageRequest);
         MallPage<MenuResp> menuRespMallPage = MallUtils.toMallPage(menuPage, MenuResp.class);

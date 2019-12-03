@@ -33,6 +33,8 @@ public class RedisServiceImpl implements RedisService {
     String couponPrefix;
     @Value("${order.no.redis.key.prefix}")
     String orderNoPrefix;
+    @Value("${order.no.redis.value.prefix:}")
+    String orderNoValuePrefix;
     @Value("${prepay.id.redis.key.prefix}")
     String prepayIdPrefix;
     @Value("${pay.overtime}")
@@ -90,7 +92,7 @@ public class RedisServiceImpl implements RedisService {
         if (StringUtils.isBlank(key)) {
             return null;
         }
-        Object value = redisTemplate.opsForValue().get(defaultPrefix +key);
+        Object value = redisTemplate.opsForValue().get(defaultPrefix + key);
         return Objects.isNull(value) ? null : aClass.cast(value);
     }
 
@@ -101,7 +103,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public String getOrderNo() {
-        return getNo(orderNoPrefix);
+        return orderNoValuePrefix + getNo(orderNoPrefix);
     }
 
     @Override

@@ -37,6 +37,8 @@
         </dependency>
     </dependencies>
     <build>
+        <!--自定义包名-->
+        <finalName>${project.artifactId}-${profiles.active}-${project.version}</finalName>
         <resources>
             <!--对资源目录进行处理-->
             <resource>

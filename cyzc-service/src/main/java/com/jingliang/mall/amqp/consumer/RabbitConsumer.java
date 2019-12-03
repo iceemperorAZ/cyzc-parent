@@ -48,7 +48,7 @@ public class RabbitConsumer {
     public void skuProcess(@Payload Sku sku) {
         //sku.getSkuLineNum()加为正数，减为负数
         log.debug("接收到库存消息，进行更新操作{}", sku);
-        skuService.updateSkuByProductId(sku);
+        skuService.updateLineSkuByProductId(sku);
     }
 
     /**

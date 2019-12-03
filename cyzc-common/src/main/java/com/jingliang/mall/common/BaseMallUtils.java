@@ -182,12 +182,13 @@ public abstract class BaseMallUtils {
      * @return 返回解密后的json数据
      */
     public static String decrypt(String sessionKey, String iv, String encryptedData) {
+        log.debug("sessionKey={}\r\niv={}\r\nencryptedData={}",sessionKey,iv,encryptedData);
         // 被加密的数据
-        byte[] dataByte = Base64.getDecoder().decode(encryptedData);
+        byte[] dataByte = Base64.getDecoder().decode(encryptedData.replaceAll(" +","+"));
         // 加密秘钥
         byte[] keyByte = Base64.getDecoder().decode(sessionKey);
         // 偏移量
-        byte[] ivByte = Base64.getDecoder().decode(iv);
+        byte[] ivByte = Base64.getDecoder().decode(iv.replaceAll(" +","+"));
         try {
             // 如果密钥不足16位，那么就补足.  这个if 中的内容很重要
             int base = 16;
@@ -214,6 +215,11 @@ public abstract class BaseMallUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static void main(String[] args) {
+        String decrypt = BaseMallUtils.decrypt("TFfi46ZWCGmtCyWGcGpKyA==", "TQ4r21TNaLutkh q73gtQw==", "HTaAHIIi2gAyksK2A49ikXw9JihVdF1 7ZxNCEyHy5RXtL083JjXRV6L3O8ABlmzsMovU USslx8bd/w9occz8DGhH8MSwkOkwN8hgLAN1CcBj2m3Q8n2rsDF8K88yBLnTHmRnf/Nr17oYU8xQyPW43w6zaLW948QxLf5NEu2JNh6I5/KIEdFWmSkUYlSeSU3qMbZRR0ZFLW2d1E5vBH4g==");
+        System.out.println(decrypt);
     }
 
     /**

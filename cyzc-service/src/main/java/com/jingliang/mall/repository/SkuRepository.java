@@ -52,5 +52,14 @@ public interface SkuRepository extends BaseRepository<Sku, Long> {
     @Modifying
     @Query("update Sku as s set s.skuLineNum = (s.skuLineNum + :#{#sku.skuLineNum}), s.updateTime = :#{#sku.updateTime}" +
             ", s.updateUserId = :#{#sku.updateUserId}, s.updateUserName = :#{#sku.updateUserName} where s.productId = :#{#sku.productId}")
-    public void updateSkuByProductId(Sku sku);
+    public void updateLineSkuByProductId(Sku sku);
+    /**
+     * 根据商品Id更新实际库存
+     *
+     * @param sku 库存对象
+     */
+    @Modifying
+    @Query("update Sku as s set s.skuRealityNum = (s.skuRealityNum + :#{#sku.skuRealityNum}), s.updateTime = :#{#sku.updateTime}" +
+            ", s.updateUserId = :#{#sku.updateUserId}, s.updateUserName = :#{#sku.updateUserName} where s.productId = :#{#sku.productId}")
+    public void updateRealitySkuByProductId(Sku sku);
 }

@@ -183,6 +183,16 @@
       "name": "server.domain",
       "type": "java.lang.String",
       "description": "Description for server.domain."
+    },
+    {
+      "name": "product.sku.init.invented.num",
+      "type": "java.lang.String",
+      "description": "Description for product.sku.init.invented.num."
+    },
+    {
+      "name": "order.no.redis.value.prefix",
+      "type": "java.lang.String",
+      "description": "Description for order.no.redis.value.prefix."
     }
   ]
 }

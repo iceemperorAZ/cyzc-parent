@@ -11,6 +11,7 @@ import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerCouponService;
 import com.jingliang.mall.service.OrderDetailService;
 import com.jingliang.mall.service.OrderService;
+import com.jingliang.mall.service.SkuService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,14 +40,16 @@ public class OrderServiceImpl implements OrderService {
     private final OrderDetailService orderDetailService;
     private final BuyerCouponService buyerCouponService;
     private final OrderDetailRepository orderDetailRepository;
+    private final SkuService skuService;
 
-    public OrderServiceImpl(OrderRepository orderRepository, RabbitProducer rabbitProducer, RedisService redisService, OrderDetailService orderDetailService, BuyerCouponService buyerCouponService, OrderDetailRepository orderDetailRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, RabbitProducer rabbitProducer, RedisService redisService, OrderDetailService orderDetailService, BuyerCouponService buyerCouponService, OrderDetailRepository orderDetailRepository, SkuService skuService) {
         this.orderRepository = orderRepository;
         this.rabbitProducer = rabbitProducer;
         this.redisService = redisService;
         this.orderDetailService = orderDetailService;
         this.buyerCouponService = buyerCouponService;
         this.orderDetailRepository = orderDetailRepository;
+        this.skuService = skuService;
     }
 
     @Override
@@ -120,6 +123,21 @@ public class OrderServiceImpl implements OrderService {
                 sku.setUpdateUserName("系统");
                 sku.setSkuLineNum(orderDetail.getProductNum());
                 rabbitProducer.sendSku(sku);
+            }
+        } else if (order.getOrderStatus() == 400) {
+            //如果为发货状态，则减去实际库存
+            //查询订单详情
+            List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
+            for (OrderDetail orderDetail : orderDetails) {
+                //把订单中的商品库存再加回去
+                Sku sku = new Sku();
+                sku.setProductId(orderDetail.getProductId());
+                sku.setUpdateTime(order.getUpdateTime());
+                sku.setUpdateUserId(-1L);
+                sku.setUpdateUserName("系统");
+                //减实际库存
+                sku.setSkuRealityNum(-orderDetail.getProductNum());
+                skuService.updateRealitySkuByProductId(sku);
             }
         }
         return order;
