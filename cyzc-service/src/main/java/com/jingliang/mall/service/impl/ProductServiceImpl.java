@@ -57,31 +57,29 @@ public class ProductServiceImpl implements ProductService {
     @Transactional(rollbackFor = Exception.class)
     public Product save(Product product) {
         product = productRepository.save(product);
-        Sku sku = skuRepository.findFirstByProductIdAndIsAvailable(product.getId(), true);
-        //存在则全部重置，否则新建
-        if (Objects.isNull(sku)) {
-            //如果是创建创建库存
-            sku = new Sku();
+        //如果不存在则创建库存，否则不处理
+        if (Objects.isNull(skuRepository.findFirstByProductIdAndIsAvailable(product.getId(), true))) {
+            Sku sku = new Sku();
+            sku.setProductTypeId(product.getProductTypeId());
+            sku.setProductTypeName(product.getProductTypeName());
+            sku.setProductId(product.getId());
+            sku.setProductName(product.getProductName());
+            sku.setSkuNo(redisService.getSkuNo());
+            sku.setCreateTime(product.getCreateTime());
+            sku.setCreateUserId(product.getCreateUserId());
+            sku.setCreateUserName(product.getCreateUserName());
+            sku.setUpdateTime(product.getUpdateTime());
+            sku.setUpdateUserId(product.getUpdateUserId());
+            sku.setUpdateUserName(product.getUpdateUserName());
+            //设置初始虚拟库存为8万
+            //追加redis中的线上库存
+            log.debug("追加redis中的线上库存，商品[{}],redis线上剩余库存为{}", sku.getProductName(), redisService.skuLineIncrement(String.valueOf(sku.getProductId()), 80000));
+            sku.setSkuLineNum(productSkuInitInventedNum);
+            sku.setSkuRealityNum(0);
+            sku.setSkuHistoryTotalNum(0);
+            sku.setIsAvailable(true);
+            skuRepository.save(sku);
         }
-        sku.setProductTypeId(product.getProductTypeId());
-        sku.setProductTypeName(product.getProductTypeName());
-        sku.setProductId(product.getId());
-        sku.setProductName(product.getProductName());
-        sku.setSkuNo(redisService.getSkuNo());
-        sku.setCreateTime(product.getCreateTime());
-        sku.setCreateUserId(product.getCreateUserId());
-        sku.setCreateUserName(product.getCreateUserName());
-        sku.setUpdateTime(product.getUpdateTime());
-        sku.setUpdateUserId(product.getUpdateUserId());
-        sku.setUpdateUserName(product.getUpdateUserName());
-        //设置初始虚拟库存为8万
-        //追加redis中的线上库存
-        log.debug("追加redis中的线上库存，商品[{}],redis线上剩余库存为{}", sku.getProductName(), redisService.skuLineIncrement(String.valueOf(sku.getProductId()), 80000));
-        sku.setSkuLineNum(productSkuInitInventedNum);
-        sku.setSkuRealityNum(0);
-        sku.setSkuHistoryTotalNum(0);
-        sku.setIsAvailable(true);
-        skuRepository.save(sku);
         return product;
     }
 
