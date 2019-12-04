@@ -125,7 +125,7 @@ public class OrderController {
         //计算使用优惠券后的支付价
         if (Objects.nonNull(order.getCouponId())) {
             BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(order.getCouponId(), buyer.getId());
-            if (Objects.isNull(buyerCoupon)) {
+            if (Objects.isNull(buyerCoupon) || buyerCoupon.getIsUsed()) {
                 return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
             }
             order.setPayableFee(order.getPayableFee() - buyerCoupon.getMoney());
