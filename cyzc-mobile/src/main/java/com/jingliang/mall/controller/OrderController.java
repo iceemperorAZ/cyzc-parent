@@ -134,20 +134,19 @@ public class OrderController {
             //优惠券标记为已使用
             buyerCouponService.save(buyerCoupon);
         }
-
+        //是否满足可以下单的订单额度
+        Config config = configService.findByCode("300");
+        if (order.getPayableFee() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_INSUFFICIENT_AMOUNT_FAIL);
+        }
         //计算运费
-        Config config = configService.findByCode("100");
-        if (order.getPayableFee() > Integer.parseInt(config.getConfigValues()) * 100) {
+        config = configService.findByCode("100");
+        if (order.getPayableFee() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             order.setDeliverFee(0L);
         } else {
             config = configService.findByCode("200");
-            order.setDeliverFee(Long.parseLong(config.getConfigValues()) * 100);
-            order.setPayableFee((order.getPayableFee() + Long.parseLong(config.getConfigValues()) * 100));
-        }
-        //是否满足可以下单的订单额度
-        config = configService.findByCode("300");
-        if (order.getPayableFee() < Integer.parseInt(config.getConfigValues()) * 100) {
-            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_INSUFFICIENT_AMOUNT_FAIL);
+            order.setDeliverFee((long) (Double.parseDouble(config.getConfigValues()) * 100));
+            order.setPayableFee((order.getPayableFee() + (long) (Double.parseDouble(config.getConfigValues()) * 100)));
         }
         //生成订单号
         order.setOrderNo(redisService.getOrderNo());
@@ -166,20 +165,21 @@ public class OrderController {
         //2.真实库存无值，则送达时间从配置表获取
         Calendar instance = Calendar.getInstance();
         instance.setTime(date);
+        //捕获异常，防止填写错误，填写格式错误则默认延时3天
         if (hasSku) {
-            instance.add(Calendar.DAY_OF_MONTH, 1);
-            order.setExpectedDeliveryTime(instance.getTime());
+            //真实库存不足延迟配送
+            config = configService.findByCode("500");
         } else {
             //真实库存不足延迟配送
             config = configService.findByCode("400");
-            try {
-                instance.add(Calendar.DAY_OF_MONTH, Integer.parseInt(config.getConfigValues()));
-            } catch (Exception e) {
-                //捕获异常，防止填写错误，填写格式错误则默认延时3天
-                instance.add(Calendar.DAY_OF_MONTH, 3);
-            }
-            order.setExpectedDeliveryTime(instance.getTime());
         }
+        try {
+            instance.add(Calendar.DAY_OF_MONTH, Integer.parseInt(config.getConfigValues()));
+        } catch (Exception e) {
+            //捕获异常，防止填写错误，填写格式错误则默认延时3天
+            instance.add(Calendar.DAY_OF_MONTH, 3);
+        }
+        order.setExpectedDeliveryTime(instance.getTime());
 
 
         order = orderService.save(order);
@@ -269,5 +269,19 @@ public class OrderController {
         MallPage<OrderResp> orderRespMallPage = MallUtils.toMallPage(orderPage, OrderResp.class);
         log.debug("返回结果：{}", orderRespMallPage);
         return MallResult.buildQueryOk(orderRespMallPage);
+    }
+
+    /**
+     * 根据订单总价查询运费金额
+     */
+    @ApiOperation(value = "根据订单总价查询运费金额")
+    @GetMapping("/find/deliverFee")
+    public MallResult<Double> getDeliverFee(Double deliverFee) {
+        Config config = configService.findByCode("100");
+        if ((long) (deliverFee * 100) > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+            return MallResult.buildQueryOk(0D);
+        }
+        config = configService.findByCode("200");
+        return MallResult.buildQueryOk(Double.parseDouble(config.getConfigValues()));
     }
 }

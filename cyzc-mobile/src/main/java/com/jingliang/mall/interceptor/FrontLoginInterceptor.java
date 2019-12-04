@@ -31,6 +31,8 @@ import java.util.Objects;
 public class FrontLoginInterceptor implements HandlerInterceptor {
     @Value("${session.buyer.key}")
     private String buyerSession;
+    @Value("${token.buyer.redis.prefix}")
+    private String tokenBuyerPrefix;
     /**
      * 用户session过期时间
      */
@@ -67,7 +69,7 @@ public class FrontLoginInterceptor implements HandlerInterceptor {
             log.debug("用户token失效");
             return false;
         }
-        Buyer buyer = redisService.get(map.get("code"), Buyer.class);
+        Buyer buyer = redisService.get(tokenBuyerPrefix + map.get("id"), Buyer.class);
         if (Objects.isNull(buyer) || !StringUtils.equals(buyer.getToken(), token)) {
             //重置response
             response.reset();
@@ -78,8 +80,19 @@ public class FrontLoginInterceptor implements HandlerInterceptor {
             log.debug("用户token失效");
             return false;
         }
+        //判断封停
+        if (buyer.getIsSealUp()) {
+            //重置response
+            response.reset();
+            //设置编码格式
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_IS_SEAL_UP_FAIL)));
+            log.debug("用户token失效");
+            return false;
+        }
         //token 验证通过则延长token过期时间
-        redisService.setExpire(map.get("code"), tokenTimeOut);
+        redisService.setExpire(tokenBuyerPrefix + map.get("id"), tokenTimeOut);
         HttpSession session = request.getSession();
         log.debug("token验证通过用户信息为：{}", buyer);
         session.setAttribute(buyerSession, buyer);

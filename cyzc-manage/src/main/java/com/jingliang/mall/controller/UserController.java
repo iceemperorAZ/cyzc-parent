@@ -40,16 +40,13 @@ import java.util.Objects;
 @Slf4j
 @RequestMapping("/back/user")
 public class UserController {
+    @Value("${token.user.redis.prefix}")
+    private String tokenUserPrefix;
     /**
      * session用户Key
      */
     @Value("${session.user.key}")
     private String sessionUser;
-    /**
-     * 用户session过期时间
-     */
-    @Value("${token.timeout}")
-    private Integer sessionTimeOut;
     private final RedisService redisService;
     private final UserService userService;
     private final BuyerService buyerService;
@@ -94,7 +91,7 @@ public class UserController {
         MallUtils.addDateAndUser(userReq, user);
         UserResp userResp = MallBeanMapper.map(userService.save(MallBeanMapper.map(userReq, User.class)), UserResp.class);
         //清除redis中的token
-        redisService.remove(user.getId() + "");
+        redisService.remove(tokenUserPrefix + user.getId());
         //清除security的登录信息
         SecurityContextHolder.getContext().setAuthentication(null);
         log.debug("返回结果：{}", userResp);

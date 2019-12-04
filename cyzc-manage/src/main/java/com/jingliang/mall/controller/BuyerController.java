@@ -4,6 +4,7 @@ import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.resp.BuyerResp;
+import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,15 +36,15 @@ import java.util.Objects;
 @RestController("backBuyerController")
 @Slf4j
 public class BuyerController {
-    /**
-     * session用户Key
-     */
-    @Value("${session.user.key}")
-    private String sessionUser;
-    private final BuyerService buyerService;
 
-    public BuyerController(BuyerService buyerService) {
+    @Value("${token.buyer.redis.prefix}")
+    private String tokenBuyerPrefix;
+
+    private final BuyerService buyerService;
+    private final RedisService redisService;
+    public BuyerController(BuyerService buyerService, RedisService redisService) {
         this.buyerService = buyerService;
+        this.redisService = redisService;
     }
 
     /**
@@ -61,6 +62,8 @@ public class BuyerController {
         if (Objects.isNull(buyer)) {
             return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
         }
+        //修改会员信息后清空redis中的会员token
+        redisService.remove(tokenBuyerPrefix + buyer.getId());
         BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         log.debug("返回结果：{}", buyerResp);
         return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);

@@ -29,15 +29,15 @@ import java.util.Objects;
 @Component
 public class WechatInterceptor implements HandlerInterceptor {
 
-    @Value("${session.buyer.key}")
-    private String buyerSession;
     @Value("${session.user.key}")
     private String userSession;
     /**
-     * 用户session过期时间
+     * 用户token过期时间
      */
     @Value("${token.timeout}")
     private Integer tokenTimeOut;
+    @Value("${token.user.redis.prefix}")
+    private String tokenUserPrefix;
     private final RedisService redisService;
 
     public WechatInterceptor(RedisService redisService) {
@@ -60,7 +60,7 @@ public class WechatInterceptor implements HandlerInterceptor {
         }
         Map<String, String> map = JwtUtil.verifyToken(token);
         HttpSession session = request.getSession();
-        if (Objects.isNull(map) || Objects.isNull(map.get("userId")) || Objects.isNull(redisService.get(map.get("userId") + "Front", User.class))) {
+        if (Objects.isNull(map) || Objects.isNull(map.get("userId"))) {
             //重置response
             response.reset();
             //设置编码格式
@@ -70,7 +70,7 @@ public class WechatInterceptor implements HandlerInterceptor {
             log.debug("用户token失效");
             return false;
         }
-        User user = redisService.get(map.get("userId") + "Front", User.class);
+        User user = redisService.get(tokenUserPrefix + "FRONT-" + map.get("userId"), User.class);
         if (Objects.isNull(user) || Objects.isNull(user.getLevel()) || user.getLevel() < 100) {
             //重置response
             response.reset();
@@ -82,7 +82,7 @@ public class WechatInterceptor implements HandlerInterceptor {
             return false;
         }
         //token 验证通过则延长token过期时间
-        redisService.setExpire(map.get("userId") + "Front", tokenTimeOut);
+        redisService.setExpire(tokenUserPrefix + "FRONT-" + map.get("userId"), tokenTimeOut);
         session.setAttribute(userSession, user);
         return true;
     }

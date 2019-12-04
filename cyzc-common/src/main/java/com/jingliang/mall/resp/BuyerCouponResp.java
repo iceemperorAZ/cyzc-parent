@@ -109,6 +109,41 @@ public class BuyerCouponResp implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
+    /**
+     * 状态 100：未使用，200：已使用，300：已失效
+     */
+    @ApiModelProperty(value = "100：未使用，200：已使用，300：已失效")
+    public Integer getStatus() {
+        //在生效期内
+        if (isUsed) {
+            //已经使用过了
+            return 200;
+        }
+        Date date = new Date();
+        int end = expirationTime.compareTo(date);
+        if (end > 0) {
+            return 100;
+        }
+        return 300;
+    }
+    /**
+     * 状态 100：可使用，200：已使用，300：已失效
+     */
+    @ApiModelProperty(value = "100：可使用，200：已使用，300：已失效")
+    public String getStatusView() {
+        if (isUsed) {
+            //已经使用过了
+            return "已使用";
+        }
+        Date date = new Date();
+        int end = expirationTime.compareTo(date);
+        if (end > 0) {
+            //在生效期内
+            return "去使用";
+        }
+        return "已失效";
+    }
+
     public Double getMoney() {
         return Objects.isNull(money) ? null : money / 100;
     }

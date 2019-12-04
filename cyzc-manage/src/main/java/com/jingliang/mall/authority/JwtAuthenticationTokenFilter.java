@@ -36,6 +36,8 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
+    @Value("${token.user.redis.prefix}")
+    private String tokenUserPrefix;
     /**
      * session用户Key
      */
@@ -62,11 +64,11 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             return;
         }
         Map<String, String> map = JwtUtil.verifyToken(token);
-        if (Objects.nonNull(map)) {
-            User user = redisService.get(map.get("userId"), User.class);
+        if (Objects.nonNull(map) && Objects.nonNull(map.get("userId"))) {
+            User user = redisService.get(tokenUserPrefix + map.get("userId"), User.class);
             if (Objects.nonNull(user) && StringUtils.equals(user.getToken(), token)) {
                 //token 验证通过则延长token过期时间
-                redisService.setExpire(map.get("userId"), tokenTimeOut);
+                redisService.setExpire(tokenUserPrefix + map.get("userId"), tokenTimeOut);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(user.getLoginName());
                 Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);

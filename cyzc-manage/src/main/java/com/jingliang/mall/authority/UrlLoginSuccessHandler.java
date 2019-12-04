@@ -31,7 +31,8 @@ import java.util.Map;
 @Component
 @Slf4j
 public class UrlLoginSuccessHandler implements AuthenticationSuccessHandler {
-
+    @Value("${token.user.redis.prefix}")
+    private String tokenUserPrefix;
     /**
      * 用户session过期时间
      */
@@ -58,7 +59,7 @@ public class UrlLoginSuccessHandler implements AuthenticationSuccessHandler {
         String token = JwtUtil.genToken(map);
         user.setToken(token);
         //存入redis 有效时长为1800秒（半小时）
-        redisService.setExpire(user.getId() + "", user, tokenTimeOut);
+        redisService.setExpire(tokenUserPrefix + user.getId(), user, tokenTimeOut);
         response.setHeader("Authorization", token);
         log.debug("token={}", token);
         response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.OK, MallConstant.TEXT_LOGIN_OK, MallBeanMapper.map(user, UserResp.class))));

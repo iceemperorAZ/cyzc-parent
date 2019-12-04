@@ -45,6 +45,10 @@ public class BuyerController {
      */
     @Value("${session.buyer.key}")
     private String sessionBuyer;
+    @Value("${token.buyer.redis.prefix}")
+    private String tokenBuyerPrefix;
+    @Value("${token.user.redis.prefix}")
+    private String tokenUserPrefix;
     /**
      * 用户session过期时间
      */
@@ -114,7 +118,7 @@ public class BuyerController {
             tokenMap.put("userId", user.getId() + "");
             log.debug("WX登录绑定的员工{}", user);
             //存入redis   有效时长为1800秒（半小时）
-            redisService.setExpire(user.getId() + "Front", user, tokenTimeOut);
+            redisService.setExpire(tokenUserPrefix + "FRONT-" + user.getId(), user, tokenTimeOut);
             Integer level = user.getLevel();
             buyerResp.setLevel(level);
             buyerResp.setUser(MallBeanMapper.map(user, UserResp.class));
@@ -124,7 +128,7 @@ public class BuyerController {
         buyer.setToken(token);
         buyer.setSessionKey(map.get("session_key") + "");
         //存入redis  有效时长为1800秒（半小时）
-        redisService.setExpire(buyerReq.getCode(), buyer, tokenTimeOut);
+        redisService.setExpire(tokenBuyerPrefix + buyer.getId(), buyer, tokenTimeOut);
         response.setHeader("Authorization", token);
         log.debug("微信登录Token= {}", token);
         log.debug("返回结果：{}", buyerResp);
@@ -140,6 +144,7 @@ public class BuyerController {
         //暂未涉及
         return MallResult.buildOk(true);
     }
+
     /**
      * 解析微信手机号
      */
@@ -164,6 +169,7 @@ public class BuyerController {
         log.debug("解析微信手机号失败");
         return MallResult.build(MallConstant.WECHAT_FAIL, MallConstant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
     }
+
     /**
      * 修改会员信息
      */

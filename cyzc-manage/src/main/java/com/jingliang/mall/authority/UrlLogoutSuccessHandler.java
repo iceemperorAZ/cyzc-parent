@@ -7,6 +7,7 @@ import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.server.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,8 @@ import java.util.Objects;
 @Component
 @Slf4j
 public class UrlLogoutSuccessHandler implements LogoutSuccessHandler {
+    @Value("${token.user.redis.prefix}")
+    private String tokenUserPrefix;
     private final RedisService redisService;
 
     public UrlLogoutSuccessHandler(RedisService redisService) {
@@ -52,7 +55,7 @@ public class UrlLogoutSuccessHandler implements LogoutSuccessHandler {
             response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.FAIL, MallConstant.TEXT_LOGOUT_FAIL)));
             return;
         }
-        redisService.remove(map.get("userId") + "");
+        redisService.remove(tokenUserPrefix + map.get("userId"));
         log.debug("Id=[{}]的用户注销成功", map.get("userId"));
         response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.OK, MallConstant.TEXT_LOGOUT_OK)));
     }
