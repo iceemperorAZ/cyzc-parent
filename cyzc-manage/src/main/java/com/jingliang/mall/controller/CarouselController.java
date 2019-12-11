@@ -180,6 +180,6 @@ public class CarouselController {
     @ApiOperation(value = "查询首页图配置")
     @PostMapping("/index/img")
     public MallResult<CarouselResp> indexImg() {
-        return MallResult.buildSaveOk(MallBeanMapper.map(carouselService.findByType(-100), CarouselResp.class));
+        return MallResult.buildQueryOk(MallBeanMapper.map(carouselService.findByType(-100), CarouselResp.class));
     }
 }

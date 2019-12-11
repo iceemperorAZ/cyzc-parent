@@ -118,7 +118,7 @@ public class OfflinePaymentController {
         OfflinePayment offlinePayment = offlinePaymentService.findByOrderId(orderId);
         OfflinePaymentResp offlinePaymentResp = MallBeanMapper.map(offlinePayment, OfflinePaymentResp.class);
         log.debug("返回参数：{}", offlinePaymentResp);
-        return MallResult.buildSaveOk(offlinePaymentResp);
+        return MallResult.buildQueryOk(offlinePaymentResp);
     }
 
 }
