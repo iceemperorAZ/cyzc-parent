@@ -1,5 +1,6 @@
 package com.jingliang.mall.amqp.consumer;
 
+import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.entity.Coupon;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.entity.Sku;
@@ -32,13 +33,15 @@ public class RabbitConsumer {
     private final OrderService orderService;
     private final WechatService wechatService;
     private final CouponService couponService;
+    private final RabbitProducer rabbitProducer;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 
-    public RabbitConsumer(SkuService skuService, OrderService orderService, WechatService wechatService, CouponService couponService) {
+    public RabbitConsumer(SkuService skuService, OrderService orderService, WechatService wechatService, CouponService couponService, RabbitProducer rabbitProducer) {
         this.skuService = skuService;
         this.orderService = orderService;
         this.wechatService = wechatService;
         this.couponService = couponService;
+        this.rabbitProducer = rabbitProducer;
     }
 
     /**
@@ -83,6 +86,8 @@ public class RabbitConsumer {
                     order.setPayNo(map.get("transaction_id"));
                     order.setUpdateTime(date);
                     orderService.update(order);
+                    //推送订单支付通知
+                    rabbitProducer.paymentNotice(order);
                     return;
                 }
                 //修改订单状态为已取消
