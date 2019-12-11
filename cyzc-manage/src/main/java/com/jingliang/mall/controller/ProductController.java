@@ -244,6 +244,14 @@ public class ProductController {
         User user = (User) session.getAttribute(sessionUser);
         Date date = new Date();
         for (Long id : productReq.getProductIds()) {
+            if(redisService.getProductSkuNum(id+"")<8000){
+                log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_ORDER_FAIL);
+                return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_ORDER_FAIL);
+            }
+            if (Objects.nonNull(productService.findShowProductById(id))) {
+                log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_DELETE_FAIL);
+                return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_DELETE_FAIL);
+            }
             Product product = new Product();
             product.setId(id);
             product.setIsAvailable(false);
@@ -253,10 +261,6 @@ public class ProductController {
             products.add(product);
         }
         List<Product> productList = productService.batchDelete(products);
-        if (productList.isEmpty()) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_DELETE_FAIL);
-            return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_DELETE_FAIL);
-        }
         List<ProductResp> productRespList = MallBeanMapper.mapList(productList, ProductResp.class);
         log.debug("返回结果：{}", productRespList);
         return MallResult.buildDeleteOk(productRespList);

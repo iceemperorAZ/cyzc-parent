@@ -137,6 +137,6 @@ public class SkuResp implements Serializable {
      */
     @ApiModelProperty(value = "补差")
     public Integer getDifferenceValue() {
-        return Math.max((skuLineNum - 80000 + skuRealityNum) * -1, 0);
+        return Math.max((skuLineNum - 80000) * -1, 0);
     }
 }

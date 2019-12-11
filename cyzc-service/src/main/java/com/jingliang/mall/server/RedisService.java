@@ -115,6 +115,23 @@ public interface RedisService {
     public Long increment(String key, Integer num);
 
     /**
+     * 返回 redis中的商品库存数
+     *
+     * @param key
+     * @return
+     */
+    public Long getProductSkuNum(String key);
+
+    /**
+     * 移除redis中的商品库存
+     *
+     * @param key
+     * @return
+     */
+    public void removeProductSkuNum(String key);
+
+
+    /**
      * 库存数量原子递减
      *
      * @param productId 商品Id

@@ -91,6 +91,12 @@ public class User implements Serializable {
     private Integer level;
 
     /**
+     * 是否为初始密码 0：否，1：是
+     */
+    @Column(name = "is_init_password")
+    private Boolean isInitPassword;
+
+    /**
      * 是否可用
      */
     @Column(name = "is_available")

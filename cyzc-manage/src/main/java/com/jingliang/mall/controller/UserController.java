@@ -85,15 +85,46 @@ public class UserController {
         if (!passwordEncoder.matches(userReq.getOldPassword(), user.getPassword())) {
             return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_OLD_PASSWORD_FAIL);
         }
+        if (!MallUtils.checkPasswordSecurity(userReq.getPassword())) {
+            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_MODIFY_PASSWORD_UNSAFE_FAIL);
+        }
         //设置
         userReq.setId(user.getId());
         userReq.setPassword(passwordEncoder.encode(userReq.getPassword()));
         MallUtils.addDateAndUser(userReq, user);
+        userReq.setIsInitPassword(false);
         UserResp userResp = MallBeanMapper.map(userService.save(MallBeanMapper.map(userReq, User.class)), UserResp.class);
         //清除redis中的token
         redisService.remove(tokenUserPrefix + user.getId());
         //清除security的登录信息
         SecurityContextHolder.getContext().setAuthentication(null);
+        log.debug("返回结果：{}", userResp);
+        return MallResult.buildUpdateOk(userResp);
+    }
+
+    /**
+     * 重置其他用户密码
+     */
+    @ApiOperation(value = "重置其他用户密码")
+    @PostMapping("/modify/other/password")
+    public MallResult<UserResp> changeOtherPassword(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", userReq);
+        if (Objects.isNull(userReq.getId())) {
+            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            return MallResult.buildParamFail();
+        }
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User user = (User) session.getAttribute(sessionUser);
+        User otherUser = userService.findById(userReq.getId());
+        //设置
+        userReq.setId(otherUser.getId());
+        //密码重置为登录名
+        userReq.setPassword(passwordEncoder.encode(otherUser.getLoginName()));
+        MallUtils.addDateAndUser(userReq, user);
+        userReq.setIsInitPassword(true);
+        UserResp userResp = MallBeanMapper.map(userService.save(MallBeanMapper.map(userReq, User.class)), UserResp.class);
+        //清除redis中的token
+        redisService.remove(tokenUserPrefix + otherUser.getId());
         log.debug("返回结果：{}", userResp);
         return MallResult.buildUpdateOk(userResp);
     }
@@ -144,6 +175,7 @@ public class UserController {
         //加密密码
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         userReq.setPassword(passwordEncoder.encode(userReq.getLoginName()));
+        userReq.setIsInitPassword(true);
         UserResp userResp = MallBeanMapper.map(userService.save(MallBeanMapper.map(userReq, User.class)), UserResp.class);
         log.debug("返回结果：{}", userResp);
         return MallResult.buildSaveOk(userResp);

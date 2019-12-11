@@ -140,9 +140,8 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> batchDelete(List<Product> products) {
         List<Sku> skus = new ArrayList<>();
         for (Product product : products) {
-            if (Objects.nonNull(productRepository.findByIdAndIsShowAndIsAvailable(product.getId(), true, true))) {
-                return new ArrayList<>();
-            }
+            //移除redis中的商品库存
+            redisService.removeProductSkuNum(product.getId() + "");
             //查询存
             Sku sku = skuRepository.findFirstByProductIdAndIsAvailable(product.getId(), true);
             sku.setProductId(product.getId());
@@ -171,6 +170,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Integer countByProductTypeIdAnnShow(Long productTypeId, Boolean isShow) {
-        return productRepository.countAllByProductTypeIdAndIsShow(productTypeId,isShow);
+        return productRepository.countAllByProductTypeIdAndIsShow(productTypeId, isShow);
     }
 }

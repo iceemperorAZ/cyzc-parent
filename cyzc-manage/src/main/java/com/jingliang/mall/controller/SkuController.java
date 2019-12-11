@@ -70,7 +70,7 @@ public class SkuController {
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.desc(root.get("updateTime")));
+            query.orderBy(cb.asc(root.get("skuLineNum")),cb.asc(root.get("updateTime")));
             return query.getRestriction();
         };
         Page<Sku> skuPage = skuService.findAll(skuSpecification, pageRequest);

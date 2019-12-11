@@ -74,6 +74,7 @@ public interface MallConstant {
     String TEXT_PRODUCT_SHOW_FAIL = "上架失败，存在未知商品";
     String TEXT_PRODUCT_HIDE_FAIL = "下架失败，存在未知商品";
     String TEXT_PRODUCT_DELETE_FAIL = "删除失败，存在已上架商品";
+    String TEXT_PRODUCT_ORDER_FAIL = "删除失败，该商品存在未完成的订单";
     String TEXT_PRODUCT_UPDATE_FAIL = "修改失败，已上架商品不允许修改";
 
     Integer COUPON_FAIL = 370;
@@ -102,6 +103,10 @@ public interface MallConstant {
 
     Integer WECHAT_FAIL = 450;
     String TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL = "微信sessionKey过期";
+
+    Integer PASSWORD_FAIL = 460;
+    String TEXT_PASSWORD_INIT_FAIL = "当前账户密码为初始密码,请修改当前密码";
+    String TEXT_MODIFY_PASSWORD_UNSAFE_FAIL = "密码安全度过低,请重新设置当前密码";
 
     Integer SYSTEM_FAIL = 500;
     String TEXT_SYSTEM_FAIL = "系统内部异常";

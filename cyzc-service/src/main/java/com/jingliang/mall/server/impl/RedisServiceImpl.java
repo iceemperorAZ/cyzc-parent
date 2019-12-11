@@ -11,7 +11,6 @@ import javax.websocket.Session;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -131,6 +130,17 @@ public class RedisServiceImpl implements RedisService {
         log.info("key为:[{}]，在redis中自增值为:[{}]", key, increment);
         return increment;
     }
+
+    @Override
+    public Long getProductSkuNum(String key) {
+        return (Long) redisTemplate.opsForValue().get(productSkuPrefix + key);
+    }
+
+    @Override
+    public void removeProductSkuNum(String key) {
+        redisTemplate.delete(productSkuPrefix + key);
+    }
+
     @Override
     public Long increment(String key, Integer num) {
         Long increment = redisTemplate.opsForValue().increment(defaultPrefix + key, num);
@@ -177,7 +187,7 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void removeSet(String key, Session value) {
-        redisTemplate.opsForSet().remove(defaultPrefix + key,value);
+        redisTemplate.opsForSet().remove(defaultPrefix + key, value);
     }
 
     @Override

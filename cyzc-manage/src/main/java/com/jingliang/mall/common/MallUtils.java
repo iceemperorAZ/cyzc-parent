@@ -3,10 +3,12 @@ package com.jingliang.mall.common;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BaseReq;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * 工具类
@@ -57,5 +59,14 @@ public class MallUtils extends BaseMallUtils {
         } else {
             return ip;
         }
+    }
+
+    /**
+     * 校验密码安全度
+     */
+    public static boolean checkPasswordSecurity(String password) {
+        //至少8个字符，至少1个大写字母，1个小写字母，1个数字和1个特殊字符：
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!#^%*?&~])[A-Za-z\\d$@$!#^%*?&~]{8,}";
+        return Pattern.matches(regex, password);
     }
 }

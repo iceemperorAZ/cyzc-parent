@@ -129,11 +129,10 @@ public class OrderServiceImpl implements OrderService {
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
             for (OrderDetail orderDetail : orderDetails) {
                 Sku sku = skuService.findByProductId(orderDetail.getProductId());
-                if(sku.getSkuRealityNum()-orderDetail.getProductNum()<=0){
+                if(sku.getSkuRealityNum()-orderDetail.getProductNum()<0){
                     return null;
                 }
                 sku = new Sku();
-                //把订单中的商品库存再加回去
                 sku.setProductId(orderDetail.getProductId());
                 sku.setUpdateTime(order.getUpdateTime());
                 sku.setUpdateUserId(-1L);

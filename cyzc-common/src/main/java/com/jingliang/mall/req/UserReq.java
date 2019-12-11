@@ -233,4 +233,10 @@ public class UserReq extends BaseReq implements Serializable {
      */
     @ApiModelProperty(value = "提成比率")
     private Integer ratio;
+
+    /**
+     * 是否为初始密码
+     */
+    @ApiModelProperty(value = "是否为初始密码")
+    private Boolean isInitPassword;
 }
