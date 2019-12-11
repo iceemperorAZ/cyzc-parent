@@ -2,6 +2,7 @@ package com.jingliang.mall.server.impl;
 
 import com.jingliang.mall.server.RedisService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,6 +13,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -193,6 +195,14 @@ public class RedisServiceImpl implements RedisService {
     @Override
     public Long getExpire(String key) {
         return redisTemplate.getExpire(defaultPrefix + key);
+    }
+
+    @Override
+    public void deleteByPre(String pre) {
+        Set<String> keys = redisTemplate.keys(pre);
+        if (CollectionUtils.isNotEmpty(keys)) {
+            redisTemplate.delete(defaultPrefix + keys);
+        }
     }
 
     private String getNo(String productNoPrefix) {

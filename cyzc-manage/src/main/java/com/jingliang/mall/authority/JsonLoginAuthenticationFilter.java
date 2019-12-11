@@ -8,7 +8,6 @@ import com.jingliang.mall.server.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -45,7 +44,7 @@ public class JsonLoginAuthenticationFilter extends UsernamePasswordAuthenticatio
                 //通过redis判断登录次数是否超过限制次数
                 //超过三次获取剩余登录时间，如果大于0则不允许登录并返回剩余时间，如果小于0则放行
                 String ip = MallUtils.getIpAddress(request);
-                Long expire = redisService.getExpire(loginLimitPrefix + ip + authenticationBean.getLoginName());
+                Long expire = redisService.getExpire(loginLimitPrefix + authenticationBean.getLoginName() + "-" + ip);
                 request.setAttribute("loginUser", authenticationBean);
                 if (Objects.nonNull(expire) && expire > 0) {
                     //不允许登录
@@ -54,9 +53,9 @@ public class JsonLoginAuthenticationFilter extends UsernamePasswordAuthenticatio
                 UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(authenticationBean.getLoginName(), authenticationBean.getPassword());
                 setDetails(request, authRequest);
                 return this.getAuthenticationManager().authenticate(authRequest);
-            } catch (IOException e) {
-                log.debug("用户信息验证失败");
+            } catch (IOException ignored) {
             }
+            log.debug("用户信息验证失败");
             UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken("", "");
             setDetails(request, authRequest);
             return this.getAuthenticationManager().authenticate(authRequest);

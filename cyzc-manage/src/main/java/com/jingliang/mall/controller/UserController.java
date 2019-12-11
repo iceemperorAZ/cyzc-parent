@@ -40,6 +40,10 @@ import java.util.Objects;
 @Slf4j
 @RequestMapping("/back/user")
 public class UserController {
+    @Value("${login.fail.count.prefix}")
+    private String loginFailCountPrefix;
+    @Value("${login.limit.prefix}")
+    private String loginLimitPrefix;
     @Value("${token.user.redis.prefix}")
     private String tokenUserPrefix;
     /**
@@ -125,6 +129,9 @@ public class UserController {
         UserResp userResp = MallBeanMapper.map(userService.save(MallBeanMapper.map(userReq, User.class)), UserResp.class);
         //清除redis中的token
         redisService.remove(tokenUserPrefix + otherUser.getId());
+        //清除redis中的登录次数
+        redisService.deleteByPre(loginFailCountPrefix + otherUser.getLoginName() + "-");
+        redisService.deleteByPre(loginLimitPrefix + otherUser.getLoginName() + "-");
         log.debug("返回结果：{}", userResp);
         return MallResult.buildUpdateOk(userResp);
     }

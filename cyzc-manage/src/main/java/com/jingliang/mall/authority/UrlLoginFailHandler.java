@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * 登陆失败处理器
@@ -34,7 +33,7 @@ public class UrlLoginFailHandler implements AuthenticationFailureHandler {
     private String loginFailCountPrefix;
     @Value("${login.limit.prefix}")
     private String loginLimitPrefix;
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
     private final RedisService redisService;
 
@@ -52,11 +51,11 @@ public class UrlLoginFailHandler implements AuthenticationFailureHandler {
         //判断超过五次的限制登录60分钟
         //判断超过六次的限制登录24小时
         //记录方式通过redis进行计数判定
-        //redis中Key格式 LOGIN-FAIL-COUNT-ip-[loginName]
+        //redis中Key格式 LOGIN-FAIL-COUNT-[loginName]ip
         String ip = MallUtils.getIpAddress(request);
         User failUser = (User) request.getAttribute("loginUser");
         String loginName = failUser.getLoginName();
-        if(exception.getClass() == LoginLimitException.class){
+        if (exception.getClass() == LoginLimitException.class) {
             //登录限制
             log.debug("登录限制拦截 = {}", exception.getMessage());
             //重置response
@@ -64,18 +63,8 @@ public class UrlLoginFailHandler implements AuthenticationFailureHandler {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_LIMIT_FAIL, MallConstant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + ip + loginName))))));
+            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_LIMIT_FAIL, MallConstant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
             return;
-        }
-        Long count = redisService.increment(loginFailCountPrefix + ip + loginName, 1);
-        if (count == 3) {
-            redisService.setExpire(loginLimitPrefix + ip + loginName, 0, /*300*/30);
-        } else if (count == 4) {
-            redisService.setExpire(loginLimitPrefix + ip + loginName, 0,/*1800*/60);
-        } else if (count == 5) {
-            redisService.setExpire(loginLimitPrefix + ip + loginName, 0,/*3600*/80);
-        } else if (count == 6) {
-            redisService.setExpire(loginLimitPrefix + ip + loginName, 0,/*86400*/120);
         }
         //登录验证失败
         log.debug("登录验证失败拦截 = {}", exception.getMessage());
@@ -85,7 +74,21 @@ public class UrlLoginFailHandler implements AuthenticationFailureHandler {
         //设置编码格式
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_LOGIN_FAIL)));
+        Long count = redisService.increment(loginFailCountPrefix + loginName + "-" + ip, 1);
+        if (count == 3) {
+            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0, /*300*/30);
+            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_LIMIT_FAIL, MallConstant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
+        } else if (count == 4) {
+            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,/*1800*/60);
+            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_LIMIT_FAIL, MallConstant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
+        } else if (count == 5) {
+            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,/*3600*/80);
+        } else if (count > 5) {
+            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,/*86400*/120);
+            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_LIMIT_FAIL, MallConstant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
+        } else {
+            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_LOGIN_FAIL)));
+        }
     }
 
 }
