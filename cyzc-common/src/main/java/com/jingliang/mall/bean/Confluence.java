@@ -1,5 +1,6 @@
 package com.jingliang.mall.bean;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -33,4 +34,8 @@ public class Confluence implements Serializable {
      */
     private Long royalty;
 
+    /**
+     * 净利润
+     */
+    private Long profit;
 }

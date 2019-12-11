@@ -76,7 +76,7 @@ public class RoleController {
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.desc(root.get("updateTime")));
+            query.orderBy(cb.desc(root.get("updateTime")),cb.desc(root.get("id")));
             return query.getRestriction();
         };
         Page<Role> rolePage = roleService.findAll(roleSpecification, pageRequest);

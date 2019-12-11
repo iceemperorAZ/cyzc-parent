@@ -212,6 +212,12 @@ public class BuyerCouponReq extends BaseReq implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTimeEnd;
 
+    /**
+     * 状态
+     */
+    @ApiModelProperty(value = "状态 未使用：100，已使用：200，已过期：300")
+    private Integer status;
+
     public void setMoney(Double money) {
         this.money = money * 100;
     }

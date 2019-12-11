@@ -72,6 +72,12 @@ public class MallResult<T> implements Serializable {
     public static <T> MallResult<T> buildParamFail() {
         return new MallResult<T>(MallConstant.PARAM_FAIL, MallConstant.TEXT_PARAM_FAIL, null);
     }
+    /**
+     * build参数格式错误返回结果
+     */
+    public static <T> MallResult<T> buildParamFormatFail() {
+        return new MallResult<T>(MallConstant.PARAM_FAIL, MallConstant.TEXT_PARAM_FORMAT_FAIL, null);
+    }
 
     /**
      * build保存成功返回结果

@@ -104,4 +104,13 @@ public interface ProductService {
      * @return 返回查询到的商品列表
      */
     List<Product> findAllByProductZoneId(Long productZoneId);
+
+    /**
+     * 根据商品分类和是否上架统计商品数量
+     *
+     * @param productTypeId 商品分类Id
+     * @param isShow        是否上架
+     * @return 返回统计到的商品数量
+     */
+    public Integer countByProductTypeIdAnnShow(Long productTypeId, Boolean isShow);
 }

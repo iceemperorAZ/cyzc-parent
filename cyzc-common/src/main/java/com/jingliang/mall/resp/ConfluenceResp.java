@@ -48,11 +48,20 @@ public class ConfluenceResp implements Serializable {
     @ApiModelProperty(value = "提成")
     private Double royalty;
 
+    /**
+     * 净利润
+     */
+    @ApiModelProperty(value = "净利润")
+    private Double profit;
+
     public Double getTotalPrice() {
         return Objects.isNull(totalPrice) ? null : totalPrice / 100;
     }
 
     public Double getRoyalty() {
         return Objects.isNull(royalty) ? null : royalty / 100;
+    }
+    public Double getProfit() {
+        return Objects.isNull(profit) ? null : profit / 100;
     }
 }

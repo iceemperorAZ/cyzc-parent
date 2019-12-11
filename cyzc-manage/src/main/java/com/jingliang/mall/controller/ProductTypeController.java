@@ -5,6 +5,7 @@ import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.ProductTypeReq;
 import com.jingliang.mall.resp.ProductTypeResp;
+import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.ProductTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,9 +44,11 @@ public class ProductTypeController {
     private String sessionUser;
 
     private final ProductTypeService productTypeService;
+    private final ProductService productService;
 
-    public ProductTypeController(ProductTypeService productTypeService) {
+    public ProductTypeController(ProductTypeService productTypeService, ProductService productService) {
         this.productTypeService = productTypeService;
+        this.productService = productService;
     }
 
     /**
@@ -78,6 +81,13 @@ public class ProductTypeController {
         if (Objects.isNull(productTypeReq.getId())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
             return MallResult.buildParamFail();
+        }
+        //判断商品分类下是否有已经上架的商品
+        //1.有则不允许删除
+        //2.无则正常删除
+        Integer count = productService.countByProductTypeIdAnnShow(productTypeReq.getId(),true);
+        if(count>0){
+            return MallResult.build(MallConstant.FAIL,MallConstant.TEXT_PRODUCT_DELETE_FAIL);
         }
         Long id = productTypeReq.getId();
         productTypeReq = new ProductTypeReq();

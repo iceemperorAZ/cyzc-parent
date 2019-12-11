@@ -34,6 +34,7 @@ public interface MallConstant {
 
     Integer PARAM_FAIL = 310;
     String TEXT_PARAM_FAIL = "参数不全";
+    String TEXT_PARAM_FORMAT_FAIL = "参数值格式错误";
 
     Integer IMAGE_FAIL = 320;
     String TEXT_IMAGE_FAIL = "图片格式无法识别";
@@ -46,6 +47,8 @@ public interface MallConstant {
     Integer DATA_FAIL = 340;
     String TEXT_DATA_FAIL = "数据不存在";
     String TEXT_BUYER_DATA_FAIL = "会员不存在";
+    String TEXT_ORDER_DATA_FAIL = "订单不存在";
+    String TEXT_DATA_REPEAT_FAIL = "数据重复";
     String TEXT_USER_DATA_FAIL = "用户不存在";
 
 
@@ -54,6 +57,7 @@ public interface MallConstant {
     String TEXT_ORDER_NOT_EXIST_FAIL = "修改失败,当前订单不存在";
     String TEXT_ORDER_PRODUCT_FAIL = "下单失败,商品已下架";
     String TEXT_ORDER_SKU_FAIL = "下单失败,库存不足";
+    String TEXT_ORDER_DELIVER_SKU_FAIL = "发货失败,库存不足";
     String TEXT_ORDER_COUPON_FAIL = "下单失败,无效优惠券";
     String TEXT_ORDER_INSUFFICIENT_AMOUNT_FAIL = "下单失败,订单总金额最低金额不满足要求";
 
@@ -65,11 +69,11 @@ public interface MallConstant {
 
 
     Integer PRODUCT_FAIL = 360;
-    String TEXT_PRODUCT_EXIST_FAIL = "商品添加失败，商品已存在";
-    String TEXT_PRODUCT_SHOW_SKU_FAIL = "商品上架失败，存在库存不足商品";
-    String TEXT_PRODUCT_SHOW_FAIL = "商品上架失败，存在未知商品";
-    String TEXT_PRODUCT_HIDE_FAIL = "商品下架失败，存在未知商品";
-    String TEXT_PRODUCT_DELETE_FAIL = "商品删除失败，存在已上架商品";
+    String TEXT_PRODUCT_EXIST_FAIL = "添加失败，商品已存在";
+    String TEXT_PRODUCT_SHOW_SKU_FAIL = "上架失败，存在库存不足商品";
+    String TEXT_PRODUCT_SHOW_FAIL = "上架失败，存在未知商品";
+    String TEXT_PRODUCT_HIDE_FAIL = "下架失败，存在未知商品";
+    String TEXT_PRODUCT_DELETE_FAIL = "删除失败，存在已上架商品";
     String TEXT_PRODUCT_UPDATE_FAIL = "修改失败，已上架商品不允许修改";
 
     Integer COUPON_FAIL = 370;
@@ -87,7 +91,7 @@ public interface MallConstant {
     String TEXT_NOT_LOGIN_FAIL = "请先登录";
 
     Integer TOKEN_FAIL = 430;
-    String TEXT_TOKEN_INVALID_FAIL = "token失效";
+    String TEXT_TOKEN_INVALID_FAIL = "请重新登录";
 
     Integer AUTHORITY_FAIL = 440;
     String TEXT_AUTHORITY_FAIL = "权限不足";

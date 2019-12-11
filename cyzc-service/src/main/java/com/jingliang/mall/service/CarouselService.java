@@ -40,6 +40,7 @@ public interface CarouselService {
      * @return 返回查询到的轮播图信息
      */
     Carousel findById(Long id);
+
     /**
      * 查询全部轮播图配置
      *
@@ -47,4 +48,12 @@ public interface CarouselService {
      * @return 返回查询到的轮播图配置列表
      */
     List<Carousel> findAll(Specification<Carousel> carouselSpecification);
+
+    /**
+     * 根据类型查询配置信息
+     *
+     * @param type
+     * @return
+     */
+    Carousel findByType(Integer type);
 }

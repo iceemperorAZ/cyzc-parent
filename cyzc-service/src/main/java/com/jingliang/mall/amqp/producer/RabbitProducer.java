@@ -6,11 +6,14 @@ import com.jingliang.mall.entity.Sku;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.AbstractJavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Component;
+
+import java.util.Objects;
 
 /**
  * 库存生产者
@@ -47,7 +50,7 @@ public class RabbitProducer {
         try {
             if (order != null) {
                 rabbitTemplate.setExchange(env.getProperty("rabbitmq.basic.exchange"));
-                rabbitTemplate.setRoutingKey(env.getProperty("rabbitmq.order.pay.dead.prod.routing.key"));
+                rabbitTemplate.setRoutingKey(Objects.requireNonNull(env.getProperty("rabbitmq.order.pay.dead.prod.routing.key")));
                 rabbitTemplate.convertAndSend(order, message -> {
                     MessageProperties mp = message.getMessageProperties();
                     mp.setDeliveryMode(MessageDeliveryMode.PERSISTENT);
@@ -67,5 +70,13 @@ public class RabbitProducer {
     public void sendCoupon(Coupon coupon) {
         log.debug("rabbitmq发送优惠券消息");
         this.rabbitTemplate.convertAndSend(env.getProperty("rabbitmq.basic.exchange"), env.getProperty("rabbitmq.coupon.routing.key"), coupon);
+    }
+
+    /**
+     * 以广播的形式发送订单支付通知
+     */
+    public void paymentNotice(Order order){
+        log.debug("rabbitmq以广播的形式发送有用户支付订单的消息");
+        this.rabbitTemplate.convertAndSend(env.getProperty("rabbitmq.payment.notice.exchange"), "", order);
     }
 }

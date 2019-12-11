@@ -32,7 +32,7 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     public UserRole findAllByUserIdAndRoleId(Long userId, Long roleId) {
-        return userRoleRepository.findAllByUserIdAndRoleIdAndIsAvailable(userId, roleId, true);
+        return userRoleRepository.findFirstByUserIdAndRoleId(userId, roleId);
     }
 
     @Override

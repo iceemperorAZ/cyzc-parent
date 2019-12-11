@@ -1,9 +1,7 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.amqp.producer.RabbitProducer;
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.resp.OrderResp;
@@ -37,9 +35,10 @@ import java.util.Objects;
 @RestController("backOrderController")
 public class OrderController {
     private final OrderService orderService;
-
-    public OrderController(OrderService orderService) {
+    private final RabbitProducer rabbitProducer;
+    public OrderController(OrderService orderService, RabbitProducer rabbitProducer) {
         this.orderService = orderService;
+        this.rabbitProducer = rabbitProducer;
     }
 
     /**
@@ -59,6 +58,10 @@ public class OrderController {
         order.setDeliveryPhone(orderReq.getDeliveryPhone());
         order.setUpdateTime(new Date());
         order = orderService.update(order);
+        if(Objects.isNull(order)){
+            log.debug("返回结果：{}", MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
+            return MallResult.build(MallConstant.ORDER_FAIL,MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
+        }
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
         return MallResult.buildUpdateOk(orderResp);
@@ -147,6 +150,7 @@ public class OrderController {
         };
         Page<Order> orderPage = orderService.findAll(orderSpecification, pageRequest);
         MallPage<OrderResp> orderRespMallPage = MallUtils.toMallPage(orderPage, OrderResp.class);
+
         log.debug("返回结果：{}", orderRespMallPage);
         return MallResult.buildQueryOk(orderRespMallPage);
     }

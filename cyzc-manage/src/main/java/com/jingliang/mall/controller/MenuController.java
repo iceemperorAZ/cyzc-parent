@@ -55,6 +55,10 @@ public class MenuController {
         this.roleMenuService = roleMenuService;
     }
 
+    /**
+     * 保存/更新资源
+     *
+     */
     @PostMapping("/save")
     @ApiOperation(value = "保存/更新资源")
     public MallResult<MenuResp> save(@RequestBody MenuReq menuReq, @ApiIgnore HttpSession session) {
@@ -68,6 +72,11 @@ public class MenuController {
         log.debug("返回参数：{}", menuResp);
         return MallResult.buildSaveOk(menuResp);
     }
+
+    /**
+     * 删除资源
+     *
+     */
     @PostMapping("/delete")
     @ApiOperation(value = "删除资源")
     public MallResult<MenuResp> delete(@RequestBody MenuReq menuReq, @ApiIgnore HttpSession session) {
@@ -102,7 +111,7 @@ public class MenuController {
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.desc(root.get("updateTime")));
+            query.orderBy(cb.desc(root.get("updateTime")), cb.desc(root.get("id")));
             return query.getRestriction();
         };
         Page<Menu> menuPage = menuService.findAll(menuSpecification, pageRequest);

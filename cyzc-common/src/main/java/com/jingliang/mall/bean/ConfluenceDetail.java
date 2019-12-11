@@ -33,4 +33,9 @@ public class ConfluenceDetail implements Serializable {
      * 提成
      */
     private Long royalty;
+
+    /**
+     * 净利润
+     */
+    private Long profit;
 }

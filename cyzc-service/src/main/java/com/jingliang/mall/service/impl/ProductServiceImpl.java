@@ -168,4 +168,9 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> findAllByProductZoneId(Long productZoneId) {
         return productRepository.findAllByProductZoneIdAndIsAvailable(productZoneId, true);
     }
+
+    @Override
+    public Integer countByProductTypeIdAnnShow(Long productTypeId, Boolean isShow) {
+        return productRepository.countAllByProductTypeIdAndIsShow(productTypeId,isShow);
+    }
 }

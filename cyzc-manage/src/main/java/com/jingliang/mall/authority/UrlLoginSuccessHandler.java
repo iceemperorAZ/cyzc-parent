@@ -64,5 +64,4 @@ public class UrlLoginSuccessHandler implements AuthenticationSuccessHandler {
         log.debug("token={}", token);
         response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.OK, MallConstant.TEXT_LOGIN_OK, MallBeanMapper.map(user, UserResp.class))));
     }
-
 }

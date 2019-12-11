@@ -1,5 +1,7 @@
 package com.jingliang.mall.server;
 
+import javax.websocket.Session;
+
 /**
  * redis服务
  *
@@ -36,7 +38,7 @@ public interface RedisService {
     /**
      * 删除
      *
-     * @param key     键
+     * @param key 键
      */
     public void remove(String key);
 
@@ -95,6 +97,15 @@ public interface RedisService {
     Long skuLineIncrement(String productId, Integer num);
 
     /**
+     * redis中原子递增
+     *
+     * @param key key
+     * @param num 值
+     * @return 返回自增后的值
+     */
+    public Long increment(String key, Integer num);
+
+    /**
      * 库存数量原子递减
      *
      * @param productId 商品Id
@@ -127,4 +138,27 @@ public interface RedisService {
      * @return 返回自增减的值
      */
     Long couponDecrement(String couponId, Integer num);
+
+    /**
+     * 添加进集合
+     *
+     * @param key key
+     * @param obj 值
+     */
+    public Long addSet(String key, Object obj);
+    /**
+     * 根据key查询数据
+     *
+     * @param key    键
+     * @param aClass 泛型
+     * @return 返回对象
+     */
+    public <T> T getSet(String key, Class<T> aClass);
+
+    /**
+     * 移除集合中的元素
+     * @param key 键
+     * @param session  值
+     */
+    void removeSet(String key, Session session);
 }

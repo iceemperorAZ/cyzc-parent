@@ -1,16 +1,16 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.amqp.producer.RabbitProducer;
-import com.jingliang.mall.entity.Coupon;
-import com.jingliang.mall.service.CouponService;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerCoupon;
+import com.jingliang.mall.entity.Coupon;
 import com.jingliang.mall.req.BuyerCouponReq;
 import com.jingliang.mall.resp.BuyerCouponResp;
+import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerCouponService;
 import com.jingliang.mall.service.BuyerService;
-import com.jingliang.mall.server.RedisService;
+import com.jingliang.mall.service.CouponService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -130,17 +130,35 @@ public class BuyerCouponController {
             List<Predicate> andPredicateList = new ArrayList<>();
             andPredicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
-            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
             List<Predicate> orPredicateList = new ArrayList<>();
             if (Objects.nonNull(buyerCouponReq.getProductTypeIds()) && !buyerCouponReq.getProductTypeIds().isEmpty()) {
                 for (Long productTypeId : buyerCouponReq.getProductTypeIds()) {
                     orPredicateList.add(cb.equal(root.get("productTypeId"), productTypeId));
                 }
-            } else {
-                return query.where(andPredicate).getRestriction();
             }
-            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
-            return query.where(andPredicate, orPredicate).getRestriction();
+            if (Objects.nonNull(buyerCouponReq.getStatus())) {
+                Date date = new Date();
+                switch (buyerCouponReq.getStatus()) {
+                    case 100:
+                        andPredicateList.add(cb.equal(root.get("isUsed"), 0));
+                        andPredicateList.add(cb.greaterThan(root.get("expirationTime"), date));
+                        break;
+                    case 200:
+                        andPredicateList.add(cb.equal(root.get("isUsed"), 1));
+                        break;
+                    default:
+                        andPredicateList.add(cb.lessThanOrEqualTo(root.get("expirationTime"), date));
+                }
+            }
+            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
+            if (orPredicateList.size() > 0) {
+                Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
+                query.where(andPredicate, orPredicate);
+            }else {
+                query.where(andPredicate);
+            }
+            query.orderBy(cb.asc(root.get("expirationTime")));
+            return query.getRestriction();
         };
         Page<BuyerCoupon> buyerCouponPage = buyerCouponService.findAll(buyerCouponSpecification, pageRequest);
         MallPage<BuyerCouponResp> buyerCouponRespMallPage = MallUtils.toMallPage(buyerCouponPage, BuyerCouponResp.class);

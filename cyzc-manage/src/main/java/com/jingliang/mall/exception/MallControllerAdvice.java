@@ -13,10 +13,10 @@ import java.util.Objects;
 
 /**
  * 统一异常处理
- * <br/>
- * Created in 2019-02-15 14:02
  *
- * @author Li Zhenfeng
+ * @author Zhenfeng Li
+ * @version 1.0.0
+ * @date 2019-09-24 16:53:10
  */
 @RestControllerAdvice
 @Slf4j

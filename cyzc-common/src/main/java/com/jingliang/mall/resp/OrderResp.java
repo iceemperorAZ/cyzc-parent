@@ -108,9 +108,9 @@ public class OrderResp implements Serializable {
     private Double deliverFee;
 
     /**
-     * 支付方式 100:微信,200:现金
+     * 支付方式 100:微信,200:其他
      */
-    @ApiModelProperty(value = "支付方式 100:微信,200:现金")
+    @ApiModelProperty(value = "支付方式 100:微信,200:其他")
     private Integer payWay;
 
     /**
@@ -169,8 +169,8 @@ public class OrderResp implements Serializable {
      * 预计送达时间
      */
     @ApiModelProperty(value = "预计送达时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date expectedDeliveryTime;
 
     /**

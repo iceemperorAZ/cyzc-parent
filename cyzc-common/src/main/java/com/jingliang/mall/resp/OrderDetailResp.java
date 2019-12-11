@@ -90,7 +90,7 @@ public class OrderDetailResp implements Serializable {
      */
     @ApiModelProperty(value = "订单详情总价")
     public Double getTotalPrice() {
-        return sellingPrice * productNum;
+        return (sellingPrice * productNum) / 100;
     }
 
     public Double getSellingPrice() {

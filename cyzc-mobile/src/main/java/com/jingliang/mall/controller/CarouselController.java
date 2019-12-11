@@ -45,6 +45,8 @@ public class CarouselController {
         Specification<Carousel> carouselSpecification = (Specification<Carousel>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
             predicateList.add(cb.equal(root.get("isAvailable"), true));
+            //大于0表示轮播图
+            predicateList.add(cb.greaterThan(root.get("type"), 0));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
             query.orderBy(cb.asc(root.get("carouselOrder")));
             return query.getRestriction();
@@ -53,5 +55,14 @@ public class CarouselController {
         List<CarouselResp> carouselResps = MallBeanMapper.mapList(carousels, CarouselResp.class);
         log.debug("返回结果：{}", carouselResps);
         return MallResult.buildQueryOk(carouselResps);
+    }
+    /**
+     * 查询启动页图
+     */
+    @ApiOperation(value = "查询启动页图")
+    @GetMapping("/index/img")
+    public MallResult<CarouselResp> startAppImg() {
+        Carousel carousel = carouselService.findByType(-100);
+        return MallResult.buildQueryOk(MallBeanMapper.map(carousel, CarouselResp.class));
     }
 }

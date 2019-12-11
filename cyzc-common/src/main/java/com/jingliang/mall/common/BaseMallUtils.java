@@ -217,11 +217,6 @@ public abstract class BaseMallUtils {
         return null;
     }
 
-    public static void main(String[] args) {
-        String decrypt = BaseMallUtils.decrypt("TFfi46ZWCGmtCyWGcGpKyA==", "TQ4r21TNaLutkh q73gtQw==", "HTaAHIIi2gAyksK2A49ikXw9JihVdF1 7ZxNCEyHy5RXtL083JjXRV6L3O8ABlmzsMovU USslx8bd/w9occz8DGhH8MSwkOkwN8hgLAN1CcBj2m3Q8n2rsDF8K88yBLnTHmRnf/Nr17oYU8xQyPW43w6zaLW948QxLf5NEu2JNh6I5/KIEdFWmSkUYlSeSU3qMbZRR0ZFLW2d1E5vBH4g==");
-        System.out.println(decrypt);
-    }
-
     /**
      * 验证手机号
      *

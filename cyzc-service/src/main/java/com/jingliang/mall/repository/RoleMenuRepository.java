@@ -19,9 +19,19 @@ public interface RoleMenuRepository extends BaseRepository<RoleMenu, Long> {
      *
      * @param roleId      角色Id
      * @param isAvailable 是否可用
-     * @return 返回查询到的决死资源关联集合
+     * @return 返回查询到的角色资源关联集合
      */
     List<RoleMenu> findAllByRoleIdAndIsAvailable(Long roleId, Boolean isAvailable);
+
+    /**
+     * 根据资源Id查询角色资源关系集合
+     *
+     * @param menuId      资源Id
+     * @param isAvailable 是否可用
+     * @return 返回查询到的角色资源关联集合
+     */
+    List<RoleMenu> findAllByMenuIdAndIsAvailable(Long menuId, Boolean isAvailable);
+
     /**
      * 根据角色Id和资源Id查询角色资源关系
      *
@@ -29,5 +39,5 @@ public interface RoleMenuRepository extends BaseRepository<RoleMenu, Long> {
      * @param menuId 资源Id
      * @return 返回保存后的角色资源关系
      */
-    RoleMenu findAllByRoleIdAndMenuIdAndIsAvailable(Long roleId, Long menuId, Boolean isAvailable);
+    RoleMenu findFirstByRoleIdAndMenuId(Long roleId, Long menuId);
 }

@@ -43,7 +43,7 @@ public class Carousel implements Serializable {
     private String imgUri;
 
     /**
-     * 类型 100:仅展示，200：外网连接，300：商品，其他待定
+     * 类型 100:仅展示，200：外网连接，300：商品，-100:首页图
      */
     @Column(name = "type")
     private Integer type;

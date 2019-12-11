@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -203,4 +200,27 @@ public class BeanConfig {
         return BindingBuilder.bind(couponQueue()).to(basicExchange()).with(env.getProperty("rabbitmq.coupon.routing.key"));
     }
 
+    /**
+     * 订单支付通知交换机
+     */
+    @Bean
+    public FanoutExchange paymentNoticeExchange() {
+        return new FanoutExchange(env.getProperty("rabbitmq.payment.notice.exchange"), true, false);
+    }
+
+    /**
+     * 订单支付通知消息队列（以广播的形式）
+     */
+    @Bean
+    public Queue paymentNoticeQueue() {
+        return new Queue(Objects.requireNonNull(env.getProperty("rabbitmq.payment.notice.queue")));
+    }
+
+    /**
+     * 创建基本交换机+订单支付通知队列 的绑定（以广播的形式）
+     */
+    @Bean
+    public Binding paymentNoticeBinding() {
+        return BindingBuilder.bind(paymentNoticeQueue()).to(paymentNoticeExchange());
+    }
 }

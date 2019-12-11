@@ -66,7 +66,10 @@ public class ProductController {
     @ApiOperation(value = "保存商品")
     public MallResult<ProductResp> save(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
-        if (productReq.getProductImgs().isEmpty() || StringUtils.isBlank(productReq.getProductName()) || Objects.isNull(productReq.getSellingPrice())) {
+        if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
+                || productReq.getProductImgs().isEmpty() || StringUtils.isBlank(productReq.getProductName())
+                || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs())
+                || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
             return MallResult.buildParamFail();
         }
@@ -76,6 +79,8 @@ public class ProductController {
             return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_PRODUCT_EXIST_FAIL);
         }
         if (Objects.nonNull(productReq.getId())) {
+            //商品名称不能被修改
+            productReq.setProductName(null);
             //将之前所有的图片删除重新上传一份新的
             Product product = productService.findAllById(productReq.getId());
             if (product.getIsShow()) {

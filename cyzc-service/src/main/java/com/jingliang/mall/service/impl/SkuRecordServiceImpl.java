@@ -6,8 +6,8 @@ import com.jingliang.mall.entity.SkuRecord;
 import com.jingliang.mall.repository.SkuDetailRepository;
 import com.jingliang.mall.repository.SkuRecordRepository;
 import com.jingliang.mall.repository.SkuRepository;
-import com.jingliang.mall.service.SkuRecordService;
 import com.jingliang.mall.server.RedisService;
+import com.jingliang.mall.service.SkuRecordService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -81,5 +81,10 @@ public class SkuRecordServiceImpl implements SkuRecordService {
     @Override
     public Page<SkuRecord> findAll(Specification<SkuRecord> skuRecordSpecification, PageRequest pageRequest) {
         return skuRecordRepository.findAll(skuRecordSpecification, pageRequest);
+    }
+
+    @Override
+    public SkuRecord findById(Long id) {
+        return skuRecordRepository.findAllByIdAndIsAvailable(id, true);
     }
 }

@@ -104,7 +104,7 @@ public class Order implements Serializable {
     private Long deliverFee;
 
     /**
-     * 支付方式 100:微信,200:现金
+     * 支付方式 100:微信,200:其他
      */
     @Column(name = "pay_way")
     private Integer payWay;

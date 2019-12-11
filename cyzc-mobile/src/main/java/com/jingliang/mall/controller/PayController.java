@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.MallConstant;
 import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.common.MallUtils;
@@ -10,7 +11,6 @@ import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.service.CartService;
 import com.jingliang.mall.service.OrderDetailService;
 import com.jingliang.mall.service.OrderService;
-import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.wx.service.WechatService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -51,12 +51,14 @@ public class PayController {
     private final OrderDetailService orderDetailService;
     private final WechatService wechatService;
     private final CartService cartService;
+    private final RabbitProducer rabbitProducer;
 
-    public PayController(OrderService orderService, OrderDetailService orderDetailService, WechatService wechatService, CartService cartService) {
+    public PayController(OrderService orderService, OrderDetailService orderDetailService, WechatService wechatService, CartService cartService, RabbitProducer rabbitProducer) {
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.wechatService = wechatService;
         this.cartService = cartService;
+        this.rabbitProducer = rabbitProducer;
     }
 
     /**
@@ -109,6 +111,7 @@ public class PayController {
         Long buyerId = order.getBuyerId();
         List<Long> productIds = orderDetails.stream().map(OrderDetail::getProductId).collect(Collectors.toList());
         cartService.emptyCartItem(buyerId, productIds);
+        rabbitProducer.paymentNotice(order);
         //返回给微信成功的消息
         log.info("支付通知签名验证成功，返回结果：<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
         return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";

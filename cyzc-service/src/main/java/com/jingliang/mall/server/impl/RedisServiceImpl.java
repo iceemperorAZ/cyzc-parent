@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.websocket.Session;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -124,6 +126,13 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
+    public Long increment(String key, Integer num) {
+        Long increment = redisTemplate.opsForValue().increment(productSkuPrefix + key, num);
+        log.info("key为:[{}]，在redis中自增值为:[{}]", key, increment);
+        return increment;
+    }
+
+    @Override
     public Long skuLineDecrement(String productId, Integer num) {
         Long decrement = redisTemplate.opsForValue().decrement(productSkuPrefix + productId, num);
         log.info("Id为:[{}]的商品，在redis中的库存数量为:[{}]", productId, decrement);
@@ -150,13 +159,28 @@ public class RedisServiceImpl implements RedisService {
         return decrement;
     }
 
+    @Override
+    public Long addSet(String key, Object obj) {
+        return redisTemplate.opsForSet().add(key, obj);
+    }
+
+    @Override
+    public <T> T getSet(String key, Class<T> aClass) {
+        return aClass.cast(redisTemplate.opsForSet().members(key));
+    }
+
+    @Override
+    public void removeSet(String key, Session value) {
+        redisTemplate.opsForSet().remove(key,value);
+    }
+
     private String getNo(String productNoPrefix) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyMMdd");
         String dateString = dateFormat.format(new Date());
         Long increment = redisTemplate.opsForValue().increment(productNoPrefix + dateString, 1);
         //两天后过期
         redisTemplate.expire(productNoPrefix + dateString, 2, TimeUnit.DAYS);
-        DecimalFormat df = new DecimalFormat("0000000000");
+        DecimalFormat df = new DecimalFormat("00000");
         return dateString + df.format(increment);
     }
 }

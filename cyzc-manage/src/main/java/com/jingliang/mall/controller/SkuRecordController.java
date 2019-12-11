@@ -1,14 +1,13 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.SkuDetail;
 import com.jingliang.mall.entity.SkuRecord;
 import com.jingliang.mall.entity.User;
-import com.jingliang.mall.service.SkuDetailService;
-import com.jingliang.mall.service.SkuRecordService;
-import com.jingliang.mall.common.*;
 import com.jingliang.mall.req.SkuRecordReq;
 import com.jingliang.mall.resp.SkuRecordResp;
+import com.jingliang.mall.service.SkuDetailService;
+import com.jingliang.mall.service.SkuRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -62,10 +61,14 @@ public class SkuRecordController {
         if (Objects.isNull(skuRecordReq.getSkuDetailId()) || Objects.isNull(skuRecordReq.getType()) || StringUtils.isBlank(skuRecordReq.getContent())) {
             return MallResult.buildParamFail();
         }
+        if (skuRecordReq.getNum() >= 0) {
+            return MallResult.buildParamFormatFail();
+        }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(skuRecordReq, user);
         SkuDetail skuDetail = skuDetailService.findById(skuRecordReq.getSkuDetailId());
-        if (skuRecordReq.getNum() > skuDetail.getSkuResidueNum()) {
+        //判定库存
+        if (skuRecordReq.getNum() + skuDetail.getSkuResidueNum() < 0) {
             return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
         }
         skuRecordReq.setProductId(skuDetail.getProductId());
@@ -86,11 +89,23 @@ public class SkuRecordController {
     @PostMapping("/update")
     public MallResult<SkuRecordResp> update(@RequestBody SkuRecordReq skuRecordReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", skuRecordReq);
-        if (Objects.isNull(skuRecordReq.getStatus())) {
+        if (Objects.isNull(skuRecordReq.getStatus()) || Objects.isNull(skuRecordReq.getId())) {
             return MallResult.buildParamFail();
         }
-        if(skuRecordReq.getStatus()==300&&StringUtils.isBlank(skuRecordReq.getApproveOpinion())){
+        if (skuRecordReq.getStatus() == 300 && StringUtils.isBlank(skuRecordReq.getApproveOpinion())) {
             return MallResult.buildParamFail();
+        }
+        //判定库存
+        SkuRecord skuRecord = skuRecordService.findById(skuRecordReq.getId());
+        if (Objects.isNull(skuRecord)) {
+            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
+        }
+        SkuDetail skuDetail = skuDetailService.findById(skuRecord.getSkuDetailId());
+        if (Objects.isNull(skuDetail)) {
+            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
+        }
+        if (skuRecord.getNum() + skuDetail.getSkuResidueNum() < 0) {
+            return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(skuRecordReq, user);

@@ -74,6 +74,9 @@ public class OrderController {
     @PostMapping("/save")
     public MallResult<Map<String, String>> save(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
+        if (Objects.isNull(orderReq.getPayWay())) {
+            return MallResult.buildParamFail();
+        }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         MallUtils.addDateAndBuyer(orderReq, buyer);
         Order order = MallBeanMapper.map(orderReq, Order.class);
@@ -121,6 +124,20 @@ public class OrderController {
             productNum += orderDetail.getProductNum();
         }
         order.setProductNum(productNum);
+        //是否满足可以下单的订单额度
+        Config config = configService.findByCode("300");
+        if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_INSUFFICIENT_AMOUNT_FAIL);
+        }
+        //计算运费
+        config = configService.findByCode("100");
+        if (order.getTotalPrice() >= (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+            order.setDeliverFee(0L);
+        } else {
+            config = configService.findByCode("200");
+            order.setDeliverFee((long) (Double.parseDouble(config.getConfigValues()) * 100));
+            order.setPayableFee((order.getPayableFee() + (long) (Double.parseDouble(config.getConfigValues()) * 100)));
+        }
         order.setPreferentialFee(0L);
         //计算使用优惠券后的支付价
         if (Objects.nonNull(order.getCouponId())) {
@@ -134,63 +151,50 @@ public class OrderController {
             //优惠券标记为已使用
             buyerCouponService.save(buyerCoupon);
         }
-        //是否满足可以下单的订单额度
-        Config config = configService.findByCode("300");
-        if (order.getPayableFee() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_INSUFFICIENT_AMOUNT_FAIL);
-        }
-        //计算运费
-        config = configService.findByCode("100");
-        if (order.getPayableFee() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            order.setDeliverFee(0L);
-        } else {
-            config = configService.findByCode("200");
-            order.setDeliverFee((long) (Double.parseDouble(config.getConfigValues()) * 100));
-            order.setPayableFee((order.getPayableFee() + (long) (Double.parseDouble(config.getConfigValues()) * 100)));
-        }
         //生成订单号
         order.setOrderNo(redisService.getOrderNo());
         order.setOrderStatus(100);
         order.setPayStartTime(date);
         order.setUpdateTime(date);
+        Map<String, String> resultMap = new HashMap<>();
         //微信支付
-        order.setPayWay(100);
-        //调起微信预支付
-        Map<String, String> resultMap = wechatService.payUnifiedOrder(order, buyer.getUniqueId());
-        if (Objects.isNull(resultMap)) {
-            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
-        }
-        //订单预计送达时间
-        //1.真实库存有值，则送达时间T+1
-        //2.真实库存无值，则送达时间从配置表获取
-        Calendar instance = Calendar.getInstance();
-        instance.setTime(date);
-        //捕获异常，防止填写错误，填写格式错误则默认延时3天
-        if (hasSku) {
-            //真实库存不足延迟配送
-            config = configService.findByCode("500");
-        } else {
-            //真实库存不足延迟配送
-            config = configService.findByCode("400");
-        }
-        try {
-            instance.add(Calendar.DAY_OF_MONTH, Integer.parseInt(config.getConfigValues()));
-        } catch (Exception e) {
+        if (Objects.equals(order.getPayWay(), 100)) {
+            //调起微信预支付
+            resultMap = wechatService.payUnifiedOrder(order, buyer.getUniqueId());
+            if (Objects.isNull(resultMap)) {
+                return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
+            }
+            //订单预计送达时间
+            //1.真实库存有值，则送达时间T+1
+            //2.真实库存无值，则送达时间从配置表获取
+            Calendar instance = Calendar.getInstance();
+            instance.setTime(date);
             //捕获异常，防止填写错误，填写格式错误则默认延时3天
-            instance.add(Calendar.DAY_OF_MONTH, 3);
+            if (hasSku) {
+                //真实库存不足延迟配送
+                config = configService.findByCode("500");
+            } else {
+                //真实库存不足延迟配送
+                config = configService.findByCode("400");
+            }
+            try {
+                instance.add(Calendar.DAY_OF_MONTH, Integer.parseInt(config.getConfigValues()));
+            } catch (Exception e) {
+                //捕获异常，防止填写错误，填写格式错误则默认延时3天
+                instance.add(Calendar.DAY_OF_MONTH, 3);
+            }
+            order.setExpectedDeliveryTime(instance.getTime());
         }
-        order.setExpectedDeliveryTime(instance.getTime());
-
-
+        resultMap.put("id", order.getId() + "");
+        resultMap.put("orderNo", order.getOrderNo());
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
         //订单Id也返回
-        resultMap.put("id", order.getId() + "");
-        resultMap.put("orderNo", order.getOrderNo());
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("微信返回结果二次签名后的返回结果：{}", resultMap);
         log.debug("返回结果：{}", orderResp);
         return MallResult.buildSaveOk(resultMap);
+
     }
 
     /**
@@ -278,7 +282,7 @@ public class OrderController {
     @GetMapping("/find/deliverFee")
     public MallResult<Double> getDeliverFee(Double deliverFee) {
         Config config = configService.findByCode("100");
-        if ((long) (deliverFee * 100) > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+        if ((long) (deliverFee * 100) >= (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             return MallResult.buildQueryOk(0D);
         }
         config = configService.findByCode("200");

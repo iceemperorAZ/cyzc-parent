@@ -176,21 +176,21 @@ public class OrderReq extends BaseReq implements Serializable {
     private Double deliverFeeEnd;
 
     /**
-     * 支付方式 100:微信,200:现金
+     * 支付方式 100:微信,200:其他
      */
-    @ApiModelProperty(value = "支付方式 100:微信,200:现金")
+    @ApiModelProperty(value = "支付方式 100:微信,200:其他")
     private Integer payWay;
 
     /**
-     * 支付方式 100:微信,200:现金-开始
+     * 支付方式 100:微信,200:其他-开始
      */
-    @ApiModelProperty(value = "支付方式 100:微信,200:现金-开始")
+    @ApiModelProperty(value = "支付方式 100:微信,200:其他-开始")
     private Integer payWayStart;
 
     /**
-     * 支付方式 100:微信,200:现金-结束
+     * 支付方式 100:微信,200:其他-结束
      */
-    @ApiModelProperty(value = "支付方式 100:微信,200:现金-结束")
+    @ApiModelProperty(value = "支付方式 100:微信,200:其他-结束")
     private Integer payWayEnd;
 
     /**
@@ -380,6 +380,22 @@ public class OrderReq extends BaseReq implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+
+    /**
+     * 修改时间开始
+     */
+    @ApiModelProperty(value = "修改时间开始")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTimeStart;
+
+    /**
+     * 修改时间结束
+     */
+    @ApiModelProperty(value = "修改时间结束")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date updateTimeEnd;
 
     /**
      * 订单详情集合

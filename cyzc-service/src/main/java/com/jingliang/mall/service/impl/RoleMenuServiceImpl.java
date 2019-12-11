@@ -32,7 +32,7 @@ public class RoleMenuServiceImpl implements RoleMenuService {
 
     @Override
     public RoleMenu findAllByRoleIdAndMenuId(Long roleId, Long menuId) {
-        return roleMenuRepository.findAllByRoleIdAndMenuIdAndIsAvailable(roleId, menuId,true);
+        return roleMenuRepository.findFirstByRoleIdAndMenuId(roleId, menuId);
     }
 
     @Override

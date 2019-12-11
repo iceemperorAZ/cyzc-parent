@@ -30,4 +30,12 @@ public interface SkuRecordService {
      * @return 返回查询到的库存出入记录列表
      */
     Page<SkuRecord> findAll(Specification<SkuRecord> skuRecordSpecification, PageRequest pageRequest);
+
+    /**
+     * 根据Id查询出入库记录
+     *
+     * @param id 主键Id
+     * @return 返回查询到的出入库记录
+     */
+    SkuRecord findById(Long id);
 }

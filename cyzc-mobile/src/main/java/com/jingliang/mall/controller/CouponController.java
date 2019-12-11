@@ -1,15 +1,15 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.entity.Coupon;
-import com.jingliang.mall.service.CouponService;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerCoupon;
-import com.jingliang.mall.service.BuyerCouponService;
+import com.jingliang.mall.entity.Coupon;
 import com.jingliang.mall.req.CouponReq;
 import com.jingliang.mall.resp.CouponResp;
+import com.jingliang.mall.service.BuyerCouponService;
+import com.jingliang.mall.service.CouponService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -85,8 +85,9 @@ public class CouponController {
             predicateList.add(cb.lessThanOrEqualTo(root.get("startTime"), date));
             predicateList.add(cb.greaterThanOrEqualTo(root.get("expirationTime"), date));
             predicateList.add(cb.equal(root.get("isAvailable"), true));
+            predicateList.add(cb.greaterThan(root.get("residueNumber"), 0));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.asc(root.get("expirationTime")));
+            query.orderBy(cb.desc(root.get("residueNumber")), cb.asc(root.get("expirationTime")));
             return query.getRestriction();
         };
         Page<Coupon> couponPage = couponService.findAll(couponSpecification, pageRequest);

@@ -101,7 +101,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order update(Order order) {
-        order = orderRepository.save(order);
         //如果是取消 则返回库存  返回优惠券
         if (order.getOrderStatus() == 200) {
             //如果有使用优惠券则返还优惠券
@@ -129,8 +128,12 @@ public class OrderServiceImpl implements OrderService {
             //查询订单详情
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
             for (OrderDetail orderDetail : orderDetails) {
+                Sku sku = skuService.findByProductId(orderDetail.getProductId());
+                if(sku.getSkuRealityNum()<=0){
+                    return null;
+                }
+                sku = new Sku();
                 //把订单中的商品库存再加回去
-                Sku sku = new Sku();
                 sku.setProductId(orderDetail.getProductId());
                 sku.setUpdateTime(order.getUpdateTime());
                 sku.setUpdateUserId(-1L);
@@ -140,6 +143,7 @@ public class OrderServiceImpl implements OrderService {
                 skuService.updateRealitySkuByProductId(sku);
             }
         }
+        order = orderRepository.save(order);
         return order;
     }
 

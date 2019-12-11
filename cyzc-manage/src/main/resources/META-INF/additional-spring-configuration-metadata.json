@@ -204,6 +204,21 @@
       "name": "token.buyer.user.prefix",
       "type": "java.lang.String",
       "description": "Description for token.buyer.user.prefix."
+    },
+    {
+      "name": "rabbitmq.payment.notice.queue",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.payment.notice.queue."
+    },
+    {
+      "name": "rabbitmq.payment.notice.exchange",
+      "type": "java.lang.String",
+      "description": "Description for rabbitmq.payment.notice.exchange."
+    },
+    {
+      "name": "token.user.redis.prefix",
+      "type": "java.lang.String",
+      "description": "Description for token.user.redis.prefix."
     }
   ]
 }

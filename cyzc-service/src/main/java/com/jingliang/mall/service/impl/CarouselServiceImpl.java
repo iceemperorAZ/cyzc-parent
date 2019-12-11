@@ -47,4 +47,9 @@ public class CarouselServiceImpl implements CarouselService {
     public List<Carousel> findAll(Specification<Carousel> carouselSpecification) {
         return carouselRepository.findAll(carouselSpecification);
     }
+
+    @Override
+    public Carousel findByType(Integer type) {
+        return carouselRepository.findFirstByTypeAndIsAvailable(type, true);
+    }
 }
