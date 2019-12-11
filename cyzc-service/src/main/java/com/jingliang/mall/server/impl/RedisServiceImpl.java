@@ -126,8 +126,14 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Long increment(String key, Integer num) {
+    public Long incrementProduct(String key, Integer num) {
         Long increment = redisTemplate.opsForValue().increment(productSkuPrefix + key, num);
+        log.info("key为:[{}]，在redis中自增值为:[{}]", key, increment);
+        return increment;
+    }
+    @Override
+    public Long increment(String key, Integer num) {
+        Long increment = redisTemplate.opsForValue().increment(defaultPrefix + key, num);
         log.info("key为:[{}]，在redis中自增值为:[{}]", key, increment);
         return increment;
     }
@@ -161,17 +167,22 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public Long addSet(String key, Object obj) {
-        return redisTemplate.opsForSet().add(key, obj);
+        return redisTemplate.opsForSet().add(defaultPrefix + key, obj);
     }
 
     @Override
     public <T> T getSet(String key, Class<T> aClass) {
-        return aClass.cast(redisTemplate.opsForSet().members(key));
+        return aClass.cast(redisTemplate.opsForSet().members(defaultPrefix + key));
     }
 
     @Override
     public void removeSet(String key, Session value) {
-        redisTemplate.opsForSet().remove(key,value);
+        redisTemplate.opsForSet().remove(defaultPrefix + key,value);
+    }
+
+    @Override
+    public Long getExpire(String key) {
+        return redisTemplate.getExpire(defaultPrefix + key);
     }
 
     private String getNo(String productNoPrefix) {

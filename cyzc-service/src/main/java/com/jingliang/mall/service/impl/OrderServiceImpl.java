@@ -129,7 +129,7 @@ public class OrderServiceImpl implements OrderService {
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
             for (OrderDetail orderDetail : orderDetails) {
                 Sku sku = skuService.findByProductId(orderDetail.getProductId());
-                if(sku.getSkuRealityNum()<=0){
+                if(sku.getSkuRealityNum()-orderDetail.getProductNum()<=0){
                     return null;
                 }
                 sku = new Sku();

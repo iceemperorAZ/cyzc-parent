@@ -64,7 +64,7 @@ public class OfflinePaymentController {
         if (Objects.isNull(order)) {
             return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_ORDER_DATA_FAIL);
         }
-        if (Objects.nonNull(offlinePaymentService.findByOrderId(offlinePaymentReq.getOrderId()))) {
+        if (Objects.nonNull(offlinePaymentService.findByOrderId(offlinePaymentReq.getOrderId())) && Objects.isNull(offlinePaymentReq.getId())) {
             return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_REPEAT_FAIL);
         }
         offlinePaymentReq.setOrderNo(order.getOrderNo());

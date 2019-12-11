@@ -90,6 +90,10 @@ public interface MallConstant {
     String TEXT_IS_SEAL_UP_FAIL = "账号被封停";
     String TEXT_NOT_LOGIN_FAIL = "请先登录";
 
+    Integer LOGIN_LIMIT_FAIL = 420;
+    String TEXT_LIMIT_FAIL = "用户名密码多次输入错误，已限制您的登录";
+
+
     Integer TOKEN_FAIL = 430;
     String TEXT_TOKEN_INVALID_FAIL = "请重新登录";
 

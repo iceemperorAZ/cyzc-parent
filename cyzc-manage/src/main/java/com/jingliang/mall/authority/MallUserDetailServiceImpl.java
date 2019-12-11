@@ -45,7 +45,7 @@ public class MallUserDetailServiceImpl implements UserDetailsService {
         userInfo.setUsername(loginName);
         User user = userService.findUserByLoginName(loginName);
         if (ObjectUtils.isEmpty(user)) {
-            throw new UsernameNotFoundException("用户[" + loginName + "不存在");
+            throw new UsernameNotFoundException("用户[" + loginName + "]不存在");
         }
         //从数据库获取密码
         userInfo.setPassword(user.getPassword());

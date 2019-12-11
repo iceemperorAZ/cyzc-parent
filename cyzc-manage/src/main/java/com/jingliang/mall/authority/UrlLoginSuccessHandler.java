@@ -1,10 +1,7 @@
 package com.jingliang.mall.authority;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jingliang.mall.common.JwtUtil;
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallConstant;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.resp.UserResp;
 import com.jingliang.mall.server.RedisService;
@@ -31,6 +28,10 @@ import java.util.Map;
 @Component
 @Slf4j
 public class UrlLoginSuccessHandler implements AuthenticationSuccessHandler {
+    @Value("${login.fail.count.prefix}")
+    private String loginFailCountPrefix;
+    @Value("${login.limit.prefix}")
+    private String loginLimitPrefix;
     @Value("${token.user.redis.prefix}")
     private String tokenUserPrefix;
     /**
@@ -62,6 +63,12 @@ public class UrlLoginSuccessHandler implements AuthenticationSuccessHandler {
         redisService.setExpire(tokenUserPrefix + user.getId(), user, tokenTimeOut);
         response.setHeader("Authorization", token);
         log.debug("token={}", token);
+        //清除redis中登录失败的记录
+        String ip = MallUtils.getIpAddress(request);
+        redisService.remove(loginFailCountPrefix+ip+user.getLoginName());
+        redisService.remove(loginLimitPrefix+ip+user.getLoginName());
+
+
         response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.OK, MallConstant.TEXT_LOGIN_OK, MallBeanMapper.map(user, UserResp.class))));
     }
 }

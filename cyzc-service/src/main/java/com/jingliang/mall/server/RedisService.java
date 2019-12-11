@@ -97,10 +97,19 @@ public interface RedisService {
     Long skuLineIncrement(String productId, Integer num);
 
     /**
+     * redis中商品数原子递增
+     *
+     * @param key key
+     * @param num 步长
+     * @return 返回自增后的值
+     */
+    public Long incrementProduct(String key, Integer num);
+
+    /**
      * redis中原子递增
      *
      * @param key key
-     * @param num 值
+     * @param num 步长
      * @return 返回自增后的值
      */
     public Long increment(String key, Integer num);
@@ -146,6 +155,7 @@ public interface RedisService {
      * @param obj 值
      */
     public Long addSet(String key, Object obj);
+
     /**
      * 根据key查询数据
      *
@@ -157,8 +167,16 @@ public interface RedisService {
 
     /**
      * 移除集合中的元素
-     * @param key 键
-     * @param session  值
+     *
+     * @param key     键
+     * @param session 值
      */
     void removeSet(String key, Session session);
+
+    /**
+     * 获取key剩余时间
+     *
+     * @param key 键
+     */
+    Long getExpire(String key);
 }

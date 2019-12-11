@@ -9,6 +9,7 @@
 package com.jingliang.mall.authority;
 
 
+import com.jingliang.mall.server.RedisService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
@@ -65,10 +66,13 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
     private final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
 
+    private final RedisService redisService;
+
+
     public WebSecurityConfigure(MallAuthenticationProvider mallAuthenticationProvider, MallFilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource
             , MallAccessDecisionManager accessDecisionManager, UrlAuthenticationEntryPoint authenticationEntryPoint, UrlLogoutSuccessHandler logoutSuccessHandler
             , UrlAccessDeniedHandler accessDeniedHandler, UrlLoginSuccessHandler urlLoginSuccessHandler, UrlLoginFailHandler urlLoginFailHandler
-            , JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter) {
+            , JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter, RedisService redisService) {
         this.mallAuthenticationProvider = mallAuthenticationProvider;
         this.filterInvocationSecurityMetadataSource = filterInvocationSecurityMetadataSource;
         this.accessDecisionManager = accessDecisionManager;
@@ -78,6 +82,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
         this.urlLoginSuccessHandler = urlLoginSuccessHandler;
         this.urlLoginFailHandler = urlLoginFailHandler;
         this.jwtAuthenticationTokenFilter = jwtAuthenticationTokenFilter;
+        this.redisService = redisService;
     }
 
     @Override
@@ -143,7 +148,7 @@ public class WebSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Bean
     JsonLoginAuthenticationFilter customAuthenticationFilter() throws Exception {
-        JsonLoginAuthenticationFilter filter = new JsonLoginAuthenticationFilter();
+        JsonLoginAuthenticationFilter filter = new JsonLoginAuthenticationFilter(redisService);
         //成功处理
         filter.setAuthenticationSuccessHandler(urlLoginSuccessHandler);
         //失败处理
