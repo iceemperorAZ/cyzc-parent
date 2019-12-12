@@ -11,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Objects;
 
 /**
  * 密码检查拦截器
@@ -28,6 +29,9 @@ public class PassWordCheckInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         User user = (User) request.getSession().getAttribute(userSession);
+        if (Objects.isNull(user)) {
+            return true;
+        }
         log.debug("进入密码检查拦截器,请求URI={}", request.getRequestURI());
         if (user.getIsInitPassword()) {
             //重置response

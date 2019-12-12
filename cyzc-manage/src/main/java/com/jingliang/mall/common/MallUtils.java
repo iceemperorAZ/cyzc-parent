@@ -66,7 +66,7 @@ public class MallUtils extends BaseMallUtils {
      */
     public static boolean checkPasswordSecurity(String password) {
         //至少8个字符，至少1个大写字母，1个小写字母，1个数字和1个特殊字符：
-        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!#^%*?&~])[A-Za-z\\d$@$!#^%*?&~]{8,}";
+        String regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@!#^%*?&~])[A-Za-z\\d$@!#^%*?&~]{8,}";
         return Pattern.matches(regex, password);
     }
 }

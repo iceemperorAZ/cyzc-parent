@@ -65,8 +65,8 @@ public class UrlLoginSuccessHandler implements AuthenticationSuccessHandler {
         log.debug("token={}", token);
         //清除redis中登录失败的记录
         String ip = MallUtils.getIpAddress(request);
-        redisService.remove(loginFailCountPrefix + user.getLoginName() + "-" + ip);
         redisService.remove(loginLimitPrefix + user.getLoginName() + "-" + ip);
+        redisService.remove(loginFailCountPrefix + user.getLoginName() + "-" + ip);
         response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.OK, MallConstant.TEXT_LOGIN_OK, MallBeanMapper.map(user, UserResp.class))));
     }
 }

@@ -199,9 +199,9 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public void deleteByPre(String pre) {
-        Set<String> keys = redisTemplate.keys(pre);
+        Set<String> keys = redisTemplate.keys(defaultPrefix + pre + "*");
         if (CollectionUtils.isNotEmpty(keys)) {
-            redisTemplate.delete(defaultPrefix + keys);
+            redisTemplate.delete(keys);
         }
     }
 

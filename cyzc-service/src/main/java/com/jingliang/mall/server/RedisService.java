@@ -1,7 +1,6 @@
 package com.jingliang.mall.server;
 
 import javax.websocket.Session;
-import java.util.Set;
 
 /**
  * redis服务
@@ -199,8 +198,9 @@ public interface RedisService {
     Long getExpire(String key);
 
     /**
-     * 根据key前缀删除数据
+     * 根据key前缀批量删除数据
+     *
      * @param pre 前缀
      */
-    public void deleteByPre(String pre) ;
+    public void deleteByPre(String pre);
 }
