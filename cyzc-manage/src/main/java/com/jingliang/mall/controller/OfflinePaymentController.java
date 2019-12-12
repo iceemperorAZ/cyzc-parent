@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.OfflinePayment;
 import com.jingliang.mall.entity.Order;
@@ -42,11 +43,13 @@ public class OfflinePaymentController {
     private final OfflinePaymentService offlinePaymentService;
     private final OrderService orderService;
     private final FastdfsService fastdfsService;
+    private final RabbitProducer rabbitProducer;
 
-    public OfflinePaymentController(OfflinePaymentService offlinePaymentService, OrderService orderService, FastdfsService fastdfsService) {
+    public OfflinePaymentController(OfflinePaymentService offlinePaymentService, OrderService orderService, FastdfsService fastdfsService, RabbitProducer rabbitProducer) {
         this.offlinePaymentService = offlinePaymentService;
         this.orderService = orderService;
         this.fastdfsService = fastdfsService;
+        this.rabbitProducer = rabbitProducer;
     }
 
     /**
@@ -101,6 +104,8 @@ public class OfflinePaymentController {
         assert offlinePayment != null;
         offlinePayment.setUrls(builder.substring(1));
         OfflinePaymentResp offlinePaymentResp = MallBeanMapper.map(offlinePaymentService.save(offlinePayment), OfflinePaymentResp.class);
+        //推送订单支付通知
+        rabbitProducer.paymentNotice(order);
         log.debug("返回参数：{}", offlinePaymentResp);
         return MallResult.buildSaveOk(offlinePaymentResp);
     }

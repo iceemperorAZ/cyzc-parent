@@ -53,7 +53,10 @@ public class FastdfsServiceImpl implements FastdfsService {
         if (StringUtils.isBlank(uri)) {
             return true;
         }
-        storageClient.deleteFile(uri.replace(imgUrl + "/", ""));
+        try {
+            storageClient.deleteFile(uri.replace(imgUrl + "/", ""));
+        }catch (Exception ignored){
+        }
         return true;
     }
 }

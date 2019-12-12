@@ -1,5 +1,6 @@
 package com.jingliang.mall.websocket;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.entity.Order;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -79,10 +80,10 @@ public class WebSocketServer {
      */
     public static void sendMessage(Session session, Order order) {
         try {
-            session.getBasicRemote().sendObject(String.format("%s (From Server，Session ID=%s)", order, session.getId()));
-            log.debug("==========================\n已推送的支付订单通知：{} \n=====================================",order);
-        } catch (IOException | EncodeException e) {
-            log.error("推送的支付订单通知出错：{}",order);
+            session.getBasicRemote().sendText(JSONObject.toJSONString(order));
+            log.debug("==========================\n已推送的支付订单通知：{} \n=====================================", order);
+        } catch (IOException e) {
+            log.error("推送的支付订单通知出错：{}", order);
             e.printStackTrace();
         }
     }

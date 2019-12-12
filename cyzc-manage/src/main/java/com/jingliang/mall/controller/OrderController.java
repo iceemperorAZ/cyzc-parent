@@ -35,10 +35,8 @@ import java.util.Objects;
 @RestController("backOrderController")
 public class OrderController {
     private final OrderService orderService;
-    private final RabbitProducer rabbitProducer;
-    public OrderController(OrderService orderService, RabbitProducer rabbitProducer) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
-        this.rabbitProducer = rabbitProducer;
     }
 
     /**

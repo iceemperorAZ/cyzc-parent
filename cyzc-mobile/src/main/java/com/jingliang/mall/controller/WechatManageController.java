@@ -16,10 +16,7 @@ import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.req.UserReq;
 import com.jingliang.mall.resp.ConfluenceDetailResp;
 import com.jingliang.mall.resp.ConfluenceResp;
-import com.jingliang.mall.service.BuyerService;
-import com.jingliang.mall.service.OrderDetailService;
-import com.jingliang.mall.service.OrderService;
-import com.jingliang.mall.service.UserService;
+import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -39,8 +36,6 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -64,12 +59,15 @@ public class WechatManageController {
     private final BuyerService buyerService;
     private final OrderService orderService;
     private final OrderDetailService orderDetailService;
+    private final WechatManageService wechatManageService;
 
-    public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService, OrderDetailService orderDetailService) {
+
+    public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService, OrderDetailService orderDetailService, WechatManageService wechatManageService) {
         this.userService = userService;
         this.buyerService = buyerService;
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
+        this.wechatManageService = wechatManageService;
     }
 
     /**
@@ -89,62 +87,16 @@ public class WechatManageController {
         Confluence confluence = new Confluence();
         confluence.setTotalPrice(0L);
         confluence.setRoyalty(0L);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(endTime);
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        //优惠券金额
-        AtomicLong couponTotal = new AtomicLong(0L);
+        confluence.setProfit(0L);
         users.forEach(user -> {
-            //查询绑定会员列表
-            List<Buyer> buyers = buyerService.findAllBySaleUserId(user.getId());
-            //总价（总价-退款）
-            AtomicReference<Long> totalPrice = new AtomicReference<>(0L);
-            buyers.forEach(buyer -> {
-                //查询会员在指定时间的所有已经完成支付的订单
-                Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                    List<Predicate> predicateList = new ArrayList<>();
-                    //订单状态300-700表示已经支付
-                    predicateList.add(cb.between(root.get("orderStatus"), 300, 600));
-                    predicateList.add(cb.between(root.get("payEndTime"), startTime, calendar.getTime()));
-                    predicateList.add(cb.equal(root.get("isAvailable"), true));
-                    predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                    query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                    return query.getRestriction();
-                };
-                List<Order> orders = orderService.findAll(orderSpecification);
-                if (orders.size() > 0) {
-                    for (Order order : orders) {
-                        //统计所有订单价格
-                        totalPrice.updateAndGet(v -> v + order.getTotalPrice());
-                        couponTotal.addAndGet(order.getPreferentialFee());
-                    }
-                }
-                //计算退货的单子
-                orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                    List<Predicate> predicateList = new ArrayList<>();
-                    //订单状态大于700表示要扣除绩效
-                    predicateList.add(cb.greaterThanOrEqualTo(root.get("orderStatus"), 700));
-                    predicateList.add(cb.between(root.get("updateTime"), startTime, calendar.getTime()));
-                    predicateList.add(cb.equal(root.get("isAvailable"), true));
-                    predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                    query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                    return query.getRestriction();
-                };
-                orders = orderService.findAll(orderSpecification);
-                if (orders.size() > 0) {
-                    for (Order order : orders) {
-                        //减去要扣除绩效的单子
-                        totalPrice.updateAndGet(v -> v - order.getTotalPrice());
-                    }
-                }
-            });
+            ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(user, startTime, endTime);
             //总价
-            confluence.setTotalPrice(totalPrice.get() + confluence.getTotalPrice());
+            confluence.setTotalPrice(confluenceDetail.getTotalPrice() + confluence.getTotalPrice());
             //计算销售提成价格
-            confluence.setRoyalty(confluence.getRoyalty() + (long) (user.getRatio() * 0.01 * totalPrice.get()));
+            confluence.setRoyalty(confluence.getRoyalty() + (long) (user.getRatio() * 0.01 * confluenceDetail.getTotalPrice()));
+            //净利润=总价-优惠券-提成
+            confluence.setProfit(confluenceDetail.getProfit() + confluence.getProfit());
         });
-        //净利润=总价-优惠券-提成
-        confluence.setProfit(confluence.getTotalPrice() - couponTotal.get() - confluence.getRoyalty());
         ConfluenceResp confluenceResp = MallBeanMapper.map(confluence, ConfluenceResp.class);
         return MallResult.buildQueryOk(confluenceResp);
     }
@@ -167,53 +119,7 @@ public class WechatManageController {
         //计算
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
         userPage.forEach(user -> {
-            ConfluenceDetail confluenceDetail = new ConfluenceDetail();
-            confluenceDetail.setId(user.getId());
-            confluenceDetail.setName(user.getUserName());
-            //查询绑定会员列表
-            List<Buyer> buyers = buyerService.findAllBySaleUserId(user.getId());
-            Long totalPrice = 0L;
-            for (Buyer buyer : buyers) {
-                //查询会员在指定时间的所有已经完成支付的订单
-                Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                    List<Predicate> predicateList = new ArrayList<>();
-                    //订单状态300-700表示已经支付
-                    predicateList.add(cb.between(root.get("orderStatus"), 300, 600));
-                    predicateList.add(cb.between(root.get("payEndTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                    predicateList.add(cb.equal(root.get("isAvailable"), true));
-                    predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                    query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                    return query.getRestriction();
-                };
-                List<Order> orders = orderService.findAll(orderSpecification);
-                if (orders.size() > 0) {
-                    for (Order order : orders) {
-                        //统计所有订单价格
-                        totalPrice += order.getTotalPrice();
-                    }
-                }
-                //计算退货的单子
-                orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                    List<Predicate> predicateList = new ArrayList<>();
-                    //订单状态大于700表示要扣除绩效
-                    predicateList.add(cb.greaterThan(root.get("orderStatus"), 700));
-                    predicateList.add(cb.between(root.get("updateTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                    predicateList.add(cb.equal(root.get("isAvailable"), true));
-                    predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                    query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                    return query.getRestriction();
-                };
-                orders = orderService.findAll(orderSpecification);
-                if (orders.size() > 0) {
-                    for (Order order : orders) {
-                        //减去要扣除绩效的单子
-                        totalPrice -= order.getTotalPrice();
-                    }
-                }
-            }
-            //销售提成
-            confluenceDetail.setTotalPrice(totalPrice);
-            confluenceDetail.setRoyalty((long) (totalPrice * user.getRatio() * 0.01));
+            ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(user, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
             confluenceDetails.add(confluenceDetail);
         });
         List<ConfluenceDetailResp> confluenceDetailResps = MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
@@ -241,55 +147,7 @@ public class WechatManageController {
         calendar.setTime(userReq.getCreateTimeEnd());
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         User user = userService.findById(userReq.getId());
-        //计算绩效
-        ConfluenceDetail confluenceDetail = new ConfluenceDetail();
-        confluenceDetail.setName(user.getUserName());
-        confluenceDetail.setTotalPrice(0L);
-        confluenceDetail.setRoyalty(0L);
-        //查询绑定会员列表
-        List<Buyer> buyers = buyerService.findAllBySaleUserId(user.getId());
-        Long totalPrice = 0L;
-        for (Buyer buyer : buyers) {
-            //查询会员在指定时间的所有已经完成支付的订单
-            Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-                //订单状态300-700表示已经支付
-                predicateList.add(cb.between(root.get("orderStatus"), 300, 600));
-                predicateList.add(cb.between(root.get("payEndTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                predicateList.add(cb.equal(root.get("isAvailable"), true));
-                predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                return query.getRestriction();
-            };
-            List<Order> orders = orderService.findAll(orderSpecification);
-            if (orders.size() > 0) {
-                for (Order order : orders) {
-                    //统计所有订单价格
-                    totalPrice += order.getTotalPrice();
-                }
-            }
-            //计算退货的单子
-            orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-                //订单状态大于700表示要扣除绩效
-                predicateList.add(cb.greaterThan(root.get("orderStatus"), 700));
-                predicateList.add(cb.between(root.get("updateTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                predicateList.add(cb.equal(root.get("isAvailable"), true));
-                predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                return query.getRestriction();
-            };
-            orders = orderService.findAll(orderSpecification);
-            if (orders.size() > 0) {
-                for (Order order : orders) {
-                    //减去要扣除绩效的单子
-                    totalPrice -= order.getTotalPrice();
-                }
-            }
-        }
-        //销售提成
-        confluenceDetail.setTotalPrice(totalPrice);
-        confluenceDetail.setRoyalty((long) (totalPrice * user.getRatio() * 0.01));
+        ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(user, userReq.getCreateTimeStart(), userReq.getUpdateTimeEnd());
         ConfluenceDetailResp confluenceDetailResp = MallBeanMapper.map(confluenceDetail, ConfluenceDetailResp.class);
         return MallResult.buildQueryOk(confluenceDetailResp);
     }
@@ -310,60 +168,9 @@ public class WechatManageController {
         calendar.setTime(userReq.getCreateTimeEnd());
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         User user = (User) session.getAttribute(sessionUser);
-        //计算绩效
-        ConfluenceDetail confluenceDetail = new ConfluenceDetail();
-        confluenceDetail.setTotalPrice(0L);
-        confluenceDetail.setRoyalty(0L);
-        //查询绑定会员列表
-        List<Buyer> buyers = buyerService.findAllBySaleUserId(user.getId());
-        Long totalPrice = 0L;
-        //优惠券金额
-        AtomicLong couponTotal = new AtomicLong(0L);
-        for (Buyer buyer : buyers) {
-            //查询会员在指定时间的所有已经完成支付的订单
-            Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-                //订单状态300-700表示已经支付
-                predicateList.add(cb.between(root.get("orderStatus"), 300, 600));
-                predicateList.add(cb.between(root.get("payEndTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                predicateList.add(cb.equal(root.get("isAvailable"), true));
-                predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                return query.getRestriction();
-            };
-            List<Order> orders = orderService.findAll(orderSpecification);
-            if (orders.size() > 0) {
-                for (Order order : orders) {
-                    //统计所有订单价格
-                    totalPrice += order.getTotalPrice();
-                    couponTotal.addAndGet(order.getPreferentialFee());
-                }
-            }
-            //计算退货的单子
-            orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-                //订单状态大于700表示要扣除绩效
-                predicateList.add(cb.greaterThan(root.get("orderStatus"), 700));
-                predicateList.add(cb.between(root.get("updateTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                predicateList.add(cb.equal(root.get("isAvailable"), true));
-                predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                return query.getRestriction();
-            };
-            orders = orderService.findAll(orderSpecification);
-            if (orders.size() > 0) {
-                for (Order order : orders) {
-                    //减去要扣除绩效的单子
-                    totalPrice -= order.getTotalPrice();
-                }
-            }
-        }
-        //计算销售提成价格
-        confluenceDetail.setTotalPrice(totalPrice);
-        confluenceDetail.setRoyalty((long) (totalPrice * user.getRatio() * 0.01));
-        //净利润=总价-优惠券-提成
-        confluenceDetail.setProfit(totalPrice - couponTotal.get() - ((long) (totalPrice * user.getRatio() * 0.01)));
+        ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(user, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
         ConfluenceDetailResp confluenceDetailResp = MallBeanMapper.map(confluenceDetail, ConfluenceDetailResp.class);
+        log.debug("返回结果：{}", confluenceDetailResp);
         return MallResult.buildQueryOk(confluenceDetailResp);
     }
 
@@ -403,53 +210,9 @@ public class WechatManageController {
         }
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
         for (Buyer buyer : buyerPage) {
-            ConfluenceDetail confluenceDetail = new ConfluenceDetail();
-            confluenceDetail.setId(buyer.getId());
-            if (StringUtils.isNotBlank(buyer.getShopName())) {
-                confluenceDetail.setName(buyer.getShopName());
-            } else {
-                confluenceDetail.setName(buyer.getUserName());
-            }
-            Long totalPrice = 0L;
-            //查询会员在指定时间的所有已经完成支付的订单
-            Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-                //订单状态300-700表示已经支付
-                predicateList.add(cb.between(root.get("orderStatus"), 300, 600));
-                predicateList.add(cb.between(root.get("payEndTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                predicateList.add(cb.equal(root.get("isAvailable"), true));
-                predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                return query.getRestriction();
-            };
-            List<Order> orders = orderService.findAll(orderSpecification);
-            if (orders.size() > 0) {
-                for (Order order : orders) {
-                    //统计所有订单价格
-                    totalPrice += order.getTotalPrice();
-                }
-            }
-            //计算退货的单子
-            orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-                //订单状态大于700表示要扣除绩效
-                predicateList.add(cb.greaterThan(root.get("orderStatus"), 700));
-                predicateList.add(cb.between(root.get("updateTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                predicateList.add(cb.equal(root.get("isAvailable"), true));
-                predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                return query.getRestriction();
-            };
-            orders = orderService.findAll(orderSpecification);
-            if (orders.size() > 0) {
-                for (Order order : orders) {
-                    //减去要扣除绩效的单子
-                    totalPrice -= order.getTotalPrice();
-                }
-            }
+            ConfluenceDetail confluenceDetail = wechatManageService.buyerPerformanceSummary(buyer, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
             //计算销售提成价格
-            confluenceDetail.setTotalPrice(totalPrice);
-            confluenceDetail.setRoyalty((long) (totalPrice * user.getRatio() * 0.01));
+            confluenceDetail.setRoyalty((long) (confluenceDetail.getTotalPrice() * user.getRatio() * 0.01));
             confluenceDetails.add(confluenceDetail);
         }
         confluenceMallPage.setContent(MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class));
@@ -497,53 +260,9 @@ public class WechatManageController {
         }
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
         for (Buyer buyer : buyerPage) {
-            ConfluenceDetail confluenceDetail = new ConfluenceDetail();
-            confluenceDetail.setId(buyer.getId());
-            if (StringUtils.isNotBlank(buyer.getShopName())) {
-                confluenceDetail.setName(buyer.getShopName());
-            } else {
-                confluenceDetail.setName(buyer.getUserName());
-            }
-            Long totalPrice = 0L;
-            //查询会员在指定时间的所有已经完成支付的订单
-            Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-                //订单状态300-700表示已经支付
-                predicateList.add(cb.between(root.get("orderStatus"), 300, 600));
-                predicateList.add(cb.between(root.get("payEndTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                predicateList.add(cb.equal(root.get("isAvailable"), true));
-                predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                return query.getRestriction();
-            };
-            List<Order> orders = orderService.findAll(orderSpecification);
-            if (orders.size() > 0) {
-                for (Order order : orders) {
-                    //统计所有订单价格
-                    totalPrice += order.getTotalPrice();
-                }
-            }
-            //计算退货的单子
-            orderSpecification = (Specification<Order>) (root, query, cb) -> {
-                List<Predicate> predicateList = new ArrayList<>();
-                //订单状态大于700表示要扣除绩效
-                predicateList.add(cb.greaterThan(root.get("orderStatus"), 700));
-                predicateList.add(cb.between(root.get("updateTime"), userReq.getCreateTimeStart(), calendar.getTime()));
-                predicateList.add(cb.equal(root.get("isAvailable"), true));
-                predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
-                query.where(cb.and(predicateList.toArray(new Predicate[0])));
-                return query.getRestriction();
-            };
-            orders = orderService.findAll(orderSpecification);
-            if (orders.size() > 0) {
-                for (Order order : orders) {
-                    //减去要扣除绩效的单子
-                    totalPrice -= order.getTotalPrice();
-                }
-            }
+            ConfluenceDetail confluenceDetail = wechatManageService.buyerPerformanceSummary(buyer, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
             //计算销售提成价格
-            confluenceDetail.setTotalPrice(totalPrice);
-            confluenceDetail.setRoyalty((long) (totalPrice * user.getRatio() * 0.01));
+            confluenceDetail.setRoyalty((long) (confluenceDetail.getTotalPrice() * user.getRatio() * 0.01));
             confluenceDetails.add(confluenceDetail);
         }
         confluenceMallPage.setContent(MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class));
@@ -726,8 +445,6 @@ public class WechatManageController {
         log.debug("返回结果：{}", confluenceMallPage);
         return MallResult.buildQueryOk(confluenceMallPage);
     }
-
-    //查询商户下的订单详情
 
     /**
      * 查询商户下的订单详情（销售）

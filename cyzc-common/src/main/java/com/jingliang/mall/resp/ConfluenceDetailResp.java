@@ -61,4 +61,8 @@ public class ConfluenceDetailResp implements Serializable {
     public Double getRoyalty() {
         return Objects.isNull(royalty) ? null : royalty / 100;
     }
+
+    public Double getProfit() {
+        return Objects.isNull(profit) ? null : profit / 100;
+    }
 }
