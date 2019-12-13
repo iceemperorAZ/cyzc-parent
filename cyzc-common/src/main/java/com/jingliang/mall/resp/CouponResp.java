@@ -153,13 +153,38 @@ public class CouponResp implements Serializable {
     private Boolean isReceive;
 
     /**
-     * 状态 100：未开始，200：已开始，300：已结束
+     * 是否发布 0：否，1：是
      */
-    @ApiModelProperty(value = "100：未开始，200：已开始，300：已结束")
+    @ApiModelProperty(value = "是否发布 0：否，1：是")
+    private Boolean isRelease;
+
+    /**
+     * 发放开始时间
+     */
+    @ApiModelProperty(value = "发放开始时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date provideStartTime;
+
+    /**
+     * 发放结束时间
+     */
+    @ApiModelProperty(value = "发放结束时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date provideEndTime;
+
+    /**
+     * 状态 -1:未发布,100：未开始，200：已开始，300：已结束
+     */
+    @ApiModelProperty(value = " -1:未开始，100：未开始，200：已开始，300：已结束")
     public Integer getStatus() {
         Date date = new Date();
-        int start = startTime.compareTo(date);
-        int end = expirationTime.compareTo(date);
+        int start = provideStartTime.compareTo(date);
+        int end = provideEndTime.compareTo(date);
+        if (!isRelease) {
+            return -1;
+        }
         if (start > 0) {
             return 100;
         }

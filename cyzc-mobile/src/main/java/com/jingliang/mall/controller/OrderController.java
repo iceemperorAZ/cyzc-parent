@@ -140,16 +140,18 @@ public class OrderController {
         }
         order.setPreferentialFee(0L);
         //计算使用优惠券后的支付价
-        if (Objects.nonNull(order.getCouponId())) {
-            BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(order.getCouponId(), buyer.getId());
-            if (Objects.isNull(buyerCoupon) || buyerCoupon.getIsUsed()) {
-                return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
+        if (Objects.nonNull(orderReq.getCouponIdList())) {
+            for (Long couponId : orderReq.getCouponIdList()) {
+                BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(couponId, buyer.getId());
+                if (Objects.isNull(buyerCoupon) || buyerCoupon.getIsUsed()) {
+                    return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
+                }
+                order.setPayableFee(order.getPayableFee() - buyerCoupon.getMoney());
+                order.setPreferentialFee(order.getPreferentialFee() + buyerCoupon.getMoney());
+                buyerCoupon.setIsUsed(true);
+                //优惠券标记为已使用
+                buyerCouponService.save(buyerCoupon);
             }
-            order.setPayableFee(order.getPayableFee() - buyerCoupon.getMoney());
-            order.setPreferentialFee(order.getPreferentialFee() + buyerCoupon.getMoney());
-            buyerCoupon.setIsUsed(true);
-            //优惠券标记为已使用
-            buyerCouponService.save(buyerCoupon);
         }
         //生成订单号
         order.setOrderNo(redisService.getOrderNo());

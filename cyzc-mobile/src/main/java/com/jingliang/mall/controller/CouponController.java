@@ -82,9 +82,10 @@ public class CouponController {
             }
             Date date = new Date();
             //可用范围内
-            predicateList.add(cb.lessThanOrEqualTo(root.get("startTime"), date));
-            predicateList.add(cb.greaterThanOrEqualTo(root.get("expirationTime"), date));
+            predicateList.add(cb.lessThanOrEqualTo(root.get("provideStartTime"), date));
+            predicateList.add(cb.greaterThanOrEqualTo(root.get("provideEndTime"), date));
             predicateList.add(cb.equal(root.get("isAvailable"), true));
+            predicateList.add(cb.equal(root.get("isRelease"), true));
             predicateList.add(cb.greaterThan(root.get("residueNumber"), 0));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
             query.orderBy(cb.desc(root.get("residueNumber")), cb.asc(root.get("expirationTime")));

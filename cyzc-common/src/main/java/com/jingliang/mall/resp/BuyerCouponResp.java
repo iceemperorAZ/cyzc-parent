@@ -110,9 +110,9 @@ public class BuyerCouponResp implements Serializable {
     private Date createTime;
 
     /**
-     * 状态 100：未使用，200：已使用，300：已失效
+     * 状态  -1:未开始，100：未使用，200：已使用，300：已失效
      */
-    @ApiModelProperty(value = "100：未使用，200：已使用，300：已失效")
+    @ApiModelProperty(value = " -1:未开始，100：未使用，200：已使用，300：已失效")
     public Integer getStatus() {
         //在生效期内
         if (isUsed) {
@@ -120,23 +120,32 @@ public class BuyerCouponResp implements Serializable {
             return 200;
         }
         Date date = new Date();
+        int start = startTime.compareTo(date);
         int end = expirationTime.compareTo(date);
+        if (start > 0) {
+            return -1;
+        }
         if (end > 0) {
             return 100;
         }
         return 300;
     }
+
     /**
      * 状态 100：可使用，200：已使用，300：已失效
      */
-    @ApiModelProperty(value = "100：可使用，200：已使用，300：已失效")
+    @ApiModelProperty(value = " -1:未开始，100：可使用，200：已使用，300：已失效")
     public String getStatusView() {
         if (isUsed) {
             //已经使用过了
             return "已使用";
         }
         Date date = new Date();
+        int start = startTime.compareTo(date);
         int end = expirationTime.compareTo(date);
+        if (start > 0) {
+            return "未开始";
+        }
         if (end > 0) {
             //在生效期内
             return "去使用";

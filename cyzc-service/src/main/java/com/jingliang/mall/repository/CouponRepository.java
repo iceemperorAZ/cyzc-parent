@@ -16,17 +16,6 @@ import java.util.List;
 public interface CouponRepository extends BaseRepository<Coupon, Long> {
 
     /**
-     * 根据主键Id、开始时间、过期时间、可用性查询优惠券
-     *
-     * @param id             主键Id
-     * @param startTime      开始时间
-     * @param expirationTime 过期时间
-     * @param isAvailable    可用性
-     * @return 返回查询到的优惠券信息
-     */
-    Coupon findByIdAndStartTimeGreaterThanEqualAndExpirationTimeLessThanEqualAndIsAvailable(Long id, Date startTime, Date expirationTime, Boolean isAvailable);
-
-    /**
      * 根据优惠券区Id查询优惠券列表
      *
      * @param productZoneId 优惠券区Id

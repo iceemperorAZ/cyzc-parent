@@ -49,14 +49,6 @@ public interface CouponService {
     List<Coupon> saveAll(List<Coupon> coupons);
 
     /**
-     * 查询在使用时间内的优惠券
-     *
-     * @param couponId 优惠券Id
-     * @return 返回查询到的优惠券信息
-     */
-    Coupon findAllById(Long couponId);
-
-    /**
      * 根据商品区Id查询优惠券列表
      *
      * @param productZoneId 商品区

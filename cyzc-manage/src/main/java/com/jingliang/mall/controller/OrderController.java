@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Order;
+import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.resp.OrderResp;
 import com.jingliang.mall.service.OrderService;
@@ -10,13 +10,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +37,13 @@ import java.util.Objects;
 @Slf4j
 @RestController("backOrderController")
 public class OrderController {
+    /**
+     * session用户Key
+     */
+    @Value("${session.user.key}")
+    private String sessionUser;
     private final OrderService orderService;
+
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
@@ -44,9 +53,10 @@ public class OrderController {
      */
     @ApiOperation(value = "发货")
     @PostMapping("/deliver")
-    public MallResult<OrderResp> deliver(@RequestBody OrderReq orderReq) {
+    public MallResult<OrderResp> deliver(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
-        if (Objects.isNull(orderReq.getId()) || StringUtils.isBlank(orderReq.getDeliveryName()) || StringUtils.isBlank(orderReq.getDeliveryPhone())) {
+        if (Objects.isNull(orderReq.getId()) || StringUtils.isBlank(orderReq.getDeliveryName())
+                || StringUtils.isBlank(orderReq.getDeliveryPhone()) || StringUtils.isBlank(orderReq.getStorehouse())) {
             return MallResult.buildParamFail();
         }
         Order order = new Order();
@@ -55,10 +65,13 @@ public class OrderController {
         order.setOrderStatus(400);
         order.setDeliveryPhone(orderReq.getDeliveryPhone());
         order.setUpdateTime(new Date());
+        User user = (User) session.getAttribute(sessionUser);
+        order.setUpdateUserId(user.getId());
+        order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
-        if(Objects.isNull(order)){
+        if (Objects.isNull(order)) {
             log.debug("返回结果：{}", MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
-            return MallResult.build(MallConstant.ORDER_FAIL,MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
+            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
         }
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
@@ -70,7 +83,7 @@ public class OrderController {
      */
     @ApiOperation(value = "退货(不扣绩效)")
     @PostMapping("/refunds")
-    public MallResult<OrderResp> refunds(@RequestBody OrderReq orderReq) {
+    public MallResult<OrderResp> refunds(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId())) {
             return MallResult.buildParamFail();
@@ -83,6 +96,9 @@ public class OrderController {
         order.setDeliveryPhone(orderReq.getDeliveryPhone());
         order.setFinishTime(date);
         order.setUpdateTime(date);
+        User user = (User) session.getAttribute(sessionUser);
+        order.setUpdateUserId(user.getId());
+        order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
@@ -94,7 +110,7 @@ public class OrderController {
      */
     @ApiOperation(value = "退货(扣绩效)")
     @PostMapping("/refunds/money")
-    public MallResult<OrderResp> refundsMoney(@RequestBody OrderReq orderReq) {
+    public MallResult<OrderResp> refundsMoney(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId())) {
             return MallResult.buildParamFail();
@@ -107,6 +123,9 @@ public class OrderController {
         order.setDeliveryPhone(orderReq.getDeliveryPhone());
         order.setFinishTime(date);
         order.setUpdateTime(date);
+        User user = (User) session.getAttribute(sessionUser);
+        order.setUpdateUserId(user.getId());
+        order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
@@ -148,7 +167,6 @@ public class OrderController {
         };
         Page<Order> orderPage = orderService.findAll(orderSpecification, pageRequest);
         MallPage<OrderResp> orderRespMallPage = MallUtils.toMallPage(orderPage, OrderResp.class);
-
         log.debug("返回结果：{}", orderRespMallPage);
         return MallResult.buildQueryOk(orderRespMallPage);
     }

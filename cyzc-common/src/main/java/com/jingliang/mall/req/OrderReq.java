@@ -134,10 +134,10 @@ public class OrderReq extends BaseReq implements Serializable {
     private Double preferentialFee;
 
     /**
-     * 用户优惠券Id
+     * 用户优惠券Id集合
      */
-    @ApiModelProperty(value = "用户优惠券Id")
-    private Long couponId;
+    @ApiModelProperty(value = "用户优惠券Id集合")
+    private List<Long> couponIdList;
 
     /**
      * 商品数量
@@ -374,6 +374,18 @@ public class OrderReq extends BaseReq implements Serializable {
     private String deliveryPhone;
 
     /**
+     * 修改人
+     */
+    @ApiModelProperty(value = "修改人")
+    private String updateUserName;
+
+    /**
+     * 修改人Id
+     */
+    @ApiModelProperty(value = "修改人Id")
+    private Long updateUserId;
+
+    /**
      * 修改时间
      */
     @ApiModelProperty(value = "修改时间")
@@ -396,6 +408,12 @@ public class OrderReq extends BaseReq implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTimeEnd;
+
+    /**
+     * 发货仓库
+     */
+    @ApiModelProperty(value = "发货仓库")
+    private String storehouse;
 
     /**
      * 订单详情集合

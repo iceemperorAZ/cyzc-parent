@@ -3,10 +3,7 @@ package com.jingliang.mall.controller;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jingliang.mall.bean.Confluence;
 import com.jingliang.mall.bean.ConfluenceDetail;
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallConstant;
-import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.entity.OrderDetail;
@@ -14,8 +11,10 @@ import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.req.UserReq;
+import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.resp.ConfluenceDetailResp;
 import com.jingliang.mall.resp.ConfluenceResp;
+import com.jingliang.mall.resp.UserResp;
 import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -530,4 +529,44 @@ public class WechatManageController {
         log.debug("返回结果：{}", confluenceDetailResps);
         return MallResult.buildQueryOk(confluenceDetailResps);
     }
+
+    /**
+     * 查询所有销售信息
+     */
+    @GetMapping("/manager/page/users")
+    @ApiOperation(value = "查询所有销售信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "分页", name = "page", dataType = "int", paramType = "query", defaultValue = "1"),
+            @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
+    })
+    public MallResult<MallPage<UserResp>> managerPageUsers(@ApiIgnore UserReq userReq) {
+        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
+        if (StringUtils.isNotBlank(userReq.getClause())) {
+            pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
+        }
+        Page<User> allUserByPage = userService.findAllUserByPage(pageRequest);
+        MallPage<UserResp> userRespMallPage = MallUtils.toMallPage(allUserByPage, UserResp.class);
+        return MallResult.buildQueryOk(userRespMallPage);
+    }
+
+    /**
+     * 查询指定销售下的商户
+     */
+    @GetMapping("/user/page/buyers")
+    @ApiOperation(value = "查询指定销售下的商户")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "销售Id", name = "id", dataType = "long", paramType = "query", required = true),
+            @ApiImplicitParam(value = "分页", name = "page", dataType = "int", paramType = "query", defaultValue = "1"),
+            @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
+    })
+    public MallResult<MallPage<BuyerResp>> managerPageBuyer(@ApiIgnore UserReq userReq) {
+        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
+        if (StringUtils.isNotBlank(userReq.getClause())) {
+            pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
+        }
+        Page<Buyer> buyerPage = buyerService.findAllBySaleUserId(userReq.getId(), pageRequest);
+        MallPage<BuyerResp> userRespMallPage = MallUtils.toMallPage(buyerPage, BuyerResp.class);
+        return MallResult.buildQueryOk(userRespMallPage);
+    }
+
 }

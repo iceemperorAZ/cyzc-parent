@@ -24,6 +24,8 @@ public interface MallConstant {
     String TEXT_RECOVERY_AUTHORITY_OK = "权限回收成功";
     String TEXT_ORDER_OK = "下单成功";
     String TEXT_PAY_OK = "支付成功";
+    String TEXT_RELEASE_OK = "发布成功";
+    String TEXT_RECALL_OK = "撤回成功";
 
     Integer FAIL = 300;
     String TEXT_LOGOUT_FAIL = "注销失败";
@@ -31,6 +33,8 @@ public interface MallConstant {
     String TEXT_BUYER_REPEAT_FAIL = "该微信号已被其他销售绑定";
     String TEXT_OLD_PASSWORD_FAIL = "原密码不正确";
     String TEXT_PHONE_FAIL = "手机号格式错误";
+    String TEXT_COUPON_RELEASE_FAIL = "发布失败，优惠券已过期或不可领取";
+    String TEXT_COUPON_SAVE_FAIL = "保存失败，优惠券时间段选择不符合逻辑";
 
     Integer PARAM_FAIL = 310;
     String TEXT_PARAM_FAIL = "参数不全";

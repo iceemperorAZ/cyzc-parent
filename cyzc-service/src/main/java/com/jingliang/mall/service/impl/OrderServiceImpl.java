@@ -104,11 +104,13 @@ public class OrderServiceImpl implements OrderService {
         //如果是取消 则返回库存  返回优惠券
         if (order.getOrderStatus() == 200) {
             //如果有使用优惠券则返还优惠券
-            if (Objects.nonNull(order.getCouponId())) {
-                BuyerCoupon buyerCoupon = new BuyerCoupon();
-                buyerCoupon.setId(order.getCouponId());
-                buyerCoupon.setIsUsed(false);
-                buyerCouponService.save(buyerCoupon);
+            if (Objects.nonNull(order.getCouponIds())) {
+                for (String couponId : order.getCouponIds().split(",")) {
+                    BuyerCoupon buyerCoupon = new BuyerCoupon();
+                    buyerCoupon.setId(Long.parseLong(couponId));
+                    buyerCoupon.setIsUsed(false);
+                    buyerCouponService.save(buyerCoupon);
+                }
             }
             //查询订单详情
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
@@ -129,7 +131,7 @@ public class OrderServiceImpl implements OrderService {
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
             for (OrderDetail orderDetail : orderDetails) {
                 Sku sku = skuService.findByProductId(orderDetail.getProductId());
-                if(sku.getSkuRealityNum()-orderDetail.getProductNum()<0){
+                if (sku.getSkuRealityNum() - orderDetail.getProductNum() < 0) {
                     return null;
                 }
                 sku = new Sku();
@@ -149,5 +151,12 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findAll(Specification<Order> orderSpecification) {
         return orderRepository.findAll(orderSpecification);
+    }
+
+    public static void main(String[] args) {
+        String[] split = "12332423".split(",");
+        for (String s : split) {
+            System.out.println(s);
+        }
     }
 }

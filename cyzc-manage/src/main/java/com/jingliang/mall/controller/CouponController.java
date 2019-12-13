@@ -1,12 +1,11 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Coupon;
 import com.jingliang.mall.entity.User;
-import com.jingliang.mall.service.CouponService;
-import com.jingliang.mall.common.*;
 import com.jingliang.mall.req.CouponReq;
 import com.jingliang.mall.resp.CouponResp;
+import com.jingliang.mall.service.CouponService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +21,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -56,17 +56,55 @@ public class CouponController {
     public MallResult<CouponResp> save(@RequestBody CouponReq couponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", couponReq);
         if (Objects.isNull(couponReq.getTotalNumber()) || Objects.isNull(couponReq.getMoney())
-                || Objects.isNull(couponReq.getUseCondition()) || Objects.isNull(couponReq.getCouponType())) {
+                || Objects.isNull(couponReq.getUseCondition()) || Objects.isNull(couponReq.getCouponType())
+                || Objects.isNull(couponReq.getStartTime()) || Objects.isNull(couponReq.getExpirationTime())
+                || Objects.isNull(couponReq.getProvideStartTime()) || Objects.isNull(couponReq.getProvideEndTime())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
             return MallResult.buildParamFail();
+        }
+        //判断时间是否符合逻辑
+        if (couponReq.getProvideEndTime().compareTo(new Date()) < 0 || couponReq.getExpirationTime().compareTo(new Date()) < 0 || couponReq.getExpirationTime().compareTo(couponReq.getProvideEndTime()) < 0) {
+            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_COUPON_SAVE_FAIL);
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(couponReq, user);
         couponReq.setProductZoneId(-1L);
         couponReq.setResidueNumber(couponReq.getTotalNumber());
+        couponReq.setIsRelease(false);
         CouponResp couponResp = MallBeanMapper.map(couponService.save(MallBeanMapper.map(couponReq, Coupon.class)), CouponResp.class);
         log.debug("返回结果：{}", couponResp);
         return MallResult.buildSaveOk(couponResp);
+    }
+
+    /**
+     * 发布/撤销优惠券
+     */
+    @ApiOperation(value = "发布/撤销优惠券")
+    @PostMapping("/release")
+    public MallResult<CouponResp> release(@RequestBody CouponReq couponReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", couponReq);
+        if (Objects.isNull(couponReq.getId()) || Objects.isNull(couponReq.getIsRelease())) {
+            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            return MallResult.buildParamFail();
+        }
+        Coupon coupon = couponService.findById(couponReq.getId());
+        if (Objects.isNull(coupon)) {
+            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_FAIL);
+        }
+        coupon.setIsRelease(couponReq.getIsRelease());
+        if (coupon.getIsRelease() && coupon.getProvideEndTime().compareTo(new Date()) < 0) {
+            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_COUPON_RELEASE_FAIL);
+        }
+        User user = (User) session.getAttribute(sessionUser);
+        coupon.setUpdateUserId(user.getId());
+        coupon.setUpdateUserName(user.getUserName());
+        CouponResp couponResp = MallBeanMapper.map(couponService.save(coupon), CouponResp.class);
+        log.debug("返回结果：{}", couponResp);
+        if (coupon.getIsRelease()) {
+            return MallResult.build(MallConstant.OK, MallConstant.TEXT_RELEASE_OK, couponResp);
+        } else {
+            return MallResult.build(MallConstant.OK, MallConstant.TEXT_RECALL_OK, couponResp);
+        }
     }
 
     /**

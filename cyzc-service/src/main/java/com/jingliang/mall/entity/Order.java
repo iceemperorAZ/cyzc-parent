@@ -86,10 +86,10 @@ public class Order implements Serializable {
     private Long preferentialFee;
 
     /**
-     * 用户优惠券Id
+     * 使用优惠券Id集合 多个之间使用,分割
      */
-    @Column(name = "coupon_id")
-    private Long couponId;
+    @Column(name = "coupon_ids")
+    private String couponIds;
 
     /**
      * 商品数量
@@ -180,6 +180,25 @@ public class Order implements Serializable {
      */
     @Column(name = "delivery_phone")
     private String deliveryPhone;
+
+    /**
+     * 修改人
+     */
+    @Column(name = "update_user_name")
+    private String updateUserName;
+
+    /**
+     * 修改人Id
+     */
+    @Column(name = "update_user_id")
+    private Long updateUserId;
+
+    /**
+     * 发货仓库
+     */
+    @Column(name = "storehouse")
+    private String storehouse;
+
 
     /**
      * 修改时间

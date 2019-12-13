@@ -7,11 +7,14 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 订单表
@@ -90,10 +93,16 @@ public class OrderResp implements Serializable {
     private Double preferentialFee;
 
     /**
-     * 用户优惠券Id
+     * 使用优惠券Id集合 多个之间使用,分割
      */
-    @ApiModelProperty(value = "用户优惠券Id")
-    private String couponId;
+    @ApiModelProperty(value = "使用优惠券Id集合 多个之间使用,分割")
+    private String couponIds;
+
+    /**
+     * 用户优惠券Id集合
+     */
+    @ApiModelProperty(value = "用户优惠券Id集合")
+    private List<Long> couponIdList;
 
     /**
      * 商品数量
@@ -198,12 +207,31 @@ public class OrderResp implements Serializable {
     private String deliveryPhone;
 
     /**
+     * 修改人
+     */
+    @ApiModelProperty(value = "修改人")
+    private String updateUserName;
+
+    /**
+     * 修改人Id
+     */
+    @ApiModelProperty(value = "修改人Id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long updateUserId;
+
+    /**
      * 修改时间
      */
     @ApiModelProperty(value = "修改时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+
+    /**
+     * 发货仓库
+     */
+    @ApiModelProperty(value = "发货仓库")
+    private String storehouse;
 
     /**
      * 订单详情列表
@@ -227,12 +255,39 @@ public class OrderResp implements Serializable {
             case 600:
                 return "已完成";
             case 700:
+            case 800:
+                return "已退货";
+            default:
+                return "未知";
+        }
+    }
+
+    @ApiModelProperty(value = "订单状态文字描述")
+    public String getStatusView() {
+        switch (orderStatus) {
+            case 100:
+                return "待支付";
+            case 200:
+                return "已取消";
+            case 300:
+                return "待发货";
+            case 400:
+                return "待收货";
+            case 500:
+                return "待确认";
+            case 600:
+                return "已完成";
+            case 700:
                 return "已退货(不扣绩效)";
             case 800:
                 return "已退货(扣绩效)";
             default:
                 return "未知";
         }
+    }
+
+    public List<Long> getCouponIdList() {
+        return StringUtils.isBlank(couponIds) ? null : Arrays.stream(couponIds.split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
     }
 
     public Double getTotalPrice() {

@@ -2,8 +2,8 @@ package com.jingliang.mall.service.impl;
 
 import com.jingliang.mall.entity.Coupon;
 import com.jingliang.mall.repository.CouponRepository;
-import com.jingliang.mall.service.CouponService;
 import com.jingliang.mall.server.RedisService;
+import com.jingliang.mall.service.CouponService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,7 +36,10 @@ public class CouponServiceImpl implements CouponService {
     @Override
     public Coupon save(Coupon coupon) {
         coupon = couponRepository.save(coupon);
-        redisService.couponIncrement(coupon.getId() + "", coupon.getResidueNumber());
+        //如果为发布状态则放入redis中
+        if (coupon.getIsRelease()) {
+            redisService.couponIncrement(coupon.getId() + "", coupon.getResidueNumber());
+        }
         return coupon;
     }
 
@@ -47,7 +50,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public Coupon findById(Long couponId) {
-        return couponRepository.findById(couponId).orElse(null);
+        return couponRepository.findAllByIdAndIsAvailable(couponId,true);
     }
 
     @Override
@@ -55,11 +58,6 @@ public class CouponServiceImpl implements CouponService {
         return couponRepository.saveAll(coupons);
     }
 
-    @Override
-    public Coupon findAllById(Long couponId) {
-        Date date = new Date();
-        return couponRepository.findByIdAndStartTimeGreaterThanEqualAndExpirationTimeLessThanEqualAndIsAvailable(couponId, date, date, true);
-    }
 
     @Override
     public List<Coupon> findAllByProductZoneId(Long productZoneId) {

@@ -323,6 +323,28 @@ public class CouponReq extends BaseReq implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTimeEnd;
 
+    /**
+     * 是否发布 0：否，1：是
+     */
+    @ApiModelProperty(value = "是否发布 0：否，1：是")
+    private Boolean isRelease;
+
+    /**
+     * 发放开始时间
+     */
+    @ApiModelProperty(value = "发放开始时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date provideStartTime;
+
+    /**
+     * 发放结束时间
+     */
+    @ApiModelProperty(value = "发放结束时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date provideEndTime;
+
     public void setMoney(Double money) {
         this.money = money * 100;
     }

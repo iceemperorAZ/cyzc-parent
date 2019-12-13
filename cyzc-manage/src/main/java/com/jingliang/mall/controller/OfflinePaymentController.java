@@ -53,7 +53,7 @@ public class OfflinePaymentController {
     }
 
     /**
-     * 保存/更新支付凭证
+     * 保存/更新支付凭证storehouse
      */
     @PostMapping("/save")
     @ApiOperation(value = "保存/更新支付凭证")
@@ -104,8 +104,10 @@ public class OfflinePaymentController {
         assert offlinePayment != null;
         offlinePayment.setUrls(builder.substring(1));
         OfflinePaymentResp offlinePaymentResp = MallBeanMapper.map(offlinePaymentService.save(offlinePayment), OfflinePaymentResp.class);
-        //推送订单支付通知
-        rabbitProducer.paymentNotice(order);
+        if (Objects.isNull(offlinePaymentReq.getOrderId())) {
+            //首次上传凭证推送订单支付通知
+            rabbitProducer.paymentNotice(order);
+        }
         log.debug("返回参数：{}", offlinePaymentResp);
         return MallResult.buildSaveOk(offlinePaymentResp);
     }

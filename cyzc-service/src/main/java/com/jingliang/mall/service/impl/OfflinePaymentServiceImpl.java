@@ -1,8 +1,8 @@
 package com.jingliang.mall.service.impl;
 
-import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.entity.OfflinePayment;
 import com.jingliang.mall.entity.Order;
+import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.OfflinePaymentRepository;
 import com.jingliang.mall.repository.OrderRepository;
 import com.jingliang.mall.service.OfflinePaymentService;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * 线下支付ServiceImpl
@@ -36,13 +35,13 @@ public class OfflinePaymentServiceImpl implements OfflinePaymentService {
     @Transactional(rollbackFor = Exception.class)
     public OfflinePayment save(OfflinePayment offlinePayment) {
         //如果是创建则修改订单否则不修改订单
-        if (Objects.isNull(offlinePayment.getId())) {
-            Order order = orderRepository.getOne(offlinePayment.getOrderId());
-            order.setPayEndTime(new Date());
-            order.setOrderStatus(300);
-            order.setUpdateTime(new Date());
-            orderRepository.save(order);
-        }
+        Order order = orderRepository.getOne(offlinePayment.getOrderId());
+        order.setPayEndTime(new Date());
+        order.setOrderStatus(300);
+        order.setUpdateTime(new Date());
+        order.setUpdateUserId(offlinePayment.getUpdateUserId());
+        order.setUpdateUserName(offlinePayment.getUpdateUserName());
+        orderRepository.save(order);
         return offlinePaymentRepository.save(offlinePayment);
     }
 

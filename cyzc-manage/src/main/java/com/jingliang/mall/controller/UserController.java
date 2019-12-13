@@ -159,9 +159,6 @@ public class UserController {
             }
             //查询是否传过来的销售是否已经绑定员工
             User user = userService.findByBuyerId(userReq.getBuyerId());
-            if (Objects.isNull(userReq.getId())) {
-                return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_REPEAT_FAIL);
-            }
             if (Objects.nonNull(user) && !Objects.equals(user.getId(), userReq.getId())) {
                 return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_REPEAT_FAIL);
             }
