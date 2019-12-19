@@ -9,14 +9,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 /**
  * 用户优惠券
  *
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2019-10-28 13:36:23
+ * @date 2019-12-18 16:50:49
  */
 @ApiModel(value = "BuyerCouponReq", description = "用户优惠券")
 @EqualsAndHashCode(callSuper = true)
@@ -62,6 +62,24 @@ public class BuyerCouponReq extends BaseReq implements Serializable {
     private Long couponIdEnd;
 
     /**
+     * 使用范围（商品分类）
+     */
+    @ApiModelProperty(value = "使用范围（商品分类）")
+    private Long productTypeId;
+
+    /**
+     * 使用范围（商品分类）-开始
+     */
+    @ApiModelProperty(value = "使用范围（商品分类）-开始")
+    private Long productTypeIdStart;
+
+    /**
+     * 使用范围（商品分类）-结束
+     */
+    @ApiModelProperty(value = "使用范围（商品分类）-结束")
+    private Long productTypeIdEnd;
+
+    /**
      * 用户Id
      */
     @ApiModelProperty(value = "用户Id")
@@ -80,40 +98,22 @@ public class BuyerCouponReq extends BaseReq implements Serializable {
     private Long buyerIdEnd;
 
     /**
-     * 金额
+     * 优惠百分比
      */
-    @ApiModelProperty(value = "金额")
-    private Double money;
+    @ApiModelProperty(value = "优惠百分比")
+    private Long percentage;
 
     /**
-     * 金额-开始
+     * 优惠百分比-开始
      */
-    @ApiModelProperty(value = "金额-开始")
-    private Double moneyStart;
+    @ApiModelProperty(value = "优惠百分比-开始")
+    private Long percentageStart;
 
     /**
-     * 金额-结束
+     * 优惠百分比-结束
      */
-    @ApiModelProperty(value = "金额-结束")
-    private Double moneyEnd;
-
-    /**
-     * 使用条件(最低使用价格)
-     */
-    @ApiModelProperty(value = "使用条件(最低使用价格)")
-    private Double useCondition;
-
-    /**
-     * 使用条件(最低使用价格)-开始
-     */
-    @ApiModelProperty(value = "使用条件(最低使用价格)-开始")
-    private Double useConditionStart;
-
-    /**
-     * 使用条件(最低使用价格)-结束
-     */
-    @ApiModelProperty(value = "使用条件(最低使用价格)-结束")
-    private Double useConditionEnd;
+    @ApiModelProperty(value = "优惠百分比-结束")
+    private Long percentageEnd;
 
     /**
      * 开始时间
@@ -164,23 +164,28 @@ public class BuyerCouponReq extends BaseReq implements Serializable {
     private Date expirationTimeEnd;
 
     /**
-     * 使用范围（商品分类多个）
-     */
-    @ApiModelProperty(value = "使用范围（商品分类多个）")
-    private Set<Long> productTypeIds;
-
-
-    /**
      * 优惠券描述
      */
     @ApiModelProperty(value = "优惠券描述")
     private String couponDescribe;
 
     /**
-     * 是否已使用 0：否，1：是
+     * 剩余可用张数
      */
-    @ApiModelProperty(value = "是否已使用 0：否，1：是")
-    private Boolean isUsed;
+    @ApiModelProperty(value = "剩余可用张数")
+    private Integer receiveNum;
+
+    /**
+     * 剩余可用张数-开始
+     */
+    @ApiModelProperty(value = "剩余可用张数-开始")
+    private Integer receiveNumStart;
+
+    /**
+     * 剩余可用张数-结束
+     */
+    @ApiModelProperty(value = "剩余可用张数-结束")
+    private Integer receiveNumEnd;
 
     /**
      * 是否可用 0：否，1：是
@@ -189,56 +194,63 @@ public class BuyerCouponReq extends BaseReq implements Serializable {
     private Boolean isAvailable;
 
     /**
-     * 领取时间(创建时间)
+     * 领取时间/赠送时间(创建时间)
      */
-    @ApiModelProperty(value = "领取时间(创建时间)")
+    @ApiModelProperty(value = "领取时间/赠送时间(创建时间)")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
-     * 领取时间(创建时间)-开始
+     * 领取时间/赠送时间(创建时间)-开始
      */
-    @ApiModelProperty(value = "领取时间(创建时间)-开始")
+    @ApiModelProperty(value = "领取时间/赠送时间(创建时间)-开始")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTimeStart;
 
     /**
-     * 领取时间(创建时间)-结束
+     * 领取时间/赠送时间(创建时间)-结束
      */
-    @ApiModelProperty(value = "领取时间(创建时间)-结束")
+    @ApiModelProperty(value = "领取时间/赠送时间(创建时间)-结束")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTimeEnd;
 
     /**
-     * 状态
+     * 创建人Id(系统：-1)
      */
-    @ApiModelProperty(value = "状态 未使用：100，已使用：200，已过期：300")
+    @ApiModelProperty(value = "创建人Id(系统：-1)")
+    private Long createUserId;
+
+    /**
+     * 创建人Id(系统：-1)-开始
+     */
+    @ApiModelProperty(value = "创建人Id(系统：-1)-开始")
+    private Long createUserIdStart;
+
+    /**
+     * 创建人Id(系统：-1)-结束
+     */
+    @ApiModelProperty(value = "创建人Id(系统：-1)-结束")
+    private Long createUserIdEnd;
+
+    /**
+     * 创建人(系统：系统)
+     */
+    @ApiModelProperty(value = "创建人(系统：系统)")
+    private String createUser;
+
+    /**
+     * 状态 可使用：100，已用完：200，已过期：300
+     */
+    @ApiModelProperty(value = "状态 可使用：100，已用完：200，已过期：300")
     private Integer status;
 
-    public void setMoney(Double money) {
-        this.money = money * 100;
-    }
+    /**
+     * 商品分类Id集合
+     */
+    @ApiModelProperty(value = "商品分类Id集合")
+    private List<Long> productTypeIds;
 
-    public void setMoneyStart(Double moneyStart) {
-        this.moneyStart = moneyStart * 100;
-    }
-
-    public void setMoneyEnd(Double moneyEnd) {
-        this.moneyEnd = moneyEnd * 100;
-    }
-
-    public void setUseCondition(Double useCondition) {
-        this.useCondition = useCondition * 100;
-    }
-
-    public void setUseConditionStart(Double useConditionStart) {
-        this.useConditionStart = useConditionStart * 100;
-    }
-
-    public void setUseConditionEnd(Double useConditionEnd) {
-        this.useConditionEnd = useConditionEnd * 100;
-    }
 }

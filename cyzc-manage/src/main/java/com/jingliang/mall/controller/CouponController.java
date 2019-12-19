@@ -55,8 +55,8 @@ public class CouponController {
     @PostMapping("/save")
     public MallResult<CouponResp> save(@RequestBody CouponReq couponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", couponReq);
-        if (Objects.isNull(couponReq.getTotalNumber()) || Objects.isNull(couponReq.getMoney())
-                || Objects.isNull(couponReq.getUseCondition()) || Objects.isNull(couponReq.getCouponType())
+        if (Objects.isNull(couponReq.getTotalNumber()) || Objects.isNull(couponReq.getPercentage())
+                || Objects.isNull(couponReq.getReceiveNum()) || Objects.isNull(couponReq.getCouponType())
                 || Objects.isNull(couponReq.getStartTime()) || Objects.isNull(couponReq.getExpirationTime())
                 || Objects.isNull(couponReq.getProvideStartTime()) || Objects.isNull(couponReq.getProvideEndTime())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
@@ -162,5 +162,4 @@ public class CouponController {
         log.debug("返回结果：{}", couponRespPage);
         return MallResult.buildQueryOk(couponRespPage);
     }
-
 }

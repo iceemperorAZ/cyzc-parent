@@ -6,10 +6,7 @@ import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.resp.OrderResp;
 import com.jingliang.mall.server.RedisService;
-import com.jingliang.mall.service.BuyerCouponService;
-import com.jingliang.mall.service.ConfigService;
-import com.jingliang.mall.service.OrderService;
-import com.jingliang.mall.service.ProductService;
+import com.jingliang.mall.service.*;
 import com.jingliang.mall.wx.service.WechatService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,12 +38,10 @@ import java.util.*;
 public class OrderController {
     @Value("${session.buyer.key}")
     private String sessionBuyer;
-    @Value("${free_shipping_quota}")
-    private Double freeShippingQuota;
-    @Value("${deliver_fee}")
-    private Double deliverFee;
     @Value("${product.sku.init.invented.num}")
     private Integer productSkuInitInventedNum;
+    @Value("${coupon.use.limit}")
+    private Integer couponUseLimit;
 
     private final OrderService orderService;
     private final ProductService productService;
@@ -55,8 +50,9 @@ public class OrderController {
     private final WechatService wechatService;
     private final RabbitProducer rabbitProducer;
     private final ConfigService configService;
+    private final BuyerCouponLimitService buyerCouponLimitService;
 
-    public OrderController(OrderService orderService, ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService, WechatService wechatService, RabbitProducer rabbitProducer, ConfigService configService) {
+    public OrderController(OrderService orderService, ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService, WechatService wechatService, RabbitProducer rabbitProducer, ConfigService configService, BuyerCouponLimitService buyerCouponLimitService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
@@ -64,6 +60,7 @@ public class OrderController {
         this.wechatService = wechatService;
         this.rabbitProducer = rabbitProducer;
         this.configService = configService;
+        this.buyerCouponLimitService = buyerCouponLimitService;
     }
 
 
@@ -89,6 +86,8 @@ public class OrderController {
         Date date = new Date();
         //是否有真实库存
         boolean hasSku = true;
+        Map<Long, Long> productPriceMap = new HashMap<>(100);
+
         //计算商品总价
         for (OrderDetail orderDetail : order.getOrderDetails()) {
             orderDetail.setId(null);
@@ -121,7 +120,12 @@ public class OrderController {
                 }
                 return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_SKU_FAIL);
             }
-            productNum += orderDetail.getProductNum();
+
+            if (productPriceMap.containsKey(product.getProductTypeId())) {
+                productPriceMap.put(product.getProductTypeId(), productPriceMap.get(product.getProductTypeId()) + product.getSellingPrice());
+            } else {
+                productPriceMap.put(product.getProductTypeId(), product.getSellingPrice());
+            }
         }
         order.setProductNum(productNum);
         //是否满足可以下单的订单额度
@@ -141,17 +145,29 @@ public class OrderController {
         order.setPreferentialFee(0L);
         //计算使用优惠券后的支付价
         if (Objects.nonNull(orderReq.getCouponIdList())) {
+            StringBuilder builder = new StringBuilder();
             for (Long couponId : orderReq.getCouponIdList()) {
                 BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(couponId, buyer.getId());
-                if (Objects.isNull(buyerCoupon) || buyerCoupon.getIsUsed()) {
+                if (Objects.isNull(buyerCoupon) || buyerCoupon.getReceiveNum() <= 0) {
                     return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
                 }
-                order.setPayableFee(order.getPayableFee() - buyerCoupon.getMoney());
-                order.setPreferentialFee(order.getPreferentialFee() + buyerCoupon.getMoney());
-                buyerCoupon.setIsUsed(true);
+                if (!productPriceMap.containsKey(buyerCoupon.getProductTypeId())) {
+                    return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
+                }
+                //查询优惠券的限制使用张数
+                BuyerCouponLimit buyerCouponLimit = buyerCouponLimitService.findByBuyerIdAndProductTypeId(buyer.getId(), buyerCoupon.getProductTypeId());
+                Integer useLimit = couponUseLimit;
+                if (Objects.nonNull(buyerCouponLimit)) {
+                    useLimit = buyerCouponLimit.getUseLimit();
+                }
+                int min = Math.min(useLimit, buyerCoupon.getReceiveNum());
+                order.setPayableFee(order.getPayableFee() - productPriceMap.get(buyerCoupon.getProductTypeId()) * buyerCoupon.getPercentage() * min);
+                order.setPreferentialFee(order.getPreferentialFee() + productPriceMap.get(buyerCoupon.getProductTypeId()) * buyerCoupon.getPercentage() * min);
                 //优惠券标记为已使用
                 buyerCouponService.save(buyerCoupon);
+                builder.append(buyerCoupon.getId()).append("|").append(min).append(",");
             }
+            order.setCouponIds(builder.substring(0, builder.length() - 1));
         }
         //生成订单号
         order.setOrderNo(redisService.getOrderNo());

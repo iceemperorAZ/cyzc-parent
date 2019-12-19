@@ -67,4 +67,11 @@ public interface BuyerCouponService {
      * @return 返回统计数量
      */
     Integer countAllByBuyerIdAndCouponIds(Long buyerId, List<Long> couponIds);
+
+    /**
+     * 查询全部
+     * @param buyerCouponSpecification 条件
+     * @return
+     */
+    List<BuyerCoupon> findAll(Specification<BuyerCoupon> buyerCouponSpecification);
 }

@@ -9,6 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * 商品分类表ServiceImpl
  *
@@ -34,5 +36,15 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     @Override
     public Page<ProductType> findAll(Specification<ProductType> productSpecification, PageRequest pageRequest) {
         return productTypeRepository.findAll(productSpecification, pageRequest);
+    }
+
+    @Override
+    public List<ProductType> findAll() {
+        return productTypeRepository.findAllByIsAvailable(true);
+    }
+
+    @Override
+    public List<ProductType> findAll(List<Long> productTypeIds) {
+        return productTypeRepository.findAllByIdInAndIsAvailable(productTypeIds,true);
     }
 }

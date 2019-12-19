@@ -57,6 +57,11 @@ public class BuyerCouponServiceImpl implements BuyerCouponService {
 
     @Override
     public Integer countAllByBuyerIdAndCouponIds(Long buyerId, List<Long> couponIds) {
-        return buyerCouponRepository.countAllByBuyerIdAndCouponIdIn(buyerId,couponIds);
+        return buyerCouponRepository.countAllByBuyerIdAndCouponIdIn(buyerId, couponIds);
+    }
+
+    @Override
+    public List<BuyerCoupon> findAll(Specification<BuyerCoupon> buyerCouponSpecification) {
+        return buyerCouponRepository.findAll(buyerCouponSpecification);
     }
 }

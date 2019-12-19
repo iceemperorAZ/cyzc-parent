@@ -11,14 +11,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * 用户优惠券
  *
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2019-10-28 13:36:23
+ * @date 2019-12-18 16:50:49
  */
 @ApiModel(value = "BuyerCouponResp", description = "用户优惠券")
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -42,6 +41,13 @@ public class BuyerCouponResp implements Serializable {
     private Long couponId;
 
     /**
+     * 使用范围（商品分类）
+     */
+    @ApiModelProperty(value = "使用范围（商品分类）")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long productTypeId;
+
+    /**
      * 用户Id
      */
     @ApiModelProperty(value = "用户Id")
@@ -49,16 +55,11 @@ public class BuyerCouponResp implements Serializable {
     private Long buyerId;
 
     /**
-     * 金额
+     * 优惠百分比
      */
-    @ApiModelProperty(value = "金额")
-    private Double money;
-
-    /**
-     * 使用条件(最低使用价格)
-     */
-    @ApiModelProperty(value = "使用条件(最低使用价格)")
-    private Double useCondition;
+    @ApiModelProperty(value = "优惠百分比")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long percentage;
 
     /**
      * 开始时间
@@ -77,23 +78,16 @@ public class BuyerCouponResp implements Serializable {
     private Date expirationTime;
 
     /**
-     * 使用范围（商品分类）
-     */
-    @ApiModelProperty(value = "使用范围（商品分类）")
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long productTypeId;
-
-    /**
      * 优惠券描述
      */
     @ApiModelProperty(value = "优惠券描述")
     private String couponDescribe;
 
     /**
-     * 是否已使用 0：否，1：是
+     * 剩余可用张数
      */
-    @ApiModelProperty(value = "是否已使用 0：否，1：是")
-    private Boolean isUsed;
+    @ApiModelProperty(value = "剩余可用张数")
+    private Integer receiveNum;
 
     /**
      * 是否可用 0：否，1：是
@@ -102,12 +96,25 @@ public class BuyerCouponResp implements Serializable {
     private Boolean isAvailable;
 
     /**
-     * 领取时间(创建时间)
+     * 领取时间/赠送时间(创建时间)
      */
-    @ApiModelProperty(value = "领取时间(创建时间)")
+    @ApiModelProperty(value = "领取时间/赠送时间(创建时间)")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
+
+    /**
+     * 创建人Id(系统：-1)
+     */
+    @ApiModelProperty(value = "创建人Id(系统：-1)")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long createUserId;
+
+    /**
+     * 创建人(系统：系统)
+     */
+    @ApiModelProperty(value = "创建人(系统：系统)")
+    private String createUser;
 
     /**
      * 状态  -1:未开始，100：未使用，200：已使用，300：已失效
@@ -115,7 +122,7 @@ public class BuyerCouponResp implements Serializable {
     @ApiModelProperty(value = " -1:未开始，100：未使用，200：已使用，300：已失效")
     public Integer getStatus() {
         //在生效期内
-        if (isUsed) {
+        if (receiveNum <= 0) {
             //已经使用过了
             return 200;
         }
@@ -136,7 +143,7 @@ public class BuyerCouponResp implements Serializable {
      */
     @ApiModelProperty(value = " -1:未开始，100：可使用，200：已使用，300：已失效")
     public String getStatusView() {
-        if (isUsed) {
+        if (receiveNum <= 0) {
             //已经使用过了
             return "已使用";
         }
@@ -153,11 +160,9 @@ public class BuyerCouponResp implements Serializable {
         return "已失效";
     }
 
-    public Double getMoney() {
-        return Objects.isNull(money) ? null : money / 100;
-    }
-
-    public Double getUseCondition() {
-        return Objects.isNull(useCondition) ? null : useCondition / 100;
-    }
+    /**
+     * 商品分类
+     */
+    @ApiModelProperty(value = "商品分类")
+    private ProductTypeResp productType;
 }

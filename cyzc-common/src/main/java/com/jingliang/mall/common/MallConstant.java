@@ -1,5 +1,9 @@
 package com.jingliang.mall.common;
 
+import com.google.common.collect.Lists;
+
+import java.util.List;
+
 /**
  * 常量定义
  *
@@ -112,9 +116,20 @@ public interface MallConstant {
     String TEXT_PASSWORD_INIT_FAIL = "当前账户密码为初始密码,请修改当前密码";
     String TEXT_MODIFY_PASSWORD_UNSAFE_FAIL = "密码安全度过低,请重新设置当前密码";
 
+    Integer FILE_FAIL = 470;
+    String TEXT_EXCEL_DOWNLOAD_FAIL = "excel下载异常";
+    String TEXT_EXCEL_UPLOAD_FAIL = "excel上传异常";
+    String TEXT_EXCEL_ANALYSIS_FAIL = "excel解析异常";
+
+
     Integer SYSTEM_FAIL = 500;
     String TEXT_SYSTEM_FAIL = "系统内部异常";
 
     Integer REQUEST_FAIL = 501;
     String TEXT_REQUEST_FAIL = "请求方式错误，当前请求方式为[#nowReq#],实际支持请求方式为[#req#]";
+
+
+    List<String> orderExcelTitle = Lists.newArrayList("单据日期", "单据编号", "客户编号", "客户名称", "销售人员"
+            , "优惠金额", "客户承担费用", "本次收款", "结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
+            "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库", "备注");
 }

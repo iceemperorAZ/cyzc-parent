@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.common.MallBeanMapper;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.common.MallUtils;
@@ -55,16 +56,12 @@ public class CouponController {
     }
 
     /**
-     * 分页查询全部优惠券
+     * 查询全部优惠券
      */
-    @ApiOperation(value = "分页查询全部优惠券")
-    @GetMapping("/page/all")
-    public MallResult<MallPage<CouponResp>> pageAllCoupon(CouponReq couponReq, @ApiIgnore HttpSession session) {
+    @ApiOperation(value = "查询全部优惠券")
+    @GetMapping("/all")
+    public MallResult<List<CouponResp>> pageAllCoupon(CouponReq couponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", couponReq);
-        PageRequest pageRequest = PageRequest.of(couponReq.getPage(), couponReq.getPageSize());
-        if (StringUtils.isNotBlank(couponReq.getClause())) {
-            pageRequest = PageRequest.of(couponReq.getPage(), couponReq.getPageSize(), Sort.by(MallUtils.separateOrder(couponReq.getClause())));
-        }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<Coupon> couponSpecification = (Specification<Coupon>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -91,21 +88,21 @@ public class CouponController {
             query.orderBy(cb.desc(root.get("residueNumber")), cb.asc(root.get("expirationTime")));
             return query.getRestriction();
         };
-        Page<Coupon> couponPage = couponService.findAll(couponSpecification, pageRequest);
+        List<Coupon> couponList = couponService.findAll(couponSpecification);
         List<BuyerCoupon> buyerCoupons = buyerCouponService.findAll(buyer.getId());
         List<Long> buyerCouponIds = buyerCoupons.stream().map(BuyerCoupon::getCouponId).collect(Collectors.toList());
-        MallPage<CouponResp> couponRespPage = MallUtils.toMallPage(couponPage, CouponResp.class);
+        List<CouponResp> couponRespList = MallBeanMapper.mapList(couponList, CouponResp.class);
         //处理领取优惠券
-        couponRespPage.setContent(couponRespPage.getContent().stream().filter(couponResp -> {
+        couponRespList = couponRespList.stream().filter(couponResp -> {
             if (buyerCouponIds.contains(couponResp.getId())) {
                 couponResp.setIsReceive(true);
             } else {
                 couponResp.setIsReceive(false);
             }
             return true;
-        }).sorted(Comparator.comparing(CouponResp::getIsReceive)).collect(Collectors.toList()));
-        log.debug("返回结果：{}", couponRespPage);
-        return MallResult.buildQueryOk(couponRespPage);
+        }).sorted(Comparator.comparing(CouponResp::getIsReceive)).collect(Collectors.toList());
+        log.debug("返回结果：{}", couponRespList);
+        return MallResult.buildQueryOk(couponRespList);
     }
 
 }

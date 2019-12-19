@@ -85,4 +85,9 @@ public class CouponServiceImpl implements CouponService {
         redisService.removeCoupon(coupon.getId() + "");
         return coupon;
     }
+
+    @Override
+    public List<Coupon> findAll(Specification<Coupon> couponSpecification) {
+        return couponRepository.findAll(couponSpecification);
+    }
 }

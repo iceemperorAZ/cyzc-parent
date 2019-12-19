@@ -5,6 +5,7 @@ import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerCoupon;
 import com.jingliang.mall.entity.Coupon;
+import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.req.BuyerCouponReq;
 import com.jingliang.mall.resp.BuyerCouponResp;
 import com.jingliang.mall.server.RedisService;
@@ -25,10 +26,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -78,10 +76,12 @@ public class BuyerCouponController {
             return MallResult.build(MallConstant.COUPON_FAIL, MallConstant.TEXT_COUPON_INVALID_FAIL);
         }
         //判断redis中的优惠券数量是否够
-        Long decrement = redisService.couponDecrement(coupon.getId() + "", 1);
-        if (decrement < 0) {
+        Long decrement = redisService.couponDecrement(coupon.getId() + "", coupon.getReceiveNum());
+        if (decrement < 0 && decrement + coupon.getReceiveNum() < 0) {
+            redisService.couponIncrement(coupon.getId() + "", coupon.getReceiveNum());
             return MallResult.build(MallConstant.COUPON_FAIL, MallConstant.TEXT_COUPON_ROB_FAIL);
         }
+
         //1.判断是否是新用户券
         //2.是则比较是否已经把新用户券领完
         //3.如果领完则将新用户状态改为false
@@ -103,8 +103,9 @@ public class BuyerCouponController {
         buyerCoupon.setCouponId(coupon.getId());
         buyerCoupon.setId(null);
         buyerCoupon.setBuyerId(buyer.getId());
-        buyerCoupon.setIsUsed(false);
         buyerCoupon.setCreateTime(new Date());
+        buyerCoupon.setCreateUserId(-1L);
+        buyerCoupon.setCreateUser("系统");
         buyerCoupon = buyerCouponService.save(buyerCoupon);
         //通过消息异步减优惠券数量
         coupon.setResidueNumber(-1);
@@ -119,7 +120,7 @@ public class BuyerCouponController {
      */
     @ApiOperation(value = "分页查询所有领取优惠券")
     @GetMapping("/page/all")
-    public MallResult<MallPage<BuyerCouponResp>> pageAllCart(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
+    public MallResult<MallPage<BuyerCouponResp>> pageAll(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponReq);
         PageRequest pageRequest = PageRequest.of(buyerCouponReq.getPage(), buyerCouponReq.getPageSize());
         if (StringUtils.isNotBlank(buyerCouponReq.getClause())) {
@@ -140,11 +141,11 @@ public class BuyerCouponController {
                 Date date = new Date();
                 switch (buyerCouponReq.getStatus()) {
                     case 100:
-                        andPredicateList.add(cb.equal(root.get("isUsed"), 0));
+                        andPredicateList.add(cb.greaterThan(root.get("receiveNum"), 0));
                         andPredicateList.add(cb.greaterThan(root.get("expirationTime"), date));
                         break;
                     case 200:
-                        andPredicateList.add(cb.equal(root.get("isUsed"), 1));
+                        andPredicateList.add(cb.lessThanOrEqualTo(root.get("receiveNum"), 0));
                         break;
                     default:
                         andPredicateList.add(cb.lessThanOrEqualTo(root.get("expirationTime"), date));
@@ -154,7 +155,7 @@ public class BuyerCouponController {
             if (orPredicateList.size() > 0) {
                 Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
                 query.where(andPredicate, orPredicate);
-            }else {
+            } else {
                 query.where(andPredicate);
             }
             query.orderBy(cb.asc(root.get("expirationTime")));
@@ -164,5 +165,61 @@ public class BuyerCouponController {
         MallPage<BuyerCouponResp> buyerCouponRespMallPage = MallUtils.toMallPage(buyerCouponPage, BuyerCouponResp.class);
         log.debug("返回结果：{}", buyerCouponRespMallPage);
         return MallResult.buildQueryOk(buyerCouponRespMallPage);
+    }
+
+    /**
+     * 查询所有领取优惠券，按商品分类分组返回
+     * @return
+     */
+    @ApiOperation(value = "查询所有领取优惠券，按商品分类分组返回")
+    @GetMapping("/group/all")
+    public MallResult<List<Map<String, Object>>> groupAll(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", buyerCouponReq);
+        Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
+        Specification<BuyerCoupon> buyerCouponSpecification = (Specification<BuyerCoupon>) (root, query, cb) -> {
+            List<Predicate> andPredicateList = new ArrayList<>();
+            andPredicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
+            andPredicateList.add(cb.equal(root.get("isAvailable"), true));
+            List<Predicate> orPredicateList = new ArrayList<>();
+            if (Objects.nonNull(buyerCouponReq.getProductTypeIds()) && !buyerCouponReq.getProductTypeIds().isEmpty()) {
+                for (Long productTypeId : buyerCouponReq.getProductTypeIds()) {
+                    orPredicateList.add(cb.equal(root.get("productTypeId"), productTypeId));
+                }
+            }
+            if (Objects.nonNull(buyerCouponReq.getStatus())) {
+                Date date = new Date();
+                switch (buyerCouponReq.getStatus()) {
+                    case 100:
+                        andPredicateList.add(cb.greaterThan(root.get("receiveNum"), 0));
+                        andPredicateList.add(cb.greaterThan(root.get("expirationTime"), date));
+                        break;
+                    case 200:
+                        andPredicateList.add(cb.lessThanOrEqualTo(root.get("receiveNum"), 0));
+                        break;
+                    default:
+                        andPredicateList.add(cb.lessThanOrEqualTo(root.get("expirationTime"), date));
+                }
+            }
+            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
+            if (orPredicateList.size() > 0) {
+                Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
+                query.where(andPredicate, orPredicate);
+            } else {
+                query.where(andPredicate);
+            }
+            query.orderBy(cb.asc(root.get("expirationTime")));
+            return query.getRestriction();
+        };
+        List<BuyerCoupon> buyerCouponList = buyerCouponService.findAll(buyerCouponSpecification);
+        Map<ProductType, List<BuyerCoupon>> collect = buyerCouponList.stream().collect(Collectors.groupingBy(BuyerCoupon::getProductType));
+        List<Map<String,Object>> list = new ArrayList<>();
+        for (Map.Entry<ProductType, List<BuyerCoupon>> entry : collect.entrySet()) {
+            Map<String,Object> map = new HashMap<>(2);
+            map.put("productTypeId",entry.getKey().getId());
+            map.put("productTypeName",entry.getKey().getProductTypeName());
+            map.put("data",entry.getValue());
+            list.add(map);
+        }
+        return MallResult.buildQueryOk(list);
     }
 }

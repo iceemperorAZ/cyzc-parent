@@ -78,4 +78,12 @@ public interface CouponService {
      * @return
      */
     Coupon delete(Coupon coupon);
+
+    /**
+     * 分页查询全部优惠券
+     *
+     * @param couponSpecification 查询条件
+     * @return 返回查询到的优惠券集合
+     */
+    List<Coupon> findAll(Specification<Coupon> couponSpecification);
 }

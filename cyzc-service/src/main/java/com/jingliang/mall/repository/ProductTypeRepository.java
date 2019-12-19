@@ -4,6 +4,8 @@ package com.jingliang.mall.repository;
 import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.repository.base.BaseRepository;
 
+import java.util.List;
+
 /**
  * 商品分类表Repository
  *
@@ -13,4 +15,12 @@ import com.jingliang.mall.repository.base.BaseRepository;
  */
 public interface ProductTypeRepository extends BaseRepository<ProductType, Long> {
 
+    /**
+     * 根据商品分类Id集合查询
+     *
+     * @param ids         分类Id集合
+     * @param isAvailable 是否可用
+     * @return
+     */
+    List<ProductType> findAllByIdInAndIsAvailable(List<Long> ids, boolean isAvailable);
 }

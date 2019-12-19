@@ -106,9 +106,10 @@ public class OrderServiceImpl implements OrderService {
             //如果有使用优惠券则返还优惠券
             if (Objects.nonNull(order.getCouponIds())) {
                 for (String couponId : order.getCouponIds().split(",")) {
+                    String[] split = couponId.split("\\|");
                     BuyerCoupon buyerCoupon = new BuyerCoupon();
-                    buyerCoupon.setId(Long.parseLong(couponId));
-                    buyerCoupon.setIsUsed(false);
+                    buyerCoupon.setId(Long.parseLong(split[0]));
+                    buyerCoupon.setReceiveNum(Integer.parseInt(split[1]));
                     buyerCouponService.save(buyerCoupon);
                 }
             }
@@ -151,12 +152,5 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findAll(Specification<Order> orderSpecification) {
         return orderRepository.findAll(orderSpecification);
-    }
-
-    public static void main(String[] args) {
-        String[] split = "12332423".split(",");
-        for (String s : split) {
-            System.out.println(s);
-        }
     }
 }
