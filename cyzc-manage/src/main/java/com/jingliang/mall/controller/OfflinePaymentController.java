@@ -4,11 +4,14 @@ import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.OfflinePayment;
 import com.jingliang.mall.entity.Order;
+import com.jingliang.mall.entity.OrderDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.OfflinePaymentReq;
 import com.jingliang.mall.resp.OfflinePaymentResp;
 import com.jingliang.mall.server.FastdfsService;
+import com.jingliang.mall.service.CartService;
 import com.jingliang.mall.service.OfflinePaymentService;
+import com.jingliang.mall.service.OrderDetailService;
 import com.jingliang.mall.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,6 +25,7 @@ import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 线下支付Controller
@@ -42,18 +46,22 @@ public class OfflinePaymentController {
     private String sessionUser;
     private final OfflinePaymentService offlinePaymentService;
     private final OrderService orderService;
+    private final OrderDetailService orderDetailService;
     private final FastdfsService fastdfsService;
     private final RabbitProducer rabbitProducer;
+    private final CartService cartService;
 
-    public OfflinePaymentController(OfflinePaymentService offlinePaymentService, OrderService orderService, FastdfsService fastdfsService, RabbitProducer rabbitProducer) {
+    public OfflinePaymentController(OfflinePaymentService offlinePaymentService, OrderService orderService, OrderDetailService orderDetailService, FastdfsService fastdfsService, RabbitProducer rabbitProducer, CartService cartService) {
         this.offlinePaymentService = offlinePaymentService;
         this.orderService = orderService;
+        this.orderDetailService = orderDetailService;
         this.fastdfsService = fastdfsService;
         this.rabbitProducer = rabbitProducer;
+        this.cartService = cartService;
     }
 
     /**
-     * 保存/更新支付凭证storehouse
+     * 保存/更新支付凭证
      */
     @PostMapping("/save")
     @ApiOperation(value = "保存/更新支付凭证")
@@ -104,9 +112,12 @@ public class OfflinePaymentController {
         assert offlinePayment != null;
         offlinePayment.setUrls(builder.substring(1));
         OfflinePaymentResp offlinePaymentResp = MallBeanMapper.map(offlinePaymentService.save(offlinePayment), OfflinePaymentResp.class);
-        if (Objects.isNull(offlinePaymentReq.getOrderId())) {
+        if (Objects.isNull(offlinePaymentReq.getId())) {
             //首次上传凭证推送订单支付通知
             rabbitProducer.paymentNotice(order);
+            //清空此订单中的购物项
+            List<OrderDetail> orderDetailList = orderDetailService.findByOrderId(order.getId());
+            cartService.emptyCartItem(order.getBuyerId(), orderDetailList.stream().map(OrderDetail::getProductId).collect(Collectors.toList()));
         }
         log.debug("返回参数：{}", offlinePaymentResp);
         return MallResult.buildSaveOk(offlinePaymentResp);

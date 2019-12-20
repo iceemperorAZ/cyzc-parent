@@ -41,8 +41,7 @@ public class BuyerCouponServiceImpl implements BuyerCouponService {
 
     @Override
     public List<BuyerCoupon> findAll(Long buyerId) {
-        Date date = new Date();
-        return buyerCouponRepository.findAllByBuyerIdAndStartTimeLessThanEqualAndExpirationTimeGreaterThanEqualAndIsAvailable(buyerId, date, date, true);
+        return buyerCouponRepository.findAllByBuyerIdAndIsAvailable(buyerId,true);
     }
 
     @Override

@@ -3,13 +3,14 @@ package com.jingliang.mall.amqp.producer;
 import com.jingliang.mall.entity.Coupon;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.entity.Sku;
+import com.jingliang.mall.server.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.AbstractJavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.stereotype.Component;
 
@@ -27,9 +28,14 @@ import java.util.Objects;
 public class RabbitProducer {
     private final RabbitTemplate rabbitTemplate;
     private final ConfigurableEnvironment env;
+    private final EmailService emailService;
+    @Value("${server.domain}")
+    private String serverDomain;
 
-    public RabbitProducer(RabbitTemplate rabbitTemplate, ConfigurableEnvironment env) {
+
+    public RabbitProducer(RabbitTemplate rabbitTemplate, ConfigurableEnvironment env, EmailService emailService) {
         this.rabbitTemplate = rabbitTemplate;
+        this.emailService = emailService;
         this.rabbitTemplate.setMessageConverter(new Jackson2JsonMessageConverter());
         this.env = env;
     }
@@ -75,8 +81,37 @@ public class RabbitProducer {
     /**
      * 以广播的形式发送订单支付通知
      */
-    public void paymentNotice(Order order){
+    public void paymentNotice(Order order) {
         log.debug("rabbitmq以广播的形式发送有用户支付订单的消息");
         this.rabbitTemplate.convertAndSend(env.getProperty("rabbitmq.payment.notice.exchange"), "", order);
+        emailService.sendHtmlMail(env.getProperty("mail.to"), "订单支付成功", "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n" +
+                "        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
+                "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"zh\">\n" +
+                "<head>\n" +
+                "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>\n" +
+                "    <title></title>\n" +
+                "</head>\n" +
+                "<body style=\"position: sticky\">\n" +
+                "<div style=\"width:350px;margin: 0 auto\">\n" +
+                "    <h3 style=\"color:green;text-align: center\">支付成功 √</h3>\n" +
+                "    <span style=\"float: left;width: 130px\">订单号:</span><span style=\"color:red\">" + order.getOrderNo() + "</span>\n" +
+                "    <br/>\n" +
+                "    <br/>\n" +
+                "    <span style=\"float: left;width: 130px\">总金额:</span><span style=\"color:red;\">￥" + order.getTotalPrice() * 1.0 / 100 + "</span>\n" +
+                "    <br/>\n" +
+                "    <span style=\"float: left;width: 130px\">优惠金额:</span><span style=\"color:red;\">￥-" + order.getPreferentialFee() * 1.0 / 100 + "</span>\n" +
+                "    <br/>\n" +
+                "    <span style=\"float: left;width: 130px\">支付金额:</span><span style=\"color:red;\">￥" + order.getPayableFee() * 1.0 / 100 + "</span>\n" +
+                "    <br/>\n" +
+                "    <br/>\n" +
+                "    <span style=\"color: green;float: right;font-weight: bold\">请登录<a style=\"color: blue\" href=" + serverDomain + " target=\"_blank\">管理系统</a>安排发货</span>\n" +
+                "    <br/>\n" +
+                "    <br/>\n" +
+                "    <span>系统邮件请勿回复</span>\n" +
+                "    <br/>\n" +
+                "    <br/>\n" +
+                "</div>\n" +
+                "</body>\n" +
+                "</html>");
     }
 }

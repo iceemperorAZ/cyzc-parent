@@ -4,6 +4,7 @@ import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.resp.OrderResp;
+import com.jingliang.mall.server.EmailService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.OfflinePaymentService;
 import com.jingliang.mall.service.OrderDetailService;

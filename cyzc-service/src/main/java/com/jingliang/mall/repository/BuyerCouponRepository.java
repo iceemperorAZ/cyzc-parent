@@ -18,12 +18,10 @@ public interface BuyerCouponRepository extends BaseRepository<BuyerCoupon, Long>
      * 查询所有可使用的优惠券
      *
      * @param buyerId        会员Id
-     * @param startTime      开始时间
-     * @param expirationTime 结束时间
      * @param isAvailable    是否可用
      * @return 返回查询到的优惠券集合
      */
-    List<BuyerCoupon> findAllByBuyerIdAndStartTimeLessThanEqualAndExpirationTimeGreaterThanEqualAndIsAvailable(Long buyerId, Date startTime, Date expirationTime, Boolean isAvailable);
+    List<BuyerCoupon> findAllByBuyerIdAndIsAvailable(Long buyerId, Boolean isAvailable);
 
     /**
      * 根据优惠券Id查询优惠券是否已经领取

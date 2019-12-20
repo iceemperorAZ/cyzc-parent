@@ -219,6 +219,31 @@
       "name": "token.user.redis.prefix",
       "type": "java.lang.String",
       "description": "Description for token.user.redis.prefix."
+    },
+    {
+      "name": "login.fail.count.prefix",
+      "type": "java.lang.String",
+      "description": "Description for login.fail.count.prefix."
+    },
+    {
+      "name": "login.limit.prefix",
+      "type": "java.lang.String",
+      "description": "Description for login.limit.prefix."
+    },
+    {
+      "name": "password.modify.time.prefix",
+      "type": "java.lang.String",
+      "description": "Description for password.modify.time.prefix."
+    },
+    {
+      "name": "coupon.use.limit",
+      "type": "java.lang.String",
+      "description": "Description for coupon.use.limit."
+    },
+    {
+      "name": "mail.to",
+      "type": "java.lang.String",
+      "description": "Description for mail.to."
     }
   ]
 }

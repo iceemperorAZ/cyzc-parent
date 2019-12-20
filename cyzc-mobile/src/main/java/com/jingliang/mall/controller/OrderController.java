@@ -22,6 +22,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -122,9 +123,9 @@ public class OrderController {
             }
 
             if (productPriceMap.containsKey(product.getProductTypeId())) {
-                productPriceMap.put(product.getProductTypeId(), productPriceMap.get(product.getProductTypeId()) + product.getSellingPrice());
+                productPriceMap.put(product.getProductTypeId(), productPriceMap.get(product.getProductTypeId()) + product.getSellingPrice() * orderDetail.getProductNum());
             } else {
-                productPriceMap.put(product.getProductTypeId(), product.getSellingPrice());
+                productPriceMap.put(product.getProductTypeId(), product.getSellingPrice() * orderDetail.getProductNum());
             }
         }
         order.setProductNum(productNum);
@@ -144,7 +145,9 @@ public class OrderController {
         }
         order.setPreferentialFee(0L);
         //计算使用优惠券后的支付价
-        if (Objects.nonNull(orderReq.getCouponIdList())) {
+        //优惠总价
+        double preferentialFee = 0D;
+        if (Objects.nonNull(orderReq.getCouponIdList()) && orderReq.getCouponIdList().size() > 0) {
             StringBuilder builder = new StringBuilder();
             for (Long couponId : orderReq.getCouponIdList()) {
                 BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(couponId, buyer.getId());
@@ -161,15 +164,19 @@ public class OrderController {
                     useLimit = buyerCouponLimit.getUseLimit();
                 }
                 int min = Math.min(useLimit, buyerCoupon.getReceiveNum());
-                order.setPayableFee(order.getPayableFee() - productPriceMap.get(buyerCoupon.getProductTypeId()) * buyerCoupon.getPercentage() * min);
-                order.setPreferentialFee(order.getPreferentialFee() + productPriceMap.get(buyerCoupon.getProductTypeId()) * buyerCoupon.getPercentage() * min);
-                //优惠券标记为已使用
+                preferentialFee += (productPriceMap.get(buyerCoupon.getProductTypeId()) * buyerCoupon.getPercentage() * 0.01 * min);
+                buyerCoupon.setReceiveNum(buyerCoupon.getReceiveNum()-min);
+                //优惠券数量减少
                 buyerCouponService.save(buyerCoupon);
                 builder.append(buyerCoupon.getId()).append("|").append(min).append(",");
             }
             order.setCouponIds(builder.substring(0, builder.length() - 1));
         }
-        //生成订单号
+        //总优惠金额进行四舍五入
+        BigDecimal b = new BigDecimal(Double.toString(preferentialFee));
+        order.setPayableFee(order.getPayableFee() - b.setScale(0, BigDecimal.ROUND_HALF_UP).longValue());
+        order.setPreferentialFee(order.getPreferentialFee() + b.setScale(0, BigDecimal.ROUND_HALF_UP).longValue());
+        //生成订单号sellingPrice
         order.setOrderNo(redisService.getOrderNo());
         order.setOrderStatus(100);
         order.setPayStartTime(date);

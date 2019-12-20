@@ -102,6 +102,7 @@ public class BuyerCouponController {
         assert buyerCoupon != null;
         buyerCoupon.setCouponId(coupon.getId());
         buyerCoupon.setId(null);
+        buyerCoupon.setProductType(null);
         buyerCoupon.setBuyerId(buyer.getId());
         buyerCoupon.setCreateTime(new Date());
         buyerCoupon.setCreateUserId(-1L);
@@ -169,6 +170,7 @@ public class BuyerCouponController {
 
     /**
      * 查询所有领取优惠券，按商品分类分组返回
+     *
      * @return
      */
     @ApiOperation(value = "查询所有领取优惠券，按商品分类分组返回")
@@ -186,20 +188,10 @@ public class BuyerCouponController {
                     orPredicateList.add(cb.equal(root.get("productTypeId"), productTypeId));
                 }
             }
-            if (Objects.nonNull(buyerCouponReq.getStatus())) {
-                Date date = new Date();
-                switch (buyerCouponReq.getStatus()) {
-                    case 100:
-                        andPredicateList.add(cb.greaterThan(root.get("receiveNum"), 0));
-                        andPredicateList.add(cb.greaterThan(root.get("expirationTime"), date));
-                        break;
-                    case 200:
-                        andPredicateList.add(cb.lessThanOrEqualTo(root.get("receiveNum"), 0));
-                        break;
-                    default:
-                        andPredicateList.add(cb.lessThanOrEqualTo(root.get("expirationTime"), date));
-                }
-            }
+            Date date = new Date();
+            andPredicateList.add(cb.greaterThan(root.get("receiveNum"), 0));
+            andPredicateList.add(cb.lessThanOrEqualTo(root.get("startTime"), date));
+            andPredicateList.add(cb.greaterThan(root.get("expirationTime"), date));
             Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
             if (orPredicateList.size() > 0) {
                 Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
@@ -212,12 +204,12 @@ public class BuyerCouponController {
         };
         List<BuyerCoupon> buyerCouponList = buyerCouponService.findAll(buyerCouponSpecification);
         Map<ProductType, List<BuyerCoupon>> collect = buyerCouponList.stream().collect(Collectors.groupingBy(BuyerCoupon::getProductType));
-        List<Map<String,Object>> list = new ArrayList<>();
+        List<Map<String, Object>> list = new ArrayList<>();
         for (Map.Entry<ProductType, List<BuyerCoupon>> entry : collect.entrySet()) {
-            Map<String,Object> map = new HashMap<>(2);
-            map.put("productTypeId",entry.getKey().getId());
-            map.put("productTypeName",entry.getKey().getProductTypeName());
-            map.put("data",entry.getValue());
+            Map<String, Object> map = new HashMap<>(2);
+            map.put("productTypeId", entry.getKey().getId());
+            map.put("productTypeName", entry.getKey().getProductTypeName());
+            map.put("data", MallBeanMapper.mapList(entry.getValue(), BuyerCouponResp.class));
             list.add(map);
         }
         return MallResult.buildQueryOk(list);

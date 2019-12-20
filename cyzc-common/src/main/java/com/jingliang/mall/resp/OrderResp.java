@@ -287,7 +287,7 @@ public class OrderResp implements Serializable {
     }
 
     public List<Long> getCouponIdList() {
-        return StringUtils.isBlank(couponIds) ? null : Arrays.stream(couponIds.split(",")).map(s -> Long.parseLong(s.trim())).collect(Collectors.toList());
+        return StringUtils.isBlank(couponIds) ? null : Arrays.stream(couponIds.split(",")).map(s -> Long.parseLong(s.split("\\|")[0].trim())).collect(Collectors.toList());
     }
 
     public Double getTotalPrice() {

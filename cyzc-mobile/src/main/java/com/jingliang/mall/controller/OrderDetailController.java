@@ -1,12 +1,10 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
 import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.Cart;
 import com.jingliang.mall.entity.OrderDetail;
 import com.jingliang.mall.req.OrderDetailReq;
-import com.jingliang.mall.resp.OrderDetailResp;
 import com.jingliang.mall.service.CartService;
 import com.jingliang.mall.service.OrderDetailService;
 import io.swagger.annotations.Api;
@@ -20,9 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -52,20 +49,21 @@ public class OrderDetailController {
      */
     @ApiOperation(value = "再来一单")
     @PostMapping("/again")
-    public MallResult<List<OrderDetailResp>> again(@RequestBody OrderDetailReq orderDetailReq, @ApiIgnore HttpSession session) {
+    public MallResult<?> again(@RequestBody OrderDetailReq orderDetailReq, @ApiIgnore HttpSession session) {
         if (Objects.isNull(orderDetailReq.getOrderId())) {
             return MallResult.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         List<OrderDetail> orderDetails = orderDetailService.findByOrderId(orderDetailReq.getOrderId());
-        List<OrderDetailResp> orderDetailResps = new ArrayList<>();
         for (OrderDetail orderDetail : orderDetails) {
             Cart cart = new Cart();
             cart.setBuyerId(buyer.getId());
             cart.setProductId(orderDetail.getProductId());
             cart.setProductNum(orderDetail.getProductNum());
-			orderDetailResps.add(MallBeanMapper.map(cartService.save(cart),OrderDetailResp.class));
-		}
-        return MallResult.buildOk(orderDetailResps);
+            cart.setIsAvailable(true);
+            cart.setCreateTime(new Date());
+            cartService.save(cart);
+        }
+        return MallResult.buildOk();
     }
 }
