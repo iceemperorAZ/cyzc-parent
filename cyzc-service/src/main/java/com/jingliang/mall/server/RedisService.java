@@ -120,7 +120,7 @@ public interface RedisService {
      * @param key
      * @return
      */
-    public Long getProductSkuNum(String key);
+    public Integer getProductSkuNum(String key);
 
     /**
      * 移除redis中的商品库存

@@ -134,8 +134,8 @@ public class RedisServiceImpl implements RedisService {
     }
 
     @Override
-    public Long getProductSkuNum(String key) {
-        return (Long) redisTemplate.opsForValue().get(productSkuPrefix + key);
+    public Integer getProductSkuNum(String key) {
+        return (Integer) redisTemplate.opsForValue().get(productSkuPrefix + key);
     }
 
     @Override

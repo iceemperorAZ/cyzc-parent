@@ -57,18 +57,6 @@ public class ProductReq extends BaseReq implements Serializable {
     private Long productTypeId;
 
     /**
-     * 商品分类Id-开始
-     */
-    @ApiModelProperty(value = "商品分类Id-开始")
-    private Long productTypeIdStart;
-
-    /**
-     * 商品分类Id-结束
-     */
-    @ApiModelProperty(value = "商品分类Id-结束")
-    private Long productTypeIdEnd;
-
-    /**
      * 商品分类名称
      */
     @ApiModelProperty(value = "商品分类名称")
@@ -77,7 +65,7 @@ public class ProductReq extends BaseReq implements Serializable {
     /**
      * 商品区Id
      */
-    @ApiModelProperty(value = "product_zone_id")
+    @ApiModelProperty(value = "商品区Id")
     private Long productZoneId;
 
     /**

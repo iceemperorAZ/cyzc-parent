@@ -187,4 +187,24 @@ public class CouponResp implements Serializable {
 	 */
 	@ApiModelProperty(value = "商品分类")
 	private ProductTypeResp productType;
+
+	/**
+	 * 状态 -1:未发布,100：未开始，200：已开始，300：已结束
+	 */
+	@ApiModelProperty(value = " -1:未开始，100：未开始，200：已开始，300：已结束")
+	public Integer getStatus() {
+		Date date = new Date();
+		int start = provideStartTime.compareTo(date);
+		int end = provideEndTime.compareTo(date);
+		if (!isRelease) {
+			return -1;
+		}
+		if (start > 0) {
+			return 100;
+		}
+		if (start < 0 && end > 0) {
+			return 200;
+		}
+		return 300;
+	}
 }
