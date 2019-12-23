@@ -304,20 +304,20 @@ public class WechatManageServiceImpl implements WechatManageService {
         confluenceDetail.setProfit(totalPrice - couponTotal.get() - ((long) (totalPrice * user.getRatio() * 0.01)));
         return confluenceDetail;
     }
-
-
-    public static void main(String[] args) throws ParseException {
-        Calendar calendar = Calendar.getInstance();
-        Date parse = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-02-02 13:13:12");
-        calendar.setTime(parse);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime()));
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime()));
-    }
+//
+//
+//    public static void main(String[] args) throws ParseException {
+//        Calendar calendar = Calendar.getInstance();
+//        Date parse = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2016-02-02 13:13:12");
+//        calendar.setTime(parse);
+//        calendar.set(Calendar.HOUR_OF_DAY, 0);
+//        calendar.set(Calendar.MINUTE, 0);
+//        calendar.set(Calendar.SECOND, 0);
+//        System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime()));
+//        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+//        calendar.set(Calendar.HOUR_OF_DAY, 23);
+//        calendar.set(Calendar.MINUTE, 59);
+//        calendar.set(Calendar.SECOND, 59);
+//        System.out.println(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime()));
+//    }
 }

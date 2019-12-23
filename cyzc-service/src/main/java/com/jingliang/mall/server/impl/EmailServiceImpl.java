@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -31,6 +32,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendSimpleMail(String sendTo, String subject, String content) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(mailProperties.getUsername());
@@ -42,6 +44,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendHtmlMail(String sendTo, String subject, String content) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
@@ -53,9 +56,8 @@ public class EmailServiceImpl implements EmailService {
             mailSender.send(mimeMessage);
             log.debug("邮件发送成功！{}", content);
         } catch (MessagingException e) {
-            e.printStackTrace();
             log.error("邮件发送异常！{}", e.getMessage());
-
+            e.printStackTrace();
         }
     }
 }
