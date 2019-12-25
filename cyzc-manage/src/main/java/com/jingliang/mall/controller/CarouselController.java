@@ -178,7 +178,7 @@ public class CarouselController {
      * 查询首页图配置
      */
     @ApiOperation(value = "查询首页图配置")
-    @PostMapping("/index/img")
+    @GetMapping("/index/img")
     public MallResult<CarouselResp> indexImg() {
         return MallResult.buildQueryOk(MallBeanMapper.map(carouselService.findByType(-100), CarouselResp.class));
     }
