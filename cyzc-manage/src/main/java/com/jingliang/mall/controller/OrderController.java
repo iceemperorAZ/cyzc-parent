@@ -4,7 +4,6 @@ import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.resp.OrderResp;
-import com.jingliang.mall.server.EmailService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.OfflinePaymentService;
 import com.jingliang.mall.service.OrderDetailService;
@@ -13,9 +12,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -81,6 +79,7 @@ public class OrderController {
         Order order = new Order();
         order.setId(orderReq.getId());
         order.setDeliveryName(orderReq.getDeliveryName());
+        order.setStorehouse(orderReq.getStorehouse());
         order.setOrderStatus(400);
         order.setDeliveryPhone(orderReq.getDeliveryPhone());
         order.setUpdateTime(new Date());
@@ -194,7 +193,7 @@ public class OrderController {
     /**
      * 导出excel
      */
-    @ApiOperation(value = "分页查询全部用户订单信息")
+    @ApiOperation(value = "导出订单excel")
     @GetMapping("/download/excel")
     public ResponseEntity<byte[]> download(OrderReq orderReq) throws IOException {
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
@@ -222,6 +221,10 @@ public class OrderController {
         List<Order> orders = orderService.findAll(orderSpecification);
         XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("销货单", MallConstant.orderExcelTitle);
         XSSFSheet sheet = orderWorkbook.getSheet("销货单");
+        XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
+        CreationHelper createHelper = orderWorkbook.getCreationHelper();
+        cellStyle.setDataFormat(
+                createHelper.createDataFormat().getFormat("yyyy/MM/dd HH:mm:ss"));
         int rowNum = 1;
         for (Order order : orders) {
             XSSFRow row = sheet.createRow(rowNum);
@@ -231,7 +234,9 @@ public class OrderController {
             //单据日期
             int celNum = 0;
             Date createTime = order.getCreateTime();
-            row.createCell(celNum).setCellValue(createTime);
+            XSSFCell cell = row.createCell(celNum);
+            cell.setCellValue(createTime);
+            cell.setCellStyle(cellStyle);
             //单据编号
             String orderNo = order.getOrderNo();
             row.createCell(++celNum).setCellValue(orderNo);
@@ -246,25 +251,33 @@ public class OrderController {
             String userName = buyer.getSale().getUserName();
             row.createCell(++celNum).setCellValue(userName);
             //优惠金额(元)
-            double preferentialFee = (order.getPreferentialFee() * 1.0) / 100;
+            double preferentialFee = (order.getPreferentialFee() * 1.00) / 100;
             row.createCell(++celNum).setCellValue(preferentialFee);
             //客户承担费用
             ++celNum;
             //本次收款
             Long payableFee = order.getPayableFee();
-            row.createCell(++celNum).setCellValue(payableFee);
+            row.createCell(++celNum).setCellValue(payableFee * 1.00 / 100);
             if (order.getPayWay() == 200) {
                 OfflinePayment offlinePayment = offlinePaymentService.findByOrderId(order.getId());
-                //结算账户
-                String payWay = offlinePayment.getPayWay();
-                row.createCell(++celNum).setCellValue(payWay);
-                //单据备注
-                String remark = offlinePayment.getRemark();
-                row.createCell(++celNum).setCellValue(remark);
+                if (Objects.nonNull(offlinePayment)) {
+                    //结算账户
+                    String payWay = offlinePayment.getPayWay();
+                    row.createCell(++celNum).setCellValue(payWay);
+                    //单据备注
+                    String remark = offlinePayment.getRemark();
+                    row.createCell(++celNum).setCellValue(remark);
+                } else {
+                    ++celNum;
+                    ++celNum;
+                }
+            } else {
+                ++celNum;
+                ++celNum;
             }
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
-            int productCelNum = ++celNum;
             for (OrderDetail orderDetail : orderDetails) {
+                int productCelNum = celNum;
                 //商品编号
                 String productNo = orderDetail.getProduct().getProductNo();
                 row.createCell(++productCelNum).setCellValue(productNo);
@@ -283,25 +296,26 @@ public class OrderController {
                 row.createCell(++productCelNum).setCellValue(productNum);
                 //单价
                 Long sellingPrice = orderDetail.getSellingPrice();
-                row.createCell(++productCelNum).setCellValue(sellingPrice);
+                row.createCell(++productCelNum).setCellValue(sellingPrice * 1.00 / 100);
                 //折扣率%
                 ++productCelNum;
                 //折扣额
+                ++productCelNum;
+                //金额
                 ++productCelNum;
                 //税率%
                 ++productCelNum;
                 //仓库
                 String storehouse = order.getStorehouse();
                 row.createCell(++productCelNum).setCellValue(storehouse);
-                //备注
-                String note = order.getNote();
-                row.createCell(++productCelNum).setCellValue(note);
+                //备注（放收货地址）
+                row.createCell(++productCelNum).setCellValue(order.getDetailAddress());
                 row = sheet.createRow(++rowNum);
             }
         }
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
         orderWorkbook.write(arrayOutputStream);
-        String newName = URLEncoder.encode("销货单明细-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss") + ".xlsx", "utf-8")
+        String newName = URLEncoder.encode("销货单明细-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ".xlsx", "utf-8")
                 .replaceAll("\\+", "%20").replaceAll("%28", "\\(")
                 .replaceAll("%29", "\\)").replaceAll("%3B", ";")
                 .replaceAll("%40", "@").replaceAll("%23", "\\#")

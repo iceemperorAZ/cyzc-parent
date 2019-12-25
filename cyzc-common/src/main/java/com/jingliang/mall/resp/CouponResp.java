@@ -191,7 +191,7 @@ public class CouponResp implements Serializable {
 	/**
 	 * 状态 -1:未发布,100：未开始，200：已开始，300：已结束
 	 */
-	@ApiModelProperty(value = " -1:未开始，100：未开始，200：已开始，300：已结束")
+	@ApiModelProperty(value = " -1:未发布，100：未开始，200：已开始，300：已结束")
 	public Integer getStatus() {
 		Date date = new Date();
 		int start = provideStartTime.compareTo(date);
