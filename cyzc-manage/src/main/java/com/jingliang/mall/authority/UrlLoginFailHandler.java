@@ -76,15 +76,15 @@ public class UrlLoginFailHandler implements AuthenticationFailureHandler {
         response.setContentType("application/json;charset=UTF-8");
         Long count = redisService.increment(loginFailCountPrefix + loginName + "-" + ip, 1);
         if (count == 3) {
-            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0, /*300*/30);
+            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0, 300);
             response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_LIMIT_FAIL, MallConstant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
         } else if (count == 4) {
-            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,/*1800*/60);
+            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,1800);
             response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_LIMIT_FAIL, MallConstant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
         } else if (count == 5) {
-            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,/*3600*/80);
+            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,3600);
         } else if (count > 5) {
-            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,/*86400*/120);
+            redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,86400);
             response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_LIMIT_FAIL, MallConstant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
         } else {
             response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_LOGIN_FAIL)));
