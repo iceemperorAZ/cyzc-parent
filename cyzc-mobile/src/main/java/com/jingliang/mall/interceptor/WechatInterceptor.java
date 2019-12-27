@@ -71,7 +71,16 @@ public class WechatInterceptor implements HandlerInterceptor {
             return false;
         }
         User user = redisService.get(tokenUserPrefix + "FRONT-" + map.get("userId"), User.class);
-        if (Objects.isNull(user) || Objects.isNull(user.getLevel()) || user.getLevel() < 100) {
+        if (Objects.isNull(user)) {
+            //重置response
+            response.reset();
+            //设置编码格式
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
+            log.debug("用户token失效");
+            return false;
+        }else if (Objects.isNull(user.getLevel()) || user.getLevel() < 100) {
             //重置response
             response.reset();
             //设置编码格式
