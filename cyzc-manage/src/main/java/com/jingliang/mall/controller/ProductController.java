@@ -194,6 +194,7 @@ public class ProductController {
             product.setId(id);
             product.setIsShow(true);
             product.setShowTime(date);
+            product.setUpdateTime(date);
             product.setShowUserId(user.getId());
             product.setShowUserName(user.getUserName());
             products.add(product);
@@ -222,7 +223,7 @@ public class ProductController {
             Product product = new Product();
             product.setId(id);
             product.setIsShow(false);
-            product.setShowTime(date);
+            product.setUpdateTime(date);
             product.setShowUserId(user.getId());
             product.setShowUserName(user.getUserName());
             products.add(product);

@@ -286,9 +286,9 @@ public class OrderController {
                 row.createCell(++productCelNum).setCellValue(productName);
                 //商品型号
                 ++productCelNum;
-                //String productTypeName = orderDetail.getProduct().getProductTypeName();
-                //属性
-                ++productCelNum;
+                //属性(商品分类)
+                String productTypeName = orderDetail.getProduct().getProductTypeName();
+                row.createCell(++productCelNum).setCellValue(productTypeName);
                 //单位
                 ++productCelNum;
                 //数量

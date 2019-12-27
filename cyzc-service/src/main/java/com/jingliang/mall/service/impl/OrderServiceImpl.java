@@ -109,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
                     String[] split = couponId.split("\\|");
                     BuyerCoupon buyerCoupon = new BuyerCoupon();
                     buyerCoupon.setId(Long.parseLong(split[0]));
-                    buyerCoupon.setReceiveNum(Integer.parseInt(split[1]));
+                    buyerCoupon.setReceiveNum(Integer.parseInt(split[1] + buyerCoupon.getReceiveNum()));
                     buyerCouponService.save(buyerCoupon);
                 }
             }
