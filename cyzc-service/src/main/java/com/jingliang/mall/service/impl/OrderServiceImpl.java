@@ -107,9 +107,8 @@ public class OrderServiceImpl implements OrderService {
             if (Objects.nonNull(order.getCouponIds())) {
                 for (String couponId : order.getCouponIds().split(",")) {
                     String[] split = couponId.split("\\|");
-                    BuyerCoupon buyerCoupon = new BuyerCoupon();
-                    buyerCoupon.setId(Long.parseLong(split[0]));
-                    buyerCoupon.setReceiveNum(Integer.parseInt(split[1] + buyerCoupon.getReceiveNum()));
+                    BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(Long.parseLong(split[0]), order.getBuyerId());
+                    buyerCoupon.setReceiveNum(Integer.parseInt(split[1])+buyerCoupon.getReceiveNum());
                     buyerCouponService.save(buyerCoupon);
                 }
             }
