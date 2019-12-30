@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
@@ -137,6 +138,7 @@ public class SkuResp implements Serializable {
      */
     @ApiModelProperty(value = "补差")
     public Integer getDifferenceValue() {
-        return Math.max((skuLineNum - 80000) * -1, 0);
+        //与@Value("${product.sku.init.invented.num}")一致
+        return Math.max((skuLineNum - 800000) * -1, 0);
     }
 }

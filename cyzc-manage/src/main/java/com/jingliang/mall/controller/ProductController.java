@@ -46,6 +46,8 @@ public class ProductController {
      */
     @Value("${session.user.key}")
     private String sessionUser;
+    @Value("${product.sku.init.invented.num}")
+    private Integer productSkuInitInventedNum;
 
     private final ProductService productService;
     private final FastdfsService fastdfsService;
@@ -245,7 +247,7 @@ public class ProductController {
         User user = (User) session.getAttribute(sessionUser);
         Date date = new Date();
         for (Long id : productReq.getProductIds()) {
-            if(redisService.getProductSkuNum(id+"")<80000){
+            if(redisService.getProductSkuNum(id+"")<productSkuInitInventedNum){
                 log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_ORDER_FAIL);
                 return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_ORDER_FAIL);
             }

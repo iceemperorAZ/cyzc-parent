@@ -73,7 +73,7 @@ public class ProductServiceImpl implements ProductService {
             sku.setUpdateUserName(product.getUpdateUserName());
             //设置初始虚拟库存为8万
             //追加redis中的线上库存
-            log.debug("追加redis中的线上库存，商品[{}],redis线上剩余库存为{}", sku.getProductName(), redisService.skuLineIncrement(String.valueOf(sku.getProductId()), 80000));
+            log.debug("追加redis中的线上库存，商品[{}],redis线上剩余库存为{}", sku.getProductName(), redisService.skuLineIncrement(String.valueOf(sku.getProductId()), productSkuInitInventedNum));
             sku.setSkuLineNum(productSkuInitInventedNum);
             sku.setSkuRealityNum(0);
             sku.setSkuHistoryTotalNum(0);
