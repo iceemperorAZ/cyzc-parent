@@ -4,6 +4,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Base64Utils;
 
+import java.util.Base64;
 import java.util.Objects;
 
 /**
@@ -33,7 +34,7 @@ public class Base64Image {
     public static Base64Image build(String base64) {
         byte[] bytes = base64ToByte(base64);
         String imgFormat = getImgFormat(base64);
-        if (Objects.isNull(bytes) || StringUtils.isBlank(imgFormat)) {
+        if (StringUtils.isBlank(imgFormat)) {
             return null;
         }
         return new Base64Image(bytes, imgFormat);
@@ -70,13 +71,13 @@ public class Base64Image {
      * @return 返回byte[]
      */
     private static byte[] base64ToByte(String base64) {
-        byte[] bytes = Base64Utils.decodeFromString(base64.split(",")[1].replace("\n", "").replace("\r", ""));
-        for (int i = 0; i < bytes.length; ++i) {
+        byte[] dataByte = Base64.getDecoder().decode(base64.split(",")[1].replace("\n", "").replace("\r", ""));
+        for (int i = 0; i < dataByte.length; ++i) {
             //调整异常数据
-            if (bytes[i] < 0) {
-                bytes[i] += 256;
+            if (dataByte[i] < 0) {
+                dataByte[i] += 256;
             }
         }
-        return bytes;
+        return dataByte;
     }
 }
