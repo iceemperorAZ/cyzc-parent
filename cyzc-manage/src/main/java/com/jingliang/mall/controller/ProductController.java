@@ -245,7 +245,7 @@ public class ProductController {
         User user = (User) session.getAttribute(sessionUser);
         Date date = new Date();
         for (Long id : productReq.getProductIds()) {
-            if(redisService.getProductSkuNum(id+"")<8000){
+            if(redisService.getProductSkuNum(id+"")<80000){
                 log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_ORDER_FAIL);
                 return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_ORDER_FAIL);
             }
