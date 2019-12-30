@@ -154,7 +154,7 @@ public class ProductController {
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.desc(root.get("updateTime")));
+            query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
