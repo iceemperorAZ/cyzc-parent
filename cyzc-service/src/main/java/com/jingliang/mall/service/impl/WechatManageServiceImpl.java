@@ -62,9 +62,9 @@ public class WechatManageServiceImpl implements WechatManageService {
         int startMonth = startCalendar.get(Calendar.MONTH);
         Calendar endCalendar = Calendar.getInstance();
         endCalendar.setTime(endTime);
-        startCalendar.set(Calendar.HOUR_OF_DAY, 23);
-        startCalendar.set(Calendar.MINUTE, 59);
-        startCalendar.set(Calendar.SECOND, 59);
+        endCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        endCalendar.set(Calendar.MINUTE, 59);
+        endCalendar.set(Calendar.SECOND, 59);
         int endYear = endCalendar.get(Calendar.YEAR);
         int endMonth = endCalendar.get(Calendar.MONTH);
         if (startYear == endYear && startMonth == endMonth) {
@@ -142,9 +142,9 @@ public class WechatManageServiceImpl implements WechatManageService {
         int startMonth = startCalendar.get(Calendar.MONTH);
         Calendar endCalendar = Calendar.getInstance();
         endCalendar.setTime(endTime);
-        startCalendar.set(Calendar.HOUR_OF_DAY, 23);
-        startCalendar.set(Calendar.MINUTE, 59);
-        startCalendar.set(Calendar.SECOND, 59);
+        endCalendar.set(Calendar.HOUR_OF_DAY, 23);
+        endCalendar.set(Calendar.MINUTE, 59);
+        endCalendar.set(Calendar.SECOND, 59);
         int endYear = endCalendar.get(Calendar.YEAR);
         int endMonth = endCalendar.get(Calendar.MONTH);
         if (startYear == endYear && startMonth == endMonth) {

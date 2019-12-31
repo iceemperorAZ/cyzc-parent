@@ -127,6 +127,7 @@ public class OrderController {
             } else {
                 productPriceMap.put(product.getProductTypeId(), product.getSellingPrice() * orderDetail.getProductNum());
             }
+            productNum+=orderDetail.getProductNum();
         }
         order.setProductNum(productNum);
         //是否满足可以下单的订单额度
