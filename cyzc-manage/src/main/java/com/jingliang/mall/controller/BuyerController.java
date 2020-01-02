@@ -42,6 +42,7 @@ public class BuyerController {
 
     private final BuyerService buyerService;
     private final RedisService redisService;
+
     public BuyerController(BuyerService buyerService, RedisService redisService) {
         this.buyerService = buyerService;
         this.redisService = redisService;
@@ -83,7 +84,7 @@ public class BuyerController {
         Specification<Buyer> buyerSpecification = (Specification<Buyer>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
             if (StringUtils.isNotBlank(buyerReq.getPhone())) {
-                predicateList.add(cb.like(root.get("phone"), buyerReq.getPhone() + "%"));
+                predicateList.add(cb.equal(root.get("id"), buyerReq.getId()));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             return predicateList.isEmpty() ? null : cb.and(predicateList.toArray(new Predicate[0]));
