@@ -43,6 +43,7 @@ public interface MallConstant {
     Integer PARAM_FAIL = 310;
     String TEXT_PARAM_FAIL = "参数不全";
     String TEXT_PARAM_FORMAT_FAIL = "参数值格式错误";
+    String TEXT_PARAM_VALUE_FAIL = "参数取值错误";
 
     Integer IMAGE_FAIL = 320;
     String TEXT_IMAGE_FAIL = "图片格式无法识别";

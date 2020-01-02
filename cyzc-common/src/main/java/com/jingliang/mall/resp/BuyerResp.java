@@ -11,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 会员表
@@ -183,4 +184,21 @@ public class BuyerResp implements Serializable {
     public void setLevel(Integer level) {
         this.level = level;
     }
+
+    /**
+     * 最后一次下单时间
+     */
+    @ApiModelProperty(value = "最后一次下单时间")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date lastOrderTime;
+
+    /**
+     * 最后一次下单距现在的天数
+     */
+    @ApiModelProperty(value = "最后一次下单距现在的天数")
+    public Long getLastOrderDay() {
+        return (System.currentTimeMillis() - lastOrderTime.getTime()) / (1000 * 3600 * 24);
+    }
+
 }

@@ -1,8 +1,9 @@
 package com.jingliang.mall.service.impl;
 
+import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.OfflinePayment;
 import com.jingliang.mall.entity.Order;
-import com.jingliang.mall.entity.User;
+import com.jingliang.mall.repository.BuyerRepository;
 import com.jingliang.mall.repository.OfflinePaymentRepository;
 import com.jingliang.mall.repository.OrderRepository;
 import com.jingliang.mall.service.OfflinePaymentService;
@@ -25,10 +26,12 @@ public class OfflinePaymentServiceImpl implements OfflinePaymentService {
 
     private final OfflinePaymentRepository offlinePaymentRepository;
     private final OrderRepository orderRepository;
+    private final BuyerRepository buyerRepository;
 
-    public OfflinePaymentServiceImpl(OfflinePaymentRepository offlinePaymentRepository, OrderRepository orderRepository) {
+    public OfflinePaymentServiceImpl(OfflinePaymentRepository offlinePaymentRepository, OrderRepository orderRepository, BuyerRepository buyerRepository) {
         this.offlinePaymentRepository = offlinePaymentRepository;
         this.orderRepository = orderRepository;
+        this.buyerRepository = buyerRepository;
     }
 
     @Override
@@ -36,12 +39,19 @@ public class OfflinePaymentServiceImpl implements OfflinePaymentService {
     public OfflinePayment save(OfflinePayment offlinePayment) {
         //如果是创建则修改订单否则不修改订单
         Order order = orderRepository.getOne(offlinePayment.getOrderId());
-        order.setPayEndTime(new Date());
+        Date date = new Date();
+        order.setPayEndTime(date);
         order.setOrderStatus(300);
-        order.setUpdateTime(new Date());
+        order.setUpdateTime(date);
         order.setUpdateUserId(offlinePayment.getUpdateUserId());
         order.setUpdateUserName(offlinePayment.getUpdateUserName());
         orderRepository.save(order);
+        if (offlinePayment.getId() != null) {
+            //更新用户最后一次下单时间
+            Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(order.getBuyerId(), true);
+            buyer.setLastOrderTime(date);
+            buyerRepository.save(buyer);
+        }
         return offlinePaymentRepository.save(offlinePayment);
     }
 

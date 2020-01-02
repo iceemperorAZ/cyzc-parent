@@ -246,4 +246,12 @@ public class BuyerReq extends BaseReq implements Serializable {
 	@ApiModelProperty(value = "是否新用户")
 	private Boolean isNew;
 
+	/**
+	 * 最后一次下单时间
+	 */
+	@ApiModelProperty(value = "最后一次下单时间")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+	private Date lastOrderTime;
+
 }

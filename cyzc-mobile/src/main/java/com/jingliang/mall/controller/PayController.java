@@ -8,6 +8,7 @@ import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.entity.OrderDetail;
 import com.jingliang.mall.req.OrderReq;
+import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.CartService;
 import com.jingliang.mall.service.OrderDetailService;
 import com.jingliang.mall.service.OrderService;
@@ -52,13 +53,15 @@ public class PayController {
     private final WechatService wechatService;
     private final CartService cartService;
     private final RabbitProducer rabbitProducer;
+    private final BuyerService buyerService;
 
-    public PayController(OrderService orderService, OrderDetailService orderDetailService, WechatService wechatService, CartService cartService, RabbitProducer rabbitProducer) {
+    public PayController(OrderService orderService, OrderDetailService orderDetailService, WechatService wechatService, CartService cartService, RabbitProducer rabbitProducer, BuyerService buyerService) {
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.wechatService = wechatService;
         this.cartService = cartService;
         this.rabbitProducer = rabbitProducer;
+        this.buyerService = buyerService;
     }
 
     /**
@@ -107,6 +110,11 @@ public class PayController {
         order.setUpdateTime(date);
         orderService.update(order);
         List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
+        //更新用户最后一次下单时间
+        Buyer buyer = buyerService.findById(order.getBuyerId());
+        buyer.setLastOrderTime(date);
+        buyerService.save(buyer);
+
         //清空订单中的购物项
         Long buyerId = order.getBuyerId();
         List<Long> productIds = orderDetails.stream().map(OrderDetail::getProductId).collect(Collectors.toList());

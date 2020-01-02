@@ -2,10 +2,12 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerService;
+import com.jingliang.mall.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,10 +45,12 @@ public class BuyerController {
 
     private final BuyerService buyerService;
     private final RedisService redisService;
+    private final UserService userService;
 
-    public BuyerController(BuyerService buyerService, RedisService redisService) {
+    public BuyerController(BuyerService buyerService, RedisService redisService, UserService userService) {
         this.buyerService = buyerService;
         this.redisService = redisService;
+        this.userService = userService;
     }
 
     /**
@@ -59,12 +64,41 @@ public class BuyerController {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
             return MallResult.buildParamFail();
         }
+        User user = userService.findById(buyerReq.getSaleUserId());
+        if (Objects.isNull(user)) {
+            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+        }
         Buyer buyer = buyerService.findById(buyerReq.getId());
         if (Objects.isNull(buyer)) {
             return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
         }
         //修改会员信息后清空redis中的会员token
         redisService.remove(tokenBuyerPrefix + buyer.getId());
+        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        log.debug("返回结果：{}", buyerResp);
+        return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
+    }
+
+    /**
+     * 重新绑定销售
+     */
+    @ApiOperation(value = "重新绑定销售")
+    @PostMapping("/update/saleUser")
+    public MallResult<BuyerResp> updateSaleUser(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", buyerReq);
+        if (Objects.isNull(buyerReq.getId())) {
+            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            return MallResult.buildParamFail();
+        }
+        Buyer buyer = buyerService.findById(buyerReq.getId());
+        if (Objects.isNull(buyer)) {
+            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
+        }
+        //更换销售后修改最后一次下单时间
+        buyerReq.setLastOrderTime(new Date());
+        //修改会员信息后清空redis中的会员token
+        redisService.remove(tokenBuyerPrefix + buyer.getId());
+        buyerReq.setLastOrderTime(new Date());
         BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         log.debug("返回结果：{}", buyerResp);
         return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);

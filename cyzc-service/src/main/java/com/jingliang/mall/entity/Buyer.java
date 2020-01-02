@@ -151,10 +151,17 @@ public class Buyer implements Serializable {
     @Column(name = "is_new")
     private Boolean isNew;
 
+    /**
+     * 最后一次下单时间
+     */
+    @Column(name = "last_order_time")
+    private Date lastOrderTime;
+
     @Transient
     private String token;
 
     @Transient
     private String sessionKey;
+
 
 }

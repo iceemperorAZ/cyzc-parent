@@ -94,8 +94,10 @@ public class BuyerController {
         if (Objects.isNull(buyer)) {
             buyer = new Buyer();
             buyer.setUniqueId(openId);
-            buyer.setCreateTime(new Date());
-            buyer.setUpdateTime(new Date());
+            Date date = new Date();
+            buyer.setCreateTime(date);
+            buyer.setUpdateTime(date);
+            buyer.setLastOrderTime(date);
             buyer.setIsAvailable(true);
             buyer.setMemberIntegral(0);
             buyer.setIsSealUp(false);
