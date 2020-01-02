@@ -127,7 +127,7 @@ public class OrderController {
             } else {
                 productPriceMap.put(product.getProductTypeId(), product.getSellingPrice() * orderDetail.getProductNum());
             }
-            productNum+=orderDetail.getProductNum();
+            productNum += orderDetail.getProductNum();
         }
         order.setProductNum(productNum);
         //是否满足可以下单的订单额度
@@ -166,7 +166,7 @@ public class OrderController {
                 }
                 int min = Math.min(useLimit, buyerCoupon.getReceiveNum());
                 preferentialFee += (productPriceMap.get(buyerCoupon.getProductTypeId()) * buyerCoupon.getPercentage() * 0.01 * min);
-                buyerCoupon.setReceiveNum(buyerCoupon.getReceiveNum()-min);
+                buyerCoupon.setReceiveNum(buyerCoupon.getReceiveNum() - min);
                 //优惠券数量减少
                 buyerCouponService.save(buyerCoupon);
                 builder.append(buyerCoupon.getId()).append("|").append(min).append(",");
@@ -190,27 +190,27 @@ public class OrderController {
             if (Objects.isNull(resultMap)) {
                 return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
             }
-            //订单预计送达时间
-            //1.真实库存有值，则送达时间T+1
-            //2.真实库存无值，则送达时间从配置表获取
-            Calendar instance = Calendar.getInstance();
-            instance.setTime(date);
-            //捕获异常，防止填写错误，填写格式错误则默认延时3天
-            if (hasSku) {
-                //真实库存不足延迟配送
-                config = configService.findByCode("500");
-            } else {
-                //真实库存不足延迟配送
-                config = configService.findByCode("400");
-            }
-            try {
-                instance.add(Calendar.DAY_OF_MONTH, Integer.parseInt(config.getConfigValues()));
-            } catch (Exception e) {
-                //捕获异常，防止填写错误，填写格式错误则默认延时3天
-                instance.add(Calendar.DAY_OF_MONTH, 3);
-            }
-            order.setExpectedDeliveryTime(instance.getTime());
         }
+        //订单预计送达时间
+        //1.真实库存有值，则送达时间T+1
+        //2.真实库存无值，则送达时间从配置表获取
+        Calendar instance = Calendar.getInstance();
+        instance.setTime(date);
+        //捕获异常，防止填写错误，填写格式错误则默认延时3天
+        if (hasSku) {
+            //真实库存不足延迟配送
+            config = configService.findByCode("500");
+        } else {
+            //真实库存不足延迟配送
+            config = configService.findByCode("400");
+        }
+        try {
+            instance.add(Calendar.DAY_OF_MONTH, Integer.parseInt(config.getConfigValues()));
+        } catch (Exception e) {
+            //捕获异常，防止填写错误，填写格式错误则默认延时3天
+            instance.add(Calendar.DAY_OF_MONTH, 3);
+        }
+        order.setExpectedDeliveryTime(instance.getTime());
         resultMap.put("id", order.getId() + "");
         resultMap.put("orderNo", order.getOrderNo());
         order = orderService.save(order);

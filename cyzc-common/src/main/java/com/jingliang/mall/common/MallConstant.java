@@ -84,6 +84,7 @@ public interface MallConstant {
     String TEXT_PRODUCT_DELETE_FAIL = "删除失败，存在已上架商品";
     String TEXT_PRODUCT_ORDER_FAIL = "删除失败，该商品存在未完成的订单";
     String TEXT_PRODUCT_UPDATE_FAIL = "修改失败，已上架商品不允许修改";
+    String TEXT_PRODUCT_SKU_FAIL = "删除失败，商品库存大于0";
 
     Integer COUPON_FAIL = 370;
     String TEXT_COUPON_RECEIVE_FAIL = "领取失败，优惠券不能重复领取";

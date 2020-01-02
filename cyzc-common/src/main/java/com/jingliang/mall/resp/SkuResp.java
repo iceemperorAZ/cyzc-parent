@@ -116,6 +116,7 @@ public class SkuResp implements Serializable {
      * 修改人
      */
     @ApiModelProperty(value = "修改人")
+
     private String updateUserName;
 
     /**

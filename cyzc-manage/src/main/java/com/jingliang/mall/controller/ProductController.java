@@ -247,14 +247,22 @@ public class ProductController {
         User user = (User) session.getAttribute(sessionUser);
         Date date = new Date();
         for (Long id : productReq.getProductIds()) {
-            if(redisService.getProductSkuNum(id+"")<productSkuInitInventedNum){
+            //判断线上库存是否小于初始库存，即是否用用户下单
+            if (redisService.getProductSkuNum(id + "") < productSkuInitInventedNum) {
                 log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_ORDER_FAIL);
                 return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_ORDER_FAIL);
+            }
+            //判断库存是否为0,有库存不允许删除
+            Sku sku = skuService.findByProductId(id);
+            if (sku.getSkuRealityNum() > 0) {
+                log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_SKU_FAIL);
+                return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SKU_FAIL);
             }
             if (Objects.nonNull(productService.findShowProductById(id))) {
                 log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_DELETE_FAIL);
                 return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_DELETE_FAIL);
             }
+
             Product product = new Product();
             product.setId(id);
             product.setIsAvailable(false);
