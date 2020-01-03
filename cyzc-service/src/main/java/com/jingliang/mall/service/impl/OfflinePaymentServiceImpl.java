@@ -46,7 +46,7 @@ public class OfflinePaymentServiceImpl implements OfflinePaymentService {
         order.setUpdateUserId(offlinePayment.getUpdateUserId());
         order.setUpdateUserName(offlinePayment.getUpdateUserName());
         orderRepository.save(order);
-        if (offlinePayment.getId() != null) {
+        if (offlinePayment.getId() == null) {
             //更新用户最后一次下单时间
             Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(order.getBuyerId(), true);
             buyer.setLastOrderTime(date);
