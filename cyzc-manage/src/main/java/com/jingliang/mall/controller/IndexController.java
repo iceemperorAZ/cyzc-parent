@@ -1,11 +1,12 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallConstant;
 import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.criteria.Predicate;
@@ -40,67 +41,27 @@ public class IndexController {
     }
 
     /**
-     * 查询近7/15/30/90/180天的成交额
-     * 查询总成交额
-     * -1:全部，0:7天，1:15天，2:30天，3:90天，4:180天
+     * 查询近[type]天的成交额 -1:全部，几天就传几 ,0:表示当天
      */
-
+    @GetMapping("/turnover")
+    @ApiOperation(value = "查询近[type]天的成交额 -1:全部，几天就传几")
     public MallResult<Double> turnover(Integer type) {
         if (type == null) {
             return MallResult.buildParamFail();
         }
         Date startTime = null;
         Date endTime = null;
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        switch (type) {
-            case -1:
-                break;
-            case 0:
-                endTime = calendar.getTime();
-                calendar.add(Calendar.DAY_OF_YEAR, -7);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                startTime = calendar.getTime();
-                break;
-            case 1:
-                endTime = calendar.getTime();
-                calendar.add(Calendar.DAY_OF_YEAR, -15);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                startTime = calendar.getTime();
-                break;
-            case 2:
-                endTime = calendar.getTime();
-                calendar.add(Calendar.DAY_OF_YEAR, -30);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                startTime = calendar.getTime();
-                break;
-            case 3:
-                endTime = calendar.getTime();
-                calendar.add(Calendar.DAY_OF_YEAR, -90);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                startTime = calendar.getTime();
-                break;
-            case 4:
-                endTime = calendar.getTime();
-                calendar.add(Calendar.DAY_OF_YEAR, -180);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                startTime = calendar.getTime();
-                break;
-            default:
-                return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_PARAM_VALUE_FAIL);
+        if (type > -1) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            endTime = calendar.getTime();
+            calendar.add(Calendar.DAY_OF_YEAR, -type);
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            startTime = calendar.getTime();
         }
         long totalPrice = 0;
         //查询会员在指定时间的所有已经完成支付的订单
@@ -124,7 +85,7 @@ public class IndexController {
                 totalPrice += order.getPayableFee();
             }
         }
-        return null;
+        return MallResult.buildQueryOk((totalPrice * 1.00) / 100);
     }
 
 
