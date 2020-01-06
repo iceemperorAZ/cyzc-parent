@@ -2,9 +2,11 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.BuyerSale;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.resp.BuyerResp;
+import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.UserService;
@@ -39,6 +41,11 @@ import java.util.Objects;
 @RestController("backBuyerController")
 @Slf4j
 public class BuyerController {
+    /**
+     * session用户Key
+     */
+    @Value("${session.user.key}")
+    private String sessionUser;
 
     @Value("${token.buyer.redis.prefix}")
     private String tokenBuyerPrefix;
@@ -46,11 +53,13 @@ public class BuyerController {
     private final BuyerService buyerService;
     private final RedisService redisService;
     private final UserService userService;
+    private final BuyerSaleService buyerSaleService;
 
-    public BuyerController(BuyerService buyerService, RedisService redisService, UserService userService) {
+    public BuyerController(BuyerService buyerService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService) {
         this.buyerService = buyerService;
         this.redisService = redisService;
         this.userService = userService;
+        this.buyerSaleService = buyerSaleService;
     }
 
     /**
@@ -94,12 +103,31 @@ public class BuyerController {
         if (Objects.isNull(buyer)) {
             return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
         }
+        BuyerSale buyerSale = buyerSaleService.findBySaleIdAndBuyerId(buyer.getSaleUserId(), buyer.getId());
+        User user = (User) session.getAttribute(sessionUser);
+        Date date = new Date();
+        if (buyerSale != null) {
+            buyerSale.setUntyingTime(date);
+            buyerSale.setUpdateTime(date);
+            buyerSale.setUpdateUser(user.getUserName());
+            buyerSale.setUpdateUserId(user.getId());
+            buyerSaleService.save(buyerSale);
+        }
         //更换销售后修改最后一次下单时间
-        buyerReq.setLastOrderTime(new Date());
+        buyerReq.setLastOrderTime(date);
         //修改会员信息后清空redis中的会员token
         redisService.remove(tokenBuyerPrefix + buyer.getId());
-        buyerReq.setLastOrderTime(new Date());
+        buyerReq.setLastOrderTime(date);
         BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        buyerSale = new BuyerSale();
+        buyerSale.setBuyerId(buyer.getId());
+        buyerSale.setSaleId(buyerReq.getSaleUserId());
+        buyerSale.setIsAvailable(true);
+        buyerSale.setCreateTime(date);
+        buyerSale.setUpdateTime(date);
+        buyerSale.setUpdateTime(date);
+        buyerSale.setUpdateTime(date);
+        buyerSale = buyerSaleService.save(buyerSale);
         log.debug("返回结果：{}", buyerResp);
         return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
     }

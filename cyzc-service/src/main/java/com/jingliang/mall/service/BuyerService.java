@@ -60,9 +60,18 @@ public interface BuyerService {
     /**
      * 分页查询商户信息
      *
-     * @param saleUserId          绑定销售Id
+     * @param saleUserId  绑定销售Id
      * @param pageRequest 分页条件
      * @return 返回查询到的商户列表
      */
     Page<Buyer> findAllBySaleUserId(Long saleUserId, PageRequest pageRequest);
+
+    /**
+     * 分页查询商户信息
+     *
+     * @param saleUserId  绑定销售Id
+     * @param pageRequest 分页条件
+     * @return 返回查询到的商户列表
+     */
+    public Page<Buyer> findAllBySaleId(Long saleUserId, PageRequest pageRequest);
 }

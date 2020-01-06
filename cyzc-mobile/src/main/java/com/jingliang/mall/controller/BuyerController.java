@@ -3,10 +3,12 @@ package com.jingliang.mall.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.BuyerSale;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.resp.UserResp;
+import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerService;
@@ -59,13 +61,15 @@ public class BuyerController {
     private final WechatService wechatService;
     private final RedisService redisService;
     private final UserService userService;
+    private final BuyerSaleService buyerSaleService;
 
-    public BuyerController(BuyerService buyerService, FastdfsService fastdfsService, WechatService wechatService, RedisService redisService, UserService userService) {
+    public BuyerController(BuyerService buyerService, FastdfsService fastdfsService, WechatService wechatService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService) {
         this.buyerService = buyerService;
         this.fastdfsService = fastdfsService;
         this.wechatService = wechatService;
         this.redisService = redisService;
         this.userService = userService;
+        this.buyerSaleService = buyerSaleService;
     }
 
     /**
@@ -223,8 +227,16 @@ public class BuyerController {
         if (Objects.isNull(buyer)) {
             return MallResult.buildSaveFail();
         }
+        Date date = new Date();
         buyerReq.setId(buyer.getId());
         BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        BuyerSale buyerSale = new BuyerSale();
+        buyerSale.setBuyerId(buyer.getId());
+        buyerSale.setSaleId(buyerReq.getSaleUserId());
+        buyerSale.setIsAvailable(true);
+        buyerSale.setCreateTime(date);
+        buyerSale.setUpdateTime(date);
+        buyerSale = buyerSaleService.save(buyerSale);
         assert buyerResp != null;
         buyerResp.setSale(MallBeanMapper.map(user, UserResp.class));
         log.debug("返回结果：{}", buyerResp);

@@ -1,6 +1,7 @@
 package com.jingliang.mall.service.impl;
 
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.BuyerSale;
 import com.jingliang.mall.repository.BuyerRepository;
 import com.jingliang.mall.service.BuyerService;
 import lombok.extern.slf4j.Slf4j;
@@ -57,4 +58,10 @@ public class BuyerServiceImpl implements BuyerService {
     public Page<Buyer> findAllBySaleUserId(Long saleUserId, PageRequest pageRequest) {
         return buyerRepository.findAllBySaleUserIdAndIsAvailable(saleUserId, true, pageRequest);
     }
+
+    @Override
+    public Page<Buyer> findAllBySaleId(Long saleUserId, PageRequest pageRequest) {
+        return buyerRepository.findAllBySaleIdAndIsAvailable(saleUserId, true, pageRequest);
+    }
+
 }

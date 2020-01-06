@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jingliang.mall.bean.Confluence;
 import com.jingliang.mall.bean.ConfluenceDetail;
 import com.jingliang.mall.common.*;
-import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.entity.Order;
-import com.jingliang.mall.entity.OrderDetail;
-import com.jingliang.mall.entity.User;
+import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.req.UserReq;
@@ -15,6 +12,7 @@ import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.resp.ConfluenceDetailResp;
 import com.jingliang.mall.resp.ConfluenceResp;
 import com.jingliang.mall.resp.UserResp;
+import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -59,14 +57,16 @@ public class WechatManageController {
     private final OrderService orderService;
     private final OrderDetailService orderDetailService;
     private final WechatManageService wechatManageService;
+    private final BuyerSaleService buyerSaleService;
 
 
-    public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService, OrderDetailService orderDetailService, WechatManageService wechatManageService) {
+    public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService, OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerSaleService buyerSaleService) {
         this.userService = userService;
         this.buyerService = buyerService;
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.wechatManageService = wechatManageService;
+        this.buyerSaleService = buyerSaleService;
     }
 
     /**
@@ -195,7 +195,7 @@ public class WechatManageController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(userReq.getCreateTimeEnd());
         calendar.add(Calendar.DAY_OF_MONTH, 1);
-        Page<Buyer> buyerPage = buyerService.findAllBySaleUserId(user.getId(), pageRequest);
+        Page<Buyer> buyerPage = buyerService.findAllBySaleId(user.getId(), pageRequest);
         MallPage<ConfluenceDetailResp> confluenceMallPage = new MallPage<>();
         confluenceMallPage.setContent(new ArrayList<>());
         confluenceMallPage.setFirst(buyerPage.isFirst());
@@ -209,7 +209,7 @@ public class WechatManageController {
         }
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
         for (Buyer buyer : buyerPage) {
-            ConfluenceDetail confluenceDetail = wechatManageService.buyerPerformanceSummary(buyer, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
+            ConfluenceDetail confluenceDetail = wechatManageService.buyerPerformanceSummary(buyer, user, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
             //计算销售提成价格
             confluenceDetail.setRoyalty((long) (confluenceDetail.getTotalPrice() * user.getRatio() * 0.01));
             confluenceDetails.add(confluenceDetail);
@@ -245,7 +245,8 @@ public class WechatManageController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(userReq.getCreateTimeEnd());
         calendar.add(Calendar.DAY_OF_MONTH, 1);
-        Page<Buyer> buyerPage = buyerService.findAllBySaleUserId(userReq.getId(), pageRequest);
+
+        Page<Buyer> buyerPage = buyerService.findAllBySaleId(userReq.getId(), pageRequest);
         MallPage<ConfluenceDetailResp> confluenceMallPage = new MallPage<>();
         confluenceMallPage.setContent(new ArrayList<>());
         confluenceMallPage.setFirst(buyerPage.isFirst());
@@ -258,8 +259,8 @@ public class WechatManageController {
             return MallResult.buildQueryOk(confluenceMallPage);
         }
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
-        for (Buyer buyer : buyerPage) {
-            ConfluenceDetail confluenceDetail = wechatManageService.buyerPerformanceSummary(buyer, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
+        for (Buyer buyerSale : buyerPage) {
+            ConfluenceDetail confluenceDetail = wechatManageService.buyerPerformanceSummary(buyerSale, user, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
             //计算销售提成价格
             confluenceDetail.setRoyalty((long) (confluenceDetail.getTotalPrice() * user.getRatio() * 0.01));
             confluenceDetails.add(confluenceDetail);
@@ -564,7 +565,7 @@ public class WechatManageController {
         if (StringUtils.isNotBlank(userReq.getClause())) {
             pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         }
-        Page<Buyer> buyerPage = buyerService.findAllBySaleUserId(userReq.getId(), pageRequest);
+        Page<Buyer> buyerPage = buyerService.findAllBySaleId(userReq.getId(), pageRequest);
         MallPage<BuyerResp> userRespMallPage = MallUtils.toMallPage(buyerPage, BuyerResp.class);
         return MallResult.buildQueryOk(userRespMallPage);
     }

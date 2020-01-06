@@ -1,9 +1,13 @@
 package com.jingliang.mall.repository;
 
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.BuyerSale;
 import com.jingliang.mall.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -32,14 +36,26 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
      * @return 返回查询到的会员列表
      */
     List<Buyer> findAllBySaleUserIdAndIsAvailable(Long saleUserId, Boolean isAvailable);
+
     /**
      * 分页查询商户信息
      *
-     * @param saleUserId          绑定销售Id
+     * @param saleUserId  绑定销售Id
      * @param isAvailable 是否可用
-     * @param pageable 分页条件
+     * @param pageable    分页条件
      * @return 返回查询到的商户列表
      */
     Page<Buyer> findAllBySaleUserIdAndIsAvailable(Long saleUserId, Boolean isAvailable, Pageable pageable);
+
+    /**
+     * 根据销售Id分页查询
+     *
+     * @param saleUserId
+     * @param isAvailable
+     * @param pageRequest
+     * @return
+     */
+    @Query("SELECT buyer FROM Buyer buyer  WHERE buyer.id in(SELECT DISTINCT buyerId  FROM BuyerSale WHERE saleId = :saleUserId and isAvailable=:isAvailable) and buyer.isAvailable=:isAvailable  ORDER BY buyer.id")
+    Page<Buyer> findAllBySaleIdAndIsAvailable( @Param("saleUserId") Long saleUserId, @Param("isAvailable") Boolean isAvailable, Pageable pageRequest);
 
 }

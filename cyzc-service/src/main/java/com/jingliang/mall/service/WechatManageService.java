@@ -19,13 +19,18 @@ public interface WechatManageService {
      * @param user      指定员工
      * @param startTime 开始时间
      * @param endTime   结束时间
+     * @return
      */
     public ConfluenceDetail userPerformanceSummary(User user, Date startTime, Date endTime);
 
     /**
      * 查询商户在指定时间内的绩效
+     *
+     * @param buyer     商户
+     * @param user      销售
      * @param startTime 开始时间
      * @param endTime   结束时间
+     * @return
      */
-    public ConfluenceDetail buyerPerformanceSummary(Buyer buyer, Date startTime, Date endTime);
+    public ConfluenceDetail buyerPerformanceSummary(Buyer buyer, User user, Date startTime, Date endTime);
 }
