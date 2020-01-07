@@ -39,4 +39,11 @@ public interface BuyerAddressService {
      * @return 返回统计到的数量
      */
     Integer countByIdAndBuyerId(Long id, Long buyerId);
+
+    /**
+     * 根据主键Id查询默认收货地址
+     * @param id
+     * @return
+     */
+    BuyerAddress findDefaultAddrByBuyerId(Long id);
 }

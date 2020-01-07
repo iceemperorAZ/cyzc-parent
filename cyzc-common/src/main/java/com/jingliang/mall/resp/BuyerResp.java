@@ -11,7 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * 会员表
@@ -200,5 +199,12 @@ public class BuyerResp implements Serializable {
     public Long getLastOrderDay() {
         return (System.currentTimeMillis() - lastOrderTime.getTime()) / (1000 * 3600 * 24);
     }
+
+    /**
+     * 默认收货地址
+     */
+    @ApiModelProperty(value = "默认收货地址")
+    private String defaultAddr;
+
 
 }

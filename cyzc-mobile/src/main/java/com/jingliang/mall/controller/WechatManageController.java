@@ -12,7 +12,6 @@ import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.resp.ConfluenceDetailResp;
 import com.jingliang.mall.resp.ConfluenceResp;
 import com.jingliang.mall.resp.UserResp;
-import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -23,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,16 +57,17 @@ public class WechatManageController {
     private final OrderService orderService;
     private final OrderDetailService orderDetailService;
     private final WechatManageService wechatManageService;
-    private final BuyerSaleService buyerSaleService;
+    private final BuyerAddressService buyerAddressService;
 
 
-    public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService, OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerSaleService buyerSaleService) {
+    public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService,
+                                  OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerAddressService buyerAddressService) {
         this.userService = userService;
         this.buyerService = buyerService;
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.wechatManageService = wechatManageService;
-        this.buyerSaleService = buyerSaleService;
+        this.buyerAddressService = buyerAddressService;
     }
 
     /**
@@ -561,13 +562,19 @@ public class WechatManageController {
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
     public MallResult<MallPage<BuyerResp>> managerPageBuyer(@ApiIgnore UserReq userReq) {
-        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
+        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize(), Sort.by(Sort.Order.asc("lastOrderTime")));
         if (StringUtils.isNotBlank(userReq.getClause())) {
             pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         }
         Page<Buyer> buyerPage = buyerService.findAllBySaleId(userReq.getId(), pageRequest);
         MallPage<BuyerResp> userRespMallPage = MallUtils.toMallPage(buyerPage, BuyerResp.class);
+        if (userRespMallPage.getContent() != null && userRespMallPage.getContent().size() > 0) {
+            for (BuyerResp buyerResp : userRespMallPage.getContent()) {
+                BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyerResp.getId());
+                String addr = buyerAddress.getProvince().getName() + "/" + buyerAddress.getCity().getName() + "/" + buyerAddress.getArea().getName() + buyerAddress.getDetailedAddress();
+                buyerResp.setDefaultAddr(addr);
+            }
+        }
         return MallResult.buildQueryOk(userRespMallPage);
     }
-
 }

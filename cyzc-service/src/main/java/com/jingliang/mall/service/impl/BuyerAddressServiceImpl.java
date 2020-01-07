@@ -57,4 +57,9 @@ public class BuyerAddressServiceImpl implements BuyerAddressService {
     public Integer countByIdAndBuyerId(Long id, Long buyerId) {
         return buyerAddressRepository.countByIdAndBuyerIdAndIsAvailable(id, buyerId, true);
     }
+
+    @Override
+    public BuyerAddress findDefaultAddrByBuyerId(Long id) {
+        return buyerAddressRepository.findFirstByBuyerIdAndIsDefaultAndIsAvailable(id,true,true);
+    }
 }
