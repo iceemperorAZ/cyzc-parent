@@ -76,13 +76,13 @@ public class ProductController {
             return MallResult.buildParamFail();
         }
         //判断商品是否重复
-        if (Objects.isNull(productReq.getId()) && Objects.nonNull(productService.findAllByProductName(productReq.getProductName()))) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_EXIST_FAIL);
-            return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_PRODUCT_EXIST_FAIL);
-        }
+//        if (Objects.isNull(productReq.getId()) && Objects.nonNull(productService.findAllByProductName(productReq.getProductName()))) {
+//            log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_EXIST_FAIL);
+//            return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_PRODUCT_EXIST_FAIL);
+//        }
         if (Objects.nonNull(productReq.getId())) {
             //商品名称不能被修改
-            productReq.setProductName(null);
+//            productReq.setProductName(null);
             //将之前所有的图片删除重新上传一份新的
             Product product = productService.findAllById(productReq.getId());
             if (product.getIsShow()) {
@@ -117,6 +117,7 @@ public class ProductController {
         productReq.setProductImgUris(builder.substring(1));
         productReq.setProductNo(redisService.getProductNo());
         productReq.setIsShow(false);
+        productReq.setIsSoonShow(productReq.getIsSoonShow() == null ? false : productReq.getIsSoonShow());
         productReq.setSalesVolume(0);
         productReq.setProductZoneId(-1L);
         productReq.setExamineStatus(ExamineStatus.NOT_SUBMITTED.getValue());

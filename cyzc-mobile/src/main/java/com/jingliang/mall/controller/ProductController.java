@@ -1,13 +1,13 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.entity.Product;
-import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.common.MallBeanMapper;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.req.ProductReq;
 import com.jingliang.mall.resp.ProductResp;
+import com.jingliang.mall.service.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +68,9 @@ public class ProductController {
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             predicateList.add(cb.equal(root.get("isShow"), true));
-            return predicateList.isEmpty() ? null : cb.and(predicateList.toArray(new Predicate[0]));
+            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            query.orderBy(cb.desc(root.get("isHot")),cb.asc(root.get("productName")), cb.asc(root.get("weight")));
+            return query.getRestriction();
         };
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
         MallPage<ProductResp> productRespPage = MallUtils.toMallPage(productPage, ProductResp.class);

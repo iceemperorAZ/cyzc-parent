@@ -228,6 +228,26 @@ public class ProductResp implements Serializable {
     private Date showTime;
 
     /**
+     * 是否即将上架
+     */
+    @ApiModelProperty(value = "是否即将上架")
+    private Boolean isSoonShow;
+
+    public Boolean getIsSoonShow() {
+        return isSoonShow;
+    }
+
+    public void setIsSoonShow(Boolean isSoonShow) {
+        this.isSoonShow = isSoonShow;
+    }
+
+    /**
+     * 重量
+     */
+    @ApiModelProperty(value = "重量")
+    private Integer weight;
+
+    /**
      * 商品图片字符串转集合
      */
     public void setProductImgUris(String productImgUris) {

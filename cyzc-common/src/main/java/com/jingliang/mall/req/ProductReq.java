@@ -356,6 +356,26 @@ public class ProductReq extends BaseReq implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date showTime;
 
+    /**
+     * 是否即将上架
+     */
+    @ApiModelProperty(value = "是否即将上架")
+    private Boolean isSoonShow;
+
+    public Boolean getIsSoonShow() {
+        return isSoonShow;
+    }
+
+    public void setIsSoonShow(Boolean isSoonShow) {
+        this.isSoonShow = isSoonShow;
+    }
+
+    /**
+     * 重量
+     */
+    @ApiModelProperty(value = "重量")
+    private Integer weight;
+
     public void setMarketPrice(Double marketPrice) {
         this.marketPrice = marketPrice * 100;
     }

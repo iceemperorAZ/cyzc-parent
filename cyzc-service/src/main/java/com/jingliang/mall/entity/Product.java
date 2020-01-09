@@ -209,4 +209,25 @@ public class Product implements Serializable {
      */
     @Column(name = "show_time")
     private Date showTime;
+
+    /**
+     * 是否即将上架
+     */
+    @Column(name = "is_soon_show")
+    private Boolean isSoonShow;
+
+    public Boolean getIsSoonShow() {
+        return isSoonShow;
+    }
+
+    public void setIsSoonShow(Boolean isSoonShow) {
+        this.isSoonShow = isSoonShow;
+    }
+
+
+    /**
+     * 重量
+     */
+    @Column(name = "weight")
+    private Integer weight;
 }
