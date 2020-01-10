@@ -6,8 +6,8 @@ import com.jingliang.mall.entity.BuyerSale;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.resp.BuyerResp;
-import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.server.RedisService;
+import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.UserService;
 import io.swagger.annotations.Api;
@@ -73,9 +73,11 @@ public class BuyerController {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
             return MallResult.buildParamFail();
         }
-        User user = userService.findById(buyerReq.getSaleUserId());
-        if (Objects.isNull(user)) {
-            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+        if (buyerReq.getSaleUserId() != null) {
+            User user = userService.findById(buyerReq.getSaleUserId());
+            if (Objects.isNull(user)) {
+                return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+            }
         }
         Buyer buyer = buyerService.findById(buyerReq.getId());
         if (Objects.isNull(buyer)) {
