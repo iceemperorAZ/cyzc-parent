@@ -144,6 +144,7 @@ public class OrderServiceImpl implements OrderService {
                 skuService.updateRealitySkuByProductId(sku);
             }
         } else if (order.getOrderStatus() == 700 || order.getOrderStatus() == 800) {
+            Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
             //查询订单详情
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
             for (OrderDetail orderDetail : orderDetails) {
@@ -156,6 +157,16 @@ public class OrderServiceImpl implements OrderService {
                 sku.setUpdateUserName("系统");
                 sku.setSkuLineNum(orderDetail.getProductNum());
                 rabbitProducer.sendSku(sku);
+                //如果已经发货，退货要加实际库存
+                if (oldOrder.getOrderStatus() >= 400) {
+                    Sku sku1 = new Sku();
+                    sku1.setProductId(orderDetail.getProductId());
+                    sku1.setSkuRealityNum(orderDetail.getProductNum());
+                    sku1.setUpdateTime(new Date());
+                    sku1.setUpdateUserId(-1L);
+                    sku1.setUpdateUserName("系统");
+                    skuService.updateRealitySkuByProductId(sku1);
+                }
             }
         }
         order = orderRepository.save(order);

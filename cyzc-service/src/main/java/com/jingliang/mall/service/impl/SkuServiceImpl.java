@@ -42,6 +42,7 @@ public class SkuServiceImpl implements SkuService {
     public void updateLineSkuByProductId(Sku sku) {
         skuRepository.updateLineSkuByProductId(sku);
     }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRealitySkuByProductId(Sku sku) {

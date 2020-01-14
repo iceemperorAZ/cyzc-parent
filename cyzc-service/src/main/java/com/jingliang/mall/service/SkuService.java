@@ -39,7 +39,7 @@ public interface SkuService {
     void updateLineSkuByProductId(Sku sku);
 
     /**
-     * 根据库存Id减少实际库存
+     * 根据库存Id减少/增加实际库存
      *
      * @param sku 库存对象
      */
