@@ -143,6 +143,20 @@ public class OrderServiceImpl implements OrderService {
                 sku.setSkuRealityNum(-orderDetail.getProductNum());
                 skuService.updateRealitySkuByProductId(sku);
             }
+        } else if (order.getOrderStatus() == 700 || order.getOrderStatus() == 800) {
+            //查询订单详情
+            List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
+            for (OrderDetail orderDetail : orderDetails) {
+                //把订单中的商品库存再加回去
+                redisService.skuLineIncrement(String.valueOf(orderDetail.getProductId()), orderDetail.getProductNum());
+                Sku sku = new Sku();
+                sku.setProductId(orderDetail.getProductId());
+                sku.setUpdateTime(new Date());
+                sku.setUpdateUserId(-1L);
+                sku.setUpdateUserName("系统");
+                sku.setSkuLineNum(orderDetail.getProductNum());
+                rabbitProducer.sendSku(sku);
+            }
         }
         order = orderRepository.save(order);
         return order;
