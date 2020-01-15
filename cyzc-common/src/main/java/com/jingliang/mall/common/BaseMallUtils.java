@@ -185,15 +185,12 @@ public abstract class BaseMallUtils {
     public static String decrypt(String sessionKey, String iv, String encryptedData) {
         try {
             log.debug("sessionKey={}\r\niv={}\r\nencryptedData={}", sessionKey, iv, encryptedData);
-            //解码，前端传递的时候进行了编码
-            iv = URLDecoder.decode(iv, "UTF8");
-            encryptedData = URLDecoder.decode(encryptedData, "UTF-8");
             // 被加密的数据
-            byte[] dataByte = Base64.getDecoder().decode(encryptedData);
+            byte[] dataByte =Base64.getDecoder().decode(encryptedData);
             // 加密秘钥
-            byte[] keyByte = Base64.getDecoder().decode(sessionKey);
+            byte[] keyByte =Base64.getDecoder().decode(sessionKey);
             // 偏移量
-            byte[] ivByte = Base64.getDecoder().decode(iv);
+            byte[] ivByte =Base64.getDecoder().decode(iv);
             // 如果密钥不足16位，那么就补足.  这个if 中的内容很重要
             int base = 16;
             if (keyByte.length % base != 0) {
@@ -220,6 +217,7 @@ public abstract class BaseMallUtils {
         }
         return null;
     }
+
     /**
      * 验证手机号
      *
