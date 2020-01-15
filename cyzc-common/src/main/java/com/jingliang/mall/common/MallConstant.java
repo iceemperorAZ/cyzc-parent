@@ -134,4 +134,5 @@ public interface MallConstant {
     List<String> orderExcelTitle = Lists.newArrayList("单据日期", "单据编号", "客户编号", "客户名称", "销售人员"
             , "优惠金额", "客户承担费用", "本次收款", "结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
             "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库", "备注");
+    List<String> buyerExcelTitle = Lists.newArrayList("主键ID", "手机号", "注册时间");
 }

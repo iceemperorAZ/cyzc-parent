@@ -14,16 +14,25 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -157,6 +166,66 @@ public class BuyerController {
         MallPage<BuyerResp> buyerRespMallPage = BaseMallUtils.toMallPage(buyerPage, BuyerResp.class);
         log.debug("返回结果：{}", buyerRespMallPage);
         return MallResult.buildQueryOk(buyerRespMallPage);
+    }
+
+    /**
+     * 导出excel
+     */
+    @ApiOperation(value = "导出商户信息excel")
+    @GetMapping("/download/excel")
+    public ResponseEntity<byte[]> download(BuyerReq buyerReq) throws IOException {
+        Specification<Buyer> buyerSpecification = (Specification<Buyer>) (root, query, cb) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            if (buyerReq.getCreateTimeStart() != null && buyerReq.getCreateTimeEnd() != null) {
+                predicateList.add(cb.between(root.get("createTime"), buyerReq.getCreateTimeStart(), buyerReq.getCreateTimeEnd()));
+            }
+            predicateList.add(cb.equal(root.get("isAvailable"), true));
+            predicateList.add(cb.isNull(root.get("saleUserId")));
+            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            query.orderBy(cb.asc(root.get("createTime")));
+            return query.getRestriction();
+        };
+        List<Buyer> buyers = buyerService.findAll(buyerSpecification);
+        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("商户信息", MallConstant.buyerExcelTitle);
+        XSSFSheet sheet = orderWorkbook.getSheet("商户信息");
+        XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
+        CreationHelper createHelper = orderWorkbook.getCreationHelper();
+        cellStyle.setDataFormat(
+                createHelper.createDataFormat().getFormat("yyyy/MM/dd HH:mm:ss"));
+        int rowNum = 1;
+        for (Buyer buyer : buyers) {
+            XSSFRow row = sheet.createRow(rowNum);
+            //"主键ID", "手机号", "注册时间"
+            //主键ID
+            int celNum = 0;
+            Long id = buyer.getId();
+            row.createCell(celNum).setCellValue(id);
+            //手机号
+            String phone = buyer.getPhone();
+            row.createCell(++celNum).setCellValue(phone);
+            //注册时间
+            Date createTime = buyer.getCreateTime();
+            XSSFCell cell = row.createCell(++celNum);
+            cell.setCellValue(createTime);
+            cell.setCellStyle(cellStyle);
+            rowNum++;
+        }
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        orderWorkbook.write(arrayOutputStream);
+        String newName = URLEncoder.encode("商户信息-" + new SimpleDateFormat("yyyy-MM-dd").format(buyerReq.getCreateTimeStart())+" ~ "+ new SimpleDateFormat("yyyy-MM-dd").format(buyerReq.getCreateTimeEnd()) + ".xlsx", "utf-8")
+                .replaceAll("\\+", "%20").replaceAll("%28", "\\(")
+                .replaceAll("%29", "\\)").replaceAll("%3B", ";")
+                .replaceAll("%40", "@").replaceAll("%23", "\\#")
+                .replaceAll("%26", "\\&").replaceAll("%2C", "\\,");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", newName));
+        headers.add("Expires", "0");
+        headers.add("Pragma", "no-cache");
+        return ResponseEntity.ok().headers(headers)
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentLength(arrayOutputStream.size())
+                .body(arrayOutputStream.toByteArray());
     }
 
 }

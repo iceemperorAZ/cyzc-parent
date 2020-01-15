@@ -1,6 +1,7 @@
 package com.jingliang.mall.service;
 
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -74,4 +75,11 @@ public interface BuyerService {
      * @return 返回查询到的商户列表
      */
     public Page<Buyer> findAllBySaleId(Long saleUserId, PageRequest pageRequest);
+
+    /**
+     * 根据条件查询
+     * @param buyerSpecification
+     * @return
+     */
+    List<Buyer> findAll(Specification<Buyer> buyerSpecification);
 }

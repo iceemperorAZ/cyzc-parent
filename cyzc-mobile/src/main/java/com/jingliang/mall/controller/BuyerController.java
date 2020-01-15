@@ -6,11 +6,12 @@ import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerSale;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BuyerReq;
+import com.jingliang.mall.req.PhoneDataReq;
 import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.resp.UserResp;
-import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.server.RedisService;
+import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.UserService;
 import com.jingliang.mall.wx.service.WechatService;
@@ -170,6 +171,32 @@ public class BuyerController {
         if (StringUtils.isNotBlank(decrypt) && StringUtils.isNotBlank(JSONObject.parseObject(decrypt).getString("purePhoneNumber"))) {
             String purePhoneNumber = JSONObject.parseObject(decrypt).getString("purePhoneNumber");
             log.debug("返回解析后的手机号：{}", purePhoneNumber);
+            return MallResult.build(MallConstant.OK, MallConstant.TEXT_OK, purePhoneNumber);
+        }
+        log.debug("解析微信手机号失败");
+        return MallResult.build(MallConstant.WECHAT_FAIL, MallConstant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
+    }
+
+    /**
+     * 修改当前用户的微信手机号
+     */
+    @ApiOperation(value = "修改当前用户的微信手机号")
+    @PostMapping("/analysis/phone")
+    public MallResult<String> analysisPhone(@RequestBody PhoneDataReq phoneDataReq,
+                                            @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", phoneDataReq);
+        if (StringUtils.isBlank(phoneDataReq.getIv()) || StringUtils.isBlank(phoneDataReq.getEncryptedData())) {
+            return MallResult.buildParamFail();
+        }
+        Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
+        String sessionKey = buyer.getSessionKey();
+        //解密用户手机号
+        String decrypt = MallUtils.decrypt(sessionKey, phoneDataReq.getIv(), phoneDataReq.getEncryptedData());
+        if (StringUtils.isNotBlank(decrypt) && StringUtils.isNotBlank(JSONObject.parseObject(decrypt).getString("purePhoneNumber"))) {
+            String purePhoneNumber = JSONObject.parseObject(decrypt).getString("purePhoneNumber");
+            log.debug("返回解析后的手机号：{}", purePhoneNumber);
+            buyer.setPhone(purePhoneNumber);
+            buyerService.save(buyer);
             return MallResult.build(MallConstant.OK, MallConstant.TEXT_OK, purePhoneNumber);
         }
         log.debug("解析微信手机号失败");
