@@ -211,6 +211,12 @@ public class Product implements Serializable {
     private Date showTime;
 
     /**
+     * 折扣价
+     */
+    @Column(name = "discount_show")
+    private String discountShow;
+
+    /**
      * 是否即将上架
      */
     @Column(name = "is_soon_show")
@@ -223,7 +229,6 @@ public class Product implements Serializable {
     public void setIsSoonShow(Boolean isSoonShow) {
         this.isSoonShow = isSoonShow;
     }
-
 
     /**
      * 重量

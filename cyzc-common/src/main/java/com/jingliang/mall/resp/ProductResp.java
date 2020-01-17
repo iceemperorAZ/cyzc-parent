@@ -165,6 +165,12 @@ public class ProductResp implements Serializable {
     private Boolean isAvailable;
 
     /**
+     * 折扣价
+     */
+    @ApiModelProperty(value = "折扣价")
+    private String discountShow;
+
+    /**
      * 创建人
      */
     @ApiModelProperty(value = "创建人")
