@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
@@ -245,6 +246,13 @@ public class ProductReq extends BaseReq implements Serializable {
      */
     @ApiModelProperty(value = "折扣价")
     private String discountShow;
+
+    public String getDiscountShow() {
+        if (StringUtils.isBlank(discountShow)) {
+            return "-1";
+        }
+        return discountShow;
+    }
 
     /**
      * 创建人

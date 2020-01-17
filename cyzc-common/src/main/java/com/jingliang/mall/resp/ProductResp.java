@@ -170,6 +170,13 @@ public class ProductResp implements Serializable {
     @ApiModelProperty(value = "折扣价")
     private String discountShow;
 
+    public String getDiscountShow() {
+        if ("-1".equals(discountShow)) {
+            return "";
+        }
+        return discountShow;
+    }
+
     /**
      * 创建人
      */
