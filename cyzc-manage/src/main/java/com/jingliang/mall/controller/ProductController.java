@@ -145,7 +145,7 @@ public class ProductController {
                 predicateList.add(cb.equal(root.get("productTypeId"), productReq.getProductTypeId()));
             }
             if (StringUtils.isNotBlank(productReq.getProductName())) {
-                predicateList.add(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"));
+                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"),cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%")));
             }
             if (Objects.nonNull(productReq.getProductZoneId())) {
                 predicateList.add(cb.equal(root.get("productZoneId"), productReq.getProductZoneId()));
