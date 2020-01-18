@@ -156,7 +156,7 @@ public class BuyerController {
         }
         Specification<Buyer> buyerSpecification = (Specification<Buyer>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
-            if (StringUtils.isNotBlank(buyerReq.getPhone())) {
+            if (buyerReq.getId() != null) {
                 predicateList.add(cb.equal(root.get("id"), buyerReq.getId()));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
@@ -212,7 +212,7 @@ public class BuyerController {
         }
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
         orderWorkbook.write(arrayOutputStream);
-        String newName = URLEncoder.encode("商户信息-" + new SimpleDateFormat("yyyy-MM-dd").format(buyerReq.getCreateTimeStart())+" ~ "+ new SimpleDateFormat("yyyy-MM-dd").format(buyerReq.getCreateTimeEnd()) + ".xlsx", "utf-8")
+        String newName = URLEncoder.encode("商户信息-" + new SimpleDateFormat("yyyy-MM-dd").format(buyerReq.getCreateTimeStart()) + " ~ " + new SimpleDateFormat("yyyy-MM-dd").format(buyerReq.getCreateTimeEnd()) + ".xlsx", "utf-8")
                 .replaceAll("\\+", "%20").replaceAll("%28", "\\(")
                 .replaceAll("%29", "\\)").replaceAll("%3B", ";")
                 .replaceAll("%40", "@").replaceAll("%23", "\\#")
