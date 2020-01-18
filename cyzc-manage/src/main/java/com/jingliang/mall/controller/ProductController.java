@@ -24,6 +24,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -133,11 +135,14 @@ public class ProductController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部商品")
-    public MallResult<MallPage<ProductResp>> pageAllProduct(ProductReq productReq) {
+    public MallResult<MallPage<ProductResp>> pageAllProduct(ProductReq productReq) throws UnsupportedEncodingException {
         log.debug("请求参数：{}", productReq);
         PageRequest pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize());
         if (StringUtils.isNotBlank(productReq.getClause())) {
             pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize(), Sort.by(MallUtils.separateOrder(productReq.getClause())));
+        }
+        if (StringUtils.isNotBlank(productReq.getProductName())) {
+            productReq.setProductName(URLDecoder.decode(productReq.getProductName(),"UTF-8"));
         }
         Specification<Product> productSpecification = (Specification<Product>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
