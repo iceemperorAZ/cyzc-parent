@@ -147,6 +147,12 @@ public class SkuDetailResp implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
+    /**
+     * 商品信息
+     */
+    @ApiModelProperty(value = "商品信息")
+    private ProductResp product;
+
     public Double getPurchasePrice() {
         return purchasePrice / 100;
     }

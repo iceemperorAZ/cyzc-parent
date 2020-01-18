@@ -142,4 +142,10 @@ public class SkuResp implements Serializable {
         //与@Value("${product.sku.init.invented.num}")一致
         return Math.max((skuLineNum - 800000) * -1, 0);
     }
+
+    /**
+     * 商品信息
+     */
+    @ApiModelProperty(value = "商品信息")
+    private ProductResp product;
 }

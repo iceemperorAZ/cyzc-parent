@@ -134,4 +134,11 @@ public class SkuDetail implements Serializable {
     @Column(name = "update_time")
     private Date updateTime;
 
+    /**
+     * 商品信息
+     */
+    @OneToOne(targetEntity = Product.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Product product;
+
 }
