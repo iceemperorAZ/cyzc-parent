@@ -4,6 +4,7 @@ import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
+import com.jingliang.mall.resp.OrderDetailResp;
 import com.jingliang.mall.resp.OrderResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.*;
@@ -88,7 +89,6 @@ public class OrderController {
         //是否有真实库存
         boolean hasSku = true;
         Map<Long, Long> productPriceMap = new HashMap<>(100);
-
         //计算商品总价
         for (OrderDetail orderDetail : order.getOrderDetails()) {
             orderDetail.setId(null);
@@ -134,6 +134,37 @@ public class OrderController {
         Config config = configService.findByCode("300");
         if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_INSUFFICIENT_AMOUNT_FAIL);
+        }
+        //计算赠品
+        config = configService.findByCode("600");
+        String values = config.getConfigValues();
+        if (StringUtils.isBlank(values)) {
+            return MallResult.buildOk();
+        }
+        String[] sections = values.split(";");
+        String productIds = "";
+        Map<Double, String> map = new TreeMap<>();
+        for (String section : sections) {
+            String[] split = section.split(":");
+            map.put(Double.valueOf(split[0]), split[1]);
+        }
+        map = ((TreeMap<Double, String>)map).descendingMap();
+        for (Map.Entry<Double, String> entry : map.entrySet()) {
+            if(order.getTotalPrice()>=entry.getKey()){
+                productIds = entry.getValue();
+                break;
+            }
+        }
+        for (String productId : productIds.split(",")) {
+            String[] split = productId.split("\\|");
+            Product product = productService.findAllById(Long.parseLong(split[1]));
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setProductNum(Integer.parseInt(split[2]));
+            orderDetail.setSellingPrice(0L);
+            orderDetail.setIsAvailable(true);
+            orderDetail.setCreateTime(new Date());
+            orderDetail.setProductId(product.getId());
+            order.getOrderDetails().add(orderDetail);
         }
         //计算运费
         config = configService.findByCode("100");
@@ -220,7 +251,6 @@ public class OrderController {
         log.debug("微信返回结果二次签名后的返回结果：{}", resultMap);
         log.debug("返回结果：{}", orderResp);
         return MallResult.buildSaveOk(resultMap);
-
     }
 
     /**
@@ -313,5 +343,47 @@ public class OrderController {
         }
         config = configService.findByCode("200");
         return MallResult.buildQueryOk(Double.parseDouble(config.getConfigValues()));
+    }
+
+    /**
+     * 根据订单总价查询赠品
+     */
+    @ApiOperation(value = "根据订单总价查询赠品")
+    @GetMapping("/find/gift")
+    public MallResult<List<OrderDetailResp>> findOrderGift(Double deliverFee) {
+        Config config = configService.findByCode("600");
+        String values = config.getConfigValues();
+        if (StringUtils.isBlank(values)) {
+            return MallResult.buildOk();
+        }
+        String[] sections = values.split(";");
+        String productIds = "";
+        Map<Double, String> map = new TreeMap<>();
+        for (String section : sections) {
+            String[] split = section.split(":");
+            map.put(Double.valueOf(split[0]), split[1]);
+        }
+        map = ((TreeMap<Double, String>)map).descendingMap();
+        for (Map.Entry<Double, String> entry : map.entrySet()) {
+            if(deliverFee>=entry.getKey()){
+                productIds = entry.getValue();
+                break;
+            }
+        }
+        List<OrderDetailResp> orderDetailResps = new ArrayList<>();
+        if (StringUtils.isBlank(productIds)) {
+            return MallResult.buildOk();
+        }
+        for (String productId : productIds.split(",")) {
+            String[] split = productId.split("\\|");
+            Product product = productService.findAllById(Long.parseLong(split[1]));
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setProductNum(Integer.parseInt(split[2]));
+            orderDetail.setSellingPrice(0L);
+            orderDetail.setProduct(product);
+            orderDetail.setProductId(product.getId());
+            orderDetailResps.add(MallBeanMapper.map(orderDetail, OrderDetailResp.class));
+        }
+        return MallResult.buildQueryOk(orderDetailResps);
     }
 }
