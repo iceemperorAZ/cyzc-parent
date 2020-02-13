@@ -138,7 +138,7 @@ public class OrderController {
         //计算赠品
         config = configService.findByCode("600");
         String values = config.getConfigValues();
-        if (StringUtils.isBlank(values)) {
+        if (StringUtils.isBlank(values) || "-".equals(values)) {
             return MallResult.buildOk();
         }
         String[] sections = values.split(";");
@@ -148,9 +148,9 @@ public class OrderController {
             String[] split = section.split(":");
             map.put(Double.valueOf(split[0]), split[1]);
         }
-        map = ((TreeMap<Double, String>)map).descendingMap();
+        map = ((TreeMap<Double, String>) map).descendingMap();
         for (Map.Entry<Double, String> entry : map.entrySet()) {
-            if(order.getTotalPrice()>=entry.getKey()){
+            if (order.getTotalPrice() >= entry.getKey()) {
                 productIds = entry.getValue();
                 break;
             }
@@ -353,7 +353,7 @@ public class OrderController {
     public MallResult<List<OrderDetailResp>> findOrderGift(Double deliverFee) {
         Config config = configService.findByCode("600");
         String values = config.getConfigValues();
-        if (StringUtils.isBlank(values)) {
+        if (StringUtils.isBlank(values) || "-".equals(values)) {
             return MallResult.buildOk();
         }
         String[] sections = values.split(";");
@@ -363,9 +363,9 @@ public class OrderController {
             String[] split = section.split(":");
             map.put(Double.valueOf(split[0]), split[1]);
         }
-        map = ((TreeMap<Double, String>)map).descendingMap();
+        map = ((TreeMap<Double, String>) map).descendingMap();
         for (Map.Entry<Double, String> entry : map.entrySet()) {
-            if(deliverFee>=entry.getKey()){
+            if (deliverFee >= entry.getKey()) {
                 productIds = entry.getValue();
                 break;
             }
