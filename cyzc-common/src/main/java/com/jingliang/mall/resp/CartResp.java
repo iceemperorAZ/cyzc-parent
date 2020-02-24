@@ -78,4 +78,17 @@ public class CartResp implements Serializable {
 	 */
 	@ApiModelProperty(value = "是否选中（一直为选中，后期再确定是否保存如数据库）")
 	private Boolean isSelect = true;
+
+    /**
+     * 商品售价
+     */
+    @ApiModelProperty(value = "商品售价")
+    private Double sellingPrice;
+
+    public Double getSellingPrice() {
+        if(product!=null){
+            return product.getSellingPrice();
+        }
+        return sellingPrice;
+    }
 }

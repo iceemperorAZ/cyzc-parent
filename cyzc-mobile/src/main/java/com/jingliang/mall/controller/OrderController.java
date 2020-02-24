@@ -138,33 +138,36 @@ public class OrderController {
         //计算赠品
         config = configService.findByCode("600");
         String values = config.getConfigValues();
-        if (StringUtils.isBlank(values) || "-".equals(values)) {
-            return MallResult.buildOk();
-        }
-        String[] sections = values.split(";");
-        String productIds = "";
-        Map<Double, String> map = new TreeMap<>();
-        for (String section : sections) {
-            String[] split = section.split(":");
-            map.put(Double.valueOf(split[0]), split[1]);
-        }
-        map = ((TreeMap<Double, String>) map).descendingMap();
-        for (Map.Entry<Double, String> entry : map.entrySet()) {
-            if (order.getTotalPrice() >= entry.getKey()) {
-                productIds = entry.getValue();
-                break;
+        if (StringUtils.isNotBlank(values) && !"-".equals(values)) {
+            String[] sections = values.split(";");
+            String productIds = "";
+            Map<Double, String> map = new TreeMap<>();
+            for (String section : sections) {
+                String[] split = section.split(":");
+                map.put(Double.valueOf(split[0]), split[1]);
             }
-        }
-        for (String productId : productIds.split(",")) {
-            String[] split = productId.split("\\|");
-            Product product = productService.findAllById(Long.parseLong(split[1]));
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setProductNum(Integer.parseInt(split[2]));
-            orderDetail.setSellingPrice(0L);
-            orderDetail.setIsAvailable(true);
-            orderDetail.setCreateTime(new Date());
-            orderDetail.setProductId(product.getId());
-            order.getOrderDetails().add(orderDetail);
+            map = ((TreeMap<Double, String>) map).descendingMap();
+            for (Map.Entry<Double, String> entry : map.entrySet()) {
+                if (order.getTotalPrice() / 100.00 >= entry.getKey()) {
+                    productIds = entry.getValue();
+                    break;
+                }
+            }
+            for (String productId : productIds.split(",")) {
+                String[] split = productId.split("\\|");
+                Product product = productService.findAllById(Long.parseLong(split[1]));
+                //查询线上库存
+                Long skuNum = redisService.skuLineDecrement(String.valueOf(product.getId()), 1);
+                if (skuNum >= 0) {
+                    OrderDetail orderDetail = new OrderDetail();
+                    orderDetail.setProductNum(Integer.parseInt(split[2]));
+                    orderDetail.setSellingPrice(0L);
+                    orderDetail.setIsAvailable(true);
+                    orderDetail.setCreateTime(new Date());
+                    orderDetail.setProductId(product.getId());
+                    order.getOrderDetails().add(orderDetail);
+                }
+            }
         }
         //计算运费
         config = configService.findByCode("100");

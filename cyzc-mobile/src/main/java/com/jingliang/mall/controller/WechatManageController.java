@@ -58,31 +58,33 @@ public class WechatManageController {
     private final OrderDetailService orderDetailService;
     private final WechatManageService wechatManageService;
     private final BuyerAddressService buyerAddressService;
+    private final ManagerSaleService managerSaleService;
 
 
     public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService,
-                                  OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerAddressService buyerAddressService) {
+                                  OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerAddressService buyerAddressService, ManagerSaleService managerSaleService) {
         this.userService = userService;
         this.buyerService = buyerService;
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.wechatManageService = wechatManageService;
         this.buyerAddressService = buyerAddressService;
+        this.managerSaleService = managerSaleService;
     }
 
     /**
      * 查询汇总信息
      */
-    @GetMapping("/manager/confluence")
-    @ApiOperation(value = "查询汇总信息（领导身份）")
+    @GetMapping("/boss/confluence")
+    @ApiOperation(value = "查询汇总信息（老板身份）")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "开始时间", name = "startTime", dataType = "date", paramType = "query", required = true),
             @ApiImplicitParam(value = "结束时间", name = "endTime", dataType = "date", paramType = "query", required = true),
     })
-    public MallResult<ConfluenceResp> managerConfluence(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime,
-                                                        @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                        @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime) {
+    public MallResult<ConfluenceResp> bossConfluence(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime,
+                                                     @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime) {
         List<User> users = userService.findAll();
         Confluence confluence = new Confluence();
         confluence.setTotalPrice(0L);
@@ -104,13 +106,13 @@ public class WechatManageController {
     /**
      * 查询所有销售（领导身份）
      */
-    @GetMapping("/manager/user/all")
-    @ApiOperation(value = "查询所有销售（领导身份）")
+    @GetMapping("/boss/user/all")
+    @ApiOperation(value = "查询所有销售（老板身份）")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
             @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
     })
-    public MallResult<List<ConfluenceDetailResp>> pageAllUser(@ApiIgnore UserReq userReq) {
+    public MallResult<List<ConfluenceDetailResp>> bossPageAllUser(@ApiIgnore UserReq userReq) {
         log.debug("请求参数：{}", userReq);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(userReq.getCreateTimeEnd());
@@ -129,16 +131,16 @@ public class WechatManageController {
     }
 
     /**
-     * 查询指定销售员绩效（领导）
+     * 查询指定销售员绩效（领导/区域经理）
      */
-    @GetMapping("/manager/user")
-    @ApiOperation(value = "查询指定销售员绩效（领导）")
+    @GetMapping({"/boss/user", "/manager/user"})
+    @ApiOperation(value = "查询指定销售员绩效（老板/区域经理）")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "销售Id", name = "id", dataType = "long", paramType = "query", required = true),
             @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
             @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
     })
-    public MallResult<ConfluenceDetailResp> managerUser(@ApiIgnore UserReq userReq) {
+    public MallResult<ConfluenceDetailResp> bossUser(@ApiIgnore UserReq userReq) {
         log.debug("请求参数：{}", userReq);
         if (Objects.isNull(userReq.getId())) {
             return MallResult.buildParamFail();
@@ -221,11 +223,11 @@ public class WechatManageController {
     }
 
     /**
-     * 查询销售员下的商户（领导）
-     * {{host}}/wx/manager/buyers?createTimeStart=2019-01-01&createTimeEnd=2019-12-12&id=33
+     * 查询销售员下的商户（老板）
+     * {{host}}/wx/boss/buyers?createTimeStart=2019-01-01&createTimeEnd=2019-12-12&id=33
      */
-    @GetMapping("/manager/buyers")
-    @ApiOperation(value = "查询销售员下的商户（领导）")
+    @GetMapping("/boss/buyers")
+    @ApiOperation(value = "查询销售员下的商户（老板）")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "销售Id", name = "id", dataType = "long", paramType = "query", required = true),
             @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
@@ -233,7 +235,7 @@ public class WechatManageController {
             @ApiImplicitParam(value = "分页", name = "page", dataType = "int", paramType = "query", defaultValue = "1"),
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
-    public MallResult<MallPage<ConfluenceDetailResp>> manageBuyer(@ApiIgnore UserReq userReq) {
+    public MallResult<MallPage<ConfluenceDetailResp>> bossBuyer(@ApiIgnore UserReq userReq) {
         log.debug("请求参数：{}", userReq);
         User user = userService.findById(userReq.getId());
         if (Objects.isNull(user)) {
@@ -273,15 +275,15 @@ public class WechatManageController {
 
 
     /**
-     * 查询商品销量(领导)[暂时不支持分页]
+     * 查询商品销量(老板)[暂时不支持分页]
      */
-    @GetMapping("/manager/products")
-    @ApiOperation(value = "查询商品销量（领导）[暂时不支持分页]")
+    @GetMapping({"/boss/products"})
+    @ApiOperation(value = "查询商品销量（老板）[暂时不支持分页]")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
             @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
     })
-    public MallResult<List<ConfluenceDetailResp>> managerProducts(@ApiIgnore UserReq userReq) {
+    public MallResult<List<ConfluenceDetailResp>> bossProducts(@ApiIgnore UserReq userReq) {
         log.debug("请求参数：{}", userReq);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(userReq.getCreateTimeEnd());
@@ -301,14 +303,17 @@ public class WechatManageController {
         };
         List<Order> orderPage = orderService.findAll(orderSpecification);
         Map<String, Long> confluenceDetailMap = new HashMap<>(156);
+        Map<String, Integer> productNum = new HashMap<>(156);
         orderPage.forEach(order -> {
             //循环订单详情（商品）
             order.getOrderDetails().forEach(orderDetail -> {
                 //商品归类计算
                 if (!confluenceDetailMap.containsKey(orderDetail.getProduct().getProductName())) {
                     confluenceDetailMap.put(orderDetail.getProduct().getProductName(), 0L);
+                    productNum.put(orderDetail.getProduct().getProductName(), 0);
                 }
                 confluenceDetailMap.put(orderDetail.getProduct().getProductName(), confluenceDetailMap.get(orderDetail.getProduct().getProductName()) + orderDetail.getSellingPrice() * orderDetail.getProductNum());
+                productNum.put(orderDetail.getProduct().getProductName(), productNum.get(orderDetail.getProduct().getProductName()) + orderDetail.getProductNum());
             });
         });
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
@@ -316,10 +321,12 @@ public class WechatManageController {
             ConfluenceDetail confluenceDetail = new ConfluenceDetail();
             confluenceDetail.setName(productName);
             confluenceDetail.setTotalPrice(totalPrice);
+            confluenceDetail.setNum(productNum.get(productName));
             confluenceDetails.add(confluenceDetail);
 
         });
         List<ConfluenceDetailResp> confluenceDetailResps = MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
+        confluenceDetailResps = confluenceDetailResps.stream().sorted(Comparator.comparing(ConfluenceDetailResp::getNum).reversed()).collect(Collectors.toList());
         log.debug("返回结果：{}", confluenceDetailResps);
         return MallResult.buildQueryOk(confluenceDetailResps);
     }
@@ -342,6 +349,7 @@ public class WechatManageController {
         //查询绑定会员列表
         List<Buyer> buyers = buyerService.findAllBySaleUserId(user.getId());
         Map<String, Long> confluenceDetailMap = new HashMap<>(156);
+        Map<String, Integer> productNum = new HashMap<>(156);
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
         for (Buyer buyer : buyers) {
             //1.查询指定时间的订单
@@ -365,8 +373,10 @@ public class WechatManageController {
                     //商品归类计算
                     if (!confluenceDetailMap.containsKey(orderDetail.getProduct().getProductName())) {
                         confluenceDetailMap.put(orderDetail.getProduct().getProductName(), 0L);
+                        productNum.put(orderDetail.getProduct().getProductName(), 0);
                     }
                     confluenceDetailMap.put(orderDetail.getProduct().getProductName(), confluenceDetailMap.get(orderDetail.getProduct().getProductName()) + orderDetail.getSellingPrice() * orderDetail.getProductNum());
+                    productNum.put(orderDetail.getProduct().getProductName(), productNum.get(orderDetail.getProduct().getProductName()) + orderDetail.getProductNum());
                 });
             });
         }
@@ -374,11 +384,13 @@ public class WechatManageController {
             ConfluenceDetail confluenceDetail = new ConfluenceDetail();
             confluenceDetail.setName(productName);
             confluenceDetail.setTotalPrice(totalPrice);
+            confluenceDetail.setNum(productNum.get(productName));
             confluenceDetails.add(confluenceDetail);
 
         });
 
         List<ConfluenceDetailResp> confluenceDetailResps = MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
+        confluenceDetailResps = confluenceDetailResps.stream().sorted(Comparator.comparing(ConfluenceDetailResp::getNum).reversed()).collect(Collectors.toList());
         log.debug("返回结果：{}", confluenceDetailResps);
         return MallResult.buildQueryOk(confluenceDetailResps);
 
@@ -509,14 +521,17 @@ public class WechatManageController {
         };
         Page<Order> orderPage = orderService.findAll(orderSpecification, pageRequest);
         Map<String, Long> confluenceDetailMap = new HashMap<>(156);
+        Map<String, Integer> productNum = new HashMap<>(156);
         orderPage.forEach(order -> {
             //循环订单详情（商品）
             order.getOrderDetails().forEach(orderDetail -> {
                 //商品归类计算
                 if (!confluenceDetailMap.containsKey(orderDetail.getProduct().getProductTypeName())) {
                     confluenceDetailMap.put(orderDetail.getProduct().getProductTypeName(), 0L);
+                    productNum.put(orderDetail.getProduct().getProductTypeName(), 0);
                 }
                 confluenceDetailMap.put(orderDetail.getProduct().getProductTypeName(), confluenceDetailMap.get(orderDetail.getProduct().getProductTypeName()) + orderDetail.getSellingPrice() * orderDetail.getProductNum());
+                productNum.put(orderDetail.getProduct().getProductTypeName(), productNum.get(orderDetail.getProduct().getProductTypeName()) + orderDetail.getProductNum());
             });
         });
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
@@ -524,10 +539,12 @@ public class WechatManageController {
             ConfluenceDetail confluenceDetail = new ConfluenceDetail();
             confluenceDetail.setName(productName);
             confluenceDetail.setTotalPrice(totalPrice);
+            confluenceDetail.setNum(productNum.get(productName));
             confluenceDetails.add(confluenceDetail);
 
         });
         List<ConfluenceDetailResp> confluenceDetailResps = MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
+        confluenceDetailResps = confluenceDetailResps.stream().sorted(Comparator.comparing(ConfluenceDetailResp::getNum).reversed()).collect(Collectors.toList());
         log.debug("返回结果：{}", confluenceDetailResps);
         return MallResult.buildQueryOk(confluenceDetailResps);
     }
@@ -551,6 +568,47 @@ public class WechatManageController {
         return MallResult.buildQueryOk(userRespMallPage);
     }
 
+
+    /**
+     * 老板查看所有销售经理
+     */
+    @GetMapping("/boss/managers")
+    @ApiOperation(value = "老板查看所有销售经理")
+    public MallResult<List<UserResp>> bossManagers() {
+        List<User> userList = userService.findByLevel(110);
+        List<UserResp> userResps = MallBeanMapper.mapList(userList, UserResp.class);
+        return MallResult.buildQueryOk(userResps);
+    }
+
+    /**
+     * 区域经理查看自己下的所有销售
+     */
+    @GetMapping("/manager/sales")
+    @ApiOperation(value = "区域经理查看自己下的所有销售")
+    public MallResult<List<UserResp>> managersSales(@DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, HttpSession session) {
+        User user = (User) session.getAttribute(sessionUser);
+        Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
+            List<Predicate> andPredicateList = new ArrayList<>();
+            andPredicateList.add(cb.equal(root.get("managerId"), user.getId()));
+            andPredicateList.add(cb.equal(root.get("isAvailable"), true));
+            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
+            List<Predicate> orPredicateList = new ArrayList<>();
+            orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), startTime));
+            orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
+            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
+            query.where(andPredicate, orPredicate);
+            query.orderBy(cb.desc(root.get("createTime")));
+            return query.getRestriction();
+        };
+        List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
+        List<User> collect = managerSales.stream().map(ManagerSale::getUser).collect(Collectors.toList());
+        List<UserResp> userResps = MallBeanMapper.mapList(collect, UserResp.class);
+        return MallResult.buildQueryOk(userResps);
+    }
+    //销售查看自己下的所有客户
+
     /**
      * 查询指定销售下的商户
      */
@@ -561,7 +619,7 @@ public class WechatManageController {
             @ApiImplicitParam(value = "分页", name = "page", dataType = "int", paramType = "query", defaultValue = "1"),
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
-    public MallResult<MallPage<BuyerResp>> managerPageBuyer(@ApiIgnore UserReq userReq) {
+    public MallResult<MallPage<BuyerResp>> salePageBuyer(@ApiIgnore UserReq userReq) {
         PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize(), Sort.by(Sort.Order.asc("lastOrderTime")));
         if (StringUtils.isNotBlank(userReq.getClause())) {
             pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
@@ -571,10 +629,97 @@ public class WechatManageController {
         if (userRespMallPage.getContent() != null && userRespMallPage.getContent().size() > 0) {
             for (BuyerResp buyerResp : userRespMallPage.getContent()) {
                 BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyerResp.getId());
-                String addr = buyerAddress.getProvince().getName() + "/" + buyerAddress.getCity().getName() + "/" + buyerAddress.getArea().getName() + buyerAddress.getDetailedAddress();
-                buyerResp.setDefaultAddr(addr);
+                if (buyerAddress != null) {
+                    String addr = buyerAddress.getProvince().getName() + "/" + buyerAddress.getCity().getName() + "/" + buyerAddress.getArea().getName() + buyerAddress.getDetailedAddress();
+                    buyerResp.setDefaultAddr(addr);
+                }
             }
         }
         return MallResult.buildQueryOk(userRespMallPage);
     }
+
+    /**
+     * 区域经理查看自己的销量
+     */
+    @GetMapping("/manager/volume")
+    @ApiOperation(value = "区域经理查看自己的销量")
+    public MallResult<List<ConfluenceDetailResp>> managersVolume(@DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, HttpSession session) {
+        User user = (User) session.getAttribute(sessionUser);
+        Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
+            List<Predicate> andPredicateList = new ArrayList<>();
+            andPredicateList.add(cb.equal(root.get("managerId"), user.getId()));
+            andPredicateList.add(cb.equal(root.get("isAvailable"), true));
+            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
+            List<Predicate> orPredicateList = new ArrayList<>();
+            orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), startTime));
+            orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
+            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
+            query.where(andPredicate, orPredicate);
+            query.orderBy(cb.desc(root.get("createTime")));
+            return query.getRestriction();
+        };
+        List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
+        //计算
+        List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
+        managerSales.forEach(managerSale -> {
+            ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(managerSale.getUser()
+                    , startTime.before(managerSale.getCreateTime()) ? managerSale.getCreateTime() : startTime
+                    , endTime.before(managerSale.getUntyingTime()) ? endTime : managerSale.getUntyingTime());
+            confluenceDetails.add(confluenceDetail);
+        });
+        List<ConfluenceDetailResp> confluenceDetailResps = MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
+        confluenceDetailResps = confluenceDetailResps.stream().sorted(Comparator.comparing(ConfluenceDetailResp::getTotalPrice).reversed()).collect(Collectors.toList());
+        log.debug("返回结果：{}", confluenceDetailResps);
+        return MallResult.buildQueryOk(confluenceDetailResps);
+    }
+
+    /**
+     * 查询销售员下的商户（区域经理）
+     * {{host}}/wx/manager/buyers?createTimeStart=2019-01-01&createTimeEnd=2019-12-12&id=33
+     */
+    @GetMapping("/manager/buyers")
+    @ApiOperation(value = "查询销售员下的商户（区域经理）")
+    @ApiImplicitParams({
+            @ApiImplicitParam(value = "销售Id", name = "id", dataType = "long", paramType = "query", required = true),
+            @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
+            @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
+    })
+    public MallResult<List<ConfluenceDetailResp>> managerBuyer(@ApiIgnore UserReq userReq) {
+        log.debug("请求参数：{}", userReq);
+        User user = userService.findById(userReq.getId());
+        if (Objects.isNull(user)) {
+            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_USER_DATA_FAIL);
+        }
+        List<ManagerSale> managerSales = managerSaleService.findByManagerIdAndSaleId(user.getId(), userReq.getId());
+        List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
+        managerSales.forEach(managerSale -> {
+            List<Buyer> buyerPage = buyerService.findAllBySaleUserId(userReq.getId());
+            for (Buyer buyerSale : buyerPage) {
+                ConfluenceDetail confluenceDetail = wechatManageService.buyerPerformanceSummary(buyerSale
+                        , user, userReq.getCreateTimeStart().before(managerSale.getCreateTime()) ? managerSale.getCreateTime() : userReq.getCreateTimeStart()
+                        , userReq.getCreateTimeEnd().before(managerSale.getUntyingTime()) ? userReq.getCreateTimeEnd() : managerSale.getUntyingTime());
+                //计算销售提成价格
+                confluenceDetail.setRoyalty((long) (confluenceDetail.getTotalPrice() * user.getRatio() * 0.01));
+                confluenceDetails.add(confluenceDetail);
+            }
+        });
+        log.debug("返回结果：{}", confluenceDetails);
+        List<ConfluenceDetailResp> confluenceDetailResps = MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
+        return MallResult.buildQueryOk(confluenceDetailResps);
+    }
+//
+//    public static void main(String[] args) throws ParseException {
+//        String beginTime = new String("2016-06-09 10:22:22");
+//        String endTime = new String("2017-05-08 11:22:22");
+//
+//        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//
+//        Date sd1 = df.parse(beginTime);
+//        Date sd2 = df.parse(endTime);
+//
+//        System.out.println(sd1.before(sd2));
+//        System.out.println(sd1.after(sd2));
+//    }
 }

@@ -79,4 +79,11 @@ public interface UserService {
      */
 
     Page<User> findAll(Specification<User> userSpecification, PageRequest pageRequest);
+
+    /**
+     * 根据等级查询用户
+     * @param level
+     * @return
+     */
+    List<User> findByLevel(int level);
 }

@@ -54,7 +54,7 @@ public class WechatManageServiceImpl implements WechatManageService {
         confluence.setProfit(0L);
         //1.判断开始时间和结束时间是否是同年同月
         //1.1 是则直接查询
-        //1.2 否以开始时间的月底为分割时间，分开查询
+        //1.2 否以结束时间的上个月月底为分割时间，分开查询
         Calendar startCalendar = Calendar.getInstance();
         startCalendar.setTime(startTime);
         startCalendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -84,11 +84,15 @@ public class WechatManageServiceImpl implements WechatManageService {
             startCalendar.set(Calendar.SECOND, 0);
             Date firstStartTime = startCalendar.getTime();
 
+            startCalendar.setTime(endTime);
+            startCalendar.set(Calendar.MONTH,-1);
             startCalendar.set(Calendar.DAY_OF_MONTH, startCalendar.getActualMaximum(Calendar.DAY_OF_MONTH));
             startCalendar.set(Calendar.HOUR_OF_DAY, 23);
             startCalendar.set(Calendar.MINUTE, 59);
             startCalendar.set(Calendar.SECOND, 59);
             Date firstEndTime = startCalendar.getTime();
+
+
             ConfluenceDetail firstConfluenceDetail = doUserPerformanceSummary(user, firstStartTime, firstEndTime);
             //总价
             confluence.setTotalPrice(firstConfluenceDetail.getTotalPrice() + confluence.getTotalPrice());

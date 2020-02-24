@@ -30,6 +30,11 @@ public class ConfluenceDetail implements Serializable {
     private Long totalPrice;
 
     /**
+     * 数量
+     */
+    private Integer num;
+
+    /**
      * 提成
      */
     private Long royalty;

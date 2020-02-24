@@ -49,6 +49,12 @@ public class ConfluenceDetailResp implements Serializable {
     private Double royalty;
 
     /**
+     * 数量
+     */
+    @ApiModelProperty(value = "数量")
+    private Integer num;
+
+    /**
      * 净利润
      */
     @ApiModelProperty(value = "净利润")

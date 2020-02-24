@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-public class WechatManageInterceptor implements HandlerInterceptor {
+public class WechatManagerInterceptor implements HandlerInterceptor {
 
     @Value("${session.user.key}")
     private String userSession;
@@ -40,7 +40,7 @@ public class WechatManageInterceptor implements HandlerInterceptor {
     private Integer tokenTimeOut;
     private final RedisService redisService;
 
-    public WechatManageInterceptor(RedisService redisService) {
+    public WechatManagerInterceptor(RedisService redisService) {
         this.redisService = redisService;
     }
 
@@ -80,7 +80,7 @@ public class WechatManageInterceptor implements HandlerInterceptor {
             response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
-        } else if (Objects.isNull(user.getLevel()) || user.getLevel() < 200) {
+        } else if (Objects.isNull(user.getLevel()) || (user.getLevel() < 110)) {
             //重置response
             response.reset();
             //设置编码格式

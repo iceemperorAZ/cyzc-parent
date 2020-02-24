@@ -239,4 +239,16 @@ public class UserReq extends BaseReq implements Serializable {
      */
     @ApiModelProperty(value = "是否为初始密码")
     private Boolean isInitPassword;
+
+    /**
+     * 区域经理Id
+     */
+    @ApiModelProperty(value = "区域经理Id")
+    private Long managerId;
+
+    /**
+     * 负责区域
+     */
+    @ApiModelProperty(value = "负责区域")
+    private String region;
 }

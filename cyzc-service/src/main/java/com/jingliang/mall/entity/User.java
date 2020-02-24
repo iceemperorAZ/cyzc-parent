@@ -1,6 +1,7 @@
 package com.jingliang.mall.entity;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -151,7 +152,30 @@ public class User implements Serializable {
     @Column(name = "ratio")
     private Integer ratio;
 
+    /**
+     * 区域经理Id
+     */
+    @Column(name = "manager_id")
+    private Long managerId;
+
+    public Long getManagerId() {
+        return managerId == null ? -1 : managerId;
+    }
+
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId == null ? -1 : managerId;
+    }
+
+    /**
+     * 负责区域
+     */
+    @Column(name = "region")
+    private String region;
+
+    public String getRegion() {
+        return StringUtils.isBlank(region) ? "-" : region;
+    }
+
     @Transient
     private String token;
-
 }

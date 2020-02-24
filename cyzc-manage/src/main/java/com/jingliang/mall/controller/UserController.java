@@ -176,10 +176,12 @@ public class UserController {
         if (Objects.isNull(userReq.getRatio())) {
             userReq.setRatio(0);
         }
-        //加密密码
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        userReq.setPassword(passwordEncoder.encode(userReq.getLoginName()));
-        userReq.setIsInitPassword(true);
+        if (userReq.getId() == null) {
+            //加密密码
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            userReq.setPassword(passwordEncoder.encode(userReq.getLoginName()));
+            userReq.setIsInitPassword(true);
+        }
         UserResp userResp = MallBeanMapper.map(userService.save(MallBeanMapper.map(userReq, User.class)), UserResp.class);
         log.debug("返回结果：{}", userResp);
         return MallResult.buildSaveOk(userResp);

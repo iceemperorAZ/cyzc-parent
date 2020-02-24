@@ -1,8 +1,9 @@
 package com.jingliang.mall.configuration;
 
 import com.jingliang.mall.interceptor.FrontLoginInterceptor;
-import com.jingliang.mall.interceptor.WechatManageInterceptor;
+import com.jingliang.mall.interceptor.WechatBossInterceptor;
 import com.jingliang.mall.interceptor.WechatInterceptor;
+import com.jingliang.mall.interceptor.WechatManagerInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -19,12 +20,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 public class InterceptorConfig extends WebMvcConfigurationSupport {
 
     private final FrontLoginInterceptor frontLoginInterceptor;
-    private final WechatManageInterceptor wechatManageInterceptor;
+    private final WechatBossInterceptor wechatBossInterceptor;
+    private final WechatManagerInterceptor wechatManagerInterceptor;
     private final WechatInterceptor wechatInterceptor;
 
-    public InterceptorConfig(FrontLoginInterceptor frontLoginInterceptor, WechatManageInterceptor wechatManageInterceptor, WechatInterceptor wechatInterceptor) {
+    public InterceptorConfig(FrontLoginInterceptor frontLoginInterceptor, WechatBossInterceptor wechatBossInterceptor, WechatManagerInterceptor wechatManagerInterceptor, WechatInterceptor wechatInterceptor) {
         this.frontLoginInterceptor = frontLoginInterceptor;
-        this.wechatManageInterceptor = wechatManageInterceptor;
+        this.wechatBossInterceptor = wechatBossInterceptor;
+        this.wechatManagerInterceptor = wechatManagerInterceptor;
         this.wechatInterceptor = wechatInterceptor;
     }
 
@@ -60,7 +63,13 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
                 //拦截器的执行顺序 设置高一点方便后期扩展
                 .order(1);
         //前台拦截器
-        registry.addInterceptor(wechatManageInterceptor)
+        registry.addInterceptor(wechatBossInterceptor)
+                //需要拦截的uri
+                .addPathPatterns("/wx/boss/**")
+                //拦截器的执行顺序 设置高一点方便后期扩展
+                .order(1);
+        //前台拦截器
+        registry.addInterceptor(wechatManagerInterceptor)
                 //需要拦截的uri
                 .addPathPatterns("/wx/manager/**")
                 //拦截器的执行顺序 设置高一点方便后期扩展
@@ -70,7 +79,7 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
                 //需要拦截的uri
                 .addPathPatterns("/wx/**")
                 //需要跳过的uri
-                .excludePathPatterns("/wx/manager/**")
+                .excludePathPatterns("/wx/manager/**","/wx/boss/**")
                 //拦截器的执行顺序 设置高一点方便后期扩展
                 .order(1);
         super.addInterceptors(registry);

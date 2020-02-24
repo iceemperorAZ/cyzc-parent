@@ -3,6 +3,8 @@ package com.jingliang.mall.repository;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.base.BaseRepository;
 
+import java.util.List;
+
 /**
  * 员工表Repository
  *
@@ -37,4 +39,12 @@ public interface UserRepository extends BaseRepository<User, Long> {
      * @return 返回查询到的用户信息
      */
     public User findFirstByLoginNameAndIsAvailable(String loginName, Boolean isAvailable);
+
+    /**
+     * 根据等级查询
+     * @param level
+     * @param isAvailable
+     * @return
+     */
+    List<User> findAllByLevelAndIsAvailable(Integer level, Boolean isAvailable);
 }

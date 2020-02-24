@@ -43,6 +43,12 @@ public class ConfluenceResp implements Serializable {
     private Double totalPrice;
 
     /**
+     * 数量
+     */
+    @ApiModelProperty(value = "数量")
+    private Integer num;
+
+    /**
      * 提成
      */
     @ApiModelProperty(value = "提成")

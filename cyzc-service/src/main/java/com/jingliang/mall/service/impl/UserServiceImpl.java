@@ -1,6 +1,8 @@
 package com.jingliang.mall.service.impl;
 
+import com.jingliang.mall.entity.ManagerSale;
 import com.jingliang.mall.entity.User;
+import com.jingliang.mall.repository.ManagerSaleRepository;
 import com.jingliang.mall.repository.UserRepository;
 import com.jingliang.mall.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +10,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,9 +28,11 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final ManagerSaleRepository managerSaleRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, ManagerSaleRepository managerSaleRepository) {
         this.userRepository = userRepository;
+        this.managerSaleRepository = managerSaleRepository;
     }
 
     @Override
@@ -34,8 +41,42 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public User save(User user) {
-        return userRepository.save(user);
+        Long id = user.getId();
+        user = userRepository.save(user);
+        Date date = new Date();
+        if (user.getManagerId() != null) {
+            if (id != null) {
+                ManagerSale managerSale = managerSaleRepository.findFirstByManagerIdAndSaleIdAndIsAvailableOrderByUntyingTime(user.getManagerId(), id, true);
+                if (managerSale != null) {
+                    if (!managerSale.getManagerId().equals(user.getManagerId())) {
+                        managerSale.setIsAvailable(false);
+                        managerSale.setUntyingTime(date);
+                        managerSale.setUpdateTime(date);
+                        managerSale.setUpdateUser(user.getUpdateUserName());
+                        managerSale.setUpdateUserId(user.getUpdateUserId());
+                        managerSaleRepository.save(managerSale);
+                    } else {
+                        return user;
+                    }
+                }
+            }
+            ManagerSale managerSale = new ManagerSale();
+            managerSale.setManagerId(user.getManagerId());
+            managerSale.setSaleId(user.getId());
+            managerSale.setCreateTime(date);
+            managerSale.setIsAvailable(true);
+            managerSale.setUpdateTime(date);
+            managerSale.setUpdateUser(user.getUpdateUserName());
+            managerSale.setUpdateUserId(user.getUpdateUserId());
+            Calendar calendar = Calendar.getInstance();
+            //将这个值设置的大一点
+            calendar.set(Calendar.YEAR, 2300);
+            managerSale.setUntyingTime(calendar.getTime());
+            managerSaleRepository.save(managerSale);
+        }
+        return user;
     }
 
     @Override
@@ -66,5 +107,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<User> findAll(Specification<User> userSpecification, PageRequest pageRequest) {
         return userRepository.findAll(userSpecification, pageRequest);
+    }
+
+    @Override
+    public List<User> findByLevel(int level) {
+        return userRepository.findAllByLevelAndIsAvailable(level,true);
     }
 }
