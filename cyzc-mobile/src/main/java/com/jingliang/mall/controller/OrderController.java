@@ -148,24 +148,27 @@ public class OrderController {
             }
             map = ((TreeMap<Double, String>) map).descendingMap();
             for (Map.Entry<Double, String> entry : map.entrySet()) {
-                if (order.getTotalPrice() / 100.00 >= entry.getKey()) {
+                if ((order.getTotalPrice() / 100.00) >= entry.getKey()) {
                     productIds = entry.getValue();
                     break;
                 }
             }
-            for (String productId : productIds.split(",")) {
-                String[] split = productId.split("\\|");
-                Product product = productService.findAllById(Long.parseLong(split[1]));
-                //查询线上库存
-                Long skuNum = redisService.skuLineDecrement(String.valueOf(product.getId()), 1);
-                if (skuNum >= 0) {
-                    OrderDetail orderDetail = new OrderDetail();
-                    orderDetail.setProductNum(Integer.parseInt(split[2]));
-                    orderDetail.setSellingPrice(0L);
-                    orderDetail.setIsAvailable(true);
-                    orderDetail.setCreateTime(new Date());
-                    orderDetail.setProductId(product.getId());
-                    order.getOrderDetails().add(orderDetail);
+            if (StringUtils.isNotBlank(productIds)) {
+                for (String productId : productIds.split(",")) {
+                    String[] split = productId.split("\\|");
+                    Product product = productService.findAllById(Long.parseLong(split[1]));
+                    //查询线上库存
+                    Long skuNum = redisService.skuLineDecrement(String.valueOf(product.getId()), 1);
+                    if (skuNum >= 0) {
+                        OrderDetail orderDetail = new OrderDetail();
+                        orderDetail.setProductNum(Integer.parseInt(split[2]));
+                        orderDetail.setSellingPrice(0L);
+                        orderDetail.setIsAvailable(true);
+                        orderDetail.setCreateTime(new Date());
+                        orderDetail.setProductId(product.getId());
+                        order.getOrderDetails().add(orderDetail);
+                        orderDetails.add(orderDetail);
+                    }
                 }
             }
         }
@@ -222,6 +225,11 @@ public class OrderController {
             //调起微信预支付
             resultMap = wechatService.payUnifiedOrder(order, buyer.getUniqueId());
             if (Objects.isNull(resultMap)) {
+                //调起支付失败
+                for (OrderDetail detail : orderDetails) {
+                    //失败就把减掉的库存加回去，并返回支付失败的信息
+                    redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+                }
                 return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
             }
         }
