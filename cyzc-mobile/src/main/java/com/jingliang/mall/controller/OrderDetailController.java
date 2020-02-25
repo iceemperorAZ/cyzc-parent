@@ -56,6 +56,10 @@ public class OrderDetailController {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         List<OrderDetail> orderDetails = orderDetailService.findByOrderId(orderDetailReq.getOrderId());
         for (OrderDetail orderDetail : orderDetails) {
+            if(orderDetail.getSellingPrice()==0){
+                //赠品不算
+                continue;
+            }
             Cart cart = new Cart();
             cart.setBuyerId(buyer.getId());
             cart.setProductId(orderDetail.getProductId());
