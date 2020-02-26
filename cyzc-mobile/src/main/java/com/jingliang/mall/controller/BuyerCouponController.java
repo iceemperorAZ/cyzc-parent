@@ -109,7 +109,6 @@ public class BuyerCouponController {
         buyerCoupon.setCreateUser("系统");
         buyerCoupon = buyerCouponService.save(buyerCoupon);
         //通过消息异步减优惠券数量
-        coupon.setResidueNumber(-1);
         rabbitProducer.sendCoupon(coupon);
         BuyerCouponResp buyerCouponResp = MallBeanMapper.map(buyerCoupon, BuyerCouponResp.class);
         log.debug("返回结果：{}", buyerCouponResp);
