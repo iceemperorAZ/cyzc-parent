@@ -92,7 +92,6 @@ public class WechatManageServiceImpl implements WechatManageService {
             startCalendar.set(Calendar.SECOND, 59);
             Date firstEndTime = startCalendar.getTime();
 
-
             ConfluenceDetail firstConfluenceDetail = doUserPerformanceSummary(user, firstStartTime, firstEndTime);
             //总价
             confluence.setTotalPrice(firstConfluenceDetail.getTotalPrice() + confluence.getTotalPrice());
