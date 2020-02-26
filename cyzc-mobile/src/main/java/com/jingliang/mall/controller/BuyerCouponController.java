@@ -75,6 +75,9 @@ public class BuyerCouponController {
         if (Objects.isNull(coupon)) {
             return MallResult.build(MallConstant.COUPON_FAIL, MallConstant.TEXT_COUPON_INVALID_FAIL);
         }
+        Integer residueNumber = coupon.getResidueNumber();
+        Integer receiveNum = coupon.getReceiveNum();
+        coupon.setReceiveNum(Math.min(residueNumber,receiveNum));
         //判断redis中的优惠券数量是否够
         Long decrement = redisService.couponDecrement(coupon.getId() + "", coupon.getReceiveNum());
         if (decrement < 0 && decrement + coupon.getReceiveNum() < 0) {
@@ -109,6 +112,7 @@ public class BuyerCouponController {
         buyerCoupon.setCreateUser("系统");
         buyerCoupon = buyerCouponService.save(buyerCoupon);
         //通过消息异步减优惠券数量
+        coupon.setResidueNumber(-buyerCoupon.getReceiveNum());
         rabbitProducer.sendCoupon(coupon);
         BuyerCouponResp buyerCouponResp = MallBeanMapper.map(buyerCoupon, BuyerCouponResp.class);
         log.debug("返回结果：{}", buyerCouponResp);
