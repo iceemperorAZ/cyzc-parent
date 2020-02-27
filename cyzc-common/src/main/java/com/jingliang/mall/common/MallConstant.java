@@ -69,6 +69,7 @@ public interface MallConstant {
     String TEXT_ORDER_DELIVER_SKU_FAIL = "发货失败,库存不足";
     String TEXT_ORDER_COUPON_FAIL = "下单失败,无效优惠券";
     String TEXT_ORDER_INSUFFICIENT_AMOUNT_FAIL = "下单失败,订单总金额最低金额不满#price#元";
+    String TEXT_ORDER_AMOUNT_HIGHER_FAIL = "订单金额高于#price#元,请联系业务经理";
 
     Integer PAY_FAIL = 350;
     String TEXT_PAY_PAID = "支付失败,订单已支付";

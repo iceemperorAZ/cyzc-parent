@@ -133,7 +133,12 @@ public class OrderController {
         //是否满足可以下单的订单额度
         Config config = configService.findByCode("300");
         if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_INSUFFICIENT_AMOUNT_FAIL.replace("#price#", (Double.parseDouble(config.getConfigValues())) + ""));
+            return MallResult.build(MallConstant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
+        }
+        //是否满足可以下单的订单额度
+        config = configService.findByCode("700");
+        if (order.getTotalPrice() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+            return MallResult.build(MallConstant.ORDER_FAIL,config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
         }
         //计算赠品
         config = configService.findByCode("600");
