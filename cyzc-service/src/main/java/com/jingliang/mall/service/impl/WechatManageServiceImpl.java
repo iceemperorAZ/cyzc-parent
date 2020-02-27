@@ -404,7 +404,7 @@ public class WechatManageServiceImpl implements WechatManageService {
                 List<Predicate> predicateList = new ArrayList<>();
                 //订单状态大于700表示要扣除绩效
                 predicateList.add(cb.greaterThan(root.get("orderStatus"), 700));
-                predicateList.add(cb.between(root.get("updateTime"), startTime, endTime));
+                predicateList.add(cb.between(root.get("finishTime"), startTime, endTime));
                 predicateList.add(cb.equal(root.get("isAvailable"), true));
                 Calendar instance = Calendar.getInstance();
                 //当前月的第一天
