@@ -591,17 +591,16 @@ public class WechatManageController {
     }
 
     /**
-     * 区域经理查看自己下的所有销售
+     * 查看区域经理下的所有销售
      */
     @GetMapping("/manager/sales")
-    @ApiOperation(value = "区域经理查看自己下的所有销售")
+    @ApiOperation(value = "查看区域经理下的所有销售")
     public MallResult<List<UserResp>> managersSales(@DateTimeFormat(pattern = "yyyy-MM-dd")
                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, HttpSession session) {
-        User user = (User) session.getAttribute(sessionUser);
+                                                    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime,Long id, HttpSession session) {
         Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
-            andPredicateList.add(cb.equal(root.get("managerId"), user.getId()));
+            andPredicateList.add(cb.equal(root.get("managerId"), id));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
             Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
             List<Predicate> orPredicateList = new ArrayList<>();
