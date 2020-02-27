@@ -68,7 +68,7 @@ public class SkuRecordController {
         MallUtils.addDateAndUser(skuRecordReq, user);
         SkuDetail skuDetail = skuDetailService.findById(skuRecordReq.getSkuDetailId());
         //判定库存
-        if (skuRecordReq.getNum() + skuDetail.getSkuResidueNum() < 0) {
+        if (skuRecordReq.getNum() + skuDetail.getSkuResidueNum() <= 0) {
             return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
         }
         skuRecordReq.setProductId(skuDetail.getProductId());

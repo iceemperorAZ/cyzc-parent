@@ -416,6 +416,16 @@ public class WechatManageController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(buyerReq.getCreateTimeEnd());
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+
+
+
+
+
+
+
+
+
+
         //1.查询指定时间的订单
         //1.1.查询每笔订单下的订单详情，取出商品分类保存
         //1.2.分类统计出商品的销量

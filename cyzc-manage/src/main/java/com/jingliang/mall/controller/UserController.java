@@ -25,6 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -123,10 +124,12 @@ public class UserController {
         //设置
         userReq.setId(otherUser.getId());
         //密码重置为登录名
-        userReq.setPassword(passwordEncoder.encode(otherUser.getLoginName()));
-        MallUtils.addDateAndUser(userReq, user);
-        userReq.setIsInitPassword(true);
-        UserResp userResp = MallBeanMapper.map(userService.save(MallBeanMapper.map(userReq, User.class)), UserResp.class);
+        otherUser.setPassword(passwordEncoder.encode(otherUser.getLoginName()));
+        otherUser.setUpdateTime(new Date());
+        otherUser.setUpdateUserId(user.getId());
+        otherUser.setUpdateUserName(user.getUserName());
+        otherUser.setIsInitPassword(true);
+        UserResp userResp = MallBeanMapper.map(userService.save(otherUser), UserResp.class);
         //清除redis中的token
         redisService.remove(tokenUserPrefix + otherUser.getId());
         //清除redis中的登录次数
