@@ -611,8 +611,17 @@ public class WechatManageController {
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
+        
         List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
         List<User> collect = managerSales.stream().map(ManagerSale::getUser).collect(Collectors.toList());
+        User user = userService.findById(id);
+        Long buyerId = user.getBuyerId();
+        Buyer buyer = buyerService.findById(buyerId);
+        if(buyer.getSaleUserId().equals(user.getId())){
+            user.setUserName(user.getUserName()+"(自己)");
+            collect.add(user);
+
+        }
         List<UserResp> userResps = MallBeanMapper.mapList(collect, UserResp.class);
         return MallResult.buildQueryOk(userResps);
     }
