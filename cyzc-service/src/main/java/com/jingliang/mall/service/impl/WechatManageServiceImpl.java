@@ -218,7 +218,7 @@ public class WechatManageServiceImpl implements WechatManageService {
             Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
                 List<Predicate> predicateList = new ArrayList<>();
                 //订单状态300-700表示已经支付
-                predicateList.add(cb.between(root.get("orderStatus"), 300, 600));
+                predicateList.add(cb.between(root.get("orderStatus"), 300, 700));
                 predicateList.add(cb.between(root.get("payEndTime"), startDate, endDate));
                 predicateList.add(cb.equal(root.get("isAvailable"), true));
                 predicateList.add(cb.equal(root.get("buyerId"), buyerId));
@@ -297,7 +297,7 @@ public class WechatManageServiceImpl implements WechatManageService {
             Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
                 List<Predicate> predicateList = new ArrayList<>();
                 //订单状态300-700表示已经支付
-                predicateList.add(cb.between(root.get("orderStatus"), 300, 600));
+                predicateList.add(cb.between(root.get("orderStatus"), 300, 700));
                 predicateList.add(cb.between(root.get("payEndTime"), startDate, endDate));
                 predicateList.add(cb.equal(root.get("isAvailable"), true));
                 predicateList.add(cb.equal(root.get("buyerId"), buyerId));
