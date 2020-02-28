@@ -76,6 +76,10 @@ public class OrderController {
                 || StringUtils.isBlank(orderReq.getDeliveryPhone()) || StringUtils.isBlank(orderReq.getStorehouse())) {
             return MallResult.buildParamFail();
         }
+        Order order1 = orderService.findById(orderReq.getId());
+        if (order1.getOrderStatus() > 300) {
+            return MallResult.build(MallConstant.FAIL, "此订单已完成发货");
+        }
         Order order = new Order();
         order.setId(orderReq.getId());
         order.setDeliveryName(orderReq.getDeliveryName());
