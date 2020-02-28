@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.persistence.criteria.Predicate;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -51,11 +53,14 @@ public class SkuController {
      */
     @ApiOperation(value = "分页查询所有库存")
     @GetMapping("/page/all")
-    public MallResult<MallPage<SkuResp>> pageAll(SkuReq skuReq) {
+    public MallResult<MallPage<SkuResp>> pageAll(SkuReq skuReq) throws UnsupportedEncodingException {
         log.debug("请求参数:{}", skuReq);
         PageRequest pageRequest = PageRequest.of(skuReq.getPage(), skuReq.getPageSize());
         if (StringUtils.isNotBlank(skuReq.getClause())) {
             pageRequest = PageRequest.of(skuReq.getPage(), skuReq.getPageSize(), Sort.by(MallUtils.separateOrder(skuReq.getClause())));
+        }
+        if (StringUtils.isNotBlank(skuReq.getProductName())) {
+            skuReq.setProductName(URLDecoder.decode(skuReq.getProductName(),"UTF-8"));
         }
         Specification<Sku> skuSpecification = (Specification<Sku>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
