@@ -608,7 +608,7 @@ public class WechatManageController {
         List<User> collect = managerSales.stream().map(ManagerSale::getUser).collect(Collectors.toList());
         User user = userService.findById(id);
         Long buyerId = user.getBuyerId();
-        if (buyerId == null) {
+        if (buyerId != null) {
             Buyer buyer = buyerService.findById(buyerId);
             if (buyer.getSaleUserId().equals(user.getId())) {
                 user.setUserName(user.getUserName() + "(自己)");
