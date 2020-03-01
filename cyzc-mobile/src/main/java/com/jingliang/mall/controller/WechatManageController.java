@@ -418,14 +418,6 @@ public class WechatManageController {
         calendar.add(Calendar.DAY_OF_MONTH, 1);
 
 
-
-
-
-
-
-
-
-
         //1.查询指定时间的订单
         //1.1.查询每笔订单下的订单详情，取出商品分类保存
         //1.2.分类统计出商品的销量
@@ -597,7 +589,7 @@ public class WechatManageController {
     @ApiOperation(value = "查看区域经理下的所有销售")
     public MallResult<List<UserResp>> managersSales(@DateTimeFormat(pattern = "yyyy-MM-dd")
                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime,Long id, HttpSession session) {
+                                                    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id, HttpSession session) {
         Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
             andPredicateList.add(cb.equal(root.get("managerId"), id));
@@ -611,16 +603,18 @@ public class WechatManageController {
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
-        
+
         List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
         List<User> collect = managerSales.stream().map(ManagerSale::getUser).collect(Collectors.toList());
         User user = userService.findById(id);
         Long buyerId = user.getBuyerId();
-        Buyer buyer = buyerService.findById(buyerId);
-        if(buyer.getSaleUserId().equals(user.getId())){
-            user.setUserName(user.getUserName()+"(自己)");
-            collect.add(user);
+        if (buyerId == null) {
+            Buyer buyer = buyerService.findById(buyerId);
+            if (buyer.getSaleUserId().equals(user.getId())) {
+                user.setUserName(user.getUserName() + "(自己)");
+                collect.add(user);
 
+            }
         }
         List<UserResp> userResps = MallBeanMapper.mapList(collect, UserResp.class);
         return MallResult.buildQueryOk(userResps);

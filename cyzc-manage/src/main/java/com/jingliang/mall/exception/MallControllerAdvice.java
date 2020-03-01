@@ -29,7 +29,7 @@ public class MallControllerAdvice {
      * @param request HttpServletRequest
      */
     @ExceptionHandler(value = Exception.class)
-    public MallResult exceptionHandler(Exception e, HttpServletRequest request) {
+    public MallResult<?> exceptionHandler(Exception e, HttpServletRequest request) {
         e.printStackTrace();
         String uri = request.getRequestURI();
         log.error("服务器异常拦截，当前请求的uri：{}", uri);
@@ -44,7 +44,7 @@ public class MallControllerAdvice {
      * @param request HttpServletRequest
      */
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-    public MallResult httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
+    public MallResult<?> httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
         e.printStackTrace();
         String uri = request.getRequestURI();
         log.error("请求格式异常拦截，当前请求的uri：{}", uri);

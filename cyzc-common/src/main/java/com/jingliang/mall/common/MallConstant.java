@@ -60,7 +60,6 @@ public interface MallConstant {
     String TEXT_DATA_REPEAT_FAIL = "数据重复";
     String TEXT_USER_DATA_FAIL = "用户不存在";
 
-
     Integer ORDER_FAIL = 350;
     String TEXT_ORDER_FAIL = "下单失败";
     String TEXT_ORDER_NOT_EXIST_FAIL = "修改失败,当前订单不存在";
@@ -76,7 +75,6 @@ public interface MallConstant {
     String TEXT_PAY_OVERTIME_FAIL = "支付失败,支付超时";
     String TEXT_PAY_FAIL = "支付失败";
     String TEXT_PAY_NOTHINGNESS_FAIL = "支付失败,订单不存在";
-
 
     Integer PRODUCT_FAIL = 360;
     String TEXT_PRODUCT_EXIST_FAIL = "添加失败，商品已存在";
@@ -105,7 +103,6 @@ public interface MallConstant {
     Integer LOGIN_LIMIT_FAIL = 420;
     String TEXT_LIMIT_FAIL = "用户名密码多次输入错误，已限制您的登录";
 
-
     Integer TOKEN_FAIL = 430;
     String TEXT_TOKEN_INVALID_FAIL = "请重新登录";
 
@@ -124,13 +121,11 @@ public interface MallConstant {
     String TEXT_EXCEL_UPLOAD_FAIL = "excel上传异常";
     String TEXT_EXCEL_ANALYSIS_FAIL = "excel解析异常";
 
-
     Integer SYSTEM_FAIL = 500;
-    String TEXT_SYSTEM_FAIL = "系统内部异常";
+    String TEXT_SYSTEM_FAIL = "当前访问人数过多，请稍后重试！";
 
     Integer REQUEST_FAIL = 501;
     String TEXT_REQUEST_FAIL = "请求方式错误，当前请求方式为[#nowReq#],实际支持请求方式为[#req#]";
-
 
     List<String> orderExcelTitle = Lists.newArrayList("单据日期", "单据编号", "客户编号", "客户名称", "销售人员"
             , "优惠金额", "客户承担费用", "本次收款", "结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
