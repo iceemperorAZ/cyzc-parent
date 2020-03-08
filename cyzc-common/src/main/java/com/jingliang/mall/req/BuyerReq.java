@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -253,5 +254,18 @@ public class BuyerReq extends BaseReq implements Serializable {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	@JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
 	private Date lastOrderTime;
+
+	/**
+	 * 金币
+	 */
+	@ApiModelProperty(value = "金币")
+	private Integer gold;
+
+
+	/**
+	 * 返利剩余次数
+	 */
+	@ApiModelProperty(value = "返利剩余次数")
+	private Integer orderSpecificNum;
 
 }

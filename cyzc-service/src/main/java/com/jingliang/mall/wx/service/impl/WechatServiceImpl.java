@@ -55,15 +55,15 @@ public class WechatServiceImpl implements WechatService {
 
 
     @Override
-    public Map getOpenId(String code) {
-        Map forEntity = restTemplate.getForObject(appLoginUrl + "?appid=" + appId + "&secret=" + secret + "&js_code=" + code + "&grant_type=authorization_code", Map.class);
+    public Map<?,?> getOpenId(String code) {
+        Map<?,?> forEntity = restTemplate.getForObject(appLoginUrl + "?appid=" + appId + "&secret=" + secret + "&js_code=" + code + "&grant_type=authorization_code", Map.class);
         log.debug("获取openId和sessionKey：{}", forEntity);
         return forEntity;
     }
 
     @Override
     public String getAccessToken() {
-        Map forEntity = restTemplate.getForObject(appAccessTokenUrl + "?appid=" + appId + "&secret=" + secret + "&grant_type=client_credential", Map.class);
+        Map<?,?> forEntity = restTemplate.getForObject(appAccessTokenUrl + "?appid=" + appId + "&secret=" + secret + "&grant_type=client_credential", Map.class);
         return Objects.isNull(forEntity) ? null : (String) forEntity.get("access_token");
     }
 
@@ -84,6 +84,56 @@ public class WechatServiceImpl implements WechatService {
         map.put("time_start", dateFormat.format(new Date(currentTimeMillis)));
         map.put("time_expire", dateFormat.format(new Date(currentTime)));
         map.put("notify_url", serverDomain + "/cy/mobile/front/pay/wechat/notify");
+        map.put("trade_type", "JSAPI");
+        map.put("openid", openId);
+        map.put("receipt", "Y");
+        map.put("out_trade_no", order.getOrderNo());
+        map.put("nonce_str", BaseMallUtils.generateString(32));
+        map.put("sign", BaseMallUtils.sign(map, payKey));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.TEXT_XML);
+        headers.set(HttpHeaders.ACCEPT_CHARSET, StandardCharsets.UTF_8.toString());
+        HttpEntity<String> request = new HttpEntity<>(BaseMallUtils.mapToXml(map), headers);
+        String xml = restTemplate.postForObject(payUrl, request, String.class);
+        Map<String, String> resultMap = BaseMallUtils.xmlToMap(xml);
+        log.debug("{}", resultMap);
+        if (Objects.isNull(resultMap) || Objects.isNull(resultMap.get("prepay_id"))) {
+            log.error("微信生成订单失败：{}",xml);
+            log.error("微信生成订单失败map：{}",resultMap);
+            return null;
+        }
+        String prepayId = resultMap.get("prepay_id");
+        order.setPayNo(prepayId);
+        //二次签名
+        Map<String, String> newMap = new TreeMap<>();
+        newMap.put("appId", appId);
+        newMap.put("nonceStr", BaseMallUtils.generateString(32));
+        newMap.put("package", "prepay_id=" + prepayId);
+        newMap.put("signType", "MD5");
+        newMap.put("timeStamp", System.currentTimeMillis() + "");
+        newMap.put("paySign", BaseMallUtils.sign(newMap, payKey));
+        //appId不进行传输
+        newMap.remove("appId");
+        return newMap;
+    }
+
+    @Override
+    public Map<String, String> recharge(Order order, String openId) {
+        Map<String, String> map = new TreeMap<>();
+        map.put("appid", appId);
+        map.put("body", "晶粮商城");
+        map.put("mch_id", payMchId);
+        map.put("sign_type", "MD5");
+        map.put("fee_type", "CNY");
+        //价格元转为分
+        map.put("total_fee", order.getPayableFee() + "");
+        map.put("spbill_create_ip", BaseMallUtils.getLocalIp());
+        long currentTimeMillis = System.currentTimeMillis();
+        long currentTime = currentTimeMillis + payOvertime * 1000;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        map.put("time_start", dateFormat.format(new Date(currentTimeMillis)));
+        map.put("time_expire", dateFormat.format(new Date(currentTime)));
+        map.put("notify_url", serverDomain + "/cy/mobile/front/pay/wechat/recharge");
         map.put("trade_type", "JSAPI");
         map.put("openid", openId);
         map.put("receipt", "Y");

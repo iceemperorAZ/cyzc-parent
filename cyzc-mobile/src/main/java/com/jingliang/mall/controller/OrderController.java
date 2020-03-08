@@ -49,20 +49,24 @@ public class OrderController {
     private final ProductService productService;
     private final BuyerCouponService buyerCouponService;
     private final RedisService redisService;
+    private final BuyerService buyerService;
     private final WechatService wechatService;
     private final RabbitProducer rabbitProducer;
-    private final ConfigService configService;
     private final BuyerCouponLimitService buyerCouponLimitService;
+    private final ConfigService configService;
+    private final GoldLogService goldLogService;
 
-    public OrderController(OrderService orderService, ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService, WechatService wechatService, RabbitProducer rabbitProducer, ConfigService configService, BuyerCouponLimitService buyerCouponLimitService) {
+    public OrderController(OrderService orderService, ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService, BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer, ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
         this.redisService = redisService;
+        this.buyerService = buyerService;
         this.wechatService = wechatService;
         this.rabbitProducer = rabbitProducer;
         this.configService = configService;
         this.buyerCouponLimitService = buyerCouponLimitService;
+        this.goldLogService = goldLogService;
     }
 
 
@@ -138,7 +142,7 @@ public class OrderController {
         //是否满足可以下单的订单额度
         config = configService.findByCode("700");
         if (order.getTotalPrice() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            return MallResult.build(MallConstant.ORDER_FAIL,config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
+            return MallResult.build(MallConstant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
         }
         //计算赠品
         config = configService.findByCode("600");
@@ -225,6 +229,22 @@ public class OrderController {
         order.setPayStartTime(date);
         order.setUpdateTime(date);
         Map<String, String> resultMap = new HashMap<>();
+        if (order.getIsGold() != null && order.getIsGold()) {
+            //选择使用金币后
+            //扣除金币
+            buyer = buyerService.findById(buyer.getId());
+            Integer gold = buyer.getGold();
+            //金币小于等于订单支付数
+            if (order.getPayableFee() / 100 >= gold / 10) {
+                order.setPayableFee(order.getPayableFee() - gold * 1000);
+                order.setGold(gold);
+            } else {
+                //金币大于订单支付数
+                order.setTotalPrice(0L);
+                //使用了对应钱数的金币
+                order.setGold(order.getPayableFee().intValue() / 10);
+            }
+        }
         //微信支付
         if (Objects.equals(order.getPayWay(), 100)) {
             //调起微信预支付
@@ -401,5 +421,32 @@ public class OrderController {
             orderDetailResps.add(MallBeanMapper.map(orderDetail, OrderDetailResp.class));
         }
         return MallResult.buildQueryOk(orderDetailResps);
+    }
+
+    @GetMapping("/wait/gold")
+    public MallResult<Integer> waitGold(HttpSession session) {
+        Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
+        Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            predicateList.add(cb.between(root.get("orderStatus"), 300, 500));
+            predicateList.add(cb.equal(root.get("buyerId"), buyer.getId()));
+            predicateList.add(cb.equal(root.get("isAvailable"), true));
+            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            query.orderBy(cb.desc(root.get("createTime")));
+            return query.getRestriction();
+        };
+        //统计所有支付后但未完成的订单
+        List<Order> orders = orderService.findAll(orderSpecification);
+        int wartGold = 0;
+        if (orders.size() > 0) {
+            for (Order order : orders) {
+                Integer gold = order.getGold();
+                if (gold == null) {
+                    continue;
+                }
+                wartGold += gold;
+            }
+        }
+        return MallResult.buildQueryOk(wartGold);
     }
 }

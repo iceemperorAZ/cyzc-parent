@@ -199,6 +199,17 @@ public class Order implements Serializable {
     @Column(name = "storehouse")
     private String storehouse;
 
+    /**
+     * 是否使用金币
+     */
+    @Column(name = "is_gold")
+    private Boolean isGold;
+
+    /**
+     * 使用金币数
+     */
+    @Column(name = "gold")
+    private Integer gold;
 
     /**
      * 修改时间

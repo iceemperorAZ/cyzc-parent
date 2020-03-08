@@ -4,14 +4,9 @@ import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.MallConstant;
 import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.common.MallUtils;
-import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.entity.Order;
-import com.jingliang.mall.entity.OrderDetail;
+import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
-import com.jingliang.mall.service.BuyerService;
-import com.jingliang.mall.service.CartService;
-import com.jingliang.mall.service.OrderDetailService;
-import com.jingliang.mall.service.OrderService;
+import com.jingliang.mall.service.*;
 import com.jingliang.mall.wx.service.WechatService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -54,14 +49,20 @@ public class PayController {
     private final CartService cartService;
     private final RabbitProducer rabbitProducer;
     private final BuyerService buyerService;
+    private final GoldLogService goldLogService;
+    private final TechargeService techargeService;
 
-    public PayController(OrderService orderService, OrderDetailService orderDetailService, WechatService wechatService, CartService cartService, RabbitProducer rabbitProducer, BuyerService buyerService) {
+    public PayController(OrderService orderService, OrderDetailService orderDetailService, WechatService wechatService,
+                         CartService cartService, RabbitProducer rabbitProducer, BuyerService buyerService, GoldLogService goldLogService,
+                         TechargeService techargeService) {
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.wechatService = wechatService;
         this.cartService = cartService;
         this.rabbitProducer = rabbitProducer;
         this.buyerService = buyerService;
+        this.goldLogService = goldLogService;
+        this.techargeService = techargeService;
     }
 
     /**
@@ -151,6 +152,58 @@ public class PayController {
             return MallResult.build(MallConstant.PAY_FAIL, MallConstant.TEXT_PAY_OVERTIME_FAIL);
         }
         return MallResult.build(MallConstant.PAY_FAIL, MallConstant.TEXT_PAY_PAID);
+    }
+
+    /**
+     * 微信充值支付回调接口
+     */
+    @ApiIgnore
+    @RequestMapping(value = "/wechat/recharge", produces = MediaType.TEXT_XML_VALUE + ";charset=UTF-8", consumes = MediaType.TEXT_XML_VALUE + ";charset=UTF-8")
+    public String recharge(@RequestBody String xml) {
+        log.info("微信充值支付异步通知返回参数：{}", xml);
+        Map<String, String> map = MallUtils.xmlToMap(xml);
+        log.info("微信充值支付异步通知返回参数map：{}", map);
+        assert map != null;
+        String oldSign = map.get("sign");
+        //对结果进行签名验证
+        String sign = wechatService.payNotifySign(map);
+        if (!StringUtils.equals(oldSign, sign)) {
+            log.error("充值支付签名验证失败");
+            //返回给微信失败的消息
+            log.error("充值支付通知签名验证失败，返回结果：<xml><return_code><![CDATA[签名验证失败]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
+            return "<xml><return_code><![CDATA[FAIL]]></return_code><return_msg><![CDATA[签名验证失败]]></return_msg></xml>";
+        }
+        log.debug("充值支付签名验证成功");
+        //查询订单
+        String orderNo = map.get("out_trade_no");
+        String timeEnd = map.get("time_end");
+        //将微信订单号临时存入msg字段中
+        GoldLog goldLog = goldLogService.findByPayNo(orderNo);
+        Integer totalFee = Integer.parseInt(map.get("total_fee"));
+        //判断支付金额和订单金额(单位：分)是否一致
+        if (!Objects.equals(goldLog.getMoney(), totalFee)) {
+            log.error("编号为：[{}]的订单应付金额[{}]和微信支付的金额[{}]不一致", orderNo, goldLog.getMoney(), totalFee);
+            //返回给微信失败的消息
+            log.error("充值支付通知金额验证失败，返回结果：<xml><return_code><![CDATA[金额验证失败]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
+            return "<xml><return_code><![CDATA[FAIL]]></return_code><![CDATA[金额验证失败]]></return_msg></xml>";
+        }
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        try {
+            goldLog.setCreateTime(dateFormat.parse(timeEnd));
+        } catch (ParseException e) {
+            goldLog.setCreateTime(date);
+        }
+        goldLog.setIsAvailable(true);
+        //查询获得的金币数
+        Techarge techarge = techargeService.findByMoney(totalFee);
+        //比例加上额外赠送
+        goldLog.setGold(techarge.getGold() + totalFee / 1000);
+        goldLog.setMsg("充值￥" + ((totalFee * 1.00) / 100.00) + "元，获得" + goldLog.getGold() + "金币");
+        goldLogService.save(goldLog);
+        //返回给微信成功的消息
+        log.info("充值支付通知签名验证成功，返回结果：<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
+        return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
     }
 
 }

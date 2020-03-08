@@ -9,6 +9,7 @@ import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.service.BuyerService;
+import com.jingliang.mall.service.GoldLogService;
 import com.jingliang.mall.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,10 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 会员表Controller
@@ -63,12 +61,14 @@ public class BuyerController {
     private final RedisService redisService;
     private final UserService userService;
     private final BuyerSaleService buyerSaleService;
+    private final GoldLogService goldLogService;
 
-    public BuyerController(BuyerService buyerService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService) {
+    public BuyerController(BuyerService buyerService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService, GoldLogService goldLogService) {
         this.buyerService = buyerService;
         this.redisService = redisService;
         this.userService = userService;
         this.buyerSaleService = buyerSaleService;
+        this.goldLogService = goldLogService;
     }
 
     /**
@@ -227,5 +227,22 @@ public class BuyerController {
                 .contentLength(arrayOutputStream.size())
                 .body(arrayOutputStream.toByteArray());
     }
+
+
+    /**
+     * 修改剩余返利次数
+     */
+    @PostMapping("/order/specific/num")
+    @ApiOperation(value = "修改剩余返利次数")
+    public MallResult<Boolean> orderSpecificNum(Map<String, String> map) {
+        Long buyerId = Long.parseLong(map.get("buyerId"));
+        Integer num = Integer.parseInt(map.get("num"));
+        Buyer buyer = buyerService.findById(buyerId);
+        buyer.setUpdateTime(new Date());
+        buyer.setOrderSpecificNum(num);
+        buyerService.save(buyer);
+        return MallResult.buildSaveOk(true);
+    }
+
 
 }

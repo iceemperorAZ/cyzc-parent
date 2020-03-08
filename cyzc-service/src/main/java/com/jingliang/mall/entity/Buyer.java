@@ -157,6 +157,18 @@ public class Buyer implements Serializable {
     @Column(name = "last_order_time")
     private Date lastOrderTime;
 
+    /**
+     * 金币
+     */
+    @Column(name = "gold")
+    private Integer gold;
+
+    /**
+     * 返利剩余次数
+     */
+    @Column(name = "order_specific_num")
+    private Integer orderSpecificNum;
+
     @Transient
     private String token;
 

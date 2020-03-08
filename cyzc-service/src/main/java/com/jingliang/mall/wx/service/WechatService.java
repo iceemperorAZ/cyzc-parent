@@ -37,6 +37,15 @@ public interface WechatService {
     public Map<String, String> payUnifiedOrder(Order order, String openId);
 
     /**
+     * 统一下单
+     *
+     * @param order  订单号
+     * @param openId 微信唯一标识
+     * @return 返回下单后的参数
+     */
+    public Map<String, String> recharge(Order order, String openId);
+
+    /**
      * 查询订单
      *
      * @param orderNo 订单号

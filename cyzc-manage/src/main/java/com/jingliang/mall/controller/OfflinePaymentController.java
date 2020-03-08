@@ -2,17 +2,11 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
-import com.jingliang.mall.entity.OfflinePayment;
-import com.jingliang.mall.entity.Order;
-import com.jingliang.mall.entity.OrderDetail;
-import com.jingliang.mall.entity.User;
+import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OfflinePaymentReq;
 import com.jingliang.mall.resp.OfflinePaymentResp;
 import com.jingliang.mall.server.FastdfsService;
-import com.jingliang.mall.service.CartService;
-import com.jingliang.mall.service.OfflinePaymentService;
-import com.jingliang.mall.service.OrderDetailService;
-import com.jingliang.mall.service.OrderService;
+import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +17,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -50,14 +45,20 @@ public class OfflinePaymentController {
     private final FastdfsService fastdfsService;
     private final RabbitProducer rabbitProducer;
     private final CartService cartService;
+    private final ConfigService configService;
+    private final GoldLogService goldLogService;
+    private final BuyerService buyerService;
 
-    public OfflinePaymentController(OfflinePaymentService offlinePaymentService, OrderService orderService, OrderDetailService orderDetailService, FastdfsService fastdfsService, RabbitProducer rabbitProducer, CartService cartService) {
+    public OfflinePaymentController(OfflinePaymentService offlinePaymentService, OrderService orderService, OrderDetailService orderDetailService, FastdfsService fastdfsService, RabbitProducer rabbitProducer, CartService cartService, ConfigService configService, GoldLogService goldLogService, BuyerService buyerService) {
         this.offlinePaymentService = offlinePaymentService;
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.fastdfsService = fastdfsService;
         this.rabbitProducer = rabbitProducer;
         this.cartService = cartService;
+        this.configService = configService;
+        this.goldLogService = goldLogService;
+        this.buyerService = buyerService;
     }
 
     /**

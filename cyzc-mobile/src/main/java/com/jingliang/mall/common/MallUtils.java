@@ -48,4 +48,22 @@ public class MallUtils extends BaseMallUtils {
         baseReq.setUpdateUserName(buyer.getUserName());
         baseReq.setIsAvailable(true);
     }
+//    /**
+//     * 抽奖算法
+//     *
+//     * @param map
+//     * @return
+//     */
+//    public static Turntable weightRandom(Map<Long, Turntable> map) {
+//        Set<Long> keySet = map.keySet();
+//        List<Long> weights = new ArrayList<>();
+//        for (Long weightKey : keySet) {
+//            Turntable weight = map.get(weightKey);
+//            for (int i = 0; i <= weight.getNum(); i++) {
+//                weights.add(weightKey);
+//            }
+//        }
+//        int idx = new Random().nextInt(weights.size());
+//        return map.get(weights.get(idx));
+//    }
 }

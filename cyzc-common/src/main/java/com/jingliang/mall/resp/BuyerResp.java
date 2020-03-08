@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -206,5 +207,15 @@ public class BuyerResp implements Serializable {
     @ApiModelProperty(value = "默认收货地址")
     private String defaultAddr;
 
+    /**
+     * 金币
+     */
+    @ApiModelProperty(value = "金币")
+    private Integer gold;
 
+    /**
+     * 返利剩余次数
+     */
+    @ApiModelProperty(value = "返利剩余次数")
+    private Integer orderSpecificNum;
 }

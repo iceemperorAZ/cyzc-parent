@@ -721,17 +721,4 @@ public class WechatManageController {
         List<ConfluenceDetailResp> confluenceDetailResps = MallBeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
         return MallResult.buildQueryOk(confluenceDetailResps);
     }
-//
-//    public static void main(String[] args) throws ParseException {
-//        String beginTime = new String("2016-06-09 10:22:22");
-//        String endTime = new String("2017-05-08 11:22:22");
-//
-//        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//
-//        Date sd1 = df.parse(beginTime);
-//        Date sd2 = df.parse(endTime);
-//
-//        System.out.println(sd1.before(sd2));
-//        System.out.println(sd1.after(sd2));
-//    }
 }

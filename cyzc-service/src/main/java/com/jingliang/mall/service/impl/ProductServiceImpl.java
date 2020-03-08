@@ -1,12 +1,12 @@
 package com.jingliang.mall.service.impl;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.dao.EsKeywordRepository;
-import com.jingliang.mall.dao.EsProductRepository;
+//import com.jingliang.mall.common.MallBeanMapper;
+//import com.jingliang.mall.dao.EsKeywordRepository;
+//import com.jingliang.mall.dao.EsProductRepository;
 import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.entity.Sku;
-import com.jingliang.mall.esdocument.EsKeyword;
-import com.jingliang.mall.esdocument.EsProduct;
+//import com.jingliang.mall.esdocument.EsKeyword;
+//import com.jingliang.mall.esdocument.EsProduct;
 import com.jingliang.mall.repository.ProductRepository;
 import com.jingliang.mall.repository.SkuRepository;
 import com.jingliang.mall.server.RedisService;
@@ -40,16 +40,16 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final SkuRepository skuRepository;
-    private final EsProductRepository esProductRepository;
-    private final EsKeywordRepository esKeywordRepository;
+//    private final EsProductRepository esProductRepository;
+//    private final EsKeywordRepository esKeywordRepository;
     private final RedisService redisService;
 
     public ProductServiceImpl(ProductRepository productRepository,
-                              SkuRepository skuRepository, EsProductRepository esProductRepository, EsKeywordRepository esKeywordRepository, RedisService redisService) {
+                              SkuRepository skuRepository,/* EsProductRepository esProductRepository, EsKeywordRepository esKeywordRepository,*/ RedisService redisService) {
         this.productRepository = productRepository;
         this.skuRepository = skuRepository;
-        this.esProductRepository = esProductRepository;
-        this.esKeywordRepository = esKeywordRepository;
+//        this.esProductRepository = esProductRepository;
+//        this.esKeywordRepository = esKeywordRepository;
         this.redisService = redisService;
     }
 
@@ -111,17 +111,17 @@ public class ProductServiceImpl implements ProductService {
         if (products.isEmpty()) {
             return products;
         }
-        List<EsKeyword> esKeywords = new ArrayList<>();
-        for (Product product : products) {
-            EsKeyword esKeyword = new EsKeyword();
-            esKeyword.setId(product.getProductTypeId());
-            esKeyword.setKeyword(product.getProductTypeName());
-            esKeywords.add(esKeyword);
-        }
-        //保存搜索词到es
-        esKeywordRepository.saveAll(MallBeanMapper.mapList(esKeywords, EsKeyword.class));
-        List<EsProduct> esProducts = MallBeanMapper.mapList(products, EsProduct.class);
-        esProductRepository.saveAll(esProducts);
+//        List<EsKeyword> esKeywords = new ArrayList<>();
+//        for (Product product : products) {
+//            EsKeyword esKeyword = new EsKeyword();
+//            esKeyword.setId(product.getProductTypeId());
+//            esKeyword.setKeyword(product.getProductTypeName());
+//            esKeywords.add(esKeyword);
+//        }
+//        //保存搜索词到es
+//        esKeywordRepository.saveAll(MallBeanMapper.mapList(esKeywords, EsKeyword.class));
+//        List<EsProduct> esProducts = MallBeanMapper.mapList(products, EsProduct.class);
+//        esProductRepository.saveAll(esProducts);
         return products;
     }
 
@@ -131,7 +131,7 @@ public class ProductServiceImpl implements ProductService {
         if (productRepository.findAllByIsAvailableAndIdIn(true, products.stream().map(Product::getId).collect(Collectors.toList())).isEmpty()) {
             return new ArrayList<>();
         }
-        esProductRepository.deleteAll(MallBeanMapper.mapList(products, EsProduct.class));
+//        esProductRepository.deleteAll(MallBeanMapper.mapList(products, EsProduct.class));
         return productRepository.saveAll(products);
     }
 

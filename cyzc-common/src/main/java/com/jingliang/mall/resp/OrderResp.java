@@ -10,6 +10,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
@@ -232,6 +233,18 @@ public class OrderResp implements Serializable {
      */
     @ApiModelProperty(value = "发货仓库")
     private String storehouse;
+
+    /**
+     * 是否使用金币
+     */
+    @ApiModelProperty(value = "是否使用金币")
+    private Boolean isGold;
+
+    /**
+     * 使用金币数
+     */
+    @ApiModelProperty(value = "使用金币数")
+    private Integer gold;
 
     /**
      * 订单详情列表
