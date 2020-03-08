@@ -12,6 +12,8 @@ import java.util.List;
  * @date 2019-09-19 09:02:33
  */
 public interface MallConstant {
+    Integer PAY_GOLD_OK = 210;
+
     Integer OK = 200;
     String TEXT_OK = "请求成功";
     String TEXT_LOGIN_OK = "登录成功";

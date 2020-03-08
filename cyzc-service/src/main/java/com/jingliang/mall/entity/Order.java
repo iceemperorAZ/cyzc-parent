@@ -212,6 +212,12 @@ public class Order implements Serializable {
     private Integer gold;
 
     /**
+     * 返金币数
+     */
+    @Column(name = "return_gold")
+    private Integer returnGold;
+
+    /**
      * 修改时间
      */
     @Column(name = "update_time")

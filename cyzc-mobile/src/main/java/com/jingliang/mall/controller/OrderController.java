@@ -181,15 +181,7 @@ public class OrderController {
                 }
             }
         }
-        //计算运费
-        config = configService.findByCode("100");
-        if (order.getTotalPrice() >= (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            order.setDeliverFee(0L);
-        } else {
-            config = configService.findByCode("200");
-            order.setDeliverFee((long) (Double.parseDouble(config.getConfigValues()) * 100));
-            order.setPayableFee((order.getPayableFee() + (long) (Double.parseDouble(config.getConfigValues()) * 100)));
-        }
+
         order.setPreferentialFee(0L);
         //计算使用优惠券后的支付价
         //优惠总价
@@ -236,26 +228,38 @@ public class OrderController {
             Integer gold = buyer.getGold();
             //金币小于等于订单支付数
             if (order.getPayableFee() / 100 >= gold / 10) {
-                order.setPayableFee(order.getPayableFee() - gold * 1000);
+                order.setPayableFee((order.getPayableFee() / 10 - gold) * 10);
                 order.setGold(gold);
             } else {
-                //金币大于订单支付数
-                order.setTotalPrice(0L);
                 //使用了对应钱数的金币
                 order.setGold(order.getPayableFee().intValue() / 10);
+                //金币大于订单支付数
+                order.setPayableFee(0L);
+                order.setOrderStatus(300);
             }
+        }
+        //计算运费
+        config = configService.findByCode("100");
+        if (order.getTotalPrice() >= (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+            order.setDeliverFee(0L);
+        } else {
+            config = configService.findByCode("200");
+            order.setDeliverFee((long) (Double.parseDouble(config.getConfigValues()) * 100));
+            order.setPayableFee((order.getPayableFee() + (long) (Double.parseDouble(config.getConfigValues()) * 100)));
         }
         //微信支付
         if (Objects.equals(order.getPayWay(), 100)) {
-            //调起微信预支付
-            resultMap = wechatService.payUnifiedOrder(order, buyer.getUniqueId());
-            if (Objects.isNull(resultMap)) {
-                //调起支付失败
-                for (OrderDetail detail : orderDetails) {
-                    //失败就把减掉的库存加回去，并返回支付失败的信息
-                    redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+            if (!order.getPayableFee().equals(0L)) {
+                //调起微信预支付
+                resultMap = wechatService.payUnifiedOrder(order, buyer.getUniqueId());
+                if (Objects.isNull(resultMap)) {
+                    //调起支付失败
+                    for (OrderDetail detail : orderDetails) {
+                        //失败就把减掉的库存加回去，并返回支付失败的信息
+                        redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+                    }
+                    return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
                 }
-                return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
             }
         }
         //订单预计送达时间
@@ -278,10 +282,13 @@ public class OrderController {
             instance.add(Calendar.DAY_OF_MONTH, 3);
         }
         order.setExpectedDeliveryTime(instance.getTime());
-        resultMap.put("id", order.getId() + "");
-        resultMap.put("orderNo", order.getOrderNo());
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
+        if (order.getPayableFee().equals(0L)) {
+            return MallResult.build(MallConstant.PAY_GOLD_OK, "");
+        }
+        resultMap.put("id", order.getId() + "");
+        resultMap.put("orderNo", order.getOrderNo());
         //订单Id也返回
         OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
         log.debug("微信返回结果二次签名后的返回结果：{}", resultMap);
@@ -435,13 +442,21 @@ public class OrderController {
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
+        //订单完成之后返金币
+        //计算返金币比例
+        Config config = configService.findByCode("800");
+        double percentage = Integer.parseInt(config.getConfigValues()) * 0.01;
+        //返的金币数
         //统计所有支付后但未完成的订单
         List<Order> orders = orderService.findAll(orderSpecification);
         int wartGold = 0;
         if (orders.size() > 0) {
             for (Order order : orders) {
-                Integer gold = order.getGold();
-                if (gold == null) {
+                if (order.getReturnGold() == null || order.getReturnGold() <= 0) {
+                    continue;
+                }
+                int gold = order.getReturnGold();
+                if (gold == 0) {
                     continue;
                 }
                 wartGold += gold;

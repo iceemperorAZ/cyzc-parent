@@ -57,10 +57,19 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order save(Order order) {
-        if (order.getOrderStatus() == 300 && order.getIsGold() != null && order.getIsGold()) {
-            Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(order.getBuyerId(), true);
+        Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(order.getBuyerId(), true);
+        if (order.getIsGold() != null && order.getIsGold()) {
             buyer.setGold(buyer.getGold() - order.getGold());
             buyerRepository.save(buyer);
+        }
+        if (order.getPayableFee() > 0 && buyer.getOrderSpecificNum() > 0) {
+            buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() - 1);
+            //计算返金币比例
+            Config config = configRepository.findFirstByCodeAndIsAvailable("800", true);
+            double percentage = Integer.parseInt(config.getConfigValues()) * 0.01;
+            //返的金币数
+            int gold = (int) ((order.getPayableFee() / 100.00) * percentage);
+            order.setReturnGold(gold);
         }
         order = orderRepository.save(order);
         //减库存
@@ -132,6 +141,15 @@ public class OrderServiceImpl implements OrderService {
                 sku.setSkuLineNum(orderDetail.getProductNum());
                 rabbitProducer.sendSku(sku);
             }
+            Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
+            Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
+            if (oldOrder.getIsGold() != null && oldOrder.getIsGold()) {
+                buyer.setGold(buyer.getGold() + oldOrder.getGold());
+                buyerRepository.save(buyer);
+            }
+            if (order.getPayableFee() > 0) {
+                buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() + 1);
+            }
         } else if (order.getOrderStatus() == 400) {
             //如果为发货状态，则减去实际库存
             //查询订单详情
@@ -175,7 +193,7 @@ public class OrderServiceImpl implements OrderService {
                     skuService.updateRealitySkuByProductId(sku1);
                 }
             }
-        } else if (order.getOrderStatus() == 600) {
+        } else if (order.getOrderStatus() == 600 && order.getReturnGold() != null && order.getReturnGold() > 0) {
             //订单完成之后返金币
             //计算返金币比例
             Config config = configRepository.findFirstByCodeAndIsAvailable("800", true);
@@ -195,7 +213,6 @@ public class OrderServiceImpl implements OrderService {
             goldLog.setBuyerId(order.getBuyerId());
             goldLog.setMsg("微信支付订单[" + order.getOrderNo() + "]￥" + (order.getPayableFee() / 100.00) + "元,获得" + gold + "金币");
             goldLogRepository.save(goldLog);
-            //其他支付需要等后台上传完凭证之后返金币
         }
         order = orderRepository.save(order);
         return order;
