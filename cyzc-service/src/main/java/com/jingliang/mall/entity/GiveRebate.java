@@ -67,10 +67,10 @@ public class GiveRebate implements Serializable {
     private Date createTime;
 
     /**
-     * 是否审批
+     * 审批状态(100:待审批，200：审批驳回，300：审批通过)
      */
-    @Column(name = "is_approval")
-    private Boolean isApproval;
+    @Column(name = "approval")
+    private Integer approval;
 
     /**
      * 审批人Id

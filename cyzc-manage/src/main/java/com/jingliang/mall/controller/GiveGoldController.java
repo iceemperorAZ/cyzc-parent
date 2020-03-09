@@ -68,7 +68,8 @@ public class GiveGoldController {
     public MallResult<Boolean> approval(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Long id = Long.parseLong(map.get("id"));
-        giveGoldService.approval(user.getId(), id);
+        Integer approval = Integer.parseInt(map.get("approval"));
+        giveGoldService.approval(user.getId(), id, approval);
         return MallResult.buildSaveOk(true);
     }
 

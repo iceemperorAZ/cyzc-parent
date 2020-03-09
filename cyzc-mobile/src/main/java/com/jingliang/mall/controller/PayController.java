@@ -195,10 +195,7 @@ public class PayController {
             goldLog.setCreateTime(date);
         }
         goldLog.setIsAvailable(true);
-        //查询获得的金币数
-        Techarge techarge = techargeService.findByMoney(totalFee);
-        //比例加上额外赠送
-        goldLog.setGold(techarge.getGold() + totalFee / 1000);
+        //额外赠送
         goldLog.setMsg("充值￥" + ((totalFee * 1.00) / 100.00) + "元，获得" + goldLog.getGold() + "金币");
         goldLogService.save(goldLog);
         //返回给微信成功的消息

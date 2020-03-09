@@ -218,4 +218,10 @@ public class BuyerResp implements Serializable {
      */
     @ApiModelProperty(value = "返利剩余次数")
     private Integer orderSpecificNum;
+
+    /**
+     * 会员等级（100：普通，200：银牌，300：金牌）
+     */
+    @ApiModelProperty(value = "会员等级")
+    private Integer memberLevel;
 }

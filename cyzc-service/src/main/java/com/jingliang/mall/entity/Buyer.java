@@ -1,5 +1,6 @@
 package com.jingliang.mall.entity;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -168,6 +169,12 @@ public class Buyer implements Serializable {
      */
     @Column(name = "order_specific_num")
     private Integer orderSpecificNum;
+
+    /**
+     * 会员等级（100：普通，200：银牌，300：金牌）
+     */
+    @Column(name = "member_level")
+    private Integer memberLevel;
 
     @Transient
     private String token;

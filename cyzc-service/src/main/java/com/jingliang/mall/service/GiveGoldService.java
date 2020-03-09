@@ -31,7 +31,7 @@ public interface GiveGoldService {
      * @param id
      * @return
      */
-    GiveGold approval(Long userId, Long id);
+    GiveGold approval(Long userId, Long id,Integer approval);
 
     /**
      * 分页查询赠送记录

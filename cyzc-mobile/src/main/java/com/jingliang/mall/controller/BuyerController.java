@@ -332,6 +332,7 @@ public class BuyerController {
         goldLog.setBuyerId(buyer.getId());
         goldLog.setIsAvailable(false);
         goldLog.setMoney(Math.toIntExact(techarge.getMoney().longValue()));
+        goldLog.setGold(techarge.getGold());
         goldLog.setCreateTime(new Date());
         goldLog.setPayNo(order.getOrderNo());
         goldLog.setType(200);

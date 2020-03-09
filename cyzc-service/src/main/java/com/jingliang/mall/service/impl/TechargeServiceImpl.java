@@ -52,12 +52,31 @@ public class TechargeServiceImpl implements TechargeService {
     }
 
     @Override
+    public Techarge hide(Long userId, Techarge techarge) {
+        techarge = techargeRepository.findAllByIdAndIsAvailable(techarge.getId(), true);
+        techarge.setShowTime(new Date());
+        techarge.setShowId(userId);
+        techarge.setIsShow(false);
+        return techargeRepository.save(techarge);
+    }
+
+    @Override
+    public Techarge delete(Long userId, Techarge techarge) {
+        techarge = techargeRepository.findAllByIdAndIsAvailable(techarge.getId(), true);
+        techarge.setShowTime(new Date());
+        techarge.setShowId(userId);
+        techarge.setIsShow(false);
+        techarge.setIsAvailable(false);
+        return techargeRepository.save(techarge);
+    }
+
+    @Override
     public List<Techarge> findAllShow() {
         return techargeRepository.findAllByIsShowAndIsAvailableOrderByMoneyAsc(true, true);
     }
 
     @Override
     public Techarge findById(Long id) {
-        return techargeRepository.findFirstByIdAndIsShowAndIsAvailable(id,true,true);
+        return techargeRepository.findFirstByIdAndIsShowAndIsAvailable(id, true, true);
     }
 }

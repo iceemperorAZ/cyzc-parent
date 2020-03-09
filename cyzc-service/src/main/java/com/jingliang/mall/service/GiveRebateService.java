@@ -1,6 +1,5 @@
 package com.jingliang.mall.service;
 
-import com.jingliang.mall.entity.GiveGold;
 import com.jingliang.mall.entity.GiveRebate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,9 +29,10 @@ public interface GiveRebateService {
      *
      * @param userId
      * @param id
+     * @param approval
      * @return
      */
-    GiveRebate approval(Long userId, Long id);
+    GiveRebate approval(Long userId, Long id, Integer approval);
 
     /**
      * 分页查询赠送记录

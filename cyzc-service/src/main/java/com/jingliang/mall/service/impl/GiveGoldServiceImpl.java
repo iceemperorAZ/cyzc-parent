@@ -43,7 +43,7 @@ public class GiveGoldServiceImpl implements GiveGoldService {
         giveGold.setCreateId(userId);
         giveGold.setGold(goldNum);
         giveGold.setCreateTime(new Date());
-        giveGold.setIsApproval(false);
+        giveGold.setApproval(100);
         giveGold.setIsAvailable(true);
         giveGold.setMsg(msg);
         return giveGoldRepository.save(giveGold);
@@ -51,10 +51,10 @@ public class GiveGoldServiceImpl implements GiveGoldService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public GiveGold approval(Long userId, Long id) {
+    public GiveGold approval(Long userId, Long id,Integer approval) {
         GiveGold giveGold = giveGoldRepository.getOne(id);
         Buyer buyer = buyerRepository.getOne(giveGold.getBuyerId());
-        giveGold.setIsApproval(true);
+        giveGold.setApproval(approval);
         giveGold.setIsAvailable(true);
         giveGold.setApprovalId(userId);
         giveGold.setApprovalTime(new Date());

@@ -46,6 +46,24 @@ public interface TechargeService {
     Techarge show(Long userId, Techarge techarge);
 
     /**
+     * 审批
+     *
+     * @param userId
+     * @param techarge
+     * @return
+     */
+    Techarge hide(Long userId, Techarge techarge);
+
+    /**
+     * 审批
+     *
+     * @param userId
+     * @param techarge
+     * @return
+     */
+    Techarge delete(Long userId, Techarge techarge);
+
+    /**
      * 查询全部审批通过的
      *
      * @return

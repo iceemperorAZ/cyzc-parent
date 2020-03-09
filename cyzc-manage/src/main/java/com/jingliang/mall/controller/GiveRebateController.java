@@ -4,10 +4,8 @@ import com.jingliang.mall.common.MallBeanMapper;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.MallResult;
 import com.jingliang.mall.common.MallUtils;
-import com.jingliang.mall.entity.GiveGold;
 import com.jingliang.mall.entity.GiveRebate;
 import com.jingliang.mall.entity.User;
-import com.jingliang.mall.resp.GiveGoldResp;
 import com.jingliang.mall.resp.GiveRebateResp;
 import com.jingliang.mall.service.GiveRebateService;
 import io.swagger.annotations.Api;
@@ -70,7 +68,8 @@ public class GiveRebateController {
     public MallResult<Boolean> approval(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Long id = Long.parseLong(map.get("id"));
-        giveRebateService.approval(user.getId(), id);
+        Integer approval = Integer.parseInt(map.get("approval"));
+        giveRebateService.approval(user.getId(), id, approval);
         return MallResult.buildSaveOk(true);
     }
 

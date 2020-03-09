@@ -39,7 +39,7 @@ public class GiveRebateServiceImpl implements GiveRebateService {
         giveRebate.setCreateId(userId);
         giveRebate.setRebate(rebateNum);
         giveRebate.setCreateTime(new Date());
-        giveRebate.setIsApproval(false);
+        giveRebate.setApproval(100);
         giveRebate.setIsAvailable(true);
         giveRebate.setMsg(msg);
         return giveRebateRepository.save(giveRebate);
@@ -47,24 +47,16 @@ public class GiveRebateServiceImpl implements GiveRebateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public GiveRebate approval(Long userId, Long id) {
+    public GiveRebate approval(Long userId, Long id, Integer approval) {
         GiveRebate giveRebate = giveRebateRepository.getOne(id);
-        Buyer buyer = buyerRepository.getOne(giveRebate.getBuyerId());
-        giveRebate.setIsApproval(true);
+        if (approval == 300) {
+            Buyer buyer = buyerRepository.getOne(giveRebate.getBuyerId());
+            buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() + giveRebate.getRebate());
+        }
+        giveRebate.setApproval(approval);
         giveRebate.setIsAvailable(true);
         giveRebate.setApprovalId(userId);
         giveRebate.setApprovalTime(new Date());
-//        buyer.setRebate(buyer.getRebate() + giveRebate.getRebate());
-//        buyerRepository.save(buyer);
-//        RebateLog goldLog = new RebateLog();
-//        goldLog.setBuyerId(giveRebate.getBuyerId());
-//        goldLog.setGiveId(userId);
-//        goldLog.setMoney(0);
-//        goldLog.setIsAvailable(true);
-//        goldLog.setRebate(giveRebate.getRebate());
-//        goldLog.setMsg("系统赠送" + giveRebate.getRebate() + "金币");
-//        goldLog.setType(300);
-//        signInLogRepository.save(goldLog);
         return giveRebateRepository.save(giveRebate);
     }
 

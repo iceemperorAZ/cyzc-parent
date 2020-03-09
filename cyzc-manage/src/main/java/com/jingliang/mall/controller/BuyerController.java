@@ -227,22 +227,4 @@ public class BuyerController {
                 .contentLength(arrayOutputStream.size())
                 .body(arrayOutputStream.toByteArray());
     }
-
-
-    /**
-     * 修改剩余返利次数
-     */
-    @PostMapping("/order/specific/num")
-    @ApiOperation(value = "修改剩余返利次数")
-    public MallResult<Boolean> orderSpecificNum(Map<String, String> map) {
-        Long buyerId = Long.parseLong(map.get("buyerId"));
-        Integer num = Integer.parseInt(map.get("num"));
-        Buyer buyer = buyerService.findById(buyerId);
-        buyer.setUpdateTime(new Date());
-        buyer.setOrderSpecificNum(num);
-        buyerService.save(buyer);
-        return MallResult.buildSaveOk(true);
-    }
-
-
 }

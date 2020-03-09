@@ -107,10 +107,10 @@ public class GiveGoldReq extends BaseReq implements Serializable {
     private Date createTime;
 
     /**
-     * 是否审批
+     * 是审批状态(100:待审批，200：审批驳回，300：审批通过)
      */
-    @ApiModelProperty(value = "是否审批")
-    private Boolean isApproval;
+    @ApiModelProperty(value = "审批状态(100:待审批，200：审批驳回，300：审批通过)")
+    private Integer isApproval;
 
     /**
      * 审批人Id

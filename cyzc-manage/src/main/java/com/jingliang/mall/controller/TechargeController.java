@@ -53,13 +53,35 @@ public class TechargeController {
     }
 
     /**
-     * 审批
+     * 上架
      */
     @PostMapping("/show")
-    @ApiOperation("审批")
+    @ApiOperation("上架")
     public MallResult<TechargeResp> show(@RequestBody TechargeReq techargeReq, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Techarge techarge = techargeService.show(user.getId(), MallBeanMapper.map(techargeReq, Techarge.class));
+        return MallResult.buildSaveOk(MallBeanMapper.map(techarge, TechargeResp.class));
+    }
+
+    /**
+     * 下架
+     */
+    @PostMapping("/hide")
+    @ApiOperation("下架")
+    public MallResult<TechargeResp> hide(@RequestBody TechargeReq techargeReq, HttpSession session) {
+        User user = (User) session.getAttribute(sessionUser);
+        Techarge techarge = techargeService.hide(user.getId(), MallBeanMapper.map(techargeReq, Techarge.class));
+        return MallResult.buildSaveOk(MallBeanMapper.map(techarge, TechargeResp.class));
+    }
+
+    /**
+     *  删除
+     */
+    @PostMapping("/delete")
+    @ApiOperation("删除")
+    public MallResult<TechargeResp> delete(@RequestBody TechargeReq techargeReq, HttpSession session) {
+        User user = (User) session.getAttribute(sessionUser);
+        Techarge techarge = techargeService.delete(user.getId(), MallBeanMapper.map(techargeReq, Techarge.class));
         return MallResult.buildSaveOk(MallBeanMapper.map(techarge, TechargeResp.class));
     }
 
