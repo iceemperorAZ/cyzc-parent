@@ -51,24 +51,26 @@ public class GiveGoldServiceImpl implements GiveGoldService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public GiveGold approval(Long userId, Long id,Integer approval) {
+    public GiveGold approval(Long userId, Long id, Integer approval) {
         GiveGold giveGold = giveGoldRepository.getOne(id);
-        Buyer buyer = buyerRepository.getOne(giveGold.getBuyerId());
         giveGold.setApproval(approval);
         giveGold.setIsAvailable(true);
         giveGold.setApprovalId(userId);
         giveGold.setApprovalTime(new Date());
-        buyer.setGold(buyer.getGold() + giveGold.getGold());
-        buyerRepository.save(buyer);
-        GoldLog goldLog = new GoldLog();
-        goldLog.setBuyerId(giveGold.getBuyerId());
-        goldLog.setGiveId(userId);
-        goldLog.setMoney(0);
-        goldLog.setIsAvailable(true);
-        goldLog.setGold(giveGold.getGold());
-        goldLog.setMsg("系统赠送" + giveGold.getGold() + "金币");
-        goldLog.setType(300);
-        signInLogRepository.save(goldLog);
+        if (approval == 300) {
+            Buyer buyer = buyerRepository.getOne(giveGold.getBuyerId());
+            buyer.setGold(buyer.getGold() + giveGold.getGold());
+            buyerRepository.save(buyer);
+            GoldLog goldLog = new GoldLog();
+            goldLog.setBuyerId(giveGold.getBuyerId());
+            goldLog.setGiveId(userId);
+            goldLog.setMoney(0);
+            goldLog.setIsAvailable(true);
+            goldLog.setGold(giveGold.getGold());
+            goldLog.setMsg("系统赠送" + giveGold.getGold() + "金币");
+            goldLog.setType(300);
+            signInLogRepository.save(goldLog);
+        }
         return giveGoldRepository.save(giveGold);
     }
 
