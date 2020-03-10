@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 
 /**
- * 赠送金币ServiceImpl
+ * 赠赠送返利次数ServiceImpl
  *
  * @author Zhenfeng Li
  * @version 1.0.0

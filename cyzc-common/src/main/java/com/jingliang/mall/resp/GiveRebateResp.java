@@ -47,10 +47,10 @@ public class GiveRebateResp implements Serializable {
     private String msg;
 
     /**
-     * 金币数
+     * 返币次数
      */
-    @ApiModelProperty(value = "金币数")
-    private Integer gold;
+    @ApiModelProperty(value = "返币次数")
+    private Integer rebate;
 
     /**
      * 创建人Id
@@ -74,7 +74,7 @@ public class GiveRebateResp implements Serializable {
      * 审批状态(100:待审批，200：审批驳回，300：审批通过)
      */
     @ApiModelProperty(value = "审批状态(100:待审批，200：审批驳回，300：审批通过)")
-    private Integer isApproval;
+    private Integer approval;
 
     /**
      * 审批人Id

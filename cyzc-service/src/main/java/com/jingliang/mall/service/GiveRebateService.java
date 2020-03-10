@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 /**
- * 赠送金币Service
+ * 赠送返利次数Service
  *
  * @author Zhenfeng Li
  * @version 1.0.0

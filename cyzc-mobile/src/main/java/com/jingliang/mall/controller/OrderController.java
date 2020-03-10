@@ -335,6 +335,7 @@ public class OrderController {
         }
         order.setFinishTime(new Date());
         order.setOrderStatus(600);
+        order.setReturnGold(0);
         OrderResp orderResp = MallBeanMapper.map(orderService.update(order), OrderResp.class);
         log.debug("返回结果：{}", orderResp);
         return MallResult.build(MallConstant.OK, MallConstant.TEXT_CONFIRM_OK, orderResp);

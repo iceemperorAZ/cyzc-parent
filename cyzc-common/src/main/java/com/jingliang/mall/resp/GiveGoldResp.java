@@ -74,7 +74,7 @@ public class GiveGoldResp implements Serializable {
      * 审批状态(100:待审批，200：审批驳回，300：审批通过)
      */
     @ApiModelProperty(value = "审批状态(100:待审批，200：审批驳回，300：审批通过)")
-    private Integer isApproval;
+    private Integer approval;
 
     /**
      * 审批人Id
