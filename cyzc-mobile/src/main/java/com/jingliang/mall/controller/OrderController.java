@@ -235,7 +235,6 @@ public class OrderController {
                 order.setGold(order.getPayableFee().intValue() / 10);
                 //金币大于订单支付数
                 order.setPayableFee(0L);
-                order.setOrderStatus(300);
             }
         }
         //计算运费
@@ -261,6 +260,9 @@ public class OrderController {
                     return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
                 }
             }
+        }
+        if (order.getPayableFee().equals(0L)) {
+            order.setOrderStatus(300);
         }
         //订单预计送达时间
         //1.真实库存有值，则送达时间T+1
