@@ -135,6 +135,7 @@ public class WechatManageServiceImpl implements WechatManageService {
         }
         confluence.setTotalPrice(0L);
         confluence.setRoyalty(0L);
+        confluence.setProfit(0L);
         //1.判断开始时间和结束时间是否是同年同月
         //1.1 是则直接查询
         //1.2 否以开始时间的月底为分割时间，分开查询
