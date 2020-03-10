@@ -193,26 +193,27 @@ public class OrderServiceImpl implements OrderService {
                     skuService.updateRealitySkuByProductId(sku1);
                 }
             }
-        } else if (order.getOrderStatus() == 600 && order.getReturnGold() != null && order.getReturnGold() > 0) {
-            //订单完成之后返金币
-            //计算返金币比例
-            Config config = configRepository.findFirstByCodeAndIsAvailable("800", true);
-            double percentage = Integer.parseInt(config.getConfigValues()) * 0.01;
-            //返的金币数
-            int gold = (int) ((order.getPayableFee() / 100.00) * percentage);
-            Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(order.getBuyerId(), true);
-            buyer.setGold(buyer.getGold() + gold);
-            buyerRepository.save(buyer);
-            GoldLog goldLog = new GoldLog();
-            goldLog.setGold(gold);
-            goldLog.setIsAvailable(true);
-            goldLog.setMoney(order.getPayableFee().intValue());
-            goldLog.setType(400);
-            goldLog.setCreateTime(new Date());
-            goldLog.setPayNo(order.getOrderNo());
-            goldLog.setBuyerId(order.getBuyerId());
-            goldLog.setMsg("微信支付订单[" + order.getOrderNo() + "]￥" + (order.getPayableFee() / 100.00) + "元,获得" + gold + "金币");
-            goldLogRepository.save(goldLog);
+        } else if (order.getOrderStatus() == 600) {
+            Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
+            if (oldOrder.getReturnGold() != null && oldOrder.getReturnGold() > 0) {
+                //订单完成之后返金币
+                //返的金币数
+                int gold = oldOrder.getReturnGold();
+                Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
+                buyer.setGold(buyer.getGold() + gold);
+                buyerRepository.save(buyer);
+                GoldLog goldLog = new GoldLog();
+                goldLog.setGold(gold);
+                goldLog.setIsAvailable(true);
+                goldLog.setMoney(oldOrder.getPayableFee().intValue());
+                goldLog.setType(400);
+                goldLog.setCreateTime(new Date());
+                goldLog.setPayNo(oldOrder.getOrderNo());
+                goldLog.setBuyerId(oldOrder.getBuyerId());
+                goldLog.setMsg("微信支付订单[" + oldOrder.getOrderNo() + "]￥" + (oldOrder.getPayableFee() / 100.00) + "元,获得" + gold + "金币");
+                goldLogRepository.save(goldLog);
+            }
+            order.setReturnGold(0);
         }
         order = orderRepository.save(order);
         return order;
