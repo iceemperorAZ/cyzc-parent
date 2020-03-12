@@ -21,5 +21,5 @@ public interface GiveRebateRepository extends BaseRepository<GiveRebate, Long> {
      * @param pageRequest
      * @return
      */
-    Page<GiveRebate> findAllByBuyerIdOrderByApprovalTimeDesc(Long buyerId, Pageable pageRequest);
+    Page<GiveRebate> findAllByBuyerIdOrderByCreateTimeDesc(Long buyerId, Pageable pageRequest);
 }

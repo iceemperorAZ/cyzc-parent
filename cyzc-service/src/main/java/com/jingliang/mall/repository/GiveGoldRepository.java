@@ -21,5 +21,5 @@ public interface GiveGoldRepository extends BaseRepository<GiveGold, Long> {
      * @param pageRequest
      * @return
      */
-    Page<GiveGold> findAllByBuyerIdOrderByApprovalTimeDesc(Long buyerId, Pageable pageRequest);
+    Page<GiveGold> findAllByBuyerIdOrderByCreateTimeDesc(Long buyerId, Pageable pageRequest);
 }
