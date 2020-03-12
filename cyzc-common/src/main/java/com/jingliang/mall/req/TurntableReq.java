@@ -1,6 +1,5 @@
 package com.jingliang.mall.req;
 
-import com.jingliang.mall.BaseReq;
 import java.time.LocalDateTime;
 import lombok.Data;
 import io.swagger.annotations.ApiModel;
