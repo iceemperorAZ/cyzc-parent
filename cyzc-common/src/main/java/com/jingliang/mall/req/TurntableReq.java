@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 转盘
@@ -103,7 +104,7 @@ public class TurntableReq extends BaseReq implements Serializable {
 	 * 创建时间
 	 */
 	@ApiModelProperty(value = "创建时间")
-	private LocalDateTime createTime;
+	private Date createTime;
 
 	/**
 	 * 创建人Id
