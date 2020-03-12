@@ -3,17 +3,17 @@ package com.jingliang.mall.req;
 import java.time.LocalDateTime;
 import lombok.Data;
 import io.swagger.annotations.ApiModel;
+import com.jingliang.mall.req.BaseReq;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 转盘
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2020-03-12 11:40:28
+ * @date 2020-03-12 17:34:10
  */
 @EqualsAndHashCode(callSuper = true)
 @ApiModel(value = "TurntableReq", description = "转盘")
@@ -41,177 +41,63 @@ public class TurntableReq extends BaseReq implements Serializable {
 	private Long idEnd;
 
 	/**
-	 * 奖品Id
+	 * 转盘图片
 	 */
-	@ApiModelProperty(value = "奖品Id")
-	private Long prizeId;
+	@ApiModelProperty(value = "转盘图片")
+	private String img;
 
 	/**
-	 * 奖品Id-开始
+	 * 描述
 	 */
-	@ApiModelProperty(value = "奖品Id-开始")
-	private Long prizeIdStart;
+	@ApiModelProperty(value = "描述")
+	private String remark;
 
 	/**
-	 * 奖品Id-结束
+	 * 转盘单次抽取需要的金币
 	 */
-	@ApiModelProperty(value = "奖品Id-结束")
-	private Long prizeIdEnd;
+	@ApiModelProperty(value = "转盘单次抽取需要的金币")
+	private Integer gold;
 
 	/**
-	 * 奖品名称
+	 * 转盘单次抽取需要的金币-开始
 	 */
-	@ApiModelProperty(value = "奖品名称")
-	private String prizeName;
+	@ApiModelProperty(value = "转盘单次抽取需要的金币-开始")
+	private Integer goldStart;
 
 	/**
-	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
+	 * 转盘单次抽取需要的金币-结束
 	 */
-	@ApiModelProperty(value = "类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)")
-	private Integer type;
+	@ApiModelProperty(value = "转盘单次抽取需要的金币-结束")
+	private Integer goldEnd;
 
 	/**
-	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)-开始
+	 * 更新时间
 	 */
-	@ApiModelProperty(value = "类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)-开始")
-	private Integer typeStart;
+	@ApiModelProperty(value = "更新时间")
+	private LocalDateTime updateTime;
 
 	/**
-	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)-结束
+	 * 更新人Id
 	 */
-	@ApiModelProperty(value = "类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)-结束")
-	private Integer typeEnd;
+	@ApiModelProperty(value = "更新人Id")
+	private Long updateUserId;
 
 	/**
-	 * 概率
+	 * 更新人Id-开始
 	 */
-	@ApiModelProperty(value = "概率")
-	private Integer probability;
+	@ApiModelProperty(value = "更新人Id-开始")
+	private Long updateUserIdStart;
 
 	/**
-	 * 概率-开始
+	 * 更新人Id-结束
 	 */
-	@ApiModelProperty(value = "概率-开始")
-	private Integer probabilityStart;
-
-	/**
-	 * 概率-结束
-	 */
-	@ApiModelProperty(value = "概率-结束")
-	private Integer probabilityEnd;
-
-	/**
-	 * 创建时间
-	 */
-	@ApiModelProperty(value = "创建时间")
-	private Date createTime;
-
-	/**
-	 * 创建人Id
-	 */
-	@ApiModelProperty(value = "创建人Id")
-	private Long createUserId;
-
-	/**
-	 * 创建人Id-开始
-	 */
-	@ApiModelProperty(value = "创建人Id-开始")
-	private Long createUserIdStart;
-
-	/**
-	 * 创建人Id-结束
-	 */
-	@ApiModelProperty(value = "创建人Id-结束")
-	private Long createUserIdEnd;
-
-	/**
-	 * 是否上架
-	 */
-	@ApiModelProperty(value = "是否上架")
-	private Boolean isShow;
-
-	/**
-	 * 上架人Id
-	 */
-	@ApiModelProperty(value = "上架人Id")
-	private Long showUserId;
-
-	/**
-	 * 上架人Id-开始
-	 */
-	@ApiModelProperty(value = "上架人Id-开始")
-	private Long showUserIdStart;
-
-	/**
-	 * 上架人Id-结束
-	 */
-	@ApiModelProperty(value = "上架人Id-结束")
-	private Long showUserIdEnd;
-
-	/**
-	 * 上架时间
-	 */
-	@ApiModelProperty(value = "上架时间")
-	private LocalDateTime showTime;
+	@ApiModelProperty(value = "更新人Id-结束")
+	private Long updateUserIdEnd;
 
 	/**
 	 * 是否可用 0：否，1：是
 	 */
 	@ApiModelProperty(value = "是否可用 0：否，1：是")
 	private Boolean isAvailable;
-
-	/**
-	 * 奖品数量
-	 */
-	@ApiModelProperty(value = "奖品数量")
-	private Integer prizeNum;
-
-	/**
-	 * 奖品数量-开始
-	 */
-	@ApiModelProperty(value = "奖品数量-开始")
-	private Integer prizeNumStart;
-
-	/**
-	 * 奖品数量-结束
-	 */
-	@ApiModelProperty(value = "奖品数量-结束")
-	private Integer prizeNumEnd;
-
-	/**
-	 * 开始角度
-	 */
-	@ApiModelProperty(value = "开始角度")
-	private Integer startAngle;
-
-	/**
-	 * 开始角度-开始
-	 */
-	@ApiModelProperty(value = "开始角度-开始")
-	private Integer startAngleStart;
-
-	/**
-	 * 开始角度-结束
-	 */
-	@ApiModelProperty(value = "开始角度-结束")
-	private Integer startAngleEnd;
-
-	/**
-	 * 结束角度
-	 */
-	@ApiModelProperty(value = "结束角度")
-	private Integer endAngle;
-
-	/**
-	 * 结束角度-开始
-	 */
-	@ApiModelProperty(value = "结束角度-开始")
-	private Integer endAngleStart;
-
-	/**
-	 * 结束角度-结束
-	 */
-	@ApiModelProperty(value = "结束角度-结束")
-	private Integer endAngleEnd;
 
 }

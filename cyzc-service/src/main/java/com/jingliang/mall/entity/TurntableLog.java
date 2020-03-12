@@ -11,7 +11,7 @@ import java.io.Serializable;
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2020-03-12 11:40:28
+ * @date 2020-03-12 17:34:10
  */
 @Table(name = "tb_turntable_log")
 @Entity
@@ -40,24 +40,6 @@ public class TurntableLog implements Serializable {
 	 */
 	@Column(name = "msg")
 	private String msg;
-
-	/**
-	 * 奖品Id
-	 */
-	@Column(name = "prize_id")
-	private Long prizeId;
-
-	/**
-	 * 奖品名称
-	 */
-	@Column(name = "prize_name")
-	private String prizeName;
-
-	/**
-	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
-	 */
-	@Column(name = "type")
-	private Integer type;
 
 	/**
 	 * 创建时间

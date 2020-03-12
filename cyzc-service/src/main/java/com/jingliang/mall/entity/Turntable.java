@@ -11,7 +11,7 @@ import java.io.Serializable;
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2020-03-12 11:40:28
+ * @date 2020-03-12 17:34:10
  */
 @Entity
 @Table(name = "tb_turntable")
@@ -30,81 +30,39 @@ public class Turntable implements Serializable {
 	private Long id;
 
 	/**
-	 * 奖品Id
+	 * 转盘图片
 	 */
-	@Column(name = "prize_id")
-	private Long prizeId;
+	@Column(name = "img")
+	private String img;
 
 	/**
-	 * 奖品名称
+	 * 描述
 	 */
-	@Column(name = "prize_name")
-	private String prizeName;
+	@Column(name = "remark")
+	private String remark;
 
 	/**
-	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
+	 * 转盘单次抽取需要的金币
 	 */
-	@Column(name = "type")
-	private Integer type;
+	@Column(name = "gold")
+	private Integer gold;
 
 	/**
-	 * 概率
+	 * 更新时间
 	 */
-	@Column(name = "probability")
-	private Integer probability;
+	@Column(name = "update_time")
+	private LocalDateTime updateTime;
 
 	/**
-	 * 创建时间
+	 * 更新人Id
 	 */
-	@Column(name = "create_time")
-	private LocalDateTime createTime;
-
-	/**
-	 * 创建人Id
-	 */
-	@Column(name = "create_user_id")
-	private Long createUserId;
-
-	/**
-	 * 是否上架
-	 */
-	@Column(name = "is_show")
-	private Boolean isShow;
-
-	/**
-	 * 上架人Id
-	 */
-	@Column(name = "show_user_id")
-	private Long showUserId;
-
-	/**
-	 * 上架时间
-	 */
-	@Column(name = "show_time")
-	private LocalDateTime showTime;
+	@Column(name = "update_user_id")
+	private Long updateUserId;
 
 	/**
 	 * 是否可用 0：否，1：是
 	 */
 	@Column(name = "is_available")
 	private Boolean isAvailable;
-
-	/**
-	 * 奖品数量
-	 */
-	@Column(name = "prize_num")
-	private Integer prizeNum;
-
-	/**
-	 * 开始角度
-	 */
-	@Column(name = "start_angle")
-	private Integer startAngle;
-
-	/**
-	 * 结束角度
-	 */
-	@Column(name = "end_angle")
-	private Integer endAngle;
 
 }

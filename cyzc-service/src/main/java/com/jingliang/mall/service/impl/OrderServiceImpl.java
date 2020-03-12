@@ -193,23 +193,23 @@ public class OrderServiceImpl implements OrderService {
                     skuService.updateRealitySkuByProductId(sku1);
                 }
             }
-            //退还的金币数
-            int gold = oldOrder.getGold();
-            Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
-            buyer.setGold(buyer.getGold() + gold);
-            buyerRepository.save(buyer);
-            GoldLog goldLog = new GoldLog();
-            goldLog.setGold(gold);
-            goldLog.setIsAvailable(true);
-            goldLog.setMoney(oldOrder.getPayableFee().intValue());
-            goldLog.setType(500);
-            goldLog.setCreateTime(new Date());
-            goldLog.setPayNo(oldOrder.getOrderNo());
-            goldLog.setBuyerId(oldOrder.getBuyerId());
-            goldLog.setMsg("订单[" + oldOrder.getOrderNo() + "]退货返还" + gold + "金币");
-            goldLogRepository.save(goldLog);
-
-
+            if (oldOrder.getGold() != null) {
+                //退还的金币数
+                int gold = oldOrder.getGold();
+                Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
+                buyer.setGold(buyer.getGold() + gold);
+                buyerRepository.save(buyer);
+                GoldLog goldLog = new GoldLog();
+                goldLog.setGold(gold);
+                goldLog.setIsAvailable(true);
+                goldLog.setMoney(oldOrder.getPayableFee().intValue());
+                goldLog.setType(500);
+                goldLog.setCreateTime(new Date());
+                goldLog.setPayNo(oldOrder.getOrderNo());
+                goldLog.setBuyerId(oldOrder.getBuyerId());
+                goldLog.setMsg("订单[" + oldOrder.getOrderNo() + "]退货返还" + gold + "金币");
+                goldLogRepository.save(goldLog);
+            }
         } else if (order.getOrderStatus() == 600) {
             Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
             if (oldOrder.getReturnGold() != null && oldOrder.getReturnGold() > 0) {
