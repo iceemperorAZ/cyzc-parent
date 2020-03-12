@@ -26,10 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 会员表Controller
@@ -266,6 +263,10 @@ public class BuyerController {
         BuyerSale buyerSale = new BuyerSale();
         buyerSale.setBuyerId(buyer.getId());
         buyerSale.setSaleId(buyerReq.getSaleUserId());
+        //将这个值设置的大一点
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2300);
+        buyerSale.setUntyingTime(calendar.getTime());
         buyerSale.setIsAvailable(true);
         buyerSale.setCreateTime(date);
         buyerSale.setUpdateTime(date);

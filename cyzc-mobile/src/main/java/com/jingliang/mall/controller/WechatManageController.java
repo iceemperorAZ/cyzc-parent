@@ -22,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,10 +58,11 @@ public class WechatManageController {
     private final WechatManageService wechatManageService;
     private final BuyerAddressService buyerAddressService;
     private final ManagerSaleService managerSaleService;
+    private final BuyerSaleService buyerSaleService;
 
 
     public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService,
-                                  OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerAddressService buyerAddressService, ManagerSaleService managerSaleService) {
+                                  OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerAddressService buyerAddressService, ManagerSaleService managerSaleService, BuyerSaleService buyerSaleService) {
         this.userService = userService;
         this.buyerService = buyerService;
         this.orderService = orderService;
@@ -70,6 +70,7 @@ public class WechatManageController {
         this.wechatManageService = wechatManageService;
         this.buyerAddressService = buyerAddressService;
         this.managerSaleService = managerSaleService;
+        this.buyerSaleService = buyerSaleService;
     }
 
     /**
@@ -631,23 +632,33 @@ public class WechatManageController {
             @ApiImplicitParam(value = "分页", name = "page", dataType = "int", paramType = "query", defaultValue = "1"),
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
-    public MallResult<MallPage<BuyerResp>> salePageBuyer(@ApiIgnore UserReq userReq) {
-        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize(), Sort.by(Sort.Order.asc("lastOrderTime")));
-        if (StringUtils.isNotBlank(userReq.getClause())) {
-            pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
-        }
-        Page<Buyer> buyerPage = buyerService.findAllBySaleId(userReq.getId(), pageRequest);
-        MallPage<BuyerResp> userRespMallPage = MallUtils.toMallPage(buyerPage, BuyerResp.class);
-        if (userRespMallPage.getContent() != null && userRespMallPage.getContent().size() > 0) {
-            for (BuyerResp buyerResp : userRespMallPage.getContent()) {
-                BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyerResp.getId());
-                if (buyerAddress != null) {
-                    String addr = buyerAddress.getProvince().getName() + "/" + buyerAddress.getCity().getName() + "/" + buyerAddress.getArea().getName() + buyerAddress.getDetailedAddress();
-                    buyerResp.setDefaultAddr(addr);
-                }
+    public MallResult<List<BuyerResp>> salePageBuyer(@DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id) {
+        Specification<BuyerSale> buyerSaleSpecification = (Specification<BuyerSale>) (root, query, cb) -> {
+            List<Predicate> andPredicateList = new ArrayList<>();
+            andPredicateList.add(cb.equal(root.get("saleId"), id));
+            andPredicateList.add(cb.equal(root.get("isAvailable"), true));
+            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
+            List<Predicate> orPredicateList = new ArrayList<>();
+            orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), startTime));
+            orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
+            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
+            query.where(andPredicate, orPredicate);
+            query.orderBy(cb.desc(root.get("createTime")));
+            return query.getRestriction();
+        };
+        List<BuyerSale> buyerSales = buyerSaleService.finAll(buyerSaleSpecification);
+        List<Buyer> collect = buyerSales.stream().map(BuyerSale::getBuyer).collect(Collectors.toList());
+        List<BuyerResp> buyerResps = MallBeanMapper.mapList(collect, BuyerResp.class);
+        for (BuyerResp buyerResp : buyerResps) {
+            BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyerResp.getId());
+            if (buyerAddress != null) {
+                String addr = buyerAddress.getProvince().getName() + "/" + buyerAddress.getCity().getName() + "/" + buyerAddress.getArea().getName() + buyerAddress.getDetailedAddress();
+                buyerResp.setDefaultAddr(addr);
             }
         }
-        return MallResult.buildQueryOk(userRespMallPage);
+        return MallResult.buildQueryOk(buyerResps);
     }
 
     /**

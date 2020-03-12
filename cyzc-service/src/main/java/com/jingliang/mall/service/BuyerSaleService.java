@@ -1,8 +1,9 @@
 package com.jingliang.mall.service;
 
 import com.jingliang.mall.entity.BuyerSale;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
 
 /**
  * 商户销售绑定表Service
@@ -29,4 +30,11 @@ public interface BuyerSaleService {
      * @return
      */
     BuyerSale findBySaleIdAndBuyerId(Long saleUserId, Long buyerId);
+
+    /**
+     * 根据条件查询绑定信息
+     *
+     * @param buyerSaleSpecification
+     */
+    List<BuyerSale> finAll(Specification<BuyerSale> buyerSaleSpecification);
 }

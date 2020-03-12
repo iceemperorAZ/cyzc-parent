@@ -76,6 +76,6 @@ public class GiveGoldServiceImpl implements GiveGoldService {
 
     @Override
     public Page<GiveGold> pageAll(Long buyerId, PageRequest pageRequest) {
-        return giveGoldRepository.findAllByBuyerId(buyerId, pageRequest);
+        return giveGoldRepository.findAllByBuyerIdOrderByApprovalTimeDesc(buyerId, pageRequest);
     }
 }

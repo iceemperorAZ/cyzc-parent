@@ -62,6 +62,6 @@ public class GiveRebateServiceImpl implements GiveRebateService {
 
     @Override
     public Page<GiveRebate> pageAll(Long buyerId, PageRequest pageRequest) {
-        return giveRebateRepository.findAllByBuyerId(buyerId, pageRequest);
+        return giveRebateRepository.findAllByBuyerIdOrderByApprovalTimeDesc(buyerId, pageRequest);
     }
 }

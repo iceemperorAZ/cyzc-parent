@@ -135,6 +135,10 @@ public class BuyerController {
         buyerSale.setSaleId(buyerReq.getSaleUserId());
         buyerSale.setIsAvailable(true);
         buyerSale.setCreateTime(date);
+        //将这个值设置的大一点
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2300);
+        buyerSale.setUntyingTime(calendar.getTime());
         buyerSale.setUpdateTime(date);
         buyerSale.setUpdateTime(date);
         buyerSale.setUpdateTime(date);

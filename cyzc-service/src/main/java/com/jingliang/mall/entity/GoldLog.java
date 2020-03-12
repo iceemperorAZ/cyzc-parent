@@ -56,7 +56,7 @@ public class GoldLog implements Serializable {
     private Boolean isAvailable;
 
     /**
-     * 获得金币方式 100:签到，200：充值，300:赠送，400：下单返利
+     * 获得金币方式 100:签到，200：充值，300:赠送，400：下单返利，500：退货返还
      */
     @Column(name = "type")
     private Integer type;

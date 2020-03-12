@@ -193,6 +193,23 @@ public class OrderServiceImpl implements OrderService {
                     skuService.updateRealitySkuByProductId(sku1);
                 }
             }
+            //退还的金币数
+            int gold = oldOrder.getGold();
+            Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
+            buyer.setGold(buyer.getGold() + gold);
+            buyerRepository.save(buyer);
+            GoldLog goldLog = new GoldLog();
+            goldLog.setGold(gold);
+            goldLog.setIsAvailable(true);
+            goldLog.setMoney(oldOrder.getPayableFee().intValue());
+            goldLog.setType(500);
+            goldLog.setCreateTime(new Date());
+            goldLog.setPayNo(oldOrder.getOrderNo());
+            goldLog.setBuyerId(oldOrder.getBuyerId());
+            goldLog.setMsg("订单[" + oldOrder.getOrderNo() + "]退货返还" + gold + "金币");
+            goldLogRepository.save(goldLog);
+
+
         } else if (order.getOrderStatus() == 600) {
             Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
             if (oldOrder.getReturnGold() != null && oldOrder.getReturnGold() > 0) {
@@ -213,7 +230,8 @@ public class OrderServiceImpl implements OrderService {
                 goldLog.setMsg("微信支付订单[" + oldOrder.getOrderNo() + "]￥" + (oldOrder.getPayableFee() / 100.00) + "元,获得" + gold + "金币");
                 goldLogRepository.save(goldLog);
             }
-            order.setReturnGold(0);
+            //留着退货会用到
+//            order.setReturnGold(0);
         }
         order = orderRepository.save(order);
         return order;
