@@ -7,6 +7,7 @@ import com.jingliang.mall.req.BaseReq;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 转盘
@@ -74,7 +75,7 @@ public class TurntableReq extends BaseReq implements Serializable {
 	 * 更新时间
 	 */
 	@ApiModelProperty(value = "更新时间")
-	private LocalDateTime updateTime;
+	private Date updateTime;
 
 	/**
 	 * 更新人Id
