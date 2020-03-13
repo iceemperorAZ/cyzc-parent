@@ -1,9 +1,9 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallConstant;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.Cart;
@@ -53,19 +53,19 @@ public class CartController {
      */
     @ApiOperation(value = "添加购物项")
     @PostMapping("/save")
-    public MallResult<CartResp> save(@RequestBody CartReq cartReq, @ApiIgnore HttpSession session) {
+    public Result<CartResp> save(@RequestBody CartReq cartReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", cartReq);
         if (Objects.isNull(cartReq.getProductId()) || Objects.isNull(cartReq.getProductNum())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         if (Objects.isNull(cartReq.getId()) && Objects.equals(cartReq.getProductNum(), 0)) {
-            return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_CART_ITEM_NUM_FAIL);
+            return Result.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_CART_ITEM_NUM_FAIL);
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         MallUtils.addDateAndBuyer(cartReq, buyer);
-        CartResp cartResp = MallBeanMapper.map(cartService.save(MallBeanMapper.map(cartReq, Cart.class)), CartResp.class);
+        CartResp cartResp = BeanMapper.map(cartService.save(BeanMapper.map(cartReq, Cart.class)), CartResp.class);
         log.debug("返回结果：{}", cartResp);
-        return MallResult.buildSaveOk(cartResp);
+        return Result.buildSaveOk(cartResp);
     }
 
     /**
@@ -73,12 +73,12 @@ public class CartController {
      */
     @ApiOperation(value = "清空购物车")
     @PostMapping("/empty")
-    public MallResult<CartResp> emptyCart(@ApiIgnore HttpSession session) {
+    public Result<CartResp> emptyCart(@ApiIgnore HttpSession session) {
         log.debug("请求清空购物车");
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         cartService.emptyCart(buyer.getId());
         log.debug("清空购物车完成");
-        return MallResult.buildOk();
+        return Result.buildOk();
     }
 
     /**
@@ -86,7 +86,7 @@ public class CartController {
      */
     @ApiOperation(value = "分页查询所有购物项")
     @GetMapping("/page/all")
-    public MallResult<MallPage<CartResp>> pageAllCart(CartReq cartReq, @ApiIgnore HttpSession session) {
+    public Result<MallPage<CartResp>> pageAllCart(CartReq cartReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", cartReq);
         PageRequest pageRequest = PageRequest.of(cartReq.getPage(), cartReq.getPageSize());
         if (StringUtils.isNotBlank(cartReq.getClause())) {
@@ -102,6 +102,6 @@ public class CartController {
         Page<Cart> cartPage = cartService.findAll(cartSpecification, pageRequest);
         MallPage<CartResp> cartResPage = MallUtils.toMallPage(cartPage, CartResp.class);
         log.debug("返回结果：{}", cartResPage);
-        return MallResult.buildQueryOk(cartResPage);
+        return Result.buildQueryOk(cartResPage);
     }
 }

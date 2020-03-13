@@ -3,11 +3,11 @@ package com.jingliang.mall.resp;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
-import java.time.LocalDateTime;
 import io.swagger.annotations.ApiModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 转盘日志
@@ -47,7 +47,7 @@ public class TurntableLogResp implements Serializable {
 	 * 创建时间
 	 */
 	@ApiModelProperty(value = "创建时间")
-	private LocalDateTime createTime;
+	private Date createTime;
 
 	/**
 	 * 是否可用 0：否，1：是

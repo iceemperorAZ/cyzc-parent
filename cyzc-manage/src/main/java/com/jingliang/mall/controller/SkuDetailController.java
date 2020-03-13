@@ -4,10 +4,10 @@ import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.SkuDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.SkuDetailService;
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallConstant;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.SkuDetailReq;
 import com.jingliang.mall.resp.SkuDetailResp;
 import com.jingliang.mall.server.RedisService;
@@ -59,23 +59,23 @@ public class SkuDetailController {
      */
     @ApiOperation("追加库存")
     @PostMapping("/save")
-    public MallResult<SkuDetailResp> save(@RequestBody SkuDetailReq skuDetailReq, @ApiIgnore HttpSession session) {
+    public Result<SkuDetailResp> save(@RequestBody SkuDetailReq skuDetailReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", skuDetailReq);
         if (Objects.isNull(skuDetailReq.getExpiredTime()) || Objects.isNull(skuDetailReq.getProductionTime()) || Objects.isNull(skuDetailReq.getPurchasePrice())
                 || Objects.isNull(skuDetailReq.getSkuId()) || Objects.isNull(skuDetailReq.getSkuAppendNum())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(skuDetailReq, user);
         skuDetailReq.setBatchNumber(redisService.getSkuBatchNumber());
-        SkuDetail skuDetail = skuDetailService.save(MallBeanMapper.map(skuDetailReq, SkuDetail.class));
+        SkuDetail skuDetail = skuDetailService.save(BeanMapper.map(skuDetailReq, SkuDetail.class));
         if (Objects.isNull(skuDetail)) {
-            return MallResult.buildSaveFail();
+            return Result.buildSaveFail();
         }
-        SkuDetailResp detailResp = MallBeanMapper.map(skuDetail, SkuDetailResp.class);
+        SkuDetailResp detailResp = BeanMapper.map(skuDetail, SkuDetailResp.class);
         log.debug("返回结果：{}", detailResp);
-        return MallResult.buildSaveOk(detailResp);
+        return Result.buildSaveOk(detailResp);
     }
 
     /**
@@ -83,7 +83,7 @@ public class SkuDetailController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部库存详情列表")
-    public MallResult<MallPage<SkuDetailResp>> pageAllProduct(SkuDetailReq skuDetailReq) {
+    public Result<MallPage<SkuDetailResp>> pageAllProduct(SkuDetailReq skuDetailReq) {
         log.debug("请求参数：{}", skuDetailReq);
         PageRequest pageRequest = PageRequest.of(skuDetailReq.getPage(), skuDetailReq.getPageSize());
         if (StringUtils.isNotBlank(skuDetailReq.getClause())) {
@@ -112,6 +112,6 @@ public class SkuDetailController {
         Page<SkuDetail> skuDetailPage = skuDetailService.findAll(skuDetailSpecification, pageRequest);
         MallPage<SkuDetailResp> skuDetailRespMallPage = MallUtils.toMallPage(skuDetailPage, SkuDetailResp.class);
         log.debug("返回结果：{}", skuDetailRespMallPage);
-        return MallResult.buildQueryOk(skuDetailRespMallPage);
+        return Result.buildQueryOk(skuDetailRespMallPage);
     }
 }

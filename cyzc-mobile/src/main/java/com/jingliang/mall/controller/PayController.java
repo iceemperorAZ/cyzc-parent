@@ -2,7 +2,7 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.MallConstant;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
@@ -132,26 +132,26 @@ public class PayController {
      */
     @ApiOperation("订单继续微信支付")
     @PostMapping("/wechat/pay")
-    public MallResult<Map<String, String>> wechatPay(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<Map<String, String>> wechatPay(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq.getId());
         if (Objects.isNull(orderReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(buyerSessionKey);
         Order order = orderService.findByIdAndBuyerId(orderReq.getId(), buyer.getId());
         if (Objects.isNull(order)) {
-            return MallResult.build(MallConstant.PAY_FAIL, MallConstant.TEXT_PAY_NOTHINGNESS_FAIL);
+            return Result.build(MallConstant.PAY_FAIL, MallConstant.TEXT_PAY_NOTHINGNESS_FAIL);
         }
         //判断订单状态
         if (order.getOrderStatus() == 100) {
             String prepayId = order.getPayNo();
             if (StringUtils.isNotBlank(prepayId)) {
                 Map<String, String> map = wechatService.payUnifiedOrderSign(prepayId);
-                return MallResult.build(MallConstant.OK, MallConstant.TEXT_OK, map);
+                return Result.build(MallConstant.OK, MallConstant.TEXT_OK, map);
             }
-            return MallResult.build(MallConstant.PAY_FAIL, MallConstant.TEXT_PAY_OVERTIME_FAIL);
+            return Result.build(MallConstant.PAY_FAIL, MallConstant.TEXT_PAY_OVERTIME_FAIL);
         }
-        return MallResult.build(MallConstant.PAY_FAIL, MallConstant.TEXT_PAY_PAID);
+        return Result.build(MallConstant.PAY_FAIL, MallConstant.TEXT_PAY_PAID);
     }
 
     /**

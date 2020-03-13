@@ -1,9 +1,7 @@
 package com.jingliang.mall.req;
 
-import java.time.LocalDateTime;
 import lombok.Data;
 import io.swagger.annotations.ApiModel;
-import com.jingliang.mall.req.BaseReq;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;

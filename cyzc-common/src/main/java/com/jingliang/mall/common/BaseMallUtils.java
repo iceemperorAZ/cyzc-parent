@@ -12,7 +12,6 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.InetAddress;
-import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
@@ -74,8 +73,8 @@ public abstract class BaseMallUtils {
      */
     public static <T> MallPage<T> toMallPage(Page page, Class<T> aClass) {
         MallPage<T> mallPage = new MallPage<>();
-        MallBeanMapper.map(page, mallPage);
-        mallPage.setContent(MallBeanMapper.mapList(page.getContent(), aClass));
+        BeanMapper.map(page, mallPage);
+        mallPage.setContent(BeanMapper.mapList(page.getContent(), aClass));
         return mallPage;
     }
 

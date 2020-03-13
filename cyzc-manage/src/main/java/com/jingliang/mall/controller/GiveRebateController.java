@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.GiveRebate;
 import com.jingliang.mall.entity.User;
@@ -51,13 +51,13 @@ public class GiveRebateController {
      */
     @PostMapping("/save")
     @ApiOperation("赠送返利次数")
-    public MallResult<GiveRebateResp> give(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
+    public Result<GiveRebateResp> give(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Long buyerId = Long.parseLong(map.get("buyerId"));
         Integer rebateNum = Integer.parseInt(map.get("rebateNum"));
         String msg = map.get("msg");
         GiveRebate giveGold = giveRebateService.give(user.getId(), buyerId, rebateNum, msg);
-        return MallResult.buildSaveOk(MallBeanMapper.map(giveGold, GiveRebateResp.class));
+        return Result.buildSaveOk(BeanMapper.map(giveGold, GiveRebateResp.class));
     }
 
     /**
@@ -65,12 +65,12 @@ public class GiveRebateController {
      */
     @PostMapping("/approval")
     @ApiOperation("审批赠送返利次数")
-    public MallResult<Boolean> approval(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
+    public Result<Boolean> approval(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Long id = Long.parseLong(map.get("id"));
         Integer approval = Integer.parseInt(map.get("approval"));
         giveRebateService.approval(user.getId(), id, approval);
-        return MallResult.buildSaveOk(true);
+        return Result.buildSaveOk(true);
     }
 
     /**
@@ -78,9 +78,9 @@ public class GiveRebateController {
      */
     @GetMapping("/page/all")
     @ApiOperation("分页查询所有赠送返利次数记录")
-    public MallResult<MallPage<GiveRebateResp>> pageAll(Long buyerId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize, @ApiIgnore HttpSession session) {
+    public Result<MallPage<GiveRebateResp>> pageAll(Long buyerId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize, @ApiIgnore HttpSession session) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         Page<GiveRebate> giveGoldPage = giveRebateService.pageAll(buyerId, pageRequest);
-        return MallResult.buildQueryOk(MallUtils.toMallPage(giveGoldPage, GiveRebateResp.class));
+        return Result.buildQueryOk(MallUtils.toMallPage(giveGoldPage, GiveRebateResp.class));
     }
 }

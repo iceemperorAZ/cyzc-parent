@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Techarge;
 import com.jingliang.mall.entity.User;
@@ -45,11 +45,11 @@ public class TechargeController {
      */
     @PostMapping("/save")
     @ApiOperation("保存/更新配置")
-    public MallResult<TechargeResp> save(@RequestBody TechargeReq techargeReq, HttpSession session) {
+    public Result<TechargeResp> save(@RequestBody TechargeReq techargeReq, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(techargeReq, user);
-        Techarge techarge = techargeService.save(MallBeanMapper.map(techargeReq, Techarge.class));
-        return MallResult.buildSaveOk(MallBeanMapper.map(techarge, TechargeResp.class));
+        Techarge techarge = techargeService.save(BeanMapper.map(techargeReq, Techarge.class));
+        return Result.buildSaveOk(BeanMapper.map(techarge, TechargeResp.class));
     }
 
     /**
@@ -57,10 +57,10 @@ public class TechargeController {
      */
     @PostMapping("/show")
     @ApiOperation("上架")
-    public MallResult<TechargeResp> show(@RequestBody TechargeReq techargeReq, HttpSession session) {
+    public Result<TechargeResp> show(@RequestBody TechargeReq techargeReq, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
-        Techarge techarge = techargeService.show(user.getId(), MallBeanMapper.map(techargeReq, Techarge.class));
-        return MallResult.buildSaveOk(MallBeanMapper.map(techarge, TechargeResp.class));
+        Techarge techarge = techargeService.show(user.getId(), BeanMapper.map(techargeReq, Techarge.class));
+        return Result.buildSaveOk(BeanMapper.map(techarge, TechargeResp.class));
     }
 
     /**
@@ -68,10 +68,10 @@ public class TechargeController {
      */
     @PostMapping("/hide")
     @ApiOperation("下架")
-    public MallResult<TechargeResp> hide(@RequestBody TechargeReq techargeReq, HttpSession session) {
+    public Result<TechargeResp> hide(@RequestBody TechargeReq techargeReq, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
-        Techarge techarge = techargeService.hide(user.getId(), MallBeanMapper.map(techargeReq, Techarge.class));
-        return MallResult.buildSaveOk(MallBeanMapper.map(techarge, TechargeResp.class));
+        Techarge techarge = techargeService.hide(user.getId(), BeanMapper.map(techargeReq, Techarge.class));
+        return Result.buildSaveOk(BeanMapper.map(techarge, TechargeResp.class));
     }
 
     /**
@@ -79,10 +79,10 @@ public class TechargeController {
      */
     @PostMapping("/delete")
     @ApiOperation("删除")
-    public MallResult<TechargeResp> delete(@RequestBody TechargeReq techargeReq, HttpSession session) {
+    public Result<TechargeResp> delete(@RequestBody TechargeReq techargeReq, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
-        Techarge techarge = techargeService.delete(user.getId(), MallBeanMapper.map(techargeReq, Techarge.class));
-        return MallResult.buildSaveOk(MallBeanMapper.map(techarge, TechargeResp.class));
+        Techarge techarge = techargeService.delete(user.getId(), BeanMapper.map(techargeReq, Techarge.class));
+        return Result.buildSaveOk(BeanMapper.map(techarge, TechargeResp.class));
     }
 
     /**
@@ -90,8 +90,8 @@ public class TechargeController {
      */
     @GetMapping("/all")
     @ApiOperation("查询全部")
-    public MallResult<List<TechargeResp>> findAll() {
+    public Result<List<TechargeResp>> findAll() {
         List<Techarge> techarges = techargeService.findAll();
-        return MallResult.buildQueryOk(MallBeanMapper.mapList(techarges, TechargeResp.class));
+        return Result.buildQueryOk(BeanMapper.mapList(techarges, TechargeResp.class));
     }
 }

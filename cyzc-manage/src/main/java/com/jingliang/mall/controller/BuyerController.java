@@ -76,27 +76,27 @@ public class BuyerController {
      */
     @ApiOperation(value = "修改会员信息")
     @PostMapping("/save")
-    public MallResult<BuyerResp> save(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerResp> save(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         if (Objects.isNull(buyerReq.getId())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         if (buyerReq.getSaleUserId() != null) {
             User user = userService.findById(buyerReq.getSaleUserId());
             if (Objects.isNull(user)) {
-                return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+                return Result.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
             }
         }
         Buyer buyer = buyerService.findById(buyerReq.getId());
         if (Objects.isNull(buyer)) {
-            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
+            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
         }
         //修改会员信息后清空redis中的会员token
         redisService.remove(tokenBuyerPrefix + buyer.getId());
-        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         log.debug("返回结果：{}", buyerResp);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
+        return Result.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
     }
 
     /**
@@ -104,15 +104,15 @@ public class BuyerController {
      */
     @ApiOperation(value = "重新绑定销售")
     @PostMapping("/update/saleUser")
-    public MallResult<BuyerResp> updateSaleUser(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerResp> updateSaleUser(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         if (Objects.isNull(buyerReq.getId())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = buyerService.findById(buyerReq.getId());
         if (Objects.isNull(buyer)) {
-            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
+            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
         }
         BuyerSale buyerSale = buyerSaleService.findBySaleIdAndBuyerId(buyer.getSaleUserId(), buyer.getId());
         User user = (User) session.getAttribute(sessionUser);
@@ -129,7 +129,7 @@ public class BuyerController {
         //修改会员信息后清空redis中的会员token
         redisService.remove(tokenBuyerPrefix + buyer.getId());
         buyerReq.setLastOrderTime(date);
-        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         buyerSale = new BuyerSale();
         buyerSale.setBuyerId(buyer.getId());
         buyerSale.setSaleId(buyerReq.getSaleUserId());
@@ -144,7 +144,7 @@ public class BuyerController {
         buyerSale.setUpdateTime(date);
         buyerSale = buyerSaleService.save(buyerSale);
         log.debug("返回结果：{}", buyerResp);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
+        return Result.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
     }
 
     /**
@@ -152,7 +152,7 @@ public class BuyerController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部会员")
-    public MallResult<MallPage<BuyerResp>> pageAllProduct(BuyerReq buyerReq) {
+    public Result<MallPage<BuyerResp>> pageAllProduct(BuyerReq buyerReq) {
         log.debug("请求参数：{}", buyerReq);
         PageRequest pageRequest = PageRequest.of(buyerReq.getPage(), buyerReq.getPageSize());
         if (StringUtils.isNotBlank(buyerReq.getClause())) {
@@ -169,7 +169,7 @@ public class BuyerController {
         Page<Buyer> buyerPage = buyerService.findAll(buyerSpecification, pageRequest);
         MallPage<BuyerResp> buyerRespMallPage = BaseMallUtils.toMallPage(buyerPage, BuyerResp.class);
         log.debug("返回结果：{}", buyerRespMallPage);
-        return MallResult.buildQueryOk(buyerRespMallPage);
+        return Result.buildQueryOk(buyerRespMallPage);
     }
 
     /**

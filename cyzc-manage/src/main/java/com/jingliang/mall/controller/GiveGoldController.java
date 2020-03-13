@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.GiveGold;
 import com.jingliang.mall.entity.User;
@@ -51,13 +51,13 @@ public class GiveGoldController {
      */
     @PostMapping("/save")
     @ApiOperation("赠送金币")
-    public MallResult<GiveGoldResp> give(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
+    public Result<GiveGoldResp> give(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Long buyerId = Long.parseLong(map.get("buyerId"));
         Integer goldNum = Integer.parseInt(map.get("goldNum"));
         String msg = map.get("msg");
         GiveGold giveGold = giveGoldService.give(user.getId(), buyerId, goldNum, msg);
-        return MallResult.buildSaveOk(MallBeanMapper.map(giveGold, GiveGoldResp.class));
+        return Result.buildSaveOk(BeanMapper.map(giveGold, GiveGoldResp.class));
     }
 
     /**
@@ -65,12 +65,12 @@ public class GiveGoldController {
      */
     @PostMapping("/approval")
     @ApiOperation("审批赠送金币")
-    public MallResult<Boolean> approval(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
+    public Result<Boolean> approval(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Long id = Long.parseLong(map.get("id"));
         Integer approval = Integer.parseInt(map.get("approval"));
         giveGoldService.approval(user.getId(), id, approval);
-        return MallResult.buildSaveOk(true);
+        return Result.buildSaveOk(true);
     }
 
     /**
@@ -78,9 +78,9 @@ public class GiveGoldController {
      */
     @GetMapping("/page/all")
     @ApiOperation("分页查询所有赠送金币记录")
-    public MallResult<MallPage<GiveGoldResp>> pageAll(Long buyerId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize, @ApiIgnore HttpSession session) {
+    public Result<MallPage<GiveGoldResp>> pageAll(Long buyerId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize, @ApiIgnore HttpSession session) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         Page<GiveGold> giveGoldPage = giveGoldService.pageAll(buyerId, pageRequest);
-        return MallResult.buildQueryOk(MallUtils.toMallPage(giveGoldPage, GiveGoldResp.class));
+        return Result.buildQueryOk(MallUtils.toMallPage(giveGoldPage, GiveGoldResp.class));
     }
 }

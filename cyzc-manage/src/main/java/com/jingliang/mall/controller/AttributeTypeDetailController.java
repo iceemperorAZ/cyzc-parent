@@ -4,10 +4,10 @@ import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.AttributeTypeDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.AttributeTypeDetailService;
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallConstant;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.AttributeTypeDetailReq;
 import com.jingliang.mall.resp.AttributeTypeDetailResp;
 import io.swagger.annotations.Api;
@@ -56,18 +56,18 @@ public class AttributeTypeDetailController {
      */
     @PostMapping("/save")
     @ApiOperation(value = "保存属性")
-    public MallResult<AttributeTypeDetailResp> save(@RequestBody AttributeTypeDetailReq attributeTypeDetailReq, @ApiIgnore HttpSession session) {
+    public Result<AttributeTypeDetailResp> save(@RequestBody AttributeTypeDetailReq attributeTypeDetailReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", attributeTypeDetailReq);
         if (Objects.isNull(attributeTypeDetailReq.getAttributeTypeId()) || StringUtils.isBlank(attributeTypeDetailReq.getAttributeName())) {
             log.debug("返回结果：{}",  MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(attributeTypeDetailReq, user);
-        AttributeTypeDetailResp attributeTypeDetailResp = MallBeanMapper.map(attributeTypeDetailService
-                .save(MallBeanMapper.map(attributeTypeDetailReq, AttributeTypeDetail.class)), AttributeTypeDetailResp.class);
+        AttributeTypeDetailResp attributeTypeDetailResp = BeanMapper.map(attributeTypeDetailService
+                .save(BeanMapper.map(attributeTypeDetailReq, AttributeTypeDetail.class)), AttributeTypeDetailResp.class);
         log.debug("返回结果：{}", attributeTypeDetailResp);
-        return MallResult.buildSaveOk(attributeTypeDetailResp);
+        return Result.buildSaveOk(attributeTypeDetailResp);
     }
 
     /**
@@ -75,7 +75,7 @@ public class AttributeTypeDetailController {
      */
     @ApiOperation(value = "分页查询全部属性")
     @GetMapping("/page/all")
-    public MallResult<MallPage<AttributeTypeDetailResp>> pageAllCoupon(AttributeTypeDetailReq attributeTypeDetailReq) {
+    public Result<MallPage<AttributeTypeDetailResp>> pageAllCoupon(AttributeTypeDetailReq attributeTypeDetailReq) {
         log.debug("请求参数：{}", attributeTypeDetailReq);
         PageRequest pageRequest = PageRequest.of(attributeTypeDetailReq.getPage(), attributeTypeDetailReq.getPageSize());
         if (StringUtils.isNotBlank(attributeTypeDetailReq.getClause())) {
@@ -95,6 +95,6 @@ public class AttributeTypeDetailController {
         Page<AttributeTypeDetail> attributeTypePage = attributeTypeDetailService.findAll(attributeTypeDetailSpecification, pageRequest);
         MallPage<AttributeTypeDetailResp> attributeTypeDetailRespPage = MallUtils.toMallPage(attributeTypePage, AttributeTypeDetailResp.class);
         log.debug("返回结果：{}", attributeTypeDetailRespPage);
-        return MallResult.buildQueryOk(attributeTypeDetailRespPage);
+        return Result.buildQueryOk(attributeTypeDetailRespPage);
     }
 }

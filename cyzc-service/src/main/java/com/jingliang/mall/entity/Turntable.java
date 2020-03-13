@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 转盘
@@ -51,7 +52,7 @@ public class Turntable implements Serializable {
 	 * 更新时间
 	 */
 	@Column(name = "update_time")
-	private LocalDateTime updateTime;
+	private Date updateTime;
 
 	/**
 	 * 更新人Id

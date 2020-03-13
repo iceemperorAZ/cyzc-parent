@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.SearchHistory;
@@ -54,13 +54,13 @@ public class SearchHistoryController {
      */
     @ApiOperation(value = "保存搜索词到历史记录")
     @PostMapping("/save")
-    public MallResult<SearchHistoryResp> save(@RequestBody SearchHistoryReq searchHistoryReq, @ApiIgnore HttpSession session) {
+    public Result<SearchHistoryResp> save(@RequestBody SearchHistoryReq searchHistoryReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", searchHistoryReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         MallUtils.addDateAndBuyer(searchHistoryReq, buyer);
-        SearchHistoryResp searchHistoryResp = MallBeanMapper.map(searchHistoryService.save(MallBeanMapper.map(searchHistoryReq, SearchHistory.class)), SearchHistoryResp.class);
+        SearchHistoryResp searchHistoryResp = BeanMapper.map(searchHistoryService.save(BeanMapper.map(searchHistoryReq, SearchHistory.class)), SearchHistoryResp.class);
         log.debug("返回结果：{}", searchHistoryResp);
-        return MallResult.buildSaveOk(searchHistoryResp);
+        return Result.buildSaveOk(searchHistoryResp);
     }
 
     /**
@@ -68,7 +68,7 @@ public class SearchHistoryController {
      */
     @ApiOperation(value = "分页查询所有历史搜索")
     @GetMapping("/page/all")
-    public MallResult<MallPage<SearchHistoryResp>> pageAll(SearchHistoryReq searchHistoryReq, @ApiIgnore HttpSession session) {
+    public Result<MallPage<SearchHistoryResp>> pageAll(SearchHistoryReq searchHistoryReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", searchHistoryReq);
         PageRequest pageRequest = PageRequest.of(searchHistoryReq.getPage(), searchHistoryReq.getPageSize());
         if (StringUtils.isNotBlank(searchHistoryReq.getClause())) {
@@ -86,7 +86,7 @@ public class SearchHistoryController {
         Page<SearchHistory> searchHistoryPage = searchHistoryService.findAll(searchHistorySpecification, pageRequest);
         MallPage<SearchHistoryResp> searchHistoryRespMallPage = MallUtils.toMallPage(searchHistoryPage, SearchHistoryResp.class);
         log.debug("返回结果：{}", searchHistoryRespMallPage);
-        return MallResult.buildQueryOk(searchHistoryRespMallPage);
+        return Result.buildQueryOk(searchHistoryRespMallPage);
     }
 
 }

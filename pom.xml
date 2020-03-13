@@ -139,6 +139,11 @@
             <artifactId>commons-codec</artifactId>
             <version>1.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.aliyun.oss</groupId>
+            <artifactId>aliyun-sdk-oss</artifactId>
+            <version>3.8.1</version>
+        </dependency>
         <!-- Swagger2 -->
         <dependency>
             <groupId>io.springfox</groupId>

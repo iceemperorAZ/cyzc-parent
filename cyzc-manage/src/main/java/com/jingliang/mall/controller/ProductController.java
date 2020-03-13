@@ -68,14 +68,14 @@ public class ProductController {
      */
     @PostMapping("/save")
     @ApiOperation(value = "保存商品")
-    public MallResult<ProductResp> save(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
+    public Result<ProductResp> save(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
                 || productReq.getProductImgs().isEmpty() || StringUtils.isBlank(productReq.getProductName())
                 || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs())
                 || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         //判断商品是否重复
 //        if (Objects.isNull(productReq.getId()) && Objects.nonNull(productService.findAllByProductName(productReq.getProductName()))) {
@@ -89,7 +89,7 @@ public class ProductController {
             Product product = productService.findAllById(productReq.getId());
             if (product.getIsShow()) {
                 //上架中的商品不能修改
-                return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_UPDATE_FAIL);
+                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_UPDATE_FAIL);
             }
             String productImgUris = product.getProductImgUris();
             if (StringUtils.isNotBlank(productImgUris)) {
@@ -106,7 +106,7 @@ public class ProductController {
             Base64Image base64Image = Base64Image.build(productImg);
             if (Objects.isNull(base64Image)) {
                 log.debug("返回结果：{}", MallConstant.TEXT_IMAGE_FAIL);
-                return MallResult.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
+                return Result.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
             }
             base64Images.add(base64Image);
         }
@@ -123,11 +123,11 @@ public class ProductController {
         productReq.setSalesVolume(0);
         productReq.setProductZoneId(-1L);
         productReq.setExamineStatus(ExamineStatus.NOT_SUBMITTED.getValue());
-        Product product = MallBeanMapper.map(productReq, Product.class);
+        Product product = BeanMapper.map(productReq, Product.class);
         ProductResp productResp = new ProductResp();
-        MallBeanMapper.map(productService.save(product), productResp);
+        BeanMapper.map(productService.save(product), productResp);
         log.debug("返回结果：{}", productResp);
-        return MallResult.buildSaveOk(productResp);
+        return Result.buildSaveOk(productResp);
     }
 
     /**
@@ -135,7 +135,7 @@ public class ProductController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部商品")
-    public MallResult<MallPage<ProductResp>> pageAllProduct(ProductReq productReq) throws UnsupportedEncodingException {
+    public Result<MallPage<ProductResp>> pageAllProduct(ProductReq productReq) throws UnsupportedEncodingException {
         log.debug("请求参数：{}", productReq);
         PageRequest pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize());
         if (StringUtils.isNotBlank(productReq.getClause())) {
@@ -158,6 +158,9 @@ public class ProductController {
             if (Objects.nonNull(productReq.getIsShow())) {
                 predicateList.add(cb.equal(root.get("isShow"), productReq.getIsShow()));
             }
+            if (Objects.nonNull(productReq.getIsSoonShow())) {
+                predicateList.add(cb.equal(root.get("isSoonShow"), productReq.getIsSoonShow()));
+            }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
             query.orderBy(cb.desc(root.get("createTime")));
@@ -166,7 +169,7 @@ public class ProductController {
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
         MallPage<ProductResp> productRespPage = MallUtils.toMallPage(productPage, ProductResp.class);
         log.debug("返回结果：{}", productRespPage);
-        return MallResult.buildQueryOk(productRespPage);
+        return Result.buildQueryOk(productRespPage);
     }
 
     /**
@@ -174,11 +177,11 @@ public class ProductController {
      */
     @ApiOperation(value = "根据Id查询商品信息")
     @GetMapping("/id")
-    public MallResult<ProductResp> findById(Long id) {
+    public Result<ProductResp> findById(Long id) {
         log.debug("请求参数：{}", id);
-        ProductResp productResp = MallBeanMapper.map(productService.findAllById(id), ProductResp.class);
+        ProductResp productResp = BeanMapper.map(productService.findAllById(id), ProductResp.class);
         log.debug("返回结果：{}", productResp);
-        return MallResult.buildSaveOk(productResp);
+        return Result.buildSaveOk(productResp);
     }
 
     /**
@@ -186,7 +189,7 @@ public class ProductController {
      */
     @ApiOperation(value = "批量上架商品")
     @PostMapping("/batch/show")
-    public MallResult<List<ProductResp>> batchShow(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
+    public Result<List<ProductResp>> batchShow(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq.getProductIds());
         List<Product> products = new ArrayList<>();
         User user = (User) session.getAttribute(sessionUser);
@@ -196,7 +199,7 @@ public class ProductController {
             //查询线上库存数
             if (Objects.isNull(sku) || sku.getSkuLineNum() < 1) {
                 log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_SHOW_SKU_FAIL);
-                return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SHOW_SKU_FAIL);
+                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SHOW_SKU_FAIL);
             }
             Product product = new Product();
             product.setId(id);
@@ -210,11 +213,11 @@ public class ProductController {
         List<Product> productList = productService.batchShow(products);
         if (productList.isEmpty()) {
             log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_SHOW_FAIL);
-            return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SHOW_FAIL);
+            return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SHOW_FAIL);
         }
-        List<ProductResp> productRespList = MallBeanMapper.mapList(productList, ProductResp.class);
+        List<ProductResp> productRespList = BeanMapper.mapList(productList, ProductResp.class);
         log.debug("返回结果：{}", productRespList);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_SHOW_UP_OK, productRespList);
+        return Result.build(MallConstant.OK, MallConstant.TEXT_SHOW_UP_OK, productRespList);
     }
 
     /**
@@ -222,7 +225,7 @@ public class ProductController {
      */
     @ApiOperation(value = "批量下架商品")
     @PostMapping("/batch/hide")
-    public MallResult<List<ProductResp>> batchHide(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
+    public Result<List<ProductResp>> batchHide(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq.getProductIds());
         List<Product> products = new ArrayList<>();
         User user = (User) session.getAttribute(sessionUser);
@@ -237,9 +240,9 @@ public class ProductController {
             products.add(product);
         });
         List<Product> productList = productService.batchHide(products);
-        List<ProductResp> productRespList = MallBeanMapper.mapList(productList, ProductResp.class);
+        List<ProductResp> productRespList = BeanMapper.mapList(productList, ProductResp.class);
         log.debug("返回结果：{}", productRespList);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_SHOW_DOWN_OK, productRespList);
+        return Result.build(MallConstant.OK, MallConstant.TEXT_SHOW_DOWN_OK, productRespList);
     }
 
     /**
@@ -247,7 +250,7 @@ public class ProductController {
      */
     @ApiOperation(value = "批量删除商品")
     @PostMapping("/batch/delete")
-    public MallResult<List<ProductResp>> batchDelete(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
+    public Result<List<ProductResp>> batchDelete(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq.getProductIds());
         List<Product> products = new ArrayList<>();
         User user = (User) session.getAttribute(sessionUser);
@@ -256,17 +259,17 @@ public class ProductController {
             //判断线上库存是否小于初始库存，即是否用用户下单
             if (redisService.getProductSkuNum(id + "") < productSkuInitInventedNum) {
                 log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_ORDER_FAIL);
-                return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_ORDER_FAIL);
+                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_ORDER_FAIL);
             }
             //判断库存是否为0,有库存不允许删除
             Sku sku = skuService.findByProductId(id);
             if (sku.getSkuRealityNum() > 0) {
                 log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_SKU_FAIL);
-                return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SKU_FAIL);
+                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SKU_FAIL);
             }
             if (Objects.nonNull(productService.findShowProductById(id))) {
                 log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_DELETE_FAIL);
-                return MallResult.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_DELETE_FAIL);
+                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_DELETE_FAIL);
             }
 
             Product product = new Product();
@@ -278,8 +281,8 @@ public class ProductController {
             products.add(product);
         }
         List<Product> productList = productService.batchDelete(products);
-        List<ProductResp> productRespList = MallBeanMapper.mapList(productList, ProductResp.class);
+        List<ProductResp> productRespList = BeanMapper.mapList(productList, ProductResp.class);
         log.debug("返回结果：{}", productRespList);
-        return MallResult.buildDeleteOk(productRespList);
+        return Result.buildDeleteOk(productRespList);
     }
 }

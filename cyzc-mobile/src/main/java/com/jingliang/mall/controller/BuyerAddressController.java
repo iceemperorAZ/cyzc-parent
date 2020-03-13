@@ -1,9 +1,9 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallConstant;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerAddress;
@@ -56,17 +56,17 @@ public class BuyerAddressController {
      */
     @ApiOperation("保存用户收货地址")
     @PostMapping("/save")
-    public MallResult<BuyerAddressResp> save(@RequestBody BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerAddressResp> save(@RequestBody BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerAddressReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         if (Objects.nonNull(buyerAddressReq.getId()) && buyerAddressService.countByIdAndBuyerId(buyerAddressReq.getId(), buyer.getId()) == 0) {
-            return MallResult.build(MallConstant.ADDRESS_FAIL, MallConstant.TEXT_ADDRESS_NOT_EXIST_FAIL);
+            return Result.build(MallConstant.ADDRESS_FAIL, MallConstant.TEXT_ADDRESS_NOT_EXIST_FAIL);
         }
         MallUtils.addDateAndBuyer(buyerAddressReq, buyer);
         buyerAddressReq.setBuyerId(buyer.getId());
-        BuyerAddressResp buyerAddressResp = MallBeanMapper.map(buyerAddressService.save(MallBeanMapper.map(buyerAddressReq, BuyerAddress.class)), BuyerAddressResp.class);
+        BuyerAddressResp buyerAddressResp = BeanMapper.map(buyerAddressService.save(BeanMapper.map(buyerAddressReq, BuyerAddress.class)), BuyerAddressResp.class);
         log.debug("返回结果：{}", buyerAddressResp);
-        return MallResult.buildSaveOk(buyerAddressResp);
+        return Result.buildSaveOk(buyerAddressResp);
     }
 
     /**
@@ -74,7 +74,7 @@ public class BuyerAddressController {
      */
     @ApiOperation(value = "分页查询所有用户收货地址")
     @GetMapping("/page/all")
-    public MallResult<MallPage<BuyerAddressResp>> pageAllCart(BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
+    public Result<MallPage<BuyerAddressResp>> pageAllCart(BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerAddressReq);
         PageRequest pageRequest = PageRequest.of(buyerAddressReq.getPage(), buyerAddressReq.getPageSize());
         if (StringUtils.isNotBlank(buyerAddressReq.getClause())) {
@@ -92,7 +92,7 @@ public class BuyerAddressController {
         Page<BuyerAddress> buyerAddressPage = buyerAddressService.findAll(buyerAddressSpecification, pageRequest);
         MallPage<BuyerAddressResp> buyerAddressRespMallPage = MallUtils.toMallPage(buyerAddressPage, BuyerAddressResp.class);
         log.debug("返回结果：{}", buyerAddressRespMallPage);
-        return MallResult.buildQueryOk(buyerAddressRespMallPage);
+        return Result.buildQueryOk(buyerAddressRespMallPage);
     }
 
     /**
@@ -100,17 +100,17 @@ public class BuyerAddressController {
      */
     @ApiOperation("根据地址Id删除用户收货地址")
     @PostMapping("/delete")
-    public MallResult<BuyerAddressResp> delete(@RequestBody BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerAddressResp> delete(@RequestBody BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerAddressReq.getId());
         if (Objects.isNull(buyerAddressReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         MallUtils.addDateAndBuyer(buyerAddressReq, buyer);
         buyerAddressReq.setIsAvailable(false);
-        BuyerAddressResp buyerAddressResp = MallBeanMapper.map(buyerAddressService.save(MallBeanMapper.map(buyerAddressReq, BuyerAddress.class)), BuyerAddressResp.class);
+        BuyerAddressResp buyerAddressResp = BeanMapper.map(buyerAddressService.save(BeanMapper.map(buyerAddressReq, BuyerAddress.class)), BuyerAddressResp.class);
         log.debug("返回结果：{}", buyerAddressResp);
-        return MallResult.buildDeleteOk(buyerAddressResp);
+        return Result.buildDeleteOk(buyerAddressResp);
     }
 
 }

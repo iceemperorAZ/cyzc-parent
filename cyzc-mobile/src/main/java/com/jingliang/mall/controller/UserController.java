@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.service.UserService;
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.resp.UserResp;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -35,13 +35,13 @@ public class UserController {
      */
     @ApiOperation(value = "根据员工编号查询员工信息")
     @GetMapping("/find/no")
-    public MallResult<UserResp> findByNo(String userNo) {
+    public Result<UserResp> findByNo(String userNo) {
         log.debug("请求参数：{}", userNo);
         if (StringUtils.isBlank(userNo)) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
-        UserResp userResp = MallBeanMapper.map(userService.findByUserNo(userNo), UserResp.class);
+        UserResp userResp = BeanMapper.map(userService.findByUserNo(userNo), UserResp.class);
         log.debug("返回结果：{}", userResp);
-        return MallResult.buildQueryOk(userResp);
+        return Result.buildQueryOk(userResp);
     }
 }

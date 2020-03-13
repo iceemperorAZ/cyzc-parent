@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallConstant;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.BuyerCouponLimit;
 import com.jingliang.mall.entity.ProductType;
@@ -57,22 +57,22 @@ public class BuyerCouponLimitController {
      */
     @ApiOperation(value = "保存/修改用户优惠券使用限制")
     @PostMapping("/save")
-    public MallResult<BuyerCouponLimitResp> save(@RequestBody BuyerCouponLimitReq buyerCouponLimitReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerCouponLimitResp> save(@RequestBody BuyerCouponLimitReq buyerCouponLimitReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponLimitReq);
         if (Objects.isNull(buyerCouponLimitReq.getBuyerId()) || Objects.isNull(buyerCouponLimitReq.getUseLimit()) || Objects.isNull(buyerCouponLimitReq.getProductTypeId())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         BuyerCouponLimit buyerCouponLimit = buyerCouponLimitService.findByBuyerIdAndProductTypeId(buyerCouponLimitReq.getBuyerId(), buyerCouponLimitReq.getProductTypeId());
         if (Objects.nonNull(buyerCouponLimit) && Objects.isNull(buyerCouponLimitReq.getId())) {
-            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_REPEAT_FAIL);
+            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_REPEAT_FAIL);
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(buyerCouponLimitReq, user);
-        buyerCouponLimit = MallBeanMapper.map(buyerCouponLimitReq, BuyerCouponLimit.class);
-        BuyerCouponLimitResp buyerCouponLimitResp = MallBeanMapper.map(buyerCouponLimitService.save(buyerCouponLimit), BuyerCouponLimitResp.class);
+        buyerCouponLimit = BeanMapper.map(buyerCouponLimitReq, BuyerCouponLimit.class);
+        BuyerCouponLimitResp buyerCouponLimitResp = BeanMapper.map(buyerCouponLimitService.save(buyerCouponLimit), BuyerCouponLimitResp.class);
         log.debug("返回结果：{}", buyerCouponLimitResp);
-        return MallResult.buildSaveOk(buyerCouponLimitResp);
+        return Result.buildSaveOk(buyerCouponLimitResp);
     }
 
     /**
@@ -81,10 +81,10 @@ public class BuyerCouponLimitController {
     @ApiOperation(value = "根据商户Id查询全部用户优惠券使用限制")
     @GetMapping("/all")
     @ApiImplicitParam(name = "商户Id", value = "buyerId", required = true, paramType = "Long")
-    public MallResult<List<BuyerCouponLimitResp>> findAll(@ApiIgnore BuyerCouponLimitReq buyerCouponLimitReq) {
+    public Result<List<BuyerCouponLimitResp>> findAll(@ApiIgnore BuyerCouponLimitReq buyerCouponLimitReq) {
         log.debug("请求参数：{}", buyerCouponLimitReq.getBuyerId());
         if (Objects.isNull(buyerCouponLimitReq.getBuyerId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         //查询所有商品分类
         List<ProductType> productTypeList = productTypeService.findAll();
@@ -101,8 +101,8 @@ public class BuyerCouponLimitController {
             buyerCouponLimit.setUseLimit(couponUseLimit);
             buyerCouponLimits.add(buyerCouponLimit);
         }
-        List<BuyerCouponLimitResp> buyerCouponLimitResps = MallBeanMapper.mapList(buyerCouponLimits, BuyerCouponLimitResp.class);
+        List<BuyerCouponLimitResp> buyerCouponLimitResps = BeanMapper.mapList(buyerCouponLimits, BuyerCouponLimitResp.class);
         log.debug("返回结果：{}", buyerCouponLimitResps);
-        return MallResult.buildQueryOk(buyerCouponLimitResps);
+        return Result.buildQueryOk(buyerCouponLimitResps);
     }
 }

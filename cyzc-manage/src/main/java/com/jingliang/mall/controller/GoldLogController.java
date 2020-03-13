@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.GoldLog;
@@ -54,7 +54,7 @@ public class GoldLogController {
      */
     @GetMapping("/page/all")
     @ApiOperation("查询签到领取金币的记录")
-    public MallResult<MallPage<GoldLogResp>> signIn(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize,Integer type, @ApiIgnore HttpSession session) {
+    public Result<MallPage<GoldLogResp>> signIn(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize, Integer type, @ApiIgnore HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         Specification<GoldLog> specification = (Specification<GoldLog>) (root, query, cb) -> {
@@ -69,6 +69,6 @@ public class GoldLogController {
             return query.getRestriction();
         };
         Page<GoldLog> signIn = signInLogService.findAll(specification, pageRequest);
-        return MallResult.buildQueryOk(MallUtils.toMallPage(signIn, GoldLogResp.class));
+        return Result.buildQueryOk(MallUtils.toMallPage(signIn, GoldLogResp.class));
     }
 }

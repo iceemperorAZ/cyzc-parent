@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Menu;
 import com.jingliang.mall.entity.RoleMenu;
@@ -61,16 +61,16 @@ public class MenuController {
      */
     @PostMapping("/save")
     @ApiOperation(value = "保存/更新资源")
-    public MallResult<MenuResp> save(@RequestBody MenuReq menuReq, @ApiIgnore HttpSession session) {
+    public Result<MenuResp> save(@RequestBody MenuReq menuReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", menuReq);
         if (StringUtils.isBlank(menuReq.getMenuName()) || StringUtils.isBlank(menuReq.getUrl())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(menuReq, user);
-        MenuResp menuResp = MallBeanMapper.map(menuService.save(MallBeanMapper.map(menuReq, Menu.class)), MenuResp.class);
+        MenuResp menuResp = BeanMapper.map(menuService.save(BeanMapper.map(menuReq, Menu.class)), MenuResp.class);
         log.debug("返回参数：{}", menuResp);
-        return MallResult.buildSaveOk(menuResp);
+        return Result.buildSaveOk(menuResp);
     }
 
     /**
@@ -79,17 +79,17 @@ public class MenuController {
      */
     @PostMapping("/delete")
     @ApiOperation(value = "删除资源")
-    public MallResult<MenuResp> delete(@RequestBody MenuReq menuReq, @ApiIgnore HttpSession session) {
+    public Result<MenuResp> delete(@RequestBody MenuReq menuReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", menuReq);
         if (Objects.isNull(menuReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(menuReq, user);
         menuReq.setIsAvailable(false);
-        MenuResp menuResp = MallBeanMapper.map(menuService.save(MallBeanMapper.map(menuReq, Menu.class)), MenuResp.class);
+        MenuResp menuResp = BeanMapper.map(menuService.save(BeanMapper.map(menuReq, Menu.class)), MenuResp.class);
         log.debug("返回参数：{}", menuResp);
-        return MallResult.buildDeleteOk(menuResp);
+        return Result.buildDeleteOk(menuResp);
     }
 
 
@@ -98,7 +98,7 @@ public class MenuController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部资源")
-    public MallResult<MallPage<MenuResp>> pageAllProduct(MenuReq menuReq) {
+    public Result<MallPage<MenuResp>> pageAllProduct(MenuReq menuReq) {
         log.debug("请求参数：{}", menuReq);
         PageRequest pageRequest = PageRequest.of(menuReq.getPage(), menuReq.getPageSize());
         if (StringUtils.isNotBlank(menuReq.getClause())) {
@@ -127,6 +127,6 @@ public class MenuController {
             });
         }
         log.debug("返回结果：{}", menuRespMallPage);
-        return MallResult.buildQueryOk(menuRespMallPage);
+        return Result.buildQueryOk(menuRespMallPage);
     }
 }

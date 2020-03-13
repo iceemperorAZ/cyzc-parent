@@ -2,12 +2,12 @@ package com.jingliang.mall.resp;
 
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.time.LocalDateTime;
 import lombok.Data;
 import io.swagger.annotations.ApiModel;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 转盘
@@ -52,7 +52,7 @@ public class TurntableResp implements Serializable {
 	 * 更新时间
 	 */
 	@ApiModelProperty(value = "更新时间")
-	private LocalDateTime updateTime;
+	private Date updateTime;
 
 	/**
 	 * 更新人Id

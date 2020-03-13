@@ -70,15 +70,15 @@ public class OrderController {
      */
     @ApiOperation(value = "发货")
     @PostMapping("/deliver")
-    public MallResult<OrderResp> deliver(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<OrderResp> deliver(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId()) || StringUtils.isBlank(orderReq.getDeliveryName())
                 || StringUtils.isBlank(orderReq.getDeliveryPhone()) || StringUtils.isBlank(orderReq.getStorehouse())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Order order1 = orderService.findById(orderReq.getId());
         if (order1.getOrderStatus() > 300) {
-            return MallResult.build(MallConstant.FAIL, "此订单已完成发货");
+            return Result.build(MallConstant.FAIL, "此订单已完成发货");
         }
         Order order = new Order();
         order.setId(orderReq.getId());
@@ -93,11 +93,11 @@ public class OrderController {
         order = orderService.update(order);
         if (Objects.isNull(order)) {
             log.debug("返回结果：{}", MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
-            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
+            return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
         }
-        OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.buildUpdateOk(orderResp);
+        return Result.buildUpdateOk(orderResp);
     }
 
     /**
@@ -105,10 +105,10 @@ public class OrderController {
      */
     @ApiOperation(value = "退货(不扣绩效)")
     @PostMapping("/refunds")
-    public MallResult<OrderResp> refunds(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<OrderResp> refunds(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Date date = new Date();
         Order order = new Order();
@@ -122,9 +122,9 @@ public class OrderController {
         order.setUpdateUserId(user.getId());
         order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
-        OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.buildUpdateOk(orderResp);
+        return Result.buildUpdateOk(orderResp);
     }
 
     /**
@@ -132,10 +132,10 @@ public class OrderController {
      */
     @ApiOperation(value = "退货(扣绩效)")
     @PostMapping("/refunds/money")
-    public MallResult<OrderResp> refundsMoney(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<OrderResp> refundsMoney(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Date date = new Date();
         Order order = new Order();
@@ -149,9 +149,9 @@ public class OrderController {
         order.setUpdateUserId(user.getId());
         order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
-        OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.buildUpdateOk(orderResp);
+        return Result.buildUpdateOk(orderResp);
     }
 
     /**
@@ -159,7 +159,7 @@ public class OrderController {
      */
     @ApiOperation(value = "分页查询全部用户订单信息")
     @GetMapping("/page/all")
-    public MallResult<MallPage<OrderResp>> pageAll(OrderReq orderReq) {
+    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq) {
         log.debug("请求参数：{}", orderReq);
         PageRequest pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize());
         if (StringUtils.isNotBlank(orderReq.getClause())) {
@@ -190,7 +190,7 @@ public class OrderController {
         Page<Order> orderPage = orderService.findAll(orderSpecification, pageRequest);
         MallPage<OrderResp> orderRespMallPage = MallUtils.toMallPage(orderPage, OrderResp.class);
         log.debug("返回结果：{}", orderRespMallPage);
-        return MallResult.buildQueryOk(orderRespMallPage);
+        return Result.buildQueryOk(orderRespMallPage);
     }
 
 

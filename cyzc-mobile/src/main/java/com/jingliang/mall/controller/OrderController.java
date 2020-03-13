@@ -75,14 +75,14 @@ public class OrderController {
      */
     @ApiOperation(value = "创建订单")
     @PostMapping("/save")
-    public MallResult<Map<String, String>> save(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<Map<String, String>> save(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getPayWay())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         MallUtils.addDateAndBuyer(orderReq, buyer);
-        Order order = MallBeanMapper.map(orderReq, Order.class);
+        Order order = BeanMapper.map(orderReq, Order.class);
         assert order != null;
         order.setTotalPrice(0L);
         order.setPayableFee(0L);
@@ -103,7 +103,7 @@ public class OrderController {
                     //如果本次有已经下架的商品就把减掉的库存加回去，并返回库存商品已下架
                     redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
                 }
-                return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_PRODUCT_FAIL);
+                return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_PRODUCT_FAIL);
             }
             //售价[商品价格*数量]
             long sellingPrice = product.getSellingPrice() * orderDetail.getProductNum();
@@ -123,7 +123,7 @@ public class OrderController {
                     //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                     redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
                 }
-                return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_SKU_FAIL);
+                return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_SKU_FAIL);
             }
 
             if (productPriceMap.containsKey(product.getProductTypeId())) {
@@ -137,12 +137,12 @@ public class OrderController {
         //是否满足可以下单的订单额度
         Config config = configService.findByCode("300");
         if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            return MallResult.build(MallConstant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
+            return Result.build(MallConstant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
         }
         //是否满足可以下单的订单额度
         config = configService.findByCode("700");
         if (order.getTotalPrice() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            return MallResult.build(MallConstant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
+            return Result.build(MallConstant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
         }
         //计算赠品
         config = configService.findByCode("600");
@@ -191,10 +191,10 @@ public class OrderController {
             for (Long couponId : orderReq.getCouponIdList()) {
                 BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(couponId, buyer.getId());
                 if (Objects.isNull(buyerCoupon) || buyerCoupon.getReceiveNum() <= 0) {
-                    return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
+                    return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
                 }
                 if (!productPriceMap.containsKey(buyerCoupon.getProductTypeId())) {
-                    return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
+                    return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
                 }
                 //查询优惠券的限制使用张数
                 BuyerCouponLimit buyerCouponLimit = buyerCouponLimitService.findByBuyerIdAndProductTypeId(buyer.getId(), buyerCoupon.getProductTypeId());
@@ -257,7 +257,7 @@ public class OrderController {
                         //失败就把减掉的库存加回去，并返回支付失败的信息
                         redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
                     }
-                    return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
+                    return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
                 }
             }
         }
@@ -287,15 +287,15 @@ public class OrderController {
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {
-            return MallResult.build(MallConstant.PAY_GOLD_OK, "");
+            return Result.build(MallConstant.PAY_GOLD_OK, "");
         }
         resultMap.put("id", order.getId() + "");
         resultMap.put("orderNo", order.getOrderNo());
         //订单Id也返回
-        OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
         log.debug("微信返回结果二次签名后的返回结果：{}", resultMap);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.buildSaveOk(resultMap);
+        return Result.buildSaveOk(resultMap);
     }
 
     /**
@@ -303,21 +303,21 @@ public class OrderController {
      */
     @ApiOperation(value = "取消订单")
     @PostMapping("/cancel")
-    public MallResult<OrderResp> cancel(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<OrderResp> cancel(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Order order = orderService.findByIdAndBuyerId(orderReq.getId(), buyer.getId());
         if (Objects.isNull(order)) {
-            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
+            return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
         }
         order.setFinishTime(new Date());
         order.setOrderStatus(200);
-        OrderResp orderResp = MallBeanMapper.map(orderService.update(order), OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(orderService.update(order), OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_CANCEL_OK, orderResp);
+        return Result.build(MallConstant.OK, MallConstant.TEXT_CANCEL_OK, orderResp);
     }
 
     /**
@@ -325,21 +325,21 @@ public class OrderController {
      */
     @ApiOperation(value = "订单完成确认")
     @PostMapping("/confirm")
-    public MallResult<OrderResp> confirm(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<OrderResp> confirm(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Order order = orderService.findByIdAndBuyerId(orderReq.getId(), buyer.getId());
         if (Objects.isNull(order)) {
-            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
+            return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
         }
         order.setFinishTime(new Date());
         order.setOrderStatus(600);
-        OrderResp orderResp = MallBeanMapper.map(orderService.update(order), OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(orderService.update(order), OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_CONFIRM_OK, orderResp);
+        return Result.build(MallConstant.OK, MallConstant.TEXT_CONFIRM_OK, orderResp);
     }
 
     /**
@@ -347,7 +347,7 @@ public class OrderController {
      */
     @ApiOperation(value = "分页查询全部用户订单信息")
     @GetMapping("/page/all")
-    public MallResult<MallPage<OrderResp>> pageAll(OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         PageRequest pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize());
         if (StringUtils.isNotBlank(orderReq.getClause())) {
@@ -373,7 +373,7 @@ public class OrderController {
         Page<Order> orderPage = orderService.findAll(orderSpecification, pageRequest);
         MallPage<OrderResp> orderRespMallPage = MallUtils.toMallPage(orderPage, OrderResp.class);
         log.debug("返回结果：{}", orderRespMallPage);
-        return MallResult.buildQueryOk(orderRespMallPage);
+        return Result.buildQueryOk(orderRespMallPage);
     }
 
     /**
@@ -381,13 +381,13 @@ public class OrderController {
      */
     @ApiOperation(value = "根据订单总价查询运费金额")
     @GetMapping("/find/deliverFee")
-    public MallResult<Double> getDeliverFee(Double deliverFee) {
+    public Result<Double> getDeliverFee(Double deliverFee) {
         Config config = configService.findByCode("100");
         if ((long) (deliverFee * 100) >= (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            return MallResult.buildQueryOk(0D);
+            return Result.buildQueryOk(0D);
         }
         config = configService.findByCode("200");
-        return MallResult.buildQueryOk(Double.parseDouble(config.getConfigValues()));
+        return Result.buildQueryOk(Double.parseDouble(config.getConfigValues()));
     }
 
     /**
@@ -395,11 +395,11 @@ public class OrderController {
      */
     @ApiOperation(value = "根据订单总价查询赠品")
     @GetMapping("/find/gift")
-    public MallResult<List<OrderDetailResp>> findOrderGift(Double deliverFee) {
+    public Result<List<OrderDetailResp>> findOrderGift(Double deliverFee) {
         Config config = configService.findByCode("600");
         String values = config.getConfigValues();
         if (StringUtils.isBlank(values) || "-".equals(values)) {
-            return MallResult.buildOk();
+            return Result.buildOk();
         }
         String[] sections = values.split(";");
         String productIds = "";
@@ -417,7 +417,7 @@ public class OrderController {
         }
         List<OrderDetailResp> orderDetailResps = new ArrayList<>();
         if (StringUtils.isBlank(productIds)) {
-            return MallResult.buildOk();
+            return Result.buildOk();
         }
         for (String productId : productIds.split(",")) {
             String[] split = productId.split("\\|");
@@ -427,13 +427,13 @@ public class OrderController {
             orderDetail.setSellingPrice(0L);
             orderDetail.setProduct(product);
             orderDetail.setProductId(product.getId());
-            orderDetailResps.add(MallBeanMapper.map(orderDetail, OrderDetailResp.class));
+            orderDetailResps.add(BeanMapper.map(orderDetail, OrderDetailResp.class));
         }
-        return MallResult.buildQueryOk(orderDetailResps);
+        return Result.buildQueryOk(orderDetailResps);
     }
 
     @GetMapping("/wait/gold")
-    public MallResult<Integer> waitGold(HttpSession session) {
+    public Result<Integer> waitGold(HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -464,6 +464,6 @@ public class OrderController {
                 wartGold += gold;
             }
         }
-        return MallResult.buildQueryOk(wartGold);
+        return Result.buildQueryOk(wartGold);
     }
 }

@@ -56,20 +56,20 @@ public class SkuRecordController {
      */
     @ApiOperation(value = "新建库存出入记录单")
     @PostMapping("/save")
-    public MallResult<SkuRecordResp> save(@RequestBody SkuRecordReq skuRecordReq, @ApiIgnore HttpSession session) {
+    public Result<SkuRecordResp> save(@RequestBody SkuRecordReq skuRecordReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", skuRecordReq);
         if (Objects.isNull(skuRecordReq.getSkuDetailId()) || Objects.isNull(skuRecordReq.getType()) || StringUtils.isBlank(skuRecordReq.getContent())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         if (skuRecordReq.getNum() >= 0) {
-            return MallResult.buildParamFormatFail();
+            return Result.buildParamFormatFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(skuRecordReq, user);
         SkuDetail skuDetail = skuDetailService.findById(skuRecordReq.getSkuDetailId());
         //判定库存
         if (skuRecordReq.getNum() + skuDetail.getSkuResidueNum() <= 0) {
-            return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
+            return Result.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
         }
         skuRecordReq.setProductId(skuDetail.getProductId());
         skuRecordReq.setProductName(skuDetail.getProductName());
@@ -77,9 +77,9 @@ public class SkuRecordController {
         skuRecordReq.setSkuNo(skuDetail.getSkuNo());
         skuRecordReq.setBatchNum(skuDetail.getBatchNumber());
         skuRecordReq.setStatus(100);
-        SkuRecordResp skuRecordResp = MallBeanMapper.map(skuRecordService.save(MallBeanMapper.map(skuRecordReq, SkuRecord.class)), SkuRecordResp.class);
+        SkuRecordResp skuRecordResp = BeanMapper.map(skuRecordService.save(BeanMapper.map(skuRecordReq, SkuRecord.class)), SkuRecordResp.class);
         log.debug("返回结果：{}", skuRecordResp);
-        return MallResult.buildSaveOk(skuRecordResp);
+        return Result.buildSaveOk(skuRecordResp);
     }
 
     /**
@@ -87,31 +87,31 @@ public class SkuRecordController {
      */
     @ApiOperation(value = "更新库存出入记录单状态")
     @PostMapping("/update")
-    public MallResult<SkuRecordResp> update(@RequestBody SkuRecordReq skuRecordReq, @ApiIgnore HttpSession session) {
+    public Result<SkuRecordResp> update(@RequestBody SkuRecordReq skuRecordReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", skuRecordReq);
         if (Objects.isNull(skuRecordReq.getStatus()) || Objects.isNull(skuRecordReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         if (skuRecordReq.getStatus() == 300 && StringUtils.isBlank(skuRecordReq.getApproveOpinion())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         //判定库存
         SkuRecord skuRecord = skuRecordService.findById(skuRecordReq.getId());
         if (Objects.isNull(skuRecord)) {
-            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
+            return Result.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
         }
         SkuDetail skuDetail = skuDetailService.findById(skuRecord.getSkuDetailId());
         if (Objects.isNull(skuDetail)) {
-            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
+            return Result.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
         }
         if (skuRecord.getNum() + skuDetail.getSkuResidueNum() < 0) {
-            return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
+            return Result.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(skuRecordReq, user);
-        SkuRecordResp skuRecordResp = MallBeanMapper.map(skuRecordService.save(MallBeanMapper.map(skuRecordReq, SkuRecord.class)), SkuRecordResp.class);
+        SkuRecordResp skuRecordResp = BeanMapper.map(skuRecordService.save(BeanMapper.map(skuRecordReq, SkuRecord.class)), SkuRecordResp.class);
         log.debug("返回结果：{}", skuRecordResp);
-        return MallResult.buildSaveOk(skuRecordResp);
+        return Result.buildSaveOk(skuRecordResp);
     }
 
     /**
@@ -119,7 +119,7 @@ public class SkuRecordController {
      */
     @ApiOperation(value = "分页查询库存出入记录列表")
     @GetMapping("/page/all")
-    public MallResult<MallPage<SkuRecordResp>> pageAllProduct(SkuRecordReq skuRecordReq) {
+    public Result<MallPage<SkuRecordResp>> pageAllProduct(SkuRecordReq skuRecordReq) {
         log.debug("请求参数：{}", skuRecordReq);
         PageRequest pageRequest = PageRequest.of(skuRecordReq.getPage(), skuRecordReq.getPageSize());
         if (StringUtils.isNotBlank(skuRecordReq.getClause())) {
@@ -151,6 +151,6 @@ public class SkuRecordController {
         Page<SkuRecord> skuRecordPage = skuRecordService.findAll(skuRecordSpecification, pageRequest);
         MallPage<SkuRecordResp> skuRecordRespMallPage = MallUtils.toMallPage(skuRecordPage, SkuRecordResp.class);
         log.debug("返回结果：{}", skuRecordRespMallPage);
-        return MallResult.buildQueryOk(skuRecordRespMallPage);
+        return Result.buildQueryOk(skuRecordRespMallPage);
     }
 }

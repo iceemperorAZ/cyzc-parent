@@ -19,7 +19,7 @@ import java.util.List;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(value = "MallResult", description = "返回结果")
-public class MallResult<T> implements Serializable {
+public class Result<T> implements Serializable {
     private static final long serialVersionUID = -2492072809889519824L;
 
     /**
@@ -46,81 +46,81 @@ public class MallResult<T> implements Serializable {
     @ApiModelProperty(value = "响应数据", notes = "响应数据")
     private T data;
 
-    public static <T> MallResult<T> build(Integer code, String msg, T data) {
-        return new MallResult<T>(code, msg, data);
+    public static <T> Result<T> build(Integer code, String msg, T data) {
+        return new Result<T>(code, msg, data);
     }
 
-    public static <T> MallResult<T> buildOk(T data) {
-        return new MallResult<T>(data);
+    public static <T> Result<T> buildOk(T data) {
+        return new Result<T>(data);
     }
 
-    public static <T> MallResult<T> buildOk() {
-        return new MallResult<T>(null);
+    public static <T> Result<T> buildOk() {
+        return new Result<T>(null);
     }
 
-    public MallResult() {
+    public Result() {
 
     }
 
-    public static <T> MallResult<T> build(Integer code, String msg) {
-        return new MallResult<T>(code, msg, null);
+    public static <T> Result<T> build(Integer code, String msg) {
+        return new Result<T>(code, msg, null);
     }
 
     /**
      * build参数不全返回结果
      */
-    public static <T> MallResult<T> buildParamFail() {
-        return new MallResult<T>(MallConstant.PARAM_FAIL, MallConstant.TEXT_PARAM_FAIL, null);
+    public static <T> Result<T> buildParamFail() {
+        return new Result<T>(MallConstant.PARAM_FAIL, MallConstant.TEXT_PARAM_FAIL, null);
     }
     /**
      * build参数格式错误返回结果
      */
-    public static <T> MallResult<T> buildParamFormatFail() {
-        return new MallResult<T>(MallConstant.PARAM_FAIL, MallConstant.TEXT_PARAM_FORMAT_FAIL, null);
+    public static <T> Result<T> buildParamFormatFail() {
+        return new Result<T>(MallConstant.PARAM_FAIL, MallConstant.TEXT_PARAM_FORMAT_FAIL, null);
     }
 
     /**
      * build保存成功返回结果
      */
-    public static <T> MallResult<T> buildSaveOk(T data) {
-        return new MallResult<T>(MallConstant.OK, MallConstant.TEXT_SAVE_OK, data);
+    public static <T> Result<T> buildSaveOk(T data) {
+        return new Result<T>(MallConstant.OK, MallConstant.TEXT_SAVE_OK, data);
     }
 
     /**
      * build修改成功返回结果
      */
-    public static <T> MallResult<T> buildUpdateOk(T data) {
-        return new MallResult<T>(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, data);
+    public static <T> Result<T> buildUpdateOk(T data) {
+        return new Result<T>(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, data);
     }
 
     /**
      * build删除成功返回结果
      */
-    public static <T> MallResult<T> buildDeleteOk(T data) {
-        return new MallResult<T>(MallConstant.OK, MallConstant.TEXT_DELETE_OK, data);
+    public static <T> Result<T> buildDeleteOk(T data) {
+        return new Result<T>(MallConstant.OK, MallConstant.TEXT_DELETE_OK, data);
     }
 
     /**
      * build保存失败返回结果
      */
-    public static <T> MallResult<T> buildSaveFail() {
-        return new MallResult<T>(MallConstant.SAVE_FAIL, MallConstant.TEXT_SAVE_FAIL, null);
+    public static <T> Result<T> buildSaveFail() {
+        return new Result<T>(MallConstant.SAVE_FAIL, MallConstant.TEXT_SAVE_FAIL, null);
     }
 
     /**
      * build查询成功返回结果
      */
-    public static <T> MallResult<T> buildQueryOk(T data) {
-        return new MallResult<T>(MallConstant.OK, MallConstant.TEXT_QUERY_OK, data);
+    public static <T> Result<T> buildQueryOk(T data) {
+        return new Result<T>(MallConstant.OK, MallConstant.TEXT_QUERY_OK, data);
     }
 
-    public MallResult(Integer code, String msg, T data) {
+    public Result(Integer code, String msg, T data) {
         this.code = code;
         this.msg = msg;
         this.data = data;
     }
 
-    public MallResult(T data) {
+    public Result(T data) {
         this.code = MallConstant.OK;
         this.msg = MallConstant.TEXT_OK;
         this.data = data;
@@ -157,10 +157,10 @@ public class MallResult<T> implements Serializable {
      * @param clazz    E3Result中的object类型
      * @return
      */
-    public static <T> MallResult formatToPojo(String jsonData, Class<T> clazz) {
+    public static <T> Result formatToPojo(String jsonData, Class<T> clazz) {
         try {
             if (clazz == null) {
-                return mapper.readValue(jsonData, MallResult.class);
+                return mapper.readValue(jsonData, Result.class);
             }
             JsonNode jsonNode = mapper.readTree(jsonData);
             JsonNode data = jsonNode.get("data");
@@ -182,9 +182,9 @@ public class MallResult<T> implements Serializable {
      * @param json
      * @return
      */
-    public static MallResult format(String json) {
+    public static Result format(String json) {
         try {
-            return mapper.readValue(json, MallResult.class);
+            return mapper.readValue(json, Result.class);
         } catch (Exception ignored) {
         }
         return null;
@@ -197,7 +197,7 @@ public class MallResult<T> implements Serializable {
      * @param clazz    集合中的类型
      * @return
      */
-    public static <T> MallResult formatToList(String jsonData, Class<T> clazz) {
+    public static <T> Result formatToList(String jsonData, Class<T> clazz) {
         try {
             JsonNode jsonNode = mapper.readTree(jsonData);
             JsonNode data = jsonNode.get("data");

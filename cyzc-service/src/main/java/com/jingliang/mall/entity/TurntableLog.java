@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 转盘日志
@@ -45,7 +46,7 @@ public class TurntableLog implements Serializable {
 	 * 创建时间
 	 */
 	@Column(name = "create_time")
-	private LocalDateTime createTime;
+	private Date createTime;
 
 	/**
 	 * 是否可用 0：否，1：是

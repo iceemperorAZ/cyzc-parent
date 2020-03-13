@@ -1,7 +1,7 @@
 package com.jingliang.mall.exception;
 
 import com.jingliang.mall.common.MallConstant;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,12 +29,12 @@ public class MallControllerAdvice {
      * @param request HttpServletRequest
      */
     @ExceptionHandler(value = Exception.class)
-    public MallResult<?> exceptionHandler(Exception e, HttpServletRequest request) {
+    public Result<?> exceptionHandler(Exception e, HttpServletRequest request) {
         e.printStackTrace();
         String uri = request.getRequestURI();
         log.error("服务器异常拦截，当前请求的uri：{}", uri);
         log.error("服务器异常拦截,错误信息=>{}", e.getMessage());
-        return MallResult.build(MallConstant.SYSTEM_FAIL, MallConstant.TEXT_SYSTEM_FAIL);
+        return Result.build(MallConstant.SYSTEM_FAIL, MallConstant.TEXT_SYSTEM_FAIL);
     }
 
     /**
@@ -44,13 +44,13 @@ public class MallControllerAdvice {
      * @param request HttpServletRequest
      */
     @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-    public MallResult<?> httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
+    public Result<?> httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e, HttpServletRequest request) {
         e.printStackTrace();
         String uri = request.getRequestURI();
         log.error("请求格式异常拦截，当前请求的uri：{}", uri);
         log.error("请求格式异常拦截,错误信息=>{}", e.getMessage());
         String method = e.getMethod();
-        return MallResult.build(MallConstant.REQUEST_FAIL, MallConstant.TEXT_REQUEST_FAIL.replace("[#nowReq#]", "[" + method + "]")
+        return Result.build(MallConstant.REQUEST_FAIL, MallConstant.TEXT_REQUEST_FAIL.replace("[#nowReq#]", "[" + method + "]")
                 .replace("[#req#]", Arrays.toString(Objects.requireNonNull(e.getSupportedHttpMethods()).stream().map(Enum::name).toArray())));
     }
 }

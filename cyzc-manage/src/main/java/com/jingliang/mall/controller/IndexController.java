@@ -1,6 +1,6 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
@@ -45,9 +45,9 @@ public class IndexController {
      */
     @GetMapping("/turnover")
     @ApiOperation(value = "查询近[type]天的成交额 -1:全部，几天就传几")
-    public MallResult<Double> turnover(Integer type) {
+    public Result<Double> turnover(Integer type) {
         if (type == null) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Date startTime = null;
         Date endTime = null;
@@ -85,7 +85,7 @@ public class IndexController {
                 totalPrice += order.getPayableFee();
             }
         }
-        return MallResult.buildQueryOk((totalPrice * 1.00) / 100);
+        return Result.buildQueryOk((totalPrice * 1.00) / 100);
     }
 
 

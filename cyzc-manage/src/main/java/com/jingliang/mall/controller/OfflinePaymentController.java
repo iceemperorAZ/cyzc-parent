@@ -17,7 +17,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -66,18 +65,18 @@ public class OfflinePaymentController {
      */
     @PostMapping("/save")
     @ApiOperation(value = "保存/更新支付凭证")
-    public MallResult<OfflinePaymentResp> save(@RequestBody OfflinePaymentReq offlinePaymentReq, @ApiIgnore HttpSession session) {
+    public Result<OfflinePaymentResp> save(@RequestBody OfflinePaymentReq offlinePaymentReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", offlinePaymentReq);
         if (Objects.isNull(offlinePaymentReq.getOrderId()) || StringUtils.isBlank(offlinePaymentReq.getRemark()) || Objects.isNull(offlinePaymentReq.getImgBase64s())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         //确认订单是否存在
         Order order = orderService.findById(offlinePaymentReq.getOrderId());
         if (Objects.isNull(order)) {
-            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_ORDER_DATA_FAIL);
+            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_ORDER_DATA_FAIL);
         }
         if (Objects.nonNull(offlinePaymentService.findByOrderId(offlinePaymentReq.getOrderId())) && Objects.isNull(offlinePaymentReq.getId())) {
-            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_REPEAT_FAIL);
+            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_REPEAT_FAIL);
         }
         offlinePaymentReq.setOrderNo(order.getOrderNo());
         if (Objects.nonNull(offlinePaymentReq.getId())) {
@@ -99,7 +98,7 @@ public class OfflinePaymentController {
             Base64Image base64Image = Base64Image.build(imgBase);
             if (Objects.isNull(base64Image)) {
                 log.debug("返回结果：{}", MallConstant.TEXT_IMAGE_FAIL);
-                return MallResult.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
+                return Result.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
             }
             base64Images.add(base64Image);
         }
@@ -109,10 +108,10 @@ public class OfflinePaymentController {
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(offlinePaymentReq, user);
-        OfflinePayment offlinePayment = MallBeanMapper.map(offlinePaymentReq, OfflinePayment.class);
+        OfflinePayment offlinePayment = BeanMapper.map(offlinePaymentReq, OfflinePayment.class);
         assert offlinePayment != null;
         offlinePayment.setUrls(builder.substring(1));
-        OfflinePaymentResp offlinePaymentResp = MallBeanMapper.map(offlinePaymentService.save(offlinePayment), OfflinePaymentResp.class);
+        OfflinePaymentResp offlinePaymentResp = BeanMapper.map(offlinePaymentService.save(offlinePayment), OfflinePaymentResp.class);
         if (Objects.isNull(offlinePaymentReq.getId())) {
             //首次上传凭证推送订单支付通知
             rabbitProducer.paymentNotice(order);
@@ -121,7 +120,7 @@ public class OfflinePaymentController {
             cartService.emptyCartItem(order.getBuyerId(), orderDetailList.stream().map(OrderDetail::getProductId).collect(Collectors.toList()));
         }
         log.debug("返回参数：{}", offlinePaymentResp);
-        return MallResult.buildSaveOk(offlinePaymentResp);
+        return Result.buildSaveOk(offlinePaymentResp);
     }
 
     /**
@@ -129,15 +128,15 @@ public class OfflinePaymentController {
      */
     @GetMapping("/findByOrderId")
     @ApiOperation(value = "根据订单Id查询支付凭证")
-    public MallResult<OfflinePaymentResp> save(Long orderId) {
+    public Result<OfflinePaymentResp> save(Long orderId) {
         log.debug("请求参数：orderId= {}", orderId);
         if (Objects.isNull(orderId)) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         OfflinePayment offlinePayment = offlinePaymentService.findByOrderId(orderId);
-        OfflinePaymentResp offlinePaymentResp = MallBeanMapper.map(offlinePayment, OfflinePaymentResp.class);
+        OfflinePaymentResp offlinePaymentResp = BeanMapper.map(offlinePayment, OfflinePaymentResp.class);
         log.debug("返回参数：{}", offlinePaymentResp);
-        return MallResult.buildQueryOk(offlinePaymentResp);
+        return Result.buildQueryOk(offlinePaymentResp);
     }
 
 }

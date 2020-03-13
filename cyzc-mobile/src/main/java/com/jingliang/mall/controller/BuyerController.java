@@ -6,7 +6,6 @@ import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.req.PhoneDataReq;
 import com.jingliang.mall.resp.BuyerResp;
-import com.jingliang.mall.resp.OrderResp;
 import com.jingliang.mall.resp.SignInResp;
 import com.jingliang.mall.resp.UserResp;
 import com.jingliang.mall.server.FastdfsService;
@@ -81,22 +80,22 @@ public class BuyerController {
      */
     @ApiOperation(value = "微信登录")
     @PostMapping("/wechat/login")
-    public MallResult<BuyerResp> login(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpServletResponse response) {
+    public Result<BuyerResp> login(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpServletResponse response) {
         log.debug("请求参数：{}", buyerReq);
         if (StringUtils.isBlank(buyerReq.getCode())) {
             log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         //调用微信接口获取openid
         Map map = wechatService.getOpenId(buyerReq.getCode());
         if (Objects.isNull(map)) {
             log.debug("返回结果：{}", MallConstant.TEXT_WECHAT_LOGIN_FAIL);
-            return MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_WECHAT_LOGIN_FAIL);
+            return Result.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_WECHAT_LOGIN_FAIL);
         }
         String openId = (String) map.get("openid");
         if (StringUtils.isBlank(openId)) {
             log.debug("返回结果：{}", MallConstant.TEXT_WECHAT_LOGIN_FAIL);
-            return MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_WECHAT_LOGIN_FAIL);
+            return Result.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_WECHAT_LOGIN_FAIL);
         }
         Buyer buyer = buyerService.findByUniqueId(openId);
         if (Objects.isNull(buyer)) {
@@ -110,17 +109,29 @@ public class BuyerController {
             buyer.setMemberIntegral(0);
             buyer.setIsSealUp(false);
             buyer.setIsNew(true);
+            buyer.setGold(10);
+            buyer.setMemberIntegral(100);
+            buyer.setOrderSpecificNum(1);
+            buyer.setIsNew(true);
             buyer.setRegisterSource("WX");
             buyer = buyerService.save(buyer);
+            GoldLog goldLog = new GoldLog();
+            goldLog.setBuyerId(buyer.getId());
+            goldLog.setIsAvailable(true);
+            goldLog.setGold(10);
+            goldLog.setMsg("新用户注册，赠送10金币。");
+            goldLog.setCreateTime(new Date());
+            goldLog.setType(300);
+            goldLogService.save(goldLog);
         }
         //是否封停
         if (buyer.getIsSealUp()) {
-            return MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_IS_SEAL_UP_FAIL);
+            return Result.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_IS_SEAL_UP_FAIL);
         }
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("id", buyer.getId() + "");
         tokenMap.put("code", buyerReq.getCode());
-        BuyerResp buyerResp = MallBeanMapper.map(buyer, BuyerResp.class);
+        BuyerResp buyerResp = BeanMapper.map(buyer, BuyerResp.class);
         User user = userService.findByBuyerId(buyer.getId());
         log.debug("WX登录信息{}", user);
         assert buyerResp != null;
@@ -131,7 +142,7 @@ public class BuyerController {
             redisService.setExpire(tokenUserPrefix + "FRONT-" + user.getId(), user, tokenTimeOut);
             Integer level = user.getLevel();
             buyerResp.setLevel(level);
-            buyerResp.setUser(MallBeanMapper.map(user, UserResp.class));
+            buyerResp.setUser(BeanMapper.map(user, UserResp.class));
         }
         //生成token
         String token = JwtUtil.genToken(tokenMap);
@@ -142,7 +153,7 @@ public class BuyerController {
         response.setHeader("Authorization", token);
         log.debug("微信登录Token= {}", token);
         log.debug("返回结果：{}", buyerResp);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_LOGIN_OK, buyerResp);
+        return Result.build(MallConstant.OK, MallConstant.TEXT_LOGIN_OK, buyerResp);
     }
 
     /**
@@ -150,9 +161,9 @@ public class BuyerController {
      */
     @ApiOperation(value = "登出")
     @PostMapping("/logout")
-    public MallResult<Boolean> logout() {
+    public Result<Boolean> logout() {
         //暂未涉及
-        return MallResult.buildOk(true);
+        return Result.buildOk(true);
     }
 
     /**
@@ -160,12 +171,12 @@ public class BuyerController {
      */
     @ApiOperation(value = "解析微信手机号")
     @GetMapping("/analysis/phone")
-    public MallResult<String> analysisPhone(@RequestParam @ApiParam("手机号加密算法的初始向量") String iv,
-                                            @RequestParam @ApiParam("手机号包括敏感数据在内的完整用户信息的加密数据") String encryptedData,
-                                            @ApiIgnore HttpSession session) {
+    public Result<String> analysisPhone(@RequestParam @ApiParam("手机号加密算法的初始向量") String iv,
+                                        @RequestParam @ApiParam("手机号包括敏感数据在内的完整用户信息的加密数据") String encryptedData,
+                                        @ApiIgnore HttpSession session) {
         log.debug("请求参数：iv={},encryptedData={}", iv, encryptedData);
         if (StringUtils.isBlank(iv) || StringUtils.isBlank(encryptedData)) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         String sessionKey = buyer.getSessionKey();
@@ -174,10 +185,10 @@ public class BuyerController {
         if (StringUtils.isNotBlank(decrypt) && StringUtils.isNotBlank(JSONObject.parseObject(decrypt).getString("purePhoneNumber"))) {
             String purePhoneNumber = JSONObject.parseObject(decrypt).getString("purePhoneNumber");
             log.debug("返回解析后的手机号：{}", purePhoneNumber);
-            return MallResult.build(MallConstant.OK, MallConstant.TEXT_OK, purePhoneNumber);
+            return Result.build(MallConstant.OK, MallConstant.TEXT_OK, purePhoneNumber);
         }
         log.debug("解析微信手机号失败");
-        return MallResult.build(MallConstant.WECHAT_FAIL, MallConstant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
+        return Result.build(MallConstant.WECHAT_FAIL, MallConstant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
     }
 
     /**
@@ -185,11 +196,11 @@ public class BuyerController {
      */
     @ApiOperation(value = "修改当前用户的微信手机号")
     @PostMapping("/analysis/phone")
-    public MallResult<String> analysisPhone(@RequestBody PhoneDataReq phoneDataReq,
-                                            @ApiIgnore HttpSession session) {
+    public Result<String> analysisPhone(@RequestBody PhoneDataReq phoneDataReq,
+                                        @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", phoneDataReq);
         if (StringUtils.isBlank(phoneDataReq.getIv()) || StringUtils.isBlank(phoneDataReq.getEncryptedData())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         String sessionKey = buyer.getSessionKey();
@@ -200,10 +211,10 @@ public class BuyerController {
             log.debug("返回解析后的手机号：{}", purePhoneNumber);
             buyer.setPhone(purePhoneNumber);
             buyerService.save(buyer);
-            return MallResult.build(MallConstant.OK, MallConstant.TEXT_OK, purePhoneNumber);
+            return Result.build(MallConstant.OK, MallConstant.TEXT_OK, purePhoneNumber);
         }
         log.debug("解析微信手机号失败");
-        return MallResult.build(MallConstant.WECHAT_FAIL, MallConstant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
+        return Result.build(MallConstant.WECHAT_FAIL, MallConstant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
     }
 
     /**
@@ -211,19 +222,19 @@ public class BuyerController {
      */
     @ApiOperation(value = "修改会员信息")
     @PostMapping("/update")
-    public MallResult<BuyerResp> update(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerResp> update(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         buyer = buyerService.findById(buyer.getId());
         if (Objects.isNull(buyer)) {
-            return MallResult.buildSaveFail();
+            return Result.buildSaveFail();
         }
         buyerReq.setId(buyer.getId());
         if (StringUtils.isNotBlank(buyerReq.getHead())) {
             Base64Image base64Image = Base64Image.build(buyerReq.getHead());
             if (Objects.isNull(base64Image)) {
                 log.debug("返回结果：{}", MallConstant.TEXT_IMAGE_FAIL);
-                return MallResult.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
+                return Result.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
             }
             if (StringUtils.isNotBlank(buyer.getHeadUri())) {
                 //新头像保存成功后把之前的头像从图片服务器删除
@@ -232,9 +243,9 @@ public class BuyerController {
             //保存新头像
             buyerReq.setHeadUri(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
         }
-        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         log.debug("返回结果：{}", buyerResp);
-        return MallResult.buildSaveOk(buyerResp);
+        return Result.buildSaveOk(buyerResp);
     }
 
     /**
@@ -242,24 +253,24 @@ public class BuyerController {
      */
     @ApiOperation(value = "绑定销售")
     @PostMapping("/binding/sale")
-    public MallResult<BuyerResp> bindingSale(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerResp> bindingSale(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         if (Objects.isNull(buyerReq.getSaleUserId()) || StringUtils.isBlank(buyerReq.getPhone()) || StringUtils.isBlank(buyerReq.getShopName())
                 || StringUtils.isBlank(buyerReq.getUserName())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = userService.findById(buyerReq.getSaleUserId());
         if (Objects.isNull(user)) {
-            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+            return Result.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         buyer = buyerService.findById(buyer.getId());
         if (Objects.isNull(buyer)) {
-            return MallResult.buildSaveFail();
+            return Result.buildSaveFail();
         }
         Date date = new Date();
         buyerReq.setId(buyer.getId());
-        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         BuyerSale buyerSale = new BuyerSale();
         buyerSale.setBuyerId(buyer.getId());
         buyerSale.setSaleId(buyerReq.getSaleUserId());
@@ -272,9 +283,9 @@ public class BuyerController {
         buyerSale.setUpdateTime(date);
         buyerSale = buyerSaleService.save(buyerSale);
         assert buyerResp != null;
-        buyerResp.setSale(MallBeanMapper.map(user, UserResp.class));
+        buyerResp.setSale(BeanMapper.map(user, UserResp.class));
         log.debug("返回结果：{}", buyerResp);
-        return MallResult.buildSaveOk(buyerResp);
+        return Result.buildSaveOk(buyerResp);
     }
 
     /**
@@ -282,8 +293,8 @@ public class BuyerController {
      */
     @GetMapping("/exemption")
     @ApiOperation(value = "免责通知")
-    public MallResult<String> analysisPhone() {
-        return MallResult.buildQueryOk(MallConstant.EXEMPTION);
+    public Result<String> analysisPhone() {
+        return Result.buildQueryOk(MallConstant.EXEMPTION);
     }
 
     /**
@@ -291,17 +302,17 @@ public class BuyerController {
      */
     @PostMapping("/signIn")
     @ApiOperation(value = "签到")
-    public MallResult<SignInResp> signIn(HttpSession session) {
+    public Result<SignInResp> signIn(HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         LocalDate localDate = LocalDate.now();
         SignIn signIn = signInService.findByBuyerIdAndLastDay(buyer.getId());
         if (signIn != null && localDate.equals(signIn.getLastDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
             //今天签到了就直接返回
-            return MallResult.build(MallConstant.FAIL, "今日已签到");
+            return Result.build(MallConstant.FAIL, "今日已签到");
         }
         signIn = signInService.signIn(buyer.getId());
-        SignInResp signInResp = MallBeanMapper.map(signIn, SignInResp.class);
-        return MallResult.build(MallConstant.OK, "签到成功", signInResp);
+        SignInResp signInResp = BeanMapper.map(signIn, SignInResp.class);
+        return Result.build(MallConstant.OK, "签到成功", signInResp);
     }
 
     /**
@@ -309,11 +320,11 @@ public class BuyerController {
      */
     @GetMapping("/signIn")
     @ApiOperation(value = "查询签到")
-    public MallResult<SignInResp> querySignIn(HttpSession session) {
+    public Result<SignInResp> querySignIn(HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         SignIn signIn = signInService.querySignIn(buyer.getId());
-        SignInResp signInResp = MallBeanMapper.map(signIn, SignInResp.class);
-        return MallResult.buildQueryOk(signInResp);
+        SignInResp signInResp = BeanMapper.map(signIn, SignInResp.class);
+        return Result.buildQueryOk(signInResp);
     }
 
     /**
@@ -321,7 +332,7 @@ public class BuyerController {
      */
     @PostMapping("/recharge")
     @ApiOperation(value = "充金币")
-    public MallResult<Map<String, String>> recharge(@RequestBody Map<String, Long> map, HttpSession session) {
+    public Result<Map<String, String>> recharge(@RequestBody Map<String, Long> map, HttpSession session) {
         Long id = map.get("id");
         Techarge techarge = techargeService.findById(id);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
@@ -341,7 +352,7 @@ public class BuyerController {
         resultMap.put("id", order.getId() + "");
         resultMap.put("orderNo", order.getOrderNo());
         log.debug("微信返回结果二次签名后的返回结果：{}", resultMap);
-        return MallResult.buildSaveOk(resultMap);
+        return Result.buildSaveOk(resultMap);
     }
 
 }

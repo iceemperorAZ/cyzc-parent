@@ -1,6 +1,6 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.Cart;
 import com.jingliang.mall.entity.OrderDetail;
@@ -49,9 +49,9 @@ public class OrderDetailController {
      */
     @ApiOperation(value = "再来一单")
     @PostMapping("/again")
-    public MallResult<?> again(@RequestBody OrderDetailReq orderDetailReq, @ApiIgnore HttpSession session) {
+    public Result<?> again(@RequestBody OrderDetailReq orderDetailReq, @ApiIgnore HttpSession session) {
         if (Objects.isNull(orderDetailReq.getOrderId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         List<OrderDetail> orderDetails = orderDetailService.findByOrderId(orderDetailReq.getOrderId());
@@ -68,6 +68,6 @@ public class OrderDetailController {
             cart.setCreateTime(new Date());
             cartService.save(cart);
         }
-        return MallResult.buildOk();
+        return Result.buildOk();
     }
 }

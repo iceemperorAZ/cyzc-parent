@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Config;
 import com.jingliang.mall.entity.User;
@@ -55,16 +55,16 @@ public class ConfigController {
      */
     @ApiOperation(value = "修改配置信息")
     @PostMapping("/update")
-    public MallResult<ConfigResp> update(@RequestBody ConfigReq configReq, @ApiIgnore HttpSession session) {
+    public Result<ConfigResp> update(@RequestBody ConfigReq configReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", configReq);
         if (StringUtils.isBlank(configReq.getName()) || StringUtils.isBlank(configReq.getConfigValues())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(configReq, user);
-        ConfigResp configResp = MallBeanMapper.map(configService.save(MallBeanMapper.map(configReq, Config.class)), ConfigResp.class);
+        ConfigResp configResp = BeanMapper.map(configService.save(BeanMapper.map(configReq, Config.class)), ConfigResp.class);
         log.debug("返回参数：{}", configResp);
-        return MallResult.buildSaveOk(configResp);
+        return Result.buildSaveOk(configResp);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ConfigController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部配置")
-    public MallResult<MallPage<ConfigResp>> pageAllProduct(ConfigReq configReq) {
+    public Result<MallPage<ConfigResp>> pageAllProduct(ConfigReq configReq) {
         log.debug("请求参数：{}", configReq);
         PageRequest pageRequest = PageRequest.of(configReq.getPage(), configReq.getPageSize());
         if (StringUtils.isNotBlank(configReq.getClause())) {
@@ -90,6 +90,6 @@ public class ConfigController {
         Page<Config> configPage = configService.findAll(configSpecification, pageRequest);
         MallPage<ConfigResp> configRespMallPage = MallUtils.toMallPage(configPage, ConfigResp.class);
         log.debug("返回结果：{}", configRespMallPage);
-        return MallResult.buildQueryOk(configRespMallPage);
+        return Result.buildQueryOk(configRespMallPage);
     }
 }

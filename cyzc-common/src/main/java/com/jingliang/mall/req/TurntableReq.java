@@ -1,9 +1,7 @@
 package com.jingliang.mall.req;
 
-import java.time.LocalDateTime;
 import lombok.Data;
 import io.swagger.annotations.ApiModel;
-import com.jingliang.mall.req.BaseReq;
 import lombok.EqualsAndHashCode;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
@@ -46,6 +44,12 @@ public class TurntableReq extends BaseReq implements Serializable {
 	 */
 	@ApiModelProperty(value = "转盘图片")
 	private String img;
+
+	/**
+	 * 转盘图片
+	 */
+	@ApiModelProperty(value = "转盘图片")
+	private String imgBase64;
 
 	/**
 	 * 描述

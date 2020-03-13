@@ -5,7 +5,7 @@ import com.jingliang.mall.entity.Sku;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.SkuService;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.SkuReq;
 import com.jingliang.mall.resp.SkuResp;
 import io.swagger.annotations.Api;
@@ -53,7 +53,7 @@ public class SkuController {
      */
     @ApiOperation(value = "分页查询所有库存")
     @GetMapping("/page/all")
-    public MallResult<MallPage<SkuResp>> pageAll(SkuReq skuReq) throws UnsupportedEncodingException {
+    public Result<MallPage<SkuResp>> pageAll(SkuReq skuReq) throws UnsupportedEncodingException {
         log.debug("请求参数:{}", skuReq);
         PageRequest pageRequest = PageRequest.of(skuReq.getPage(), skuReq.getPageSize());
         if (StringUtils.isNotBlank(skuReq.getClause())) {
@@ -81,6 +81,6 @@ public class SkuController {
         Page<Sku> skuPage = skuService.findAll(skuSpecification, pageRequest);
         MallPage<SkuResp> skuRespMallPage = MallUtils.toMallPage(skuPage, SkuResp.class);
         log.debug("返回结果：{}", skuRespMallPage);
-        return MallResult.buildQueryOk(skuRespMallPage);
+        return Result.buildQueryOk(skuRespMallPage);
     }
 }

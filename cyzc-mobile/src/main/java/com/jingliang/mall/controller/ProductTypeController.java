@@ -4,7 +4,7 @@ import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.service.ProductTypeService;
 import com.jingliang.mall.common.MallConstant;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.req.ProductTypeReq;
 import com.jingliang.mall.resp.ProductTypeResp;
@@ -48,7 +48,7 @@ public class ProductTypeController {
      */
     @ApiOperation(value = "分页查询所有商品分类")
     @GetMapping("/page/all")
-    public MallResult<MallPage<ProductTypeResp>> pageAllProductTypeResp(ProductTypeReq productTypeReq) {
+    public Result<MallPage<ProductTypeResp>> pageAllProductTypeResp(ProductTypeReq productTypeReq) {
         log.debug("请求参数：{}", productTypeReq);
         PageRequest pageRequest = PageRequest.of(productTypeReq.getPage(), productTypeReq.getPageSize());
         if (StringUtils.isNotBlank(productTypeReq.getClause())) {
@@ -67,6 +67,6 @@ public class ProductTypeController {
         Page<ProductType> productTypeByPage = productTypeService.findAll(productTypeSpecification, pageRequest);
         MallPage<ProductTypeResp> productTypeRespPage = MallUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeRespPage);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_QUERY_OK, productTypeRespPage);
+        return Result.build(MallConstant.OK, MallConstant.TEXT_QUERY_OK, productTypeRespPage);
     }
 }

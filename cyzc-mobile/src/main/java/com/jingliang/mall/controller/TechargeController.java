@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Techarge;
 import com.jingliang.mall.resp.TechargeResp;
 import com.jingliang.mall.service.TechargeService;
@@ -39,8 +39,8 @@ public class TechargeController {
      */
     @GetMapping("/all")
     @ApiOperation("查询全部")
-    public MallResult<List<TechargeResp>> findAll() {
+    public Result<List<TechargeResp>> findAll() {
         List<Techarge> techarges = techargeService.findAllShow();
-        return MallResult.buildQueryOk(MallBeanMapper.mapList(techarges, TechargeResp.class));
+        return Result.buildQueryOk(BeanMapper.mapList(techarges, TechargeResp.class));
     }
 }
