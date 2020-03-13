@@ -313,6 +313,9 @@ public class OrderController {
         if (Objects.isNull(order)) {
             return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
         }
+        if (order.getOrderStatus()<=200) {
+            return Result.build(MallConstant.ORDER_FAIL, "订单已经取消");
+        }
         order.setFinishTime(new Date());
         order.setOrderStatus(200);
         OrderResp orderResp = BeanMapper.map(orderService.update(order), OrderResp.class);
