@@ -109,7 +109,6 @@ public class BuyerController {
             buyer.setMemberIntegral(0);
             buyer.setIsSealUp(false);
             buyer.setIsNew(true);
-            buyer.setGold(10);
             buyer.setMemberLevel(100);
             buyer.setOrderSpecificNum(1);
             buyer.setIsNew(true);
