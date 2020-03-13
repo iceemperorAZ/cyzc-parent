@@ -313,7 +313,7 @@ public class OrderController {
         if (Objects.isNull(order)) {
             return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
         }
-        if (order.getOrderStatus()<=200) {
+        if (order.getOrderStatus() == 200) {
             return Result.build(MallConstant.ORDER_FAIL, "订单已经取消");
         }
         order.setFinishTime(new Date());
@@ -337,6 +337,9 @@ public class OrderController {
         Order order = orderService.findByIdAndBuyerId(orderReq.getId(), buyer.getId());
         if (Objects.isNull(order)) {
             return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
+        }
+        if (order.getOrderStatus() == 600) {
+            return Result.build(MallConstant.ORDER_FAIL, "订单已经完成确认");
         }
         order.setFinishTime(new Date());
         order.setOrderStatus(600);
