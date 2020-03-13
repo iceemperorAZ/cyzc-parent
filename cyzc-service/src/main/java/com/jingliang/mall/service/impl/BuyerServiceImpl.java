@@ -1,9 +1,9 @@
 package com.jingliang.mall.service.impl;
 
 import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.entity.BuyerSale;
-import com.jingliang.mall.entity.Order;
+import com.jingliang.mall.entity.GoldLog;
 import com.jingliang.mall.repository.BuyerRepository;
+import com.jingliang.mall.repository.GoldLogRepository;
 import com.jingliang.mall.service.BuyerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,9 +26,11 @@ import java.util.List;
 public class BuyerServiceImpl implements BuyerService {
 
     private final BuyerRepository buyerRepository;
+    private final GoldLogRepository goldLogRepository;
 
-    public BuyerServiceImpl(BuyerRepository buyerRepository) {
+    public BuyerServiceImpl(BuyerRepository buyerRepository, GoldLogRepository goldLogRepository) {
         this.buyerRepository = buyerRepository;
+        this.goldLogRepository = goldLogRepository;
     }
 
     @Override
@@ -37,6 +40,17 @@ public class BuyerServiceImpl implements BuyerService {
 
     @Override
     public Buyer save(Buyer buyer) {
+        if (buyer.getId() == null) {
+            GoldLog goldLog = new GoldLog();
+            goldLog.setBuyerId(buyer.getId());
+            goldLog.setIsAvailable(true);
+            goldLog.setGold(10);
+            goldLog.setMsg("新用户注册，赠送10金币。");
+            goldLog.setCreateTime(new Date());
+            goldLog.setType(300);
+            goldLogRepository.save(goldLog);
+            buyer.setGold(10);
+        }
         return buyerRepository.save(buyer);
     }
 

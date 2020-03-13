@@ -109,20 +109,11 @@ public class BuyerController {
             buyer.setMemberIntegral(0);
             buyer.setIsSealUp(false);
             buyer.setIsNew(true);
-            buyer.setGold(0);
             buyer.setMemberLevel(100);
             buyer.setOrderSpecificNum(1);
             buyer.setIsNew(true);
             buyer.setRegisterSource("WX");
             buyer = buyerService.save(buyer);
-            GoldLog goldLog = new GoldLog();
-            goldLog.setBuyerId(buyer.getId());
-            goldLog.setIsAvailable(true);
-            goldLog.setGold(10);
-            goldLog.setMsg("新用户注册，赠送10金币。");
-            goldLog.setCreateTime(new Date());
-            goldLog.setType(300);
-            goldLogService.save(goldLog);
         }
         //是否封停
         if (buyer.getIsSealUp()) {

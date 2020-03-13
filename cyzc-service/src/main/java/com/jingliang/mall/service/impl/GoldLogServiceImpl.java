@@ -46,7 +46,7 @@ public class GoldLogServiceImpl implements GoldLogService {
     public void save(GoldLog goldLog) {
         if (goldLog.getIsAvailable()) {
             Buyer buyer = buyerRepository.getOne(goldLog.getBuyerId());
-            buyer.setGold(buyer.getGold() + goldLog.getGold());
+            buyer.setGold((buyer.getGold() == null ? 0 : buyer.getGold()) + goldLog.getGold());
             buyerRepository.save(buyer);
         }
         signInLogRepository.save(goldLog);
