@@ -147,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
                 buyer.setGold(buyer.getGold() + oldOrder.getGold());
                 buyerRepository.save(buyer);
             }
-            if (order.getPayableFee() > 0) {
+            if (order.getPayableFee() > 0 && order.getReturnGold() != null && order.getReturnGold() > 0) {
                 buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() + 1);
             }
         } else if (order.getOrderStatus() == 400) {
