@@ -110,7 +110,7 @@ public class BuyerController {
             buyer.setIsSealUp(false);
             buyer.setIsNew(true);
             buyer.setGold(10);
-            buyer.setMemberIntegral(100);
+            buyer.setMemberLevel(100);
             buyer.setOrderSpecificNum(1);
             buyer.setIsNew(true);
             buyer.setRegisterSource("WX");
