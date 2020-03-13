@@ -1,6 +1,8 @@
 package com.jingliang.mall.common;
 
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.Turntable;
+import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BaseReq;
 import lombok.extern.slf4j.Slf4j;
@@ -48,22 +50,22 @@ public class MallUtils extends BaseMallUtils {
         baseReq.setUpdateUserName(buyer.getUserName());
         baseReq.setIsAvailable(true);
     }
-//    /**
-//     * 抽奖算法
-//     *
-//     * @param map
-//     * @return
-//     */
-//    public static Turntable weightRandom(Map<Long, Turntable> map) {
-//        Set<Long> keySet = map.keySet();
-//        List<Long> weights = new ArrayList<>();
-//        for (Long weightKey : keySet) {
-//            Turntable weight = map.get(weightKey);
-//            for (int i = 0; i <= weight.getNum(); i++) {
-//                weights.add(weightKey);
-//            }
-//        }
-//        int idx = new Random().nextInt(weights.size());
-//        return map.get(weights.get(idx));
-//    }
+    /**
+     * 抽奖算法
+     *
+     * @param map
+     * @return
+     */
+    public static TurntableDetail weightRandom(Map<Long, TurntableDetail> map) {
+        Set<Long> keySet = map.keySet();
+        List<Long> weights = new ArrayList<>();
+        for (Long weightKey : keySet) {
+            TurntableDetail weight = map.get(weightKey);
+            for (int i = 0; i <= weight.getProbability(); i++) {
+                weights.add(weightKey);
+            }
+        }
+        int idx = new Random().nextInt(weights.size());
+        return map.get(weights.get(idx));
+    }
 }

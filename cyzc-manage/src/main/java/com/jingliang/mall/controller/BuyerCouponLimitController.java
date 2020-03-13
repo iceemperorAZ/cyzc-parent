@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.BuyerCouponLimit;
@@ -60,12 +60,12 @@ public class BuyerCouponLimitController {
     public Result<BuyerCouponLimitResp> save(@RequestBody BuyerCouponLimitReq buyerCouponLimitReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponLimitReq);
         if (Objects.isNull(buyerCouponLimitReq.getBuyerId()) || Objects.isNull(buyerCouponLimitReq.getUseLimit()) || Objects.isNull(buyerCouponLimitReq.getProductTypeId())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         BuyerCouponLimit buyerCouponLimit = buyerCouponLimitService.findByBuyerIdAndProductTypeId(buyerCouponLimitReq.getBuyerId(), buyerCouponLimitReq.getProductTypeId());
         if (Objects.nonNull(buyerCouponLimit) && Objects.isNull(buyerCouponLimitReq.getId())) {
-            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_REPEAT_FAIL);
+            return Result.build(Constant.DATA_FAIL, Constant.TEXT_DATA_REPEAT_FAIL);
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(buyerCouponLimitReq, user);

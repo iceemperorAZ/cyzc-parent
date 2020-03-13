@@ -2,7 +2,7 @@ package com.jingliang.mall.authority;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.JwtUtil;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.server.RedisService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,17 +46,17 @@ public class UrlLogoutSuccessHandler implements LogoutSuccessHandler {
         String token = request.getHeader("Authorization");
         if (StringUtils.isBlank(token)) {
             log.debug("用户注销失败");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.FAIL, MallConstant.TEXT_LOGOUT_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.FAIL, Constant.TEXT_LOGOUT_FAIL)));
             return;
         }
         Map<String, String> map = JwtUtil.verifyToken(token);
         if (Objects.isNull(map)) {
             log.debug("用户注销失败");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.FAIL, MallConstant.TEXT_LOGOUT_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.FAIL, Constant.TEXT_LOGOUT_FAIL)));
             return;
         }
         redisService.remove(tokenUserPrefix + map.get("userId"));
         log.debug("Id=[{}]的用户注销成功", map.get("userId"));
-        response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.OK, MallConstant.TEXT_LOGOUT_OK)));
+        response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.OK, Constant.TEXT_LOGOUT_OK)));
     }
 }

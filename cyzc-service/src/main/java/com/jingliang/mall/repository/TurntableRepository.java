@@ -12,4 +12,5 @@ import com.jingliang.mall.entity.Turntable;
  */
 public interface TurntableRepository extends BaseRepository<Turntable, Long> {
 
+    Turntable findFirstByGoldAndIsAvailable(Integer gold, boolean isAvailable);
 }

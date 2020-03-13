@@ -2,7 +2,7 @@ package com.jingliang.mall.authority;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.JwtUtil;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.server.RedisService;
@@ -83,6 +83,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         //设置编码格式
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
+        response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.TOKEN_FAIL, Constant.TEXT_TOKEN_INVALID_FAIL)));
     }
 }

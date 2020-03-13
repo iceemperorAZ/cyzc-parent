@@ -2,7 +2,7 @@ package com.jingliang.mall.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.JwtUtil;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.server.RedisService;
@@ -55,7 +55,7 @@ public class WechatBossInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.TOKEN_FAIL, Constant.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         }
@@ -67,7 +67,7 @@ public class WechatBossInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.TOKEN_FAIL, Constant.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         }
@@ -78,7 +78,7 @@ public class WechatBossInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.TOKEN_FAIL, Constant.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         } else if (Objects.isNull(user.getLevel()) || user.getLevel() < 200) {
@@ -87,7 +87,7 @@ public class WechatBossInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.AUTHORITY_FAIL, MallConstant.TEXT_AUTHORITY_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.AUTHORITY_FAIL, Constant.TEXT_AUTHORITY_FAIL)));
             log.debug("权限不足");
             return false;
         }

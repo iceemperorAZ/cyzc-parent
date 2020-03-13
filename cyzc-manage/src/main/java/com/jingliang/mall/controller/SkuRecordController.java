@@ -69,7 +69,7 @@ public class SkuRecordController {
         SkuDetail skuDetail = skuDetailService.findById(skuRecordReq.getSkuDetailId());
         //判定库存
         if (skuRecordReq.getNum() + skuDetail.getSkuResidueNum() <= 0) {
-            return Result.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
+            return Result.build(Constant.SAVE_FAIL, Constant.TEXT_SKU_NUM_FAIL);
         }
         skuRecordReq.setProductId(skuDetail.getProductId());
         skuRecordReq.setProductName(skuDetail.getProductName());
@@ -98,14 +98,14 @@ public class SkuRecordController {
         //判定库存
         SkuRecord skuRecord = skuRecordService.findById(skuRecordReq.getId());
         if (Objects.isNull(skuRecord)) {
-            return Result.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
+            return Result.build(Constant.FAIL, Constant.TEXT_DATA_FAIL);
         }
         SkuDetail skuDetail = skuDetailService.findById(skuRecord.getSkuDetailId());
         if (Objects.isNull(skuDetail)) {
-            return Result.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
+            return Result.build(Constant.FAIL, Constant.TEXT_DATA_FAIL);
         }
         if (skuRecord.getNum() + skuDetail.getSkuResidueNum() < 0) {
-            return Result.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_SKU_NUM_FAIL);
+            return Result.build(Constant.SAVE_FAIL, Constant.TEXT_SKU_NUM_FAIL);
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(skuRecordReq, user);

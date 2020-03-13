@@ -1,7 +1,7 @@
 package com.jingliang.mall.authority;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
@@ -31,6 +31,6 @@ public class UrlAuthenticationEntryPoint implements AuthenticationEntryPoint {
         //设置编码格式
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write(JSONObject.toJSONString(Result.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_NOT_LOGIN_FAIL)));
+        response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.LOGIN_FAIL, Constant.TEXT_NOT_LOGIN_FAIL)));
     }
 }

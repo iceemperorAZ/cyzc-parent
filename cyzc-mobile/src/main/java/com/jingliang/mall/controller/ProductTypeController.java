@@ -2,7 +2,7 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.service.ProductTypeService;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
@@ -67,6 +67,6 @@ public class ProductTypeController {
         Page<ProductType> productTypeByPage = productTypeService.findAll(productTypeSpecification, pageRequest);
         MallPage<ProductTypeResp> productTypeRespPage = MallUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeRespPage);
-        return Result.build(MallConstant.OK, MallConstant.TEXT_QUERY_OK, productTypeRespPage);
+        return Result.build(Constant.OK, Constant.TEXT_QUERY_OK, productTypeRespPage);
     }
 }

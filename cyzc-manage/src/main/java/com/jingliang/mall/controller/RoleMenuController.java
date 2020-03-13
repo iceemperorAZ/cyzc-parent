@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.RoleMenu;
 import com.jingliang.mall.entity.User;
@@ -57,7 +57,7 @@ public class RoleMenuController {
 		}
 		RoleMenu roleMenu = roleMenuService.findAllByRoleIdAndMenuId(roleMenuReq.getRoleId(), roleMenuReq.getMenuId());
 		if (Objects.isNull(roleMenu) && !isAvailable) {
-			return Result.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
+			return Result.build(Constant.FAIL, Constant.TEXT_DATA_FAIL);
 		}
 		User user = (User) session.getAttribute(sessionUser);
 		Date date = new Date();
@@ -79,10 +79,10 @@ public class RoleMenuController {
 		RoleMenuResp roleMenuResp = BeanMapper.map(roleMenuService.save(roleMenu), RoleMenuResp.class);
 		if (isAvailable) {
 			//授权成功
-			return Result.build(MallConstant.OK, MallConstant.TEXT_AUTHORIZE_OK, roleMenuResp);
+			return Result.build(Constant.OK, Constant.TEXT_AUTHORIZE_OK, roleMenuResp);
 		}
 		//撤权成功
-		return Result.build(MallConstant.OK, MallConstant.TEXT_RECOVERY_AUTHORITY_OK, roleMenuResp);
+		return Result.build(Constant.OK, Constant.TEXT_RECOVERY_AUTHORITY_OK, roleMenuResp);
 	}
 
 

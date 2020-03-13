@@ -1,6 +1,7 @@
 package com.jingliang.mall.service;
 
 import com.jingliang.mall.entity.Turntable;
+import com.jingliang.mall.entity.TurntableDetail;
 
 import java.util.List;
 
@@ -38,8 +39,18 @@ public interface TurntableService {
 
     /**
      * 删除
+     *
      * @param id
      * @param userId
      */
     void delete(Long id, Long userId);
+
+    /**
+     * 抽奖
+     *
+     * @param id
+     * @param buyerId
+     * @return
+     */
+    TurntableDetail extract(Long id, Long buyerId);
 }

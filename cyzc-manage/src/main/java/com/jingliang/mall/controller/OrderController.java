@@ -78,7 +78,7 @@ public class OrderController {
         }
         Order order1 = orderService.findById(orderReq.getId());
         if (order1.getOrderStatus() > 300) {
-            return Result.build(MallConstant.FAIL, "此订单已完成发货");
+            return Result.build(Constant.FAIL, "此订单已完成发货");
         }
         Order order = new Order();
         order.setId(orderReq.getId());
@@ -92,8 +92,8 @@ public class OrderController {
         order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
         if (Objects.isNull(order)) {
-            log.debug("返回结果：{}", MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
-            return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_ORDER_DELIVER_SKU_FAIL);
+            return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_DELIVER_SKU_FAIL);
         }
         OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
@@ -223,7 +223,7 @@ public class OrderController {
             return query.getRestriction();
         };
         List<Order> orders = orderService.findAll(orderSpecification);
-        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("销货单", MallConstant.orderExcelTitle);
+        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("销货单", Constant.orderExcelTitle);
         XSSFSheet sheet = orderWorkbook.getSheet("销货单");
         XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
         CreationHelper createHelper = orderWorkbook.getCreationHelper();

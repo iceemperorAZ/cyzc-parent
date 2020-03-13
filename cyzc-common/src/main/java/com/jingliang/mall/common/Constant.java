@@ -11,7 +11,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2019-09-19 09:02:33
  */
-public interface MallConstant {
+public interface Constant {
     Integer PAY_GOLD_OK = 210;
 
     Integer OK = 200;

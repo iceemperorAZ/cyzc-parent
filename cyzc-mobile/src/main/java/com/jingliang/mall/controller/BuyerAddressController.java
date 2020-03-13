@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
@@ -60,7 +60,7 @@ public class BuyerAddressController {
         log.debug("请求参数：{}", buyerAddressReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         if (Objects.nonNull(buyerAddressReq.getId()) && buyerAddressService.countByIdAndBuyerId(buyerAddressReq.getId(), buyer.getId()) == 0) {
-            return Result.build(MallConstant.ADDRESS_FAIL, MallConstant.TEXT_ADDRESS_NOT_EXIST_FAIL);
+            return Result.build(Constant.ADDRESS_FAIL, Constant.TEXT_ADDRESS_NOT_EXIST_FAIL);
         }
         MallUtils.addDateAndBuyer(buyerAddressReq, buyer);
         buyerAddressReq.setBuyerId(buyer.getId());

@@ -79,24 +79,24 @@ public class BuyerController {
     public Result<BuyerResp> save(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         if (Objects.isNull(buyerReq.getId())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         if (buyerReq.getSaleUserId() != null) {
             User user = userService.findById(buyerReq.getSaleUserId());
             if (Objects.isNull(user)) {
-                return Result.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+                return Result.build(Constant.FAIL, Constant.TEXT_BUYER_FAIL);
             }
         }
         Buyer buyer = buyerService.findById(buyerReq.getId());
         if (Objects.isNull(buyer)) {
-            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
+            return Result.build(Constant.DATA_FAIL, Constant.TEXT_BUYER_DATA_FAIL);
         }
         //修改会员信息后清空redis中的会员token
         redisService.remove(tokenBuyerPrefix + buyer.getId());
         BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         log.debug("返回结果：{}", buyerResp);
-        return Result.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
+        return Result.build(Constant.OK, Constant.TEXT_UPDATE_OK, buyerResp);
     }
 
     /**
@@ -107,12 +107,12 @@ public class BuyerController {
     public Result<BuyerResp> updateSaleUser(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         if (Objects.isNull(buyerReq.getId())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         Buyer buyer = buyerService.findById(buyerReq.getId());
         if (Objects.isNull(buyer)) {
-            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
+            return Result.build(Constant.DATA_FAIL, Constant.TEXT_BUYER_DATA_FAIL);
         }
         BuyerSale buyerSale = buyerSaleService.findBySaleIdAndBuyerId(buyer.getSaleUserId(), buyer.getId());
         User user = (User) session.getAttribute(sessionUser);
@@ -144,7 +144,7 @@ public class BuyerController {
         buyerSale.setUpdateTime(date);
         buyerSale = buyerSaleService.save(buyerSale);
         log.debug("返回结果：{}", buyerResp);
-        return Result.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
+        return Result.build(Constant.OK, Constant.TEXT_UPDATE_OK, buyerResp);
     }
 
     /**
@@ -190,7 +190,7 @@ public class BuyerController {
             return query.getRestriction();
         };
         List<Buyer> buyers = buyerService.findAll(buyerSpecification);
-        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("商户信息", MallConstant.buyerExcelTitle);
+        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("商户信息", Constant.buyerExcelTitle);
         XSSFSheet sheet = orderWorkbook.getSheet("商户信息");
         XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
         CreationHelper createHelper = orderWorkbook.getCreationHelper();

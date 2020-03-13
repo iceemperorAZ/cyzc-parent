@@ -59,12 +59,12 @@ public class CouponController {
                 || Objects.isNull(couponReq.getReceiveNum()) || Objects.isNull(couponReq.getCouponType())
                 || Objects.isNull(couponReq.getStartTime()) || Objects.isNull(couponReq.getExpirationTime())
                 || Objects.isNull(couponReq.getProvideStartTime()) || Objects.isNull(couponReq.getProvideEndTime())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         //判断时间是否符合逻辑
         if (couponReq.getProvideEndTime().compareTo(new Date()) < 0 || couponReq.getExpirationTime().compareTo(new Date()) < 0 || couponReq.getExpirationTime().compareTo(couponReq.getProvideEndTime()) < 0) {
-            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_COUPON_SAVE_FAIL);
+            return Result.build(Constant.DATA_FAIL, Constant.TEXT_COUPON_SAVE_FAIL);
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(couponReq, user);
@@ -84,16 +84,16 @@ public class CouponController {
     public Result<CouponResp> release(@RequestBody CouponReq couponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", couponReq);
         if (Objects.isNull(couponReq.getId()) || Objects.isNull(couponReq.getIsRelease())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         Coupon coupon = couponService.findById(couponReq.getId());
         if (Objects.isNull(coupon)) {
-            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_FAIL);
+            return Result.build(Constant.DATA_FAIL, Constant.TEXT_DATA_FAIL);
         }
         coupon.setIsRelease(couponReq.getIsRelease());
         if (coupon.getIsRelease() && coupon.getProvideEndTime().compareTo(new Date()) < 0) {
-            return Result.build(MallConstant.DATA_FAIL, MallConstant.TEXT_COUPON_RELEASE_FAIL);
+            return Result.build(Constant.DATA_FAIL, Constant.TEXT_COUPON_RELEASE_FAIL);
         }
         User user = (User) session.getAttribute(sessionUser);
         coupon.setUpdateUserId(user.getId());
@@ -101,9 +101,9 @@ public class CouponController {
         CouponResp couponResp = BeanMapper.map(couponService.save(coupon), CouponResp.class);
         log.debug("返回结果：{}", couponResp);
         if (coupon.getIsRelease()) {
-            return Result.build(MallConstant.OK, MallConstant.TEXT_RELEASE_OK, couponResp);
+            return Result.build(Constant.OK, Constant.TEXT_RELEASE_OK, couponResp);
         } else {
-            return Result.build(MallConstant.OK, MallConstant.TEXT_RECALL_OK, couponResp);
+            return Result.build(Constant.OK, Constant.TEXT_RECALL_OK, couponResp);
         }
     }
 
@@ -116,7 +116,7 @@ public class CouponController {
         log.debug("请求参数：{}", couponReq);
         Long id = couponReq.getId();
         if (Objects.isNull(id)) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         couponReq = new CouponReq();

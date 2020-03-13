@@ -74,7 +74,7 @@ public class ProductController {
                 || productReq.getProductImgs().isEmpty() || StringUtils.isBlank(productReq.getProductName())
                 || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs())
                 || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         //判断商品是否重复
@@ -89,7 +89,7 @@ public class ProductController {
             Product product = productService.findAllById(productReq.getId());
             if (product.getIsShow()) {
                 //上架中的商品不能修改
-                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_UPDATE_FAIL);
+                return Result.build(Constant.PRODUCT_FAIL, Constant.TEXT_PRODUCT_UPDATE_FAIL);
             }
             String productImgUris = product.getProductImgUris();
             if (StringUtils.isNotBlank(productImgUris)) {
@@ -105,8 +105,8 @@ public class ProductController {
         for (String productImg : productReq.getProductImgs()) {
             Base64Image base64Image = Base64Image.build(productImg);
             if (Objects.isNull(base64Image)) {
-                log.debug("返回结果：{}", MallConstant.TEXT_IMAGE_FAIL);
-                return Result.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
+                log.debug("返回结果：{}", Constant.TEXT_IMAGE_FAIL);
+                return Result.build(Constant.IMAGE_FAIL, Constant.TEXT_IMAGE_FAIL);
             }
             base64Images.add(base64Image);
         }
@@ -198,8 +198,8 @@ public class ProductController {
             Sku sku = skuService.findByProductId(id);
             //查询线上库存数
             if (Objects.isNull(sku) || sku.getSkuLineNum() < 1) {
-                log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_SHOW_SKU_FAIL);
-                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SHOW_SKU_FAIL);
+                log.debug("返回结果：{}", Constant.TEXT_PRODUCT_SHOW_SKU_FAIL);
+                return Result.build(Constant.PRODUCT_FAIL, Constant.TEXT_PRODUCT_SHOW_SKU_FAIL);
             }
             Product product = new Product();
             product.setId(id);
@@ -212,12 +212,12 @@ public class ProductController {
         }
         List<Product> productList = productService.batchShow(products);
         if (productList.isEmpty()) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_SHOW_FAIL);
-            return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SHOW_FAIL);
+            log.debug("返回结果：{}", Constant.TEXT_PRODUCT_SHOW_FAIL);
+            return Result.build(Constant.PRODUCT_FAIL, Constant.TEXT_PRODUCT_SHOW_FAIL);
         }
         List<ProductResp> productRespList = BeanMapper.mapList(productList, ProductResp.class);
         log.debug("返回结果：{}", productRespList);
-        return Result.build(MallConstant.OK, MallConstant.TEXT_SHOW_UP_OK, productRespList);
+        return Result.build(Constant.OK, Constant.TEXT_SHOW_UP_OK, productRespList);
     }
 
     /**
@@ -242,7 +242,7 @@ public class ProductController {
         List<Product> productList = productService.batchHide(products);
         List<ProductResp> productRespList = BeanMapper.mapList(productList, ProductResp.class);
         log.debug("返回结果：{}", productRespList);
-        return Result.build(MallConstant.OK, MallConstant.TEXT_SHOW_DOWN_OK, productRespList);
+        return Result.build(Constant.OK, Constant.TEXT_SHOW_DOWN_OK, productRespList);
     }
 
     /**
@@ -258,18 +258,18 @@ public class ProductController {
         for (Long id : productReq.getProductIds()) {
             //判断线上库存是否小于初始库存，即是否用用户下单
             if (redisService.getProductSkuNum(id + "") < productSkuInitInventedNum) {
-                log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_ORDER_FAIL);
-                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_ORDER_FAIL);
+                log.debug("返回结果：{}", Constant.TEXT_PRODUCT_ORDER_FAIL);
+                return Result.build(Constant.PRODUCT_FAIL, Constant.TEXT_PRODUCT_ORDER_FAIL);
             }
             //判断库存是否为0,有库存不允许删除
             Sku sku = skuService.findByProductId(id);
             if (sku.getSkuRealityNum() > 0) {
-                log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_SKU_FAIL);
-                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_SKU_FAIL);
+                log.debug("返回结果：{}", Constant.TEXT_PRODUCT_SKU_FAIL);
+                return Result.build(Constant.PRODUCT_FAIL, Constant.TEXT_PRODUCT_SKU_FAIL);
             }
             if (Objects.nonNull(productService.findShowProductById(id))) {
-                log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_DELETE_FAIL);
-                return Result.build(MallConstant.PRODUCT_FAIL, MallConstant.TEXT_PRODUCT_DELETE_FAIL);
+                log.debug("返回结果：{}", Constant.TEXT_PRODUCT_DELETE_FAIL);
+                return Result.build(Constant.PRODUCT_FAIL, Constant.TEXT_PRODUCT_DELETE_FAIL);
             }
 
             Product product = new Product();

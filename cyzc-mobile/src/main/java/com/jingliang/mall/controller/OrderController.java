@@ -103,7 +103,7 @@ public class OrderController {
                     //如果本次有已经下架的商品就把减掉的库存加回去，并返回库存商品已下架
                     redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
                 }
-                return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_PRODUCT_FAIL);
+                return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_PRODUCT_FAIL);
             }
             //售价[商品价格*数量]
             long sellingPrice = product.getSellingPrice() * orderDetail.getProductNum();
@@ -123,7 +123,7 @@ public class OrderController {
                     //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                     redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
                 }
-                return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_SKU_FAIL);
+                return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_SKU_FAIL);
             }
 
             if (productPriceMap.containsKey(product.getProductTypeId())) {
@@ -137,12 +137,12 @@ public class OrderController {
         //是否满足可以下单的订单额度
         Config config = configService.findByCode("300");
         if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            return Result.build(MallConstant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
+            return Result.build(Constant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
         }
         //是否满足可以下单的订单额度
         config = configService.findByCode("700");
         if (order.getTotalPrice() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
-            return Result.build(MallConstant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
+            return Result.build(Constant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
         }
         //计算赠品
         config = configService.findByCode("600");
@@ -191,10 +191,10 @@ public class OrderController {
             for (Long couponId : orderReq.getCouponIdList()) {
                 BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(couponId, buyer.getId());
                 if (Objects.isNull(buyerCoupon) || buyerCoupon.getReceiveNum() <= 0) {
-                    return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
+                    return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_COUPON_FAIL);
                 }
                 if (!productPriceMap.containsKey(buyerCoupon.getProductTypeId())) {
-                    return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_COUPON_FAIL);
+                    return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_COUPON_FAIL);
                 }
                 //查询优惠券的限制使用张数
                 BuyerCouponLimit buyerCouponLimit = buyerCouponLimitService.findByBuyerIdAndProductTypeId(buyer.getId(), buyerCoupon.getProductTypeId());
@@ -257,7 +257,7 @@ public class OrderController {
                         //失败就把减掉的库存加回去，并返回支付失败的信息
                         redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
                     }
-                    return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_FAIL);
+                    return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_FAIL);
                 }
             }
         }
@@ -287,7 +287,7 @@ public class OrderController {
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {
-            return Result.build(MallConstant.PAY_GOLD_OK, "");
+            return Result.build(Constant.PAY_GOLD_OK, "");
         }
         resultMap.put("id", order.getId() + "");
         resultMap.put("orderNo", order.getOrderNo());
@@ -311,16 +311,16 @@ public class OrderController {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Order order = orderService.findByIdAndBuyerId(orderReq.getId(), buyer.getId());
         if (Objects.isNull(order)) {
-            return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
+            return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_NOT_EXIST_FAIL);
         }
         if (order.getOrderStatus() == 200) {
-            return Result.build(MallConstant.ORDER_FAIL, "订单已经取消");
+            return Result.build(Constant.ORDER_FAIL, "订单已经取消");
         }
         order.setFinishTime(new Date());
         order.setOrderStatus(200);
         OrderResp orderResp = BeanMapper.map(orderService.update(order), OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return Result.build(MallConstant.OK, MallConstant.TEXT_CANCEL_OK, orderResp);
+        return Result.build(Constant.OK, Constant.TEXT_CANCEL_OK, orderResp);
     }
 
     /**
@@ -336,16 +336,16 @@ public class OrderController {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Order order = orderService.findByIdAndBuyerId(orderReq.getId(), buyer.getId());
         if (Objects.isNull(order)) {
-            return Result.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_NOT_EXIST_FAIL);
+            return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_NOT_EXIST_FAIL);
         }
         if (order.getOrderStatus() == 600) {
-            return Result.build(MallConstant.ORDER_FAIL, "订单已经完成确认");
+            return Result.build(Constant.ORDER_FAIL, "订单已经完成确认");
         }
         order.setFinishTime(new Date());
         order.setOrderStatus(600);
         OrderResp orderResp = BeanMapper.map(orderService.update(order), OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return Result.build(MallConstant.OK, MallConstant.TEXT_CONFIRM_OK, orderResp);
+        return Result.build(Constant.OK, Constant.TEXT_CONFIRM_OK, orderResp);
     }
 
     /**

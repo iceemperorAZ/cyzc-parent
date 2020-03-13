@@ -5,7 +5,7 @@ import com.jingliang.mall.entity.AttributeType;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.AttributeTypeService;
 import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.AttributeTypeReq;
@@ -59,7 +59,7 @@ public class AttributeTypeController {
     public Result<AttributeTypeResp> save(@RequestBody AttributeTypeReq attributeTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", attributeTypeReq);
         if (Objects.isNull(attributeTypeReq.getProductTypeId()) || StringUtils.isBlank(attributeTypeReq.getAttributeTypeName())) {
-            log.debug("返回结果：{}",  MallConstant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}",  Constant.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);

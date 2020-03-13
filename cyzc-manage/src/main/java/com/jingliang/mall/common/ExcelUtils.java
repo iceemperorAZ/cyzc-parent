@@ -110,10 +110,10 @@ public class ExcelUtils {
             // 故障
             case ERROR:
                 value = ErrorEval.getText(cell.getErrorCellValue());
-                throw new ExcelException(MallConstant.TEXT_EXCEL_ANALYSIS_FAIL);
+                throw new ExcelException(Constant.TEXT_EXCEL_ANALYSIS_FAIL);
             default:
                 value = "未知类型";
-                throw new ExcelException(MallConstant.TEXT_EXCEL_ANALYSIS_FAIL);
+                throw new ExcelException(Constant.TEXT_EXCEL_ANALYSIS_FAIL);
         }
         return value;
     }
