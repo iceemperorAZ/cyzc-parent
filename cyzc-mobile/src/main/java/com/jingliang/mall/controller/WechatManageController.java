@@ -633,7 +633,6 @@ public class WechatManageController {
             @ApiImplicitParam(value = "分页", name = "page", dataType = "int", paramType = "query", defaultValue = "1"),
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
-    //TODO creationTime修改回startTime
     public Result<List<BuyerResp>> salePageBuyer(@DateTimeFormat(pattern = "yyyy-MM-dd")
                                                  @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") @RequestParam("creationTime") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                  @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id) {
@@ -674,7 +673,6 @@ public class WechatManageController {
      */
     @GetMapping("/manager/volume")
     @ApiOperation(value = "区域经理查看自己的销量")
-    //TODO creationTime修改回startTime
     public Result<List<ConfluenceDetailResp>> managersVolume(@DateTimeFormat(pattern = "yyyy-MM-dd")
                                                              @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") @RequestParam("creationTime") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                              @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, HttpSession session) {
