@@ -1,5 +1,8 @@
 package com.jingliang.mall.controller;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jingliang.mall.bean.Confluence;
 import com.jingliang.mall.bean.ConfluenceDetail;
@@ -83,9 +86,9 @@ public class WechatManageController {
             @ApiImplicitParam(value = "结束时间", name = "endTime", dataType = "date", paramType = "query", required = true),
     })
     public Result<ConfluenceResp> bossConfluence(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime,
+                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime,
                                                  @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime) {
+                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime) {
         List<User> users = userService.findAll();
         Confluence confluence = new Confluence();
         confluence.setTotalPrice(0L);
@@ -589,18 +592,16 @@ public class WechatManageController {
     @GetMapping("/manager/sales")
     @ApiOperation(value = "查看区域经理下的所有销售")
     public Result<List<UserResp>> managersSales(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id, HttpSession session) {
+                                                @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id, HttpSession session) {
         Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
             andPredicateList.add(cb.equal(root.get("managerId"), id));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
             Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
-            List<Predicate> orPredicateList = new ArrayList<>();
-            orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), startTime));
-            orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
-            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
-            query.where(andPredicate, orPredicate);
+            andPredicateList.add(cb.greaterThanOrEqualTo(root.get("createTime"), startTime));
+            andPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
+            query.where(andPredicate);
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
@@ -633,8 +634,8 @@ public class WechatManageController {
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
     public Result<List<BuyerResp>> salePageBuyer(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id) {
+                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id) {
         Specification<BuyerSale> buyerSaleSpecification = (Specification<BuyerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
             andPredicateList.add(cb.equal(root.get("saleId"), id));
@@ -667,19 +668,17 @@ public class WechatManageController {
     @GetMapping("/manager/volume")
     @ApiOperation(value = "区域经理查看自己的销量")
     public Result<List<ConfluenceDetailResp>> managersVolume(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, HttpSession session) {
+                                                             @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                             @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
             andPredicateList.add(cb.equal(root.get("managerId"), user.getId()));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
             Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
-            List<Predicate> orPredicateList = new ArrayList<>();
-            orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), startTime));
-            orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
-            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
-            query.where(andPredicate, orPredicate);
+            andPredicateList.add(cb.greaterThanOrEqualTo(root.get("createTime"), startTime));
+            andPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
+            query.where(andPredicate);
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
@@ -732,4 +731,5 @@ public class WechatManageController {
         List<ConfluenceDetailResp> confluenceDetailResps = BeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
         return Result.buildQueryOk(confluenceDetailResps);
     }
+
 }
