@@ -26,7 +26,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -634,7 +633,7 @@ public class WechatManageController {
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
     public Result<List<BuyerResp>> salePageBuyer(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") @RequestParam("creationTime") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                  @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id) {
         Specification<BuyerSale> buyerSaleSpecification = (Specification<BuyerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
@@ -652,7 +651,7 @@ public class WechatManageController {
         };
         List<BuyerSale> buyerSales = buyerSaleService.finAll(buyerSaleSpecification);
         List<Buyer> collect = buyerSales.stream().filter(buyerSale -> {
-            if (buyerSale.getUntyingTime().compareTo(startTime) < 0 || buyerSale.getCreateTime().compareTo(endTime) > 0) {
+            if (buyerSale.getUntyingTime().compareTo(creationTime) < 0 || buyerSale.getCreateTime().compareTo(endTime) > 0) {
                 return false;
             }
             return true;
@@ -674,7 +673,7 @@ public class WechatManageController {
     @GetMapping("/manager/volume")
     @ApiOperation(value = "区域经理查看自己的销量")
     public Result<List<ConfluenceDetailResp>> managersVolume(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                             @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") @RequestParam("creationTime") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                             @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                              @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
@@ -694,13 +693,13 @@ public class WechatManageController {
         //计算
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
         managerSales.stream().filter(managerSale -> {
-            if (managerSale.getUntyingTime().compareTo(startTime) < 0 || managerSale.getCreateTime().compareTo(endTime) > 0) {
+            if (managerSale.getUntyingTime().compareTo(creationTime) < 0 || managerSale.getCreateTime().compareTo(endTime) > 0) {
                 return false;
             }
             return true;
         }).forEach(managerSale -> {
             ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(managerSale.getUser()
-                    , startTime.before(managerSale.getCreateTime()) ? managerSale.getCreateTime() : startTime
+                    , creationTime.before(managerSale.getCreateTime()) ? managerSale.getCreateTime() : creationTime
                     , endTime.before(managerSale.getUntyingTime()) ? endTime : managerSale.getUntyingTime());
             confluenceDetails.add(confluenceDetail);
         });
