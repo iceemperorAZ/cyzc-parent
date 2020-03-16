@@ -118,10 +118,16 @@ public class TurntableDetailReq extends BaseReq implements Serializable {
 	private Integer probabilityEnd;
 
 	/**
-	 * 奖品数量
+	 * 奖品最多被抽到的次数
 	 */
-	@ApiModelProperty(value = "奖品数量")
+	@ApiModelProperty(value = "奖品最多被抽到的次数")
 	private Integer prizeNum;
+
+	/**
+	 * 奖品基数
+	 */
+	@ApiModelProperty(value = "奖品基数")
+	private Integer baseNum;
 
 	/**
 	 * 奖品数量-开始

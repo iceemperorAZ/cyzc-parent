@@ -4,6 +4,7 @@ import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.Turntable;
 import com.jingliang.mall.entity.TurntableDetail;
+import com.jingliang.mall.entity.TurntableLog;
 import com.jingliang.mall.exception.TurntableException;
 import com.jingliang.mall.repository.BuyerRepository;
 import com.jingliang.mall.repository.TurntableDetailRepository;
@@ -82,10 +83,15 @@ public class TurntableServiceImpl implements TurntableService {
         turntableDetail1.setPrizeNum(turntableDetail1.getPrizeNum() - 1);
         turntableDetailRepository.save(turntableDetail1);
         //减少用户金币
-        buyer.setGold(buyer.getGold());
+        buyer.setGold(buyer.getGold() - turntable.getGold());
         buyerRepository.save(buyer);
         //记录抽奖日志
-
+        TurntableLog turntableLog = new TurntableLog();
+        turntableLog.setBuyerId(buyerId);
+        turntableLog.setCreateTime(new Date());
+        turntableLog.setIsAvailable(true);
+        turntableLog.setMsg("获得" + turntableDetail1.getPrizeName() + "x" + turntableDetail1.getBaseNum() + ".");
+        turntableLogRepository.save(turntableLog);
         return turntableDetail1;
     }
 }

@@ -61,10 +61,16 @@ public class TurntableDetail implements Serializable {
 	private Integer probability;
 
 	/**
-	 * 奖品数量
+	 * 奖品最多被抽到的次数
 	 */
 	@Column(name = "prize_num")
 	private Integer prizeNum;
+
+	/**
+	 * 奖品基数
+	 */
+	@Column(name = "base_num")
+	private Integer baseNum;
 
 	/**
 	 * 开始角度

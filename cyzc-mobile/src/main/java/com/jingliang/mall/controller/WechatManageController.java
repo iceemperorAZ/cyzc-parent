@@ -598,9 +598,9 @@ public class WechatManageController {
             List<Predicate> andPredicateList = new ArrayList<>();
             andPredicateList.add(cb.equal(root.get("managerId"), id));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
-            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
             andPredicateList.add(cb.greaterThanOrEqualTo(root.get("createTime"), startTime));
             andPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
+            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
             query.where(andPredicate);
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
@@ -675,9 +675,9 @@ public class WechatManageController {
             List<Predicate> andPredicateList = new ArrayList<>();
             andPredicateList.add(cb.equal(root.get("managerId"), user.getId()));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
-            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
             andPredicateList.add(cb.greaterThanOrEqualTo(root.get("createTime"), startTime));
             andPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), endTime));
+            Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
             query.where(andPredicate);
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();

@@ -1,18 +1,18 @@
 package com.jingliang.mall.resp;
 
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.time.LocalDateTime;
-import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 转盘详情
- * 
+ *
  * @author Zhenfeng Li
  * @version 1.0.0
  * @date 2020-03-12 17:34:10
@@ -22,101 +22,107 @@ import java.util.Date;
 @Data
 public class TurntableDetailResp implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * 主键Id
-	 */
-	@ApiModelProperty(value = "主键Id")
-	@JsonSerialize(using = ToStringSerializer.class)
-	private Long id;
+    /**
+     * 主键Id
+     */
+    @ApiModelProperty(value = "主键Id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
 
-	/**
-	 * 转盘Id
-	 */
-	@ApiModelProperty(value = "转盘Id")
-	@JsonSerialize(using = ToStringSerializer.class)
-	private Long turntableId;
+    /**
+     * 转盘Id
+     */
+    @ApiModelProperty(value = "转盘Id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long turntableId;
 
-	/**
-	 * 奖品Id
-	 */
-	@ApiModelProperty(value = "奖品Id")
-	@JsonSerialize(using = ToStringSerializer.class)
-	private Long prizeId;
+    /**
+     * 奖品Id
+     */
+    @ApiModelProperty(value = "奖品Id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long prizeId;
 
-	/**
-	 * 奖品名称
-	 */
-	@ApiModelProperty(value = "奖品名称")
-	private String prizeName;
+    /**
+     * 奖品最多被抽到的次数
+     */
+    @ApiModelProperty(value = "奖品最多被抽到的次数")
+    private Integer prizeNum;
 
-	/**
-	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
-	 */
-	@ApiModelProperty(value = "类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)")
-	private Integer type;
+    /**
+     * 奖品基数
+     */
+    @ApiModelProperty(value = "奖品基数")
+    private Integer baseNum;
 
-	/**
-	 * 概率
-	 */
-	@ApiModelProperty(value = "概率")
-	private Integer probability;
+    /**
+     * 奖品名称
+     */
+    @ApiModelProperty(value = "奖品名称")
+    private String prizeName;
 
-	/**
-	 * 奖品数量
-	 */
-	@ApiModelProperty(value = "奖品数量")
-	private Integer prizeNum;
+    /**
+     * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
+     */
+    @ApiModelProperty(value = "类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)")
+    private Integer type;
 
-	/**
-	 * 开始角度
-	 */
-	@ApiModelProperty(value = "开始角度")
-	private Integer startAngle;
+    /**
+     * 概率
+     */
+    @ApiModelProperty(value = "概率")
+    private Integer probability;
 
-	/**
-	 * 结束角度
-	 */
-	@ApiModelProperty(value = "结束角度")
-	private Integer endAngle;
+    /**
+     * 开始角度
+     */
+    @ApiModelProperty(value = "开始角度")
+    private Integer startAngle;
 
-	/**
-	 * 创建时间
-	 */
-	@ApiModelProperty(value = "创建时间")
-	private Date createTime;
+    /**
+     * 结束角度
+     */
+    @ApiModelProperty(value = "结束角度")
+    private Integer endAngle;
 
-	/**
-	 * 创建人Id
-	 */
-	@ApiModelProperty(value = "创建人Id")
-	@JsonSerialize(using = ToStringSerializer.class)
-	private Long createUserId;
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty(value = "创建时间")
+    private Date createTime;
 
-	/**
-	 * 是否上架
-	 */
-	@ApiModelProperty(value = "是否上架")
-	private Boolean isShow;
+    /**
+     * 创建人Id
+     */
+    @ApiModelProperty(value = "创建人Id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long createUserId;
 
-	/**
-	 * 上架人Id
-	 */
-	@ApiModelProperty(value = "上架人Id")
-	@JsonSerialize(using = ToStringSerializer.class)
-	private Long showUserId;
+    /**
+     * 是否上架
+     */
+    @ApiModelProperty(value = "是否上架")
+    private Boolean isShow;
 
-	/**
-	 * 上架时间
-	 */
-	@ApiModelProperty(value = "上架时间")
-	private Date showTime;
+    /**
+     * 上架人Id
+     */
+    @ApiModelProperty(value = "上架人Id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long showUserId;
 
-	/**
-	 * 是否可用 0：否，1：是
-	 */
-	@ApiModelProperty(value = "是否可用 0：否，1：是")
-	private Boolean isAvailable;
+    /**
+     * 上架时间
+     */
+    @ApiModelProperty(value = "上架时间")
+    private Date showTime;
+
+    /**
+     * 是否可用 0：否，1：是
+     */
+    @ApiModelProperty(value = "是否可用 0：否，1：是")
+    private Boolean isAvailable;
 
 }
