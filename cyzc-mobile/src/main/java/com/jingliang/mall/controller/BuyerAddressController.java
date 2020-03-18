@@ -1,10 +1,6 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.Constant;
-import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.Result;
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerAddress;
 import com.jingliang.mall.req.BuyerAddressReq;
@@ -62,7 +58,7 @@ public class BuyerAddressController {
         if (Objects.nonNull(buyerAddressReq.getId()) && buyerAddressService.countByIdAndBuyerId(buyerAddressReq.getId(), buyer.getId()) == 0) {
             return Result.build(Constant.ADDRESS_FAIL, Constant.TEXT_ADDRESS_NOT_EXIST_FAIL);
         }
-        MallUtils.addDateAndBuyer(buyerAddressReq, buyer);
+        MUtils.addDateAndBuyer(buyerAddressReq, buyer);
         buyerAddressReq.setBuyerId(buyer.getId());
         BuyerAddressResp buyerAddressResp = BeanMapper.map(buyerAddressService.save(BeanMapper.map(buyerAddressReq, BuyerAddress.class)), BuyerAddressResp.class);
         log.debug("返回结果：{}", buyerAddressResp);
@@ -78,7 +74,7 @@ public class BuyerAddressController {
         log.debug("请求参数：{}", buyerAddressReq);
         PageRequest pageRequest = PageRequest.of(buyerAddressReq.getPage(), buyerAddressReq.getPageSize());
         if (StringUtils.isNotBlank(buyerAddressReq.getClause())) {
-            pageRequest = PageRequest.of(buyerAddressReq.getPage(), buyerAddressReq.getPageSize(), Sort.by(MallUtils.separateOrder(buyerAddressReq.getClause())));
+            pageRequest = PageRequest.of(buyerAddressReq.getPage(), buyerAddressReq.getPageSize(), Sort.by(MUtils.separateOrder(buyerAddressReq.getClause())));
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<BuyerAddress> buyerAddressSpecification = (Specification<BuyerAddress>) (root, query, cb) -> {
@@ -90,7 +86,7 @@ public class BuyerAddressController {
             return query.getRestriction();
         };
         Page<BuyerAddress> buyerAddressPage = buyerAddressService.findAll(buyerAddressSpecification, pageRequest);
-        MallPage<BuyerAddressResp> buyerAddressRespMallPage = MallUtils.toMallPage(buyerAddressPage, BuyerAddressResp.class);
+        MallPage<BuyerAddressResp> buyerAddressRespMallPage = MUtils.toMallPage(buyerAddressPage, BuyerAddressResp.class);
         log.debug("返回结果：{}", buyerAddressRespMallPage);
         return Result.buildQueryOk(buyerAddressRespMallPage);
     }
@@ -106,7 +102,7 @@ public class BuyerAddressController {
             return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
-        MallUtils.addDateAndBuyer(buyerAddressReq, buyer);
+        MUtils.addDateAndBuyer(buyerAddressReq, buyer);
         buyerAddressReq.setIsAvailable(false);
         BuyerAddressResp buyerAddressResp = BeanMapper.map(buyerAddressService.save(BeanMapper.map(buyerAddressReq, BuyerAddress.class)), BuyerAddressResp.class);
         log.debug("返回结果：{}", buyerAddressResp);

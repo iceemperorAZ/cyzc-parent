@@ -1,11 +1,13 @@
 package com.jingliang.mall.service.impl;
 
 import com.jingliang.mall.entity.TurntableDetail;
+import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.TurntableDetailRepository;
 import com.jingliang.mall.service.TurntableDetailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,5 +42,14 @@ public class TurntableDetailServiceImpl implements TurntableDetailService {
         TurntableDetail turntableDetail = turntableDetailRepository.getOne(id);
         turntableDetail.setIsAvailable(false);
         turntableDetailRepository.save(turntableDetail);
+    }
+
+    @Override
+    public TurntableDetail show(User user, TurntableDetail turntableDetail) {
+        TurntableDetail turntableDetail1 = turntableDetailRepository.findById(turntableDetail.getId()).orElse(null);
+        turntableDetail1.setIsShow(turntableDetail.getIsShow());
+        turntableDetail1.setShowTime(new Date());
+        turntableDetail1.setShowUserId(user.getId());
+        return turntableDetailRepository.save(turntableDetail);
     }
 }

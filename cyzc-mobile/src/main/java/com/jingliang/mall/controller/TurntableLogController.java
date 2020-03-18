@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.TurntableLog;
@@ -41,12 +41,20 @@ public class TurntableLogController {
         this.turntableLogService = turntableLogService;
     }
 
+    /**
+     * 查询自己的抽奖记录
+     *
+     * @param page
+     * @param pageSize
+     * @param session
+     * @return
+     */
     @GetMapping("/find/all/page")
     public Result<MallPage<TurntableLogResp>> pageAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize, @ApiIgnore HttpSession session) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Page<TurntableLog> turntableLogPage = turntableLogService.pageAll(buyer.getId(), pageRequest);
-        MallPage<TurntableLogResp> turntableLogRespMallPage = MallUtils.toMallPage(turntableLogPage, TurntableLogResp.class);
+        MallPage<TurntableLogResp> turntableLogRespMallPage = MUtils.toMallPage(turntableLogPage, TurntableLogResp.class);
         return Result.buildQueryOk(turntableLogRespMallPage);
 
     }

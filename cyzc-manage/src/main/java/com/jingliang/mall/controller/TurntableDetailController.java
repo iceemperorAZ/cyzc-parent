@@ -9,9 +9,11 @@ import com.jingliang.mall.req.TurntableDetailReq;
 import com.jingliang.mall.resp.TurntableDetailResp;
 import com.jingliang.mall.service.TurntableDetailService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -40,12 +42,16 @@ public class TurntableDetailController {
     }
 
     /**
-     * 保存转盘项
+     * 保存/修改转盘项
      */
     @PostMapping("/save")
-    public Result<TurntableDetailResp> save(@RequestBody TurntableDetailReq turntableDetailReq, HttpSession session) {
+    @ApiOperation("保存/修改转盘项")
+    public Result<TurntableDetailResp> save(@RequestBody TurntableDetailReq turntableDetailReq, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(turntableDetailReq, user);
+        if (turntableDetailReq.getId() == null) {
+            turntableDetailReq.setIsShow(false);
+        }
         TurntableDetail turntableDetail = turntableDetailService.save(BeanMapper.map(turntableDetailReq, TurntableDetail.class));
         return Result.buildSaveOk(BeanMapper.map(turntableDetail, TurntableDetailResp.class));
     }
@@ -54,16 +60,28 @@ public class TurntableDetailController {
      * 根据转盘Id查询转盘项
      */
     @GetMapping("/all/turntableId")
-    public Result<List<TurntableDetailResp>> save(Long turntableId) {
+    @ApiOperation("根据转盘Id查询转盘项")
+    public Result<List<TurntableDetailResp>> findAll(Long turntableId) {
         List<TurntableDetail> turntableDetails = turntableDetailService.findAll(turntableId);
-        return Result.buildSaveOk(BeanMapper.mapList(turntableDetails, TurntableDetailResp.class));
+        return Result.buildQueryOk(BeanMapper.mapList(turntableDetails, TurntableDetailResp.class));
+    }
+    /**
+     * 上下架
+     */
+    @PostMapping("/show")
+    @ApiOperation("上下架")
+    public Result<TurntableDetailResp> show(@RequestBody TurntableDetailReq turntableDetailReq, @ApiIgnore HttpSession session) {
+        User user = (User) session.getAttribute(sessionUser);
+        TurntableDetail turntableDetail = turntableDetailService.show(user,BeanMapper.map(turntableDetailReq, TurntableDetail.class));
+        return Result.buildSaveOk(BeanMapper.map(turntableDetail, TurntableDetailResp.class));
     }
 
     /**
      * 删除
      */
     @DeleteMapping("/{id}")
-    public Result<Boolean> delete(@PathVariable Long id, HttpSession session) {
+    @ApiOperation("删除")
+    public Result<Boolean> delete(@PathVariable Long id, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         turntableDetailService.delete(id, user.getId());
         return Result.buildDeleteOk(true);

@@ -1,6 +1,7 @@
 package com.jingliang.mall.service;
 
 import com.jingliang.mall.entity.TurntableDetail;
+import com.jingliang.mall.entity.User;
 
 import java.util.List;
 
@@ -36,4 +37,13 @@ public interface TurntableDetailService {
      * @param userId
      */
     void delete(Long id, Long userId);
+
+    /**
+     * 上下架
+     *
+     * @param user
+     * @param turntableDetail
+     * @return
+     */
+    TurntableDetail show(User user, TurntableDetail turntableDetail);
 }

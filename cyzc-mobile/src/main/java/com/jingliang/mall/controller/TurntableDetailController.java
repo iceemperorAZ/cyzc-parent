@@ -1,11 +1,8 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.TurntableDetail;
-import com.jingliang.mall.entity.User;
-import com.jingliang.mall.req.TurntableDetailReq;
 import com.jingliang.mall.resp.TurntableDetailResp;
 import com.jingliang.mall.service.TurntableDetailService;
 import io.swagger.annotations.Api;
@@ -13,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**

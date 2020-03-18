@@ -4,7 +4,7 @@ import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.Cart;
 import com.jingliang.mall.req.CartReq;
@@ -62,7 +62,7 @@ public class CartController {
             return Result.build(Constant.SAVE_FAIL, Constant.TEXT_CART_ITEM_NUM_FAIL);
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
-        MallUtils.addDateAndBuyer(cartReq, buyer);
+        MUtils.addDateAndBuyer(cartReq, buyer);
         CartResp cartResp = BeanMapper.map(cartService.save(BeanMapper.map(cartReq, Cart.class)), CartResp.class);
         log.debug("返回结果：{}", cartResp);
         return Result.buildSaveOk(cartResp);
@@ -90,7 +90,7 @@ public class CartController {
         log.debug("请求参数：{}", cartReq);
         PageRequest pageRequest = PageRequest.of(cartReq.getPage(), cartReq.getPageSize());
         if (StringUtils.isNotBlank(cartReq.getClause())) {
-            pageRequest = PageRequest.of(cartReq.getPage(), cartReq.getPageSize(), Sort.by(MallUtils.separateOrder(cartReq.getClause())));
+            pageRequest = PageRequest.of(cartReq.getPage(), cartReq.getPageSize(), Sort.by(MUtils.separateOrder(cartReq.getClause())));
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<Cart> cartSpecification = (Specification<Cart>) (root, query, cb) -> {
@@ -100,7 +100,7 @@ public class CartController {
             return predicateList.isEmpty() ? null : cb.and(predicateList.toArray(new Predicate[0]));
         };
         Page<Cart> cartPage = cartService.findAll(cartSpecification, pageRequest);
-        MallPage<CartResp> cartResPage = MallUtils.toMallPage(cartPage, CartResp.class);
+        MallPage<CartResp> cartResPage = MUtils.toMallPage(cartPage, CartResp.class);
         log.debug("返回结果：{}", cartResPage);
         return Result.buildQueryOk(cartResPage);
     }

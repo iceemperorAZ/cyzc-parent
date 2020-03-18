@@ -3,7 +3,7 @@ package com.jingliang.mall.controller;
 import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.req.ProductReq;
 import com.jingliang.mall.resp.ProductResp;
@@ -53,7 +53,7 @@ public class ProductController {
         log.debug("请求参数：{}", productReq);
         PageRequest pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize());
         if (StringUtils.isNotBlank(productReq.getClause())) {
-            pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize(), Sort.by(MallUtils.separateOrder(productReq.getClause())));
+            pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize(), Sort.by(MUtils.separateOrder(productReq.getClause())));
         }
         Specification<Product> productSpecification = (Specification<Product>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -73,7 +73,7 @@ public class ProductController {
             return query.getRestriction();
         };
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
-        MallPage<ProductResp> productRespPage = MallUtils.toMallPage(productPage, ProductResp.class);
+        MallPage<ProductResp> productRespPage = MUtils.toMallPage(productPage, ProductResp.class);
         log.debug("返回结果：{}", productRespPage);
         return Result.buildQueryOk(productRespPage);
     }

@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
-import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.GoldLog;
 import com.jingliang.mall.resp.GoldLogResp;
@@ -65,6 +65,6 @@ public class GoldLogController {
             return query.getRestriction();
         };
         Page<GoldLog> signIn = signInLogService.findAll(specification, pageRequest);
-        return Result.buildQueryOk(MallUtils.toMallPage(signIn, GoldLogResp.class));
+        return Result.buildQueryOk(MUtils.toMallPage(signIn, GoldLogResp.class));
     }
 }

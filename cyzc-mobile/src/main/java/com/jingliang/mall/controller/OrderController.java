@@ -81,7 +81,7 @@ public class OrderController {
             return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
-        MallUtils.addDateAndBuyer(orderReq, buyer);
+        MUtils.addDateAndBuyer(orderReq, buyer);
         Order order = BeanMapper.map(orderReq, Order.class);
         assert order != null;
         order.setTotalPrice(0L);
@@ -357,7 +357,7 @@ public class OrderController {
         log.debug("请求参数：{}", orderReq);
         PageRequest pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize());
         if (StringUtils.isNotBlank(orderReq.getClause())) {
-            pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize(), Sort.by(MallUtils.separateOrder(orderReq.getClause())));
+            pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize(), Sort.by(MUtils.separateOrder(orderReq.getClause())));
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
@@ -377,7 +377,7 @@ public class OrderController {
             return query.getRestriction();
         };
         Page<Order> orderPage = orderService.findAll(orderSpecification, pageRequest);
-        MallPage<OrderResp> orderRespMallPage = MallUtils.toMallPage(orderPage, OrderResp.class);
+        MallPage<OrderResp> orderRespMallPage = MUtils.toMallPage(orderPage, OrderResp.class);
         log.debug("返回结果：{}", orderRespMallPage);
         return Result.buildQueryOk(orderRespMallPage);
     }

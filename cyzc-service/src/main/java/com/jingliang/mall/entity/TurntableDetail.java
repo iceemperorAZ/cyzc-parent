@@ -1,15 +1,15 @@
 package com.jingliang.mall.entity;
 
-import java.time.LocalDateTime;
 import lombok.Data;
-import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 转盘详情
- * 
+ *
  * @author Zhenfeng Li
  * @version 1.0.0
  * @date 2020-03-12 17:34:10
@@ -19,105 +19,126 @@ import java.util.Date;
 @Table(name = "tb_turntable_detail")
 public class TurntableDetail implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * 主键Id
-	 */
-	@Column(name = "id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "idGenerator")
-	@GenericGenerator(name = "idGenerator", strategy = "com.jingliang.mall.common.IdGenerator")
-	@Id
-	private Long id;
+    /**
+     * 主键Id
+     */
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "idGenerator")
+    @GenericGenerator(name = "idGenerator", strategy = "com.jingliang.mall.common.IdGenerator")
+    @Id
+    private Long id;
 
-	/**
-	 * 转盘Id
-	 */
-	@Column(name = "turntable_id")
-	private Long turntableId;
+    /**
+     * 转盘Id
+     */
+    @Column(name = "turntable_id")
+    private Long turntableId;
 
-	/**
-	 * 奖品Id
-	 */
-	@Column(name = "prize_id")
-	private Long prizeId;
+    /**
+     * 奖品Id
+     */
+    @Column(name = "prize_id")
+    private Long prizeId;
 
-	/**
-	 * 奖品名称
-	 */
-	@Column(name = "prize_name")
-	private String prizeName;
+    /**
+     * 商品信息
+     */
+    @OneToOne(targetEntity = Product.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "prize_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Product product;
 
-	/**
-	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
-	 */
-	@Column(name = "type")
-	private Integer type;
+    /**
+     * 奖品名称
+     */
+    @Column(name = "prize_name")
+    private String prizeName;
 
-	/**
-	 * 概率
-	 */
-	@Column(name = "probability")
-	private Integer probability;
+    /**
+     * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
+     */
+    @Column(name = "type")
+    private Integer type;
 
-	/**
-	 * 奖品最多被抽到的次数
-	 */
-	@Column(name = "prize_num")
-	private Integer prizeNum;
+    /**
+     * 概率
+     */
+    @Column(name = "probability")
+    private Integer probability;
 
-	/**
-	 * 奖品基数
-	 */
-	@Column(name = "base_num")
-	private Integer baseNum;
+    /**
+     * 奖品最多被抽到的次数
+     */
+    @Column(name = "prize_num")
+    private Integer prizeNum;
 
-	/**
-	 * 开始角度
-	 */
-	@Column(name = "start_angle")
-	private Integer startAngle;
+    /**
+     * 奖品基数
+     */
+    @Column(name = "base_num")
+    private Integer baseNum;
 
-	/**
-	 * 结束角度
-	 */
-	@Column(name = "end_angle")
-	private Integer endAngle;
+    /**
+     * 开始角度
+     */
+    @Column(name = "start_angle")
+    private Integer startAngle;
 
-	/**
-	 * 创建时间
-	 */
-	@Column(name = "create_time")
-	private Date createTime;
+    /**
+     * 结束角度
+     */
+    @Column(name = "end_angle")
+    private Integer endAngle;
 
-	/**
-	 * 创建人Id
-	 */
-	@Column(name = "create_user_id")
-	private Long createUserId;
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Date createTime;
 
-	/**
-	 * 是否上架
-	 */
-	@Column(name = "is_show")
-	private Boolean isShow;
+    /**
+     * 创建人Id
+     */
+    @Column(name = "create_user_id")
+    private Long createUserId;
 
-	/**
-	 * 上架人Id
-	 */
-	@Column(name = "show_user_id")
-	private Long showUserId;
+    /**
+     * 上架人
+     */
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "create_user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private User createUser;
 
-	/**
-	 * 上架时间
-	 */
-	@Column(name = "show_time")
-	private Date showTime;
+    /**
+     * 是否上架
+     */
+    @Column(name = "is_show")
+    private Boolean isShow;
 
-	/**
-	 * 是否可用 0：否，1：是
-	 */
-	@Column(name = "is_available")
-	private Boolean isAvailable;
+    /**
+     * 上架人Id
+     */
+    @Column(name = "show_user_id")
+    private Long showUserId;
+
+    /**
+     * 上架人
+     */
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "show_user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private User showUser;
+
+    /**
+     * 上架时间
+     */
+    @Column(name = "show_time")
+    private Date showTime;
+
+    /**
+     * 是否可用 0：否，1：是
+     */
+    @Column(name = "is_available")
+    private Boolean isAvailable;
 
 }

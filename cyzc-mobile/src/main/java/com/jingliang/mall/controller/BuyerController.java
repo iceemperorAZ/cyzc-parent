@@ -172,7 +172,7 @@ public class BuyerController {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         String sessionKey = buyer.getSessionKey();
         //解密用户手机号
-        String decrypt = MallUtils.decrypt(sessionKey, iv, encryptedData);
+        String decrypt = MUtils.decrypt(sessionKey, iv, encryptedData);
         if (StringUtils.isNotBlank(decrypt) && StringUtils.isNotBlank(JSONObject.parseObject(decrypt).getString("purePhoneNumber"))) {
             String purePhoneNumber = JSONObject.parseObject(decrypt).getString("purePhoneNumber");
             log.debug("返回解析后的手机号：{}", purePhoneNumber);
@@ -196,7 +196,7 @@ public class BuyerController {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         String sessionKey = buyer.getSessionKey();
         //解密用户手机号
-        String decrypt = MallUtils.decrypt(sessionKey, phoneDataReq.getIv(), phoneDataReq.getEncryptedData());
+        String decrypt = MUtils.decrypt(sessionKey, phoneDataReq.getIv(), phoneDataReq.getEncryptedData());
         if (StringUtils.isNotBlank(decrypt) && StringUtils.isNotBlank(JSONObject.parseObject(decrypt).getString("purePhoneNumber"))) {
             String purePhoneNumber = JSONObject.parseObject(decrypt).getString("purePhoneNumber");
             log.debug("返回解析后的手机号：{}", purePhoneNumber);

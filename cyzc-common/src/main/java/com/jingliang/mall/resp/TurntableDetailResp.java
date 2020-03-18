@@ -1,6 +1,5 @@
 package com.jingliang.mall.resp;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
@@ -17,7 +16,6 @@ import java.util.Date;
  * @version 1.0.0
  * @date 2020-03-12 17:34:10
  */
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(value = "TurntableDetailResp", description = "转盘详情")
 @Data
 public class TurntableDetailResp implements Serializable {
@@ -44,6 +42,12 @@ public class TurntableDetailResp implements Serializable {
     @ApiModelProperty(value = "奖品Id")
     @JsonSerialize(using = ToStringSerializer.class)
     private Long prizeId;
+
+    /**
+     * 商品奖品
+     */
+    @ApiModelProperty(value = "商品奖品")
+    private ProductResp product;
 
     /**
      * 奖品最多被抽到的次数
@@ -101,6 +105,12 @@ public class TurntableDetailResp implements Serializable {
     private Long createUserId;
 
     /**
+     * 创建人
+     */
+    @ApiModelProperty(value = "创建人")
+    private UserResp createUser;
+
+    /**
      * 是否上架
      */
     @ApiModelProperty(value = "是否上架")
@@ -112,6 +122,12 @@ public class TurntableDetailResp implements Serializable {
     @ApiModelProperty(value = "上架人Id")
     @JsonSerialize(using = ToStringSerializer.class)
     private Long showUserId;
+
+    /**
+     * 上架人
+     */
+    @ApiModelProperty(value = "上架人")
+    private UserResp showUser;
 
     /**
      * 上架时间

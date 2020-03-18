@@ -11,10 +11,7 @@ import com.jingliang.mall.service.TurntableService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -52,7 +49,7 @@ public class TurntableController {
      * 抽奖
      */
     @PostMapping("/extract")
-    public Result<TurntableDetail> extract(TurntableReq turntableReq, HttpSession session) {
+    public Result<TurntableDetail> extract(@RequestBody TurntableReq turntableReq, HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         try {
             TurntableDetail turntableDetail = turntableService.extract(turntableReq.getId(), buyer.getId());

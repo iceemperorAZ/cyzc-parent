@@ -31,7 +31,7 @@ import java.util.*;
  * @date 2019-09-19 15:19
  */
 @Slf4j
-public class MallUtils extends BaseMallUtils {
+public class MUtils extends BaseMallUtils {
 
     /**
      * 添加时间和用户信息
@@ -49,23 +49,5 @@ public class MallUtils extends BaseMallUtils {
         baseReq.setUpdateUserId(buyer.getId());
         baseReq.setUpdateUserName(buyer.getUserName());
         baseReq.setIsAvailable(true);
-    }
-    /**
-     * 抽奖算法
-     *
-     * @param map
-     * @return
-     */
-    public static TurntableDetail weightRandom(Map<Long, TurntableDetail> map) {
-        Set<Long> keySet = map.keySet();
-        List<Long> weights = new ArrayList<>();
-        for (Long weightKey : keySet) {
-            TurntableDetail weight = map.get(weightKey);
-            for (int i = 0; i <= weight.getProbability(); i++) {
-                weights.add(weightKey);
-            }
-        }
-        int idx = new Random().nextInt(weights.size());
-        return map.get(weights.get(idx));
     }
 }

@@ -567,7 +567,7 @@ public class WechatManageController {
             pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         }
         Page<User> allUserByPage = userService.findAllUserByPage(pageRequest);
-        MallPage<UserResp> userRespMallPage = MallUtils.toMallPage(allUserByPage, UserResp.class);
+        MallPage<UserResp> userRespMallPage = MUtils.toMallPage(allUserByPage, UserResp.class);
         return Result.buildQueryOk(userRespMallPage);
     }
 
@@ -697,7 +697,7 @@ public class WechatManageController {
                 return false;
             }
             return true;
-        }).forEach(managerSale -> {
+        }).collect(Collectors.toList()).forEach(managerSale -> {
             ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(managerSale.getUser()
                     , creationTime.before(managerSale.getCreateTime()) ? managerSale.getCreateTime() : creationTime
                     , endTime.before(managerSale.getUntyingTime()) ? endTime : managerSale.getUntyingTime());

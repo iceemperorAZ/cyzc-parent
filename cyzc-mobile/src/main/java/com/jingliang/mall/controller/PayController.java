@@ -2,8 +2,8 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.common.Result;
-import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.service.*;
@@ -72,7 +72,7 @@ public class PayController {
     @RequestMapping(value = "/wechat/notify", produces = MediaType.TEXT_XML_VALUE + ";charset=UTF-8", consumes = MediaType.TEXT_XML_VALUE + ";charset=UTF-8")
     public String wechatNotify(@RequestBody String xml) {
         log.info("微信支付异步通知返回参数：{}", xml);
-        Map<String, String> map = MallUtils.xmlToMap(xml);
+        Map<String, String> map = MUtils.xmlToMap(xml);
         log.info("微信支付异步通知返回参数map：{}", map);
         assert map != null;
         String oldSign = map.get("sign");
@@ -161,7 +161,7 @@ public class PayController {
     @RequestMapping(value = "/wechat/recharge", produces = MediaType.TEXT_XML_VALUE + ";charset=UTF-8", consumes = MediaType.TEXT_XML_VALUE + ";charset=UTF-8")
     public String recharge(@RequestBody String xml) {
         log.info("微信充值支付异步通知返回参数：{}", xml);
-        Map<String, String> map = MallUtils.xmlToMap(xml);
+        Map<String, String> map = MUtils.xmlToMap(xml);
         log.info("微信充值支付异步通知返回参数map：{}", map);
         assert map != null;
         String oldSign = map.get("sign");

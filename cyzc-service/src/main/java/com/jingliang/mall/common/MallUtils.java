@@ -1,8 +1,6 @@
 package com.jingliang.mall.common;
 
-import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.TurntableDetail;
-import com.jingliang.mall.req.BaseReq;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
@@ -31,10 +29,13 @@ public class MallUtils extends BaseMallUtils {
             TurntableDetail weight = map.get(weightKey);
             //奖品数量为0的不参与抽奖
             if (weight.getPrizeNum() > 0) {
-                for (int i = 0; i <= weight.getProbability(); i++) {
+                for (int i = 0; i < weight.getProbability(); i++) {
                     weights.add(weightKey);
                 }
             }
+        }
+        if (weights.size() == 0) {
+            return null;
         }
         int idx = new Random().nextInt(weights.size());
         return map.get(weights.get(idx));

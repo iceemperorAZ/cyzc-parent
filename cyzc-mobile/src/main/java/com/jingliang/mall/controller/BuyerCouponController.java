@@ -128,7 +128,7 @@ public class BuyerCouponController {
         log.debug("请求参数：{}", buyerCouponReq);
         PageRequest pageRequest = PageRequest.of(buyerCouponReq.getPage(), buyerCouponReq.getPageSize());
         if (StringUtils.isNotBlank(buyerCouponReq.getClause())) {
-            pageRequest = PageRequest.of(buyerCouponReq.getPage(), buyerCouponReq.getPageSize(), Sort.by(MallUtils.separateOrder(buyerCouponReq.getClause())));
+            pageRequest = PageRequest.of(buyerCouponReq.getPage(), buyerCouponReq.getPageSize(), Sort.by(MUtils.separateOrder(buyerCouponReq.getClause())));
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<BuyerCoupon> buyerCouponSpecification = (Specification<BuyerCoupon>) (root, query, cb) -> {
@@ -166,7 +166,7 @@ public class BuyerCouponController {
             return query.getRestriction();
         };
         Page<BuyerCoupon> buyerCouponPage = buyerCouponService.findAll(buyerCouponSpecification, pageRequest);
-        MallPage<BuyerCouponResp> buyerCouponRespMallPage = MallUtils.toMallPage(buyerCouponPage, BuyerCouponResp.class);
+        MallPage<BuyerCouponResp> buyerCouponRespMallPage = MUtils.toMallPage(buyerCouponPage, BuyerCouponResp.class);
         log.debug("返回结果：{}", buyerCouponRespMallPage);
         return Result.buildQueryOk(buyerCouponRespMallPage);
     }
