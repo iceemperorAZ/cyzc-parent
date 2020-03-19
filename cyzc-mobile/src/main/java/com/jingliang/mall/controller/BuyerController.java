@@ -1,4 +1,6 @@
 package com.jingliang.mall.controller;
+import java.util.Date;
+import com.jingliang.mall.entity.Region;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.*;
@@ -261,7 +263,6 @@ public class BuyerController {
         }
         Date date = new Date();
         buyerReq.setId(buyer.getId());
-        BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         BuyerSale buyerSale = new BuyerSale();
         buyerSale.setBuyerId(buyer.getId());
         buyerSale.setSaleId(buyerReq.getSaleUserId());
@@ -272,7 +273,20 @@ public class BuyerController {
         buyerSale.setIsAvailable(true);
         buyerSale.setCreateTime(date);
         buyerSale.setUpdateTime(date);
-        buyerSale = buyerSaleService.save(buyerSale);
+        BuyerAddress buyerAddress = new BuyerAddress();
+        buyerAddress.setBuyerId(buyer.getId());
+        buyerAddress.setProvinceCode(buyerReq.getProvinceCode());
+        buyerAddress.setCityCode(buyerReq.getCityCode());
+        buyerAddress.setAreaCode(buyerReq.getAreaCode());
+        buyerAddress.setDetailedAddress(buyerReq.getDetailedAddress());
+        buyerAddress.setIsDefault(true);
+        buyerAddress.setIsAvailable(true);
+        buyerAddress.setCreateTime(new Date());
+        buyerAddress.setUpdateTime(new Date());
+        buyerAddress.setConsigneeName(buyerReq.getUserName());
+        buyerAddress.setPhone(buyerReq.getPhone());
+        buyerAddress.setPostCode("0000");
+        BuyerResp buyerResp = BeanMapper.map(buyerSaleService.bindingSale(buyerSale,BeanMapper.map(buyerReq, Buyer.class),buyerAddress), BuyerResp.class);
         assert buyerResp != null;
         buyerResp.setSale(BeanMapper.map(user, UserResp.class));
         log.debug("返回结果：{}", buyerResp);
@@ -345,5 +359,17 @@ public class BuyerController {
         log.debug("微信返回结果二次签名后的返回结果：{}", resultMap);
         return Result.buildSaveOk(resultMap);
     }
+
+    /**
+     * 获取用户最新信息
+     */
+    @ApiOperation(value = "获取用户最新信息")
+    @GetMapping("/buyer")
+    public Result<BuyerResp> buyer(HttpSession session) {
+        Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
+        //获取用户最新信息
+        return Result.build(Constant.OK, Constant.TEXT_LOGIN_OK, BeanMapper.map(buyerService.findById(buyer.getId()), BuyerResp.class));
+    }
+
 
 }

@@ -1,5 +1,7 @@
 package com.jingliang.mall.service;
 
+import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.BuyerAddress;
 import com.jingliang.mall.entity.BuyerSale;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -37,4 +39,15 @@ public interface BuyerSaleService {
      * @param buyerSaleSpecification
      */
     List<BuyerSale> finAll(Specification<BuyerSale> buyerSaleSpecification);
+
+    /**
+     * 绑定销售
+     *
+     * @param buyerSale
+     * @param buyer
+     * @param address
+     * @return
+     */
+    Buyer bindingSale(BuyerSale buyerSale, Buyer buyer, BuyerAddress address);
+
 }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -39,6 +40,7 @@ public class BuyerServiceImpl implements BuyerService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Buyer save(Buyer buyer) {
         if (buyer.getId() == null) {
             GoldLog goldLog = new GoldLog();

@@ -1,5 +1,6 @@
 package com.jingliang.mall.service;
 
+import com.jingliang.mall.entity.Turntable;
 import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.entity.User;
 
@@ -46,4 +47,12 @@ public interface TurntableDetailService {
      * @return
      */
     TurntableDetail show(User user, TurntableDetail turntableDetail);
+
+    /**
+     * 根据Id查询
+     *
+     * @param id
+     * @return
+     */
+    TurntableDetail findById(Long id);
 }

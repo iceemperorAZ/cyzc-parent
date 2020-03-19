@@ -37,6 +37,12 @@ public class TurntableDetail implements Serializable {
     private Long turntableId;
 
     /**
+     * 转盘图片
+     */
+    @Column(name = "img")
+    private String img;
+
+    /**
      * 奖品Id
      */
     @Column(name = "prize_id")

@@ -1,16 +1,20 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.common.Base64Image;
 import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.common.Result;
+import com.jingliang.mall.entity.Turntable;
 import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.TurntableDetailReq;
 import com.jingliang.mall.resp.TurntableDetailResp;
+import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.service.TurntableDetailService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -36,9 +40,11 @@ public class TurntableDetailController {
     @Value("${session.user.key}")
     private String sessionUser;
     private final TurntableDetailService turntableDetailService;
+    private final FastdfsService fastdfsService;
 
-    public TurntableDetailController(TurntableDetailService turntableDetailService) {
+    public TurntableDetailController(TurntableDetailService turntableDetailService, FastdfsService fastdfsService) {
         this.turntableDetailService = turntableDetailService;
+        this.fastdfsService = fastdfsService;
     }
 
     /**
@@ -51,6 +57,20 @@ public class TurntableDetailController {
         MallUtils.addDateAndUser(turntableDetailReq, user);
         if (turntableDetailReq.getId() == null) {
             turntableDetailReq.setIsShow(false);
+        }
+        MallUtils.addDateAndUser(turntableDetailReq, user);
+        //保存或修改转盘图片
+        if (StringUtils.isNotBlank(turntableDetailReq.getImgBase64())) {
+            if (turntableDetailReq.getId() != null) {
+                TurntableDetail turntableDetail = turntableDetailService.findById(turntableDetailReq.getId());
+                //有就把之前的删除了
+                if (turntableDetail != null && StringUtils.isNotBlank(turntableDetail.getImg())) {
+                    fastdfsService.deleteFile(turntableDetail.getImg());
+                }
+            }
+            Base64Image base64Image = Base64Image.build(turntableDetailReq.getImgBase64());
+            assert base64Image != null;
+            turntableDetailReq.setImg(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
         }
         TurntableDetail turntableDetail = turntableDetailService.save(BeanMapper.map(turntableDetailReq, TurntableDetail.class));
         return Result.buildSaveOk(BeanMapper.map(turntableDetail, TurntableDetailResp.class));

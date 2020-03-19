@@ -136,6 +136,13 @@ public class TurntableDetailResp implements Serializable {
     private Date showTime;
 
     /**
+     * 图片
+     */
+    @ApiModelProperty(value = "图片")
+    private String img;
+    ;
+
+    /**
      * 是否可用 0：否，1：是
      */
     @ApiModelProperty(value = "是否可用 0：否，1：是")

@@ -22,5 +22,4 @@ public interface TurntableDetailRepository extends BaseRepository<TurntableDetai
      * @return
      */
     List<TurntableDetail> findAllByTurntableIdAndIsAvailable(Long turntableId, Boolean isAvailable);
-
 }

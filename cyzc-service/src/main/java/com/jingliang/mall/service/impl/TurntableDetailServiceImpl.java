@@ -1,5 +1,6 @@
 package com.jingliang.mall.service.impl;
 
+import com.jingliang.mall.entity.Turntable;
 import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.TurntableDetailRepository;
@@ -51,5 +52,10 @@ public class TurntableDetailServiceImpl implements TurntableDetailService {
         turntableDetail1.setShowTime(new Date());
         turntableDetail1.setShowUserId(user.getId());
         return turntableDetailRepository.save(turntableDetail);
+    }
+
+    @Override
+    public TurntableDetail findById(Long id) {
+        return turntableDetailRepository.findAllByIdAndIsAvailable(id,true);
     }
 }

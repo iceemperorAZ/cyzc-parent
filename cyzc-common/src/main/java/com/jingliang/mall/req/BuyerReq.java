@@ -260,17 +260,40 @@ public class BuyerReq extends BaseReq implements Serializable {
     @ApiModelProperty(value = "金币")
     private Integer gold;
 
-	/**
-	 * 会员等级（100：普通，200：银牌，300：金牌）
-	 */
-	@ApiModelProperty(value = "会员等级")
-	private Integer memberLevel;
-
+    /**
+     * 会员等级（100：普通，200：银牌，300：金牌）
+     */
+    @ApiModelProperty(value = "会员等级")
+    private Integer memberLevel;
 
     /**
      * 返利剩余次数
      */
     @ApiModelProperty(value = "返利剩余次数")
     private Integer orderSpecificNum;
+
+    /**
+     * 省编码
+     */
+    @ApiModelProperty(value = "省编码")
+    private String provinceCode;
+
+    /**
+     * 市编码
+     */
+    @ApiModelProperty(value = "市编码")
+    private String cityCode;
+
+    /**
+     * 县编码
+     */
+    @ApiModelProperty(value = "县编码")
+    private String areaCode;
+
+    /**
+     * 详细地址
+     */
+    @ApiModelProperty(value = "详细地址")
+    private String detailedAddress;
 
 }

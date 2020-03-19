@@ -1,11 +1,16 @@
 package com.jingliang.mall.service.impl;
 
+import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.BuyerAddress;
 import com.jingliang.mall.entity.BuyerSale;
+import com.jingliang.mall.repository.BuyerAddressRepository;
+import com.jingliang.mall.repository.BuyerRepository;
 import com.jingliang.mall.repository.BuyerSaleRepository;
 import com.jingliang.mall.service.BuyerSaleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,9 +26,13 @@ import java.util.List;
 public class BuyerSaleServiceImpl implements BuyerSaleService {
 
     private final BuyerSaleRepository buyerSaleRepository;
+    private final BuyerRepository buyerRepository;
+    private final BuyerAddressRepository buyerAddressRepository;
 
-    public BuyerSaleServiceImpl(BuyerSaleRepository buyerSaleRepository) {
+    public BuyerSaleServiceImpl(BuyerSaleRepository buyerSaleRepository, BuyerRepository buyerRepository, BuyerAddressRepository buyerAddressRepository) {
         this.buyerSaleRepository = buyerSaleRepository;
+        this.buyerRepository = buyerRepository;
+        this.buyerAddressRepository = buyerAddressRepository;
     }
 
     @Override
@@ -41,4 +50,17 @@ public class BuyerSaleServiceImpl implements BuyerSaleService {
         return buyerSaleRepository.findAll(buyerSaleSpecification);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Buyer bindingSale(BuyerSale buyerSale, Buyer buyer, BuyerAddress address) {
+        buyerSaleRepository.save(buyerSale);
+        buyerSaleRepository.save(buyerSale);
+        BuyerAddress buyerAddress = buyerAddressRepository.findFirstByBuyerIdAndIsDefaultAndIsAvailable(buyer.getId(), true, true);
+        if (buyerAddress != null) {
+            buyerAddress.setIsDefault(false);
+            buyerAddressRepository.save(buyerAddress);
+        }
+        buyerAddressRepository.save(address);
+        return buyerRepository.saveAndFlush(buyer);
+    }
 }
