@@ -40,7 +40,7 @@ public class TurntableDetailController {
      */
     @GetMapping("/all/turntableId")
     public Result<List<TurntableDetailResp>> save(Long turntableId) {
-        List<TurntableDetail> turntableDetails = turntableDetailService.findAll(turntableId);
+        List<TurntableDetail> turntableDetails = turntableDetailService.findAllByShow(turntableId);
         return Result.buildSaveOk(BeanMapper.mapList(turntableDetails, TurntableDetailResp.class));
     }
 }

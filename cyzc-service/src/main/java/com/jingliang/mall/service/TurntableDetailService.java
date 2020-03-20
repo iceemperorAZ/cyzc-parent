@@ -29,6 +29,14 @@ public interface TurntableDetailService {
      * @param turntableId
      * @return
      */
+    List<TurntableDetail> findAllByShow(Long turntableId);
+
+    /**
+     * 根据转盘Id查询转盘详情
+     *
+     * @param turntableId
+     * @return
+     */
     List<TurntableDetail> findAll(Long turntableId);
 
     /**

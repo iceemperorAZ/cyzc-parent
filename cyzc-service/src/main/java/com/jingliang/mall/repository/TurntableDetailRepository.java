@@ -22,4 +22,14 @@ public interface TurntableDetailRepository extends BaseRepository<TurntableDetai
      * @return
      */
     List<TurntableDetail> findAllByTurntableIdAndIsAvailable(Long turntableId, Boolean isAvailable);
+
+    /**
+     * 根据转盘Id查询
+     *
+     * @param turntableId
+     * @param isAvailable
+     * @param isShow
+     * @return
+     */
+    List<TurntableDetail> findAllByTurntableIdAndIsAvailableAndIsShow(Long turntableId, Boolean isAvailable, Boolean isShow);
 }

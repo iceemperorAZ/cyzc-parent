@@ -33,6 +33,11 @@ public class TurntableDetailServiceImpl implements TurntableDetailService {
     }
 
     @Override
+    public List<TurntableDetail> findAllByShow(Long turntableId) {
+        return turntableDetailRepository.findAllByTurntableIdAndIsAvailableAndIsShow(turntableId, true, true);
+    }
+
+    @Override
     public List<TurntableDetail> findAll(Long turntableId) {
         return turntableDetailRepository.findAllByTurntableIdAndIsAvailable(turntableId, true);
     }
