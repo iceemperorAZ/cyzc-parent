@@ -111,25 +111,28 @@ public class TurntableServiceImpl implements TurntableService {
         turntableLog.setBuyerId(buyerId);
         turntableLog.setCreateTime(new Date());
         turntableLog.setIsAvailable(true);
-        turntableLog.setMsg("获得" + turntableDetail1.getPrizeName() + "x" + turntableDetail1.getBaseNum() + ".");
-        turntableLogRepository.saveAndFlush(turntableLog);
         //处理抽到的奖品
         Integer type = turntableDetail1.getType();
+        String name = "";
         //判断奖品的类型
         switch (type) {
             case 200:
                 //金币
                 buyer.setGold(buyer.getGold() + turntableDetail1.getBaseNum());
+                name = "金币" + "x" + turntableDetail1.getBaseNum();
                 break;
             case 300:
                 //返利次数
+                name = "返利次数" + "x" + turntableDetail1.getBaseNum();
                 buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() + turntableDetail1.getBaseNum());
                 break;
             case 400:
                 //商品
+                name = "商品";
                 //生成订单
                 Long prizeId = turntableDetail1.getPrizeId();
                 Product product = productRepository.getOne(prizeId);
+                name = product.getProductName() + "x" + turntableDetail1.getBaseNum();
                 //创建订单
                 Order order = new Order();
                 order.setOrderNo(redisService.getOrderNo());
@@ -191,7 +194,8 @@ public class TurntableServiceImpl implements TurntableService {
                 break;
             default:
         }
-
+        turntableLog.setMsg("获得" + name + ".");
+        turntableLogRepository.saveAndFlush(turntableLog);
 
         return turntableDetail1;
     }
