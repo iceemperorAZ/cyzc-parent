@@ -74,7 +74,7 @@ public class TurntableServiceImpl implements TurntableService {
 
     @Override
     public void delete(Long id, Long userId) {
-        Turntable turntable = turntableRepository.findAllByIdAndIsAvailable(id,true);
+        Turntable turntable = turntableRepository.findAllByIdAndIsAvailable(id, true);
         turntable.setIsAvailable(false);
         turntable.setUpdateTime(new Date());
         turntable.setUpdateUserId(userId);
@@ -92,7 +92,7 @@ public class TurntableServiceImpl implements TurntableService {
             //金币不够不能抽奖
             throw new TurntableException("金币数量不足！");
         }
-        List<TurntableDetail> turntableDetails = turntableDetailRepository.findAllByTurntableIdAndIsAvailable(id, true);
+        List<TurntableDetail> turntableDetails = turntableDetailRepository.findAllByTurntableIdAndIsAvailableAndIsShow(id, true, true);
         Map<Long, TurntableDetail> detailMap = turntableDetails.stream().parallel().collect(Collectors.toMap(TurntableDetail::getId, turntableDetail -> turntableDetail));
         TurntableDetail turntableDetail1 = MallUtils.weightRandom(detailMap);
         //获取转盘所需要的金币数
