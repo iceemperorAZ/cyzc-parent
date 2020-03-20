@@ -74,7 +74,7 @@ public class TurntableServiceImpl implements TurntableService {
 
     @Override
     public void delete(Long id, Long userId) {
-        Turntable turntable = turntableRepository.getOne(id);
+        Turntable turntable = turntableRepository.findAllByIdAndIsAvailable(id,true);
         turntable.setIsAvailable(false);
         turntable.setUpdateTime(new Date());
         turntable.setUpdateUserId(userId);

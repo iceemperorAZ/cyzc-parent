@@ -4,7 +4,6 @@ import com.jingliang.mall.common.Base64Image;
 import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.common.Result;
-import com.jingliang.mall.entity.Turntable;
 import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.TurntableDetailReq;
@@ -21,6 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 转盘详情Controller
@@ -85,6 +85,7 @@ public class TurntableDetailController {
         List<TurntableDetail> turntableDetails = turntableDetailService.findAll(turntableId);
         return Result.buildQueryOk(BeanMapper.mapList(turntableDetails, TurntableDetailResp.class));
     }
+
     /**
      * 上下架
      */
@@ -92,18 +93,18 @@ public class TurntableDetailController {
     @ApiOperation("上下架")
     public Result<TurntableDetailResp> show(@RequestBody TurntableDetailReq turntableDetailReq, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
-        TurntableDetail turntableDetail = turntableDetailService.show(user,BeanMapper.map(turntableDetailReq, TurntableDetail.class));
+        TurntableDetail turntableDetail = turntableDetailService.show(user, BeanMapper.map(turntableDetailReq, TurntableDetail.class));
         return Result.buildSaveOk(BeanMapper.map(turntableDetail, TurntableDetailResp.class));
     }
 
     /**
      * 删除
      */
-    @DeleteMapping("/{id}")
+    @PostMapping("/id")
     @ApiOperation("删除")
-    public Result<Boolean> delete(@PathVariable Long id, @ApiIgnore HttpSession session) {
+    public Result<Boolean> delete(@RequestBody Map<String, Long> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
-        turntableDetailService.delete(id, user.getId());
+        turntableDetailService.delete(map.get("id"), user.getId());
         return Result.buildDeleteOk(true);
     }
 }

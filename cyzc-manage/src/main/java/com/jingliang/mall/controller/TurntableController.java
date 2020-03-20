@@ -20,6 +20,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 转盘Controller
@@ -84,11 +85,11 @@ public class TurntableController {
     /**
      * '删除
      */
-    @DeleteMapping("/{id}")
+    @PostMapping("/id")
     @ApiOperation("删除")
-    public Result<Boolean> delete(@PathVariable Long id, @ApiIgnore HttpSession session) {
+    public Result<Boolean> delete(@RequestBody Map<String, Long> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
-        turntableService.delete(id, user.getId());
+        turntableService.delete(map.get("id"), user.getId());
         return Result.buildDeleteOk(true);
     }
 

@@ -1,6 +1,5 @@
 package com.jingliang.mall.service.impl;
 
-import com.jingliang.mall.entity.Turntable;
 import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.TurntableDetailRepository;
@@ -40,14 +39,14 @@ public class TurntableDetailServiceImpl implements TurntableDetailService {
 
     @Override
     public void delete(Long id, Long userId) {
-        TurntableDetail turntableDetail = turntableDetailRepository.getOne(id);
+        TurntableDetail turntableDetail = turntableDetailRepository.findAllByIdAndIsAvailable(id, true);
         turntableDetail.setIsAvailable(false);
         turntableDetailRepository.save(turntableDetail);
     }
 
     @Override
     public TurntableDetail show(User user, TurntableDetail turntableDetail) {
-        TurntableDetail turntableDetail1 = turntableDetailRepository.findById(turntableDetail.getId()).orElse(null);
+        TurntableDetail turntableDetail1 = turntableDetailRepository.findAllByIdAndIsAvailable(turntableDetail.getId(), true);
         turntableDetail1.setIsShow(turntableDetail.getIsShow());
         turntableDetail1.setShowTime(new Date());
         turntableDetail1.setShowUserId(user.getId());
@@ -56,6 +55,6 @@ public class TurntableDetailServiceImpl implements TurntableDetailService {
 
     @Override
     public TurntableDetail findById(Long id) {
-        return turntableDetailRepository.findAllByIdAndIsAvailable(id,true);
+        return turntableDetailRepository.findAllByIdAndIsAvailable(id, true);
     }
 }
