@@ -1,5 +1,6 @@
 package com.jingliang.mall.service.impl;
 
+import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.exception.TurntableException;
@@ -9,6 +10,7 @@ import com.jingliang.mall.service.BuyerAddressService;
 import com.jingliang.mall.service.ConfigService;
 import com.jingliang.mall.service.TurntableService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TurntableServiceImpl implements TurntableService {
 
+    @Value("${product.sku.init.invented.num}")
+    private Integer productSkuInitInventedNum;
     private final TurntableRepository turntableRepository;
     private final BuyerRepository buyerRepository;
     private final TurntableDetailRepository turntableDetailRepository;
@@ -41,8 +45,9 @@ public class TurntableServiceImpl implements TurntableService {
     private final ConfigService configService;
     private final SkuRepository skuRepository;
     private final OrderDetailRepository orderDetailRepository;
+    private final RabbitProducer rabbitProducer;
 
-    public TurntableServiceImpl(TurntableRepository turntableRepository, BuyerRepository buyerRepository, TurntableDetailRepository turntableDetailRepository, TurntableLogRepository turntableLogRepository, ProductRepository productRepository, OrderRepository orderRepository, ConfigRepository configRepository, RedisService redisService, BuyerAddressService buyerAddressService, ConfigService configService, SkuRepository skuRepository, OrderDetailRepository orderDetailRepository) {
+    public TurntableServiceImpl(TurntableRepository turntableRepository, BuyerRepository buyerRepository, TurntableDetailRepository turntableDetailRepository, TurntableLogRepository turntableLogRepository, ProductRepository productRepository, OrderRepository orderRepository, ConfigRepository configRepository, RedisService redisService, BuyerAddressService buyerAddressService, ConfigService configService, SkuRepository skuRepository, OrderDetailRepository orderDetailRepository, RabbitProducer rabbitProducer) {
         this.turntableRepository = turntableRepository;
         this.buyerRepository = buyerRepository;
         this.turntableDetailRepository = turntableDetailRepository;
@@ -55,6 +60,7 @@ public class TurntableServiceImpl implements TurntableService {
         this.configService = configService;
         this.skuRepository = skuRepository;
         this.orderDetailRepository = orderDetailRepository;
+        this.rabbitProducer = rabbitProducer;
     }
 
     @Override
@@ -97,7 +103,7 @@ public class TurntableServiceImpl implements TurntableService {
         TurntableDetail turntableDetail1 = MallUtils.weightRandom(detailMap);
         //获取转盘所需要的金币数
         if (turntableDetail1 == null) {
-            //金币不够不能抽奖
+            //奖品已被抽完
             throw new TurntableException("奖品已被抽完！");
         }
         //把抽到的商品数量减1
@@ -131,11 +137,18 @@ public class TurntableServiceImpl implements TurntableService {
                 break;
             case 400:
                 //商品
-                name = "获得" + "商品";
                 //生成订单
                 Long prizeId = turntableDetail1.getPrizeId();
                 Product product = productRepository.getOne(prizeId);
-                name = product.getProductName() + "x" + turntableDetail1.getBaseNum();
+                //查询线上库存
+                Long skuNum = redisService.skuLineDecrement(String.valueOf(product.getId()), turntableDetail1.getBaseNum());
+                if (skuNum < 0) {
+                    //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
+                    redisService.skuLineIncrement(String.valueOf(product.getId()), turntableDetail1.getBaseNum());
+                    //奖品已被抽完
+                    throw new TurntableException("奖品已被抽完！");
+                }
+                name = "获得" + product.getProductName() + "x" + turntableDetail1.getBaseNum();
                 //创建订单
                 Order order = new Order();
                 order.setOrderNo(redisService.getOrderNo());
@@ -194,6 +207,8 @@ public class TurntableServiceImpl implements TurntableService {
                 orderDetail.setCreateTime(new Date());
                 orderDetail.setIsAvailable(true);
                 orderDetailRepository.saveAndFlush(orderDetail);
+                //发送到消息服务器
+                rabbitProducer.sendOrderExpireMsg(order);
                 break;
             default:
         }
