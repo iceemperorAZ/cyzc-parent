@@ -116,19 +116,22 @@ public class TurntableServiceImpl implements TurntableService {
         String name = "";
         //判断奖品的类型
         switch (type) {
+            case 100:
+                name = "谢谢参与.";
+                break;
             case 200:
                 //金币
                 buyer.setGold(buyer.getGold() + turntableDetail1.getBaseNum());
-                name = "金币" + "x" + turntableDetail1.getBaseNum();
+                name = "获得" + "金币" + "x" + turntableDetail1.getBaseNum();
                 break;
             case 300:
                 //返利次数
-                name = "返利次数" + "x" + turntableDetail1.getBaseNum();
+                name = "获得" + "返利次数" + "x" + turntableDetail1.getBaseNum();
                 buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() + turntableDetail1.getBaseNum());
                 break;
             case 400:
                 //商品
-                name = "商品";
+                name = "获得" + "商品";
                 //生成订单
                 Long prizeId = turntableDetail1.getPrizeId();
                 Product product = productRepository.getOne(prizeId);
@@ -194,7 +197,7 @@ public class TurntableServiceImpl implements TurntableService {
                 break;
             default:
         }
-        turntableLog.setMsg("获得" + name + ".");
+        turntableLog.setMsg(name + ".");
         turntableLogRepository.saveAndFlush(turntableLog);
 
         return turntableDetail1;

@@ -22,6 +22,6 @@ public interface TurntableLogRepository extends BaseRepository<TurntableLog, Lon
      * @param pageable
      * @return
      */
-    Page<TurntableLog> findAllByBuyerIdAndIsAvailable(Long buyerId, Boolean isAvailable, Pageable pageable);
+    Page<TurntableLog> findAllByBuyerIdAndIsAvailableOrderByCreateTimeDesc(Long buyerId, Boolean isAvailable, Pageable pageable);
 
 }

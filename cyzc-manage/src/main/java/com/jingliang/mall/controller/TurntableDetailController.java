@@ -1,14 +1,13 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.Base64Image;
-import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.MallUtils;
-import com.jingliang.mall.common.Result;
+import com.jingliang.mall.common.*;
+import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.TurntableDetailReq;
 import com.jingliang.mall.resp.TurntableDetailResp;
 import com.jingliang.mall.server.FastdfsService;
+import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.TurntableDetailService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,10 +40,12 @@ public class TurntableDetailController {
     private String sessionUser;
     private final TurntableDetailService turntableDetailService;
     private final FastdfsService fastdfsService;
+    private final ProductService productService;
 
-    public TurntableDetailController(TurntableDetailService turntableDetailService, FastdfsService fastdfsService) {
+    public TurntableDetailController(TurntableDetailService turntableDetailService, FastdfsService fastdfsService, ProductService productService) {
         this.turntableDetailService = turntableDetailService;
         this.fastdfsService = fastdfsService;
+        this.productService = productService;
     }
 
     /**
@@ -72,6 +73,13 @@ public class TurntableDetailController {
             assert base64Image != null;
             turntableDetailReq.setImg(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
         }
+        if (turntableDetailReq.getType() == 400) {
+            Product product = productService.findAllById(turntableDetailReq.getPrizeId());
+            if (product == null) {
+                return Result.build(Constant.FAIL, "商品不存在");
+            }
+        }
+
         TurntableDetail turntableDetail = turntableDetailService.save(BeanMapper.map(turntableDetailReq, TurntableDetail.class));
         return Result.buildSaveOk(BeanMapper.map(turntableDetail, TurntableDetailResp.class));
     }

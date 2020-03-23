@@ -5,6 +5,7 @@ import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.TurntableDetail;
+import com.jingliang.mall.exception.TurntableException;
 import com.jingliang.mall.req.TurntableReq;
 import com.jingliang.mall.resp.TurntableResp;
 import com.jingliang.mall.service.TurntableService;
@@ -54,9 +55,9 @@ public class TurntableController {
         try {
             TurntableDetail turntableDetail = turntableService.extract(turntableReq.getId(), buyer.getId());
             return Result.build(Constant.OK, "抽奖成功", turntableDetail);
-        } catch (Exception e) {
+        } catch (TurntableException e) {
             e.printStackTrace();
-            return Result.build(Constant.FAIL, e.getMessage());
+            return Result.build(Constant.OK, e.getMessage());
         }
     }
 }

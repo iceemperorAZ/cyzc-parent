@@ -27,6 +27,6 @@ public class TurntableLogServiceImpl implements TurntableLogService {
 
     @Override
     public Page<TurntableLog> pageAll(Long buyerId, PageRequest pageRequest) {
-        return turntableLogRepository.findAllByBuyerIdAndIsAvailable(buyerId, true, pageRequest);
+        return turntableLogRepository.findAllByBuyerIdAndIsAvailableOrderByCreateTimeDesc(buyerId, true, pageRequest);
     }
 }
