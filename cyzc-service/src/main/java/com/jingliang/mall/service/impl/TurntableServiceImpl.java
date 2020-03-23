@@ -96,7 +96,7 @@ public class TurntableServiceImpl implements TurntableService {
         //获取转盘所需要的金币数
         if (gold < turntable.getGold()) {
             //金币不够不能抽奖
-            throw new TurntableException("金币数量不足！");
+            throw new TurntableException("谢谢惠顾！");
         }
         List<TurntableDetail> turntableDetails = turntableDetailRepository.findAllByTurntableIdAndIsAvailableAndIsShow(id, true, true);
         Map<Long, TurntableDetail> detailMap = turntableDetails.stream().parallel().collect(Collectors.toMap(TurntableDetail::getId, turntableDetail -> turntableDetail));
@@ -104,7 +104,7 @@ public class TurntableServiceImpl implements TurntableService {
         //获取转盘所需要的金币数
         if (turntableDetail1 == null) {
             //奖品已被抽完
-            throw new TurntableException("奖品已被抽完！");
+            throw new TurntableException("谢谢惠顾！");
         }
         //把抽到的商品数量减1
         turntableDetail1.setPrizeNum(turntableDetail1.getPrizeNum() - 1);
@@ -146,7 +146,7 @@ public class TurntableServiceImpl implements TurntableService {
                     //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                     redisService.skuLineIncrement(String.valueOf(product.getId()), turntableDetail1.getBaseNum());
                     //奖品已被抽完
-                    throw new TurntableException("奖品已被抽完！");
+                    throw new TurntableException("谢谢惠顾！");
                 }
                 name = "获得" + product.getProductName() + "x" + turntableDetail1.getBaseNum();
                 //创建订单
