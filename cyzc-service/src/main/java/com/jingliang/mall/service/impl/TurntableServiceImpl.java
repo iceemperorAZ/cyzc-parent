@@ -92,7 +92,7 @@ public class TurntableServiceImpl implements TurntableService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(noRollbackFor = TurntableException.class)
     public TurntableDetail extract(Long id, Long buyerId) {
         Turntable turntable = turntableRepository.findAllByIdAndIsAvailable(id, true);
         Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(buyerId, true);
@@ -102,11 +102,18 @@ public class TurntableServiceImpl implements TurntableService {
             //金币不够不能抽奖
             throw new TurntableException("金币不足！");
         }
+        //记录抽奖日志
+        TurntableLog turntableLog = new TurntableLog();
+        turntableLog.setBuyerId(buyerId);
+        turntableLog.setCreateTime(new Date());
+        turntableLog.setIsAvailable(true);
         List<TurntableDetail> turntableDetails = turntableDetailRepository.findAllByTurntableIdAndIsAvailableAndIsShow(id, true, true);
         Map<Long, TurntableDetail> detailMap = turntableDetails.stream().parallel().collect(Collectors.toMap(TurntableDetail::getId, turntableDetail -> turntableDetail));
         TurntableDetail turntableDetail1 = MallUtils.weightRandom(detailMap);
         if (turntableDetail1 == null) {
             //奖品已被抽完
+            turntableLog.setMsg("谢谢惠顾.");
+            turntableLogRepository.saveAndFlush(turntableLog);
             throw new TurntableException("谢谢惠顾！");
         }
         //把抽到的商品数量减1
@@ -115,11 +122,7 @@ public class TurntableServiceImpl implements TurntableService {
         //减少用户金币
         buyer.setGold(buyer.getGold() - turntable.getGold());
         buyerRepository.saveAndFlush(buyer);
-        //记录抽奖日志
-        TurntableLog turntableLog = new TurntableLog();
-        turntableLog.setBuyerId(buyerId);
-        turntableLog.setCreateTime(new Date());
-        turntableLog.setIsAvailable(true);
+
         //处理抽到的奖品
         Integer type = turntableDetail1.getType();
         String name = "";
@@ -149,6 +152,8 @@ public class TurntableServiceImpl implements TurntableService {
                     //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                     redisService.skuLineIncrement(String.valueOf(product.getId()), turntableDetail1.getBaseNum());
                     //奖品已被抽完
+                    turntableLog.setMsg("谢谢惠顾.");
+                    turntableLogRepository.saveAndFlush(turntableLog);
                     throw new TurntableException("谢谢惠顾！");
                 }
                 name = "获得" + product.getProductName() + "x" + turntableDetail1.getBaseNum();

@@ -37,29 +37,6 @@ public class MallUtils extends BaseMallUtils {
         baseReq.setIsAvailable(true);
     }
 
-    /**
-     * 获取真实Ip地址
-     *
-     * @param request 请求
-     * @return 返回得到的真实Ip
-     */
-    public static String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        if (ip.contains(",")) {
-            return ip.split(",")[0];
-        } else {
-            return ip;
-        }
-    }
 
     /**
      * 校验密码安全度
