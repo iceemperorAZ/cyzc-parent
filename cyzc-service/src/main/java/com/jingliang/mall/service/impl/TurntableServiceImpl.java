@@ -47,7 +47,11 @@ public class TurntableServiceImpl implements TurntableService {
     private final OrderDetailRepository orderDetailRepository;
     private final RabbitProducer rabbitProducer;
 
-    public TurntableServiceImpl(TurntableRepository turntableRepository, BuyerRepository buyerRepository, TurntableDetailRepository turntableDetailRepository, TurntableLogRepository turntableLogRepository, ProductRepository productRepository, OrderRepository orderRepository, ConfigRepository configRepository, RedisService redisService, BuyerAddressService buyerAddressService, ConfigService configService, SkuRepository skuRepository, OrderDetailRepository orderDetailRepository, RabbitProducer rabbitProducer) {
+    public TurntableServiceImpl(TurntableRepository turntableRepository, BuyerRepository buyerRepository,
+                                TurntableDetailRepository turntableDetailRepository, TurntableLogRepository turntableLogRepository,
+                                ProductRepository productRepository, OrderRepository orderRepository, ConfigRepository configRepository,
+                                RedisService redisService, BuyerAddressService buyerAddressService, ConfigService configService, SkuRepository skuRepository,
+                                OrderDetailRepository orderDetailRepository, RabbitProducer rabbitProducer) {
         this.turntableRepository = turntableRepository;
         this.buyerRepository = buyerRepository;
         this.turntableDetailRepository = turntableDetailRepository;
@@ -96,12 +100,11 @@ public class TurntableServiceImpl implements TurntableService {
         //获取转盘所需要的金币数
         if (gold < turntable.getGold()) {
             //金币不够不能抽奖
-            throw new TurntableException("谢谢惠顾！");
+            throw new TurntableException("金币不足！");
         }
         List<TurntableDetail> turntableDetails = turntableDetailRepository.findAllByTurntableIdAndIsAvailableAndIsShow(id, true, true);
         Map<Long, TurntableDetail> detailMap = turntableDetails.stream().parallel().collect(Collectors.toMap(TurntableDetail::getId, turntableDetail -> turntableDetail));
         TurntableDetail turntableDetail1 = MallUtils.weightRandom(detailMap);
-        //获取转盘所需要的金币数
         if (turntableDetail1 == null) {
             //奖品已被抽完
             throw new TurntableException("谢谢惠顾！");
@@ -214,7 +217,6 @@ public class TurntableServiceImpl implements TurntableService {
         }
         turntableLog.setMsg(name + ".");
         turntableLogRepository.saveAndFlush(turntableLog);
-
         return turntableDetail1;
     }
 }
