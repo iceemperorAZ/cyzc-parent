@@ -4,10 +4,12 @@ import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.Constant;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.BuyerAddress;
 import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.exception.TurntableException;
 import com.jingliang.mall.req.TurntableReq;
 import com.jingliang.mall.resp.TurntableResp;
+import com.jingliang.mall.service.BuyerAddressService;
 import com.jingliang.mall.service.TurntableService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +35,11 @@ public class TurntableController {
     @Value("${session.buyer.key}")
     private String sessionBuyer;
     private final TurntableService turntableService;
+    private final BuyerAddressService buyerAddressService;
 
-    public TurntableController(TurntableService turntableService) {
+    public TurntableController(TurntableService turntableService, BuyerAddressService buyerAddressService) {
         this.turntableService = turntableService;
+        this.buyerAddressService = buyerAddressService;
     }
 
     /**
@@ -52,6 +56,11 @@ public class TurntableController {
     @PostMapping("/extract")
     public Result<TurntableDetail> extract(@RequestBody TurntableReq turntableReq, HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
+        //查询默认地址
+        BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyer.getId());
+        if (buyerAddress == null) {
+            return Result.build(Constant.OK, "请配置默认地址");
+        }
         try {
             TurntableDetail turntableDetail = turntableService.extract(turntableReq.getId(), buyer.getId());
             return Result.build(Constant.OK, "抽奖成功", turntableDetail);
