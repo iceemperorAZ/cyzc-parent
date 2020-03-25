@@ -186,7 +186,7 @@ public class TurntableServiceImpl implements TurntableService {
                 //捕获异常，防止填写错误，填写格式错误则默认延时3天
                 //捕获异常，防止填写错误，填写格式错误则默认延时3天
                 Sku sku = skuRepository.findFirstByProductIdAndIsAvailable(prizeId, true);
-                if (sku.getSkuRealityNum() < turntableDetail1.getBaseNum()) {
+                if (sku.getSkuRealityNum() >= turntableDetail1.getBaseNum()) {
                     //真实库存不足延迟配送
                     config = configService.findByCode("500");
                 } else {
