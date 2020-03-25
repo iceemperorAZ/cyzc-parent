@@ -122,7 +122,6 @@ public class TurntableServiceImpl implements TurntableService {
         //减少用户金币
         buyer.setGold(buyer.getGold() - turntable.getGold());
         buyerRepository.saveAndFlush(buyer);
-
         //处理抽到的奖品
         Integer type = turntableDetail1.getType();
         String name = "";
@@ -215,8 +214,13 @@ public class TurntableServiceImpl implements TurntableService {
                 orderDetail.setCreateTime(new Date());
                 orderDetail.setIsAvailable(true);
                 orderDetailRepository.saveAndFlush(orderDetail);
-                //发送到消息服务器
-                rabbitProducer.sendOrderExpireMsg(order);
+                sku = new Sku();
+                sku.setProductId(orderDetail.getProductId());
+                sku.setUpdateTime(order.getCreateTime());
+                sku.setUpdateUserId(-1L);
+                sku.setUpdateUserName("抽奖系统");
+                sku.setSkuLineNum(-orderDetail.getProductNum());
+                rabbitProducer.sendSku(sku);
                 break;
             default:
         }

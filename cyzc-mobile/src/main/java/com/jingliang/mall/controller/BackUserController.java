@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
@@ -54,12 +53,13 @@ public class BackUserController {
      */
     @ApiOperation(value = "后台登录")
     @PostMapping("/back/login")
-    public Result<UserResp> backLogin(@RequestBody UserReq userReq, HttpServletResponse response) throws IOException {
+    public void backLogin(@RequestBody UserReq userReq, HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         User user = userService.findByUserNo(userReq.getUserNo());
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        if (user == null || !passwordEncoder.matches(user.getPassword(), userReq.getPassword())) {
-            return Result.build(Constant.FAIL, "工号或密码错误！");
+        if (user == null || !passwordEncoder.matches(userReq.getPassword(), user.getPassword())) {
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.FAIL, "工号或密码错误！")));
+            return;
         }
         log.debug("登录成功，用户信息 = {}", user);
         Map<String, String> map = new HashMap<>(5);
@@ -73,6 +73,5 @@ public class BackUserController {
         redisService.setExpire(tokenUserPrefix + user.getId(), user, tokenTimeOut);
         response.setHeader("Authorization", token);
         response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.OK, Constant.TEXT_LOGIN_OK, BeanMapper.map(user, UserResp.class))));
-        return Result.build(Constant.OK, "登录成功", BeanMapper.map(user, UserResp.class));
     }
 }
