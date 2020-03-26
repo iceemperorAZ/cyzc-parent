@@ -312,8 +312,8 @@ public class OrderController {
                 //仓库
                 String storehouse = order.getStorehouse();
                 row.createCell(++productCelNum).setCellValue(storehouse);
-                //备注（放收货地址）
-                row.createCell(++productCelNum).setCellValue(order.getDetailAddress());
+                //备注（放收货地址 + 收货人 + 电话）
+                row.createCell(++productCelNum).setCellValue(order.getDetailAddress() + " " + order.getReceiverName() + " " + order.getReceiverPhone());
                 row = sheet.createRow(++rowNum);
             }
         }
