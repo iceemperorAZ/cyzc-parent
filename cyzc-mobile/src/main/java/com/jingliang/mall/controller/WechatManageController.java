@@ -242,7 +242,8 @@ public class WechatManageController {
         if (Objects.isNull(user)) {
             return Result.build(Constant.DATA_FAIL, Constant.TEXT_USER_DATA_FAIL);
         }
-        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
+        //TODO   临时添加分页，后面恢复 谨记谨记！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+        PageRequest pageRequest = PageRequest.of(userReq.getPage(), 2000);
         if (StringUtils.isNotBlank(userReq.getClause())) {
             pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         }
