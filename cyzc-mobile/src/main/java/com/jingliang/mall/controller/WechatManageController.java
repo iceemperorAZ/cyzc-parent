@@ -649,9 +649,15 @@ public class WechatManageController {
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(endTime);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
         List<BuyerSale> buyerSales = buyerSaleService.finAll(buyerSaleSpecification);
         List<Buyer> collect = buyerSales.stream().filter(buyerSale -> {
-            if (buyerSale.getUntyingTime().compareTo(creationTime) < 0 || buyerSale.getCreateTime().compareTo(endTime) > 0) {
+            if (buyerSale.getUntyingTime().compareTo(creationTime) < 0 || buyerSale.getCreateTime().compareTo(calendar.getTime()) > 0) {
                 return false;
             }
             return true;
