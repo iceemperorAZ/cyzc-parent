@@ -128,7 +128,7 @@ public class TurntableServiceImpl implements TurntableService {
         //判断奖品的类型
         switch (type) {
             case 100:
-                name = "谢谢参与.";
+                name = "谢谢参与";
                 break;
             case 200:
                 //金币
