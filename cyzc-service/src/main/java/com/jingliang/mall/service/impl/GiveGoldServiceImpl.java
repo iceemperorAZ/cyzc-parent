@@ -28,12 +28,12 @@ public class GiveGoldServiceImpl implements GiveGoldService {
 
     private final GiveGoldRepository giveGoldRepository;
     private final BuyerRepository buyerRepository;
-    private final GoldLogRepository signInLogRepository;
+    private final GoldLogRepository goldLogRepository;
 
-    public GiveGoldServiceImpl(GiveGoldRepository giveGoldRepository, BuyerRepository buyerRepository, GoldLogRepository signInLogRepository) {
+    public GiveGoldServiceImpl(GiveGoldRepository giveGoldRepository, BuyerRepository buyerRepository, GoldLogRepository goldLogRepository) {
         this.giveGoldRepository = giveGoldRepository;
         this.buyerRepository = buyerRepository;
-        this.signInLogRepository = signInLogRepository;
+        this.goldLogRepository = goldLogRepository;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class GiveGoldServiceImpl implements GiveGoldService {
             goldLog.setGold(giveGold.getGold());
             goldLog.setMsg("系统赠送" + giveGold.getGold() + "金币");
             goldLog.setType(300);
-            signInLogRepository.save(goldLog);
+            goldLogRepository.save(goldLog);
         }
         return giveGoldRepository.save(giveGold);
     }

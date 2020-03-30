@@ -192,7 +192,8 @@ public class WechatManageController {
     public Result<MallPage<ConfluenceDetailResp>> userBuyer(@ApiIgnore UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
         User user = (User) session.getAttribute(sessionUser);
-        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
+        //TODO 临时修改
+        PageRequest pageRequest = PageRequest.of(userReq.getPage(), 2000);
         if (StringUtils.isNotBlank(userReq.getClause())) {
             pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         }
@@ -598,6 +599,11 @@ public class WechatManageController {
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
             Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
             List<Predicate> orPredicateList = new ArrayList<>();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(endTime);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
             orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), endTime));
             orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), startTime));
             Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));

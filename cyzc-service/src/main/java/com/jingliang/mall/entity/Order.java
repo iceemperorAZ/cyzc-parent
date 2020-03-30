@@ -1,6 +1,7 @@
 package com.jingliang.mall.entity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ import java.util.List;
 @Table(name = "tb_order")
 @Entity
 @Data
+@Accessors(chain = true)
 public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;

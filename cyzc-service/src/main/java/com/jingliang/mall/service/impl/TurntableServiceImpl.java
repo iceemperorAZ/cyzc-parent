@@ -46,12 +46,13 @@ public class TurntableServiceImpl implements TurntableService {
     private final SkuRepository skuRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final RabbitProducer rabbitProducer;
+    private final GoldLogRepository goldLogRepository;
 
     public TurntableServiceImpl(TurntableRepository turntableRepository, BuyerRepository buyerRepository,
                                 TurntableDetailRepository turntableDetailRepository, TurntableLogRepository turntableLogRepository,
                                 ProductRepository productRepository, OrderRepository orderRepository, ConfigRepository configRepository,
                                 RedisService redisService, BuyerAddressService buyerAddressService, ConfigService configService, SkuRepository skuRepository,
-                                OrderDetailRepository orderDetailRepository, RabbitProducer rabbitProducer) {
+                                OrderDetailRepository orderDetailRepository, RabbitProducer rabbitProducer, GoldLogRepository goldLogRepository) {
         this.turntableRepository = turntableRepository;
         this.buyerRepository = buyerRepository;
         this.turntableDetailRepository = turntableDetailRepository;
@@ -65,6 +66,7 @@ public class TurntableServiceImpl implements TurntableService {
         this.skuRepository = skuRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.rabbitProducer = rabbitProducer;
+        this.goldLogRepository = goldLogRepository;
     }
 
     @Override
@@ -134,6 +136,14 @@ public class TurntableServiceImpl implements TurntableService {
                 //金币
                 buyer.setGold(buyer.getGold() + turntableDetail1.getBaseNum());
                 name = "获得" + "金币" + "x" + turntableDetail1.getBaseNum();
+                GoldLog goldLog = new GoldLog();
+                goldLog.setBuyerId(buyerId);
+                goldLog.setMoney(0);
+                goldLog.setIsAvailable(true);
+                goldLog.setGold(turntableDetail1.getBaseNum());
+                goldLog.setMsg("抽奖获得金币x" + turntableDetail1.getBaseNum() );
+                goldLog.setType(600);
+                goldLogRepository.save(goldLog);
                 break;
             case 300:
                 //返利次数
