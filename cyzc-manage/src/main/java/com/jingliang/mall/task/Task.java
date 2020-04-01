@@ -40,8 +40,6 @@ public class Task {
 
     /**
      * 订单自动确认定时任务
-     */
-    /**
      * 每天00:00:00查询出发货三天还没有的确认收货的单子，执行自动确认
      */
     @Scheduled(cron = "0 0 0 * * ? ")
@@ -67,6 +65,5 @@ public class Task {
                 orderService.update(new Order().setId(order.getId()).setOrderStatus(600));
             });
         }
-
     }
 }

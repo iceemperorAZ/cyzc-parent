@@ -4,6 +4,8 @@ import com.jingliang.mall.entity.TurntableLog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
+
 /**
  * 转盘日志Service
  *
@@ -21,4 +23,12 @@ public interface TurntableLogService {
      * @return
      */
     Page<TurntableLog> pageAll(Long buyerId, PageRequest pageRequest);
+
+    /**
+     * 查询前100条中奖纪录
+     *
+     * @param pageRequest
+     * @return
+     */
+    List<TurntableLog> prizeAll(PageRequest pageRequest);
 }

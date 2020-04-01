@@ -1,7 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallPage;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MUtils;
+import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.TurntableLog;
@@ -12,13 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 /**
  * 转盘日志Controller
@@ -59,4 +59,14 @@ public class TurntableLogController {
 
     }
 
+    /**
+     * 查询前num条中奖记录
+     */
+    @GetMapping("/find/prize/{num}")
+    public Result<List<TurntableLogResp>> prizeAll(@PathVariable Integer num) {
+        PageRequest pageRequest = PageRequest.of(0, num, Sort.by(Sort.Order.desc("createTime")));
+        List<TurntableLog> turntableLogPage = turntableLogService.prizeAll(pageRequest);
+        List<TurntableLogResp> turntableLogResps = BeanMapper.mapList(turntableLogPage, TurntableLogResp.class);
+        return Result.buildQueryOk(turntableLogResps);
+    }
 }

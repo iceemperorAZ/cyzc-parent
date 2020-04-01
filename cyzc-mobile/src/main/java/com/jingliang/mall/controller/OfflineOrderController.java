@@ -59,6 +59,10 @@ public class OfflineOrderController {
         offlineOrderReq.setSalesmanName(user.getUserName());
         offlineOrderReq.setSalesmanId(user.getId());
         offlineOrderReq.setSalesmanNo(user.getUserNo());
+        if (offlineOrderReq.getRate() != null && offlineOrderReq.getRate() != 200) {
+            offlineOrderReq.setRate(null);
+        }
+        offlineOrderReq.setEnable(false);
         offlineOrderReq.setSalesmanPhone(user.getPhone());
         offlineOrderReq.setCreateTime(new Date());
         OfflineOrder offlineOrder = offlineOrderService.save(BeanMapper.map(offlineOrderReq, OfflineOrder.class));
@@ -75,6 +79,7 @@ public class OfflineOrderController {
                                                       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeStart,
                                                       @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
                                                       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeEnd,
+                                                      Integer rate,
                                                       @ApiIgnore HttpSession session) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         User user = (User) session.getAttribute(sessionUser);
@@ -82,6 +87,9 @@ public class OfflineOrderController {
             List<Predicate> predicateList = new ArrayList<>();
             if (createTimeStart != null && createTimeEnd != null) {
                 predicateList.add(cb.between(root.get("createTime"), createTimeStart, createTimeEnd));
+            }
+            if (rate != null) {
+                predicateList.add(cb.equal(root.get("rate"), rate));
             }
             predicateList.add(cb.equal(root.get("salesmanId"), user.getId()));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));

@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
+
 /**
  * 线下订单Service
  *
@@ -30,4 +32,28 @@ public interface OfflineOrderService {
      * @return
      */
     Page<OfflineOrder> pageAll(Specification<OfflineOrder> specification, PageRequest pageRequest);
+
+    /**
+     * 根据条件查询全部
+     *
+     * @param specification
+     * @return
+     */
+    List<OfflineOrder> downExcel(Specification<OfflineOrder> specification);
+
+    /**
+     * 解锁订单
+     *
+     * @param id
+     * @return
+     */
+    Boolean unlock(Long id);
+
+    /**
+     * 修改发票开具进度为完成
+     *
+     * @param id
+     * @return
+     */
+    Boolean success(Long id);
 }

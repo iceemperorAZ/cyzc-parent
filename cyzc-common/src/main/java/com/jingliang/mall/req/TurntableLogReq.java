@@ -2,12 +2,10 @@ package com.jingliang.mall.req;
 
 import java.util.Date;
 import lombok.Data;
-import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.Api;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jingliang.mall.req.BaseReq;
-import lombok.EqualsAndHashCode;
-import io.swagger.annotations.ApiModelProperty;
 import org.springframework.format.annotation.DateTimeFormat;
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 
 /**
@@ -15,12 +13,11 @@ import java.io.Serializable;
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2020-03-17 10:04:21
+ * @date 2020-04-01 09:39:37
  */
-@EqualsAndHashCode(callSuper = true)
-@ApiModel(value = "TurntableLogReq", description = "转盘日志")
+@Api(value = "转盘日志")
 @Data
-public class TurntableLogReq extends BaseReq implements Serializable {
+public class TurntableLogReq implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -41,6 +38,36 @@ public class TurntableLogReq extends BaseReq implements Serializable {
 	 */
 	@ApiModelProperty(value = "消息内容")
 	private String msg;
+
+	/**
+	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
+	 */
+	@ApiModelProperty(value = "类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)")
+	private Integer type;
+
+	/**
+	 * 奖品Id
+	 */
+	@ApiModelProperty(value = "奖品Id")
+	private Long prizeId;
+
+	/**
+	 * 奖品名称
+	 */
+	@ApiModelProperty(value = "奖品名称")
+	private String prizeName;
+
+	/**
+	 * 奖品数量
+	 */
+	@ApiModelProperty(value = "奖品数量")
+	private Integer prizeNum;
+
+	/**
+	 * 消耗金币数量
+	 */
+	@ApiModelProperty(value = "消耗金币数量")
+	private Integer gold;
 
 	/**
 	 * 创建时间

@@ -1,20 +1,19 @@
 package com.jingliang.mall.req;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
+import io.swagger.annotations.Api;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+import io.swagger.annotations.ApiModelProperty;
+import java.io.Serializable;
 
 /**
  * 线下订单
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2020-03-25 15:38:48
+ * @date 2020-03-31 15:47:06
  */
 @Api(value = "线下订单")
 @Data
@@ -68,19 +67,37 @@ public class OfflineOrderReq implements Serializable {
 	 * 数量
 	 */
 	@ApiModelProperty(value = "数量")
-	private String num;
+	private Integer num;
 
 	/**
 	 * 单价(单位：分)
 	 */
 	@ApiModelProperty(value = "单价(单位：分)")
-	private String unitPrice;
+	private Integer unitPrice;
 
 	/**
 	 * 总价(单位：分)
 	 */
 	@ApiModelProperty(value = "总价(单位：分)")
 	private Integer totalPrice;
+
+	/**
+	 * 省
+	 */
+	@ApiModelProperty(value = "省")
+	private String province;
+
+	/**
+	 * 市
+	 */
+	@ApiModelProperty(value = "市")
+	private String city;
+
+	/**
+	 * 区/县
+	 */
+	@ApiModelProperty(value = "区/县")
+	private String county;
 
 	/**
 	 * 客户地址
@@ -127,6 +144,12 @@ public class OfflineOrderReq implements Serializable {
 	private String remarks;
 
 	/**
+	 * 是否可用
+	 */
+	@ApiModelProperty(value = "是否可用")
+	private Boolean isAvailable;
+
+	/**
 	 * 创建时间
 	 */
 	@ApiModelProperty(value = "创建时间")
@@ -135,8 +158,75 @@ public class OfflineOrderReq implements Serializable {
 	private Date createTime;
 
 	/**
-	 * 是否可用
+	 * 开具发票进度（100：无需发票，200：待开发票，300：已开发票）
 	 */
-	@ApiModelProperty(value = "是否可用")
-	private Boolean isAvailable;
+	@ApiModelProperty(value = "开具发票进度（100：无需发票，200：待开发票，300：已开发票）")
+	private Integer rate;
+
+	/**
+	 * 发票类型（100：增值税专用发票，200：增值税普通发票 ）
+	 */
+	@ApiModelProperty(value = "发票类型（100：增值税专用发票，200：增值税普通发票 ）")
+	private Integer type;
+
+	/**
+	 * 单位名称
+	 */
+	@ApiModelProperty(value = "单位名称")
+	private String unitName;
+
+	/**
+	 * 纳税人识别码
+	 */
+	@ApiModelProperty(value = "纳税人识别码")
+	private String taxpayerIdentificationNumber;
+
+	/**
+	 * 注册地址
+	 */
+	@ApiModelProperty(value = "注册地址")
+	private String registeredAddress;
+
+	/**
+	 * 注册电话
+	 */
+	@ApiModelProperty(value = "注册电话")
+	private String registeredTelephone;
+
+	/**
+	 * 开户银行
+	 */
+	@ApiModelProperty(value = "开户银行")
+	private String bankOfDeposit;
+
+	/**
+	 * 银行账户
+	 */
+	@ApiModelProperty(value = "银行账户")
+	private String bankAccount;
+
+	/**
+	 * 联系人
+	 */
+	@ApiModelProperty(value = "联系人")
+	private String contacts;
+
+	/**
+	 * 联系电话
+	 */
+	@ApiModelProperty(value = "联系电话")
+	private String contactNumber;
+
+	/**
+	 * 快递地址
+	 */
+	@ApiModelProperty(value = "快递地址")
+	private String expressAddress;
+
+	/**
+	 * 锁定
+	 */
+	@ApiModelProperty(value = "锁定")
+	private Boolean enable;
+
 }

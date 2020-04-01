@@ -24,4 +24,15 @@ public interface TurntableLogRepository extends BaseRepository<TurntableLog, Lon
      */
     Page<TurntableLog> findAllByBuyerIdAndIsAvailableOrderByCreateTimeDesc(Long buyerId, Boolean isAvailable, Pageable pageable);
 
+
+    /**
+     * 查询前100条中奖的记录
+     *
+     * @param type
+     * @param isAvailable
+     * @param pageable
+     * @return
+     */
+    Page<TurntableLog> findAllByTypeGreaterThanAndIsAvailable(Integer type, Boolean isAvailable, Pageable pageable);
+
 }

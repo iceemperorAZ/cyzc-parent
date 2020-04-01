@@ -1,18 +1,17 @@
 package com.jingliang.mall.entity;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import lombok.Data;
 import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 转盘日志
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2020-03-12 17:34:10
+ * @date 2020-04-01 09:39:37
  */
 @Table(name = "tb_turntable_log")
 @Entity
@@ -37,10 +36,47 @@ public class TurntableLog implements Serializable {
 	private Long buyerId;
 
 	/**
+	 * 商户
+	 */
+	@OneToOne(targetEntity = Buyer.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "buyer_id", referencedColumnName = "id", insertable = false, updatable = false)
+	private Buyer buyer;
+
+	/**
 	 * 消息内容
 	 */
 	@Column(name = "msg")
 	private String msg;
+
+	/**
+	 * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
+	 */
+	@Column(name = "type")
+	private Integer type;
+
+	/**
+	 * 奖品Id
+	 */
+	@Column(name = "prize_id")
+	private Long prizeId;
+
+	/**
+	 * 奖品名称
+	 */
+	@Column(name = "prize_name")
+	private String prizeName;
+
+	/**
+	 * 奖品数量
+	 */
+	@Column(name = "prize_num")
+	private Integer prizeNum;
+
+	/**
+	 * 消耗金币数量
+	 */
+	@Column(name = "gold")
+	private Integer gold;
 
 	/**
 	 * 创建时间

@@ -126,6 +126,11 @@ public class TurntableServiceImpl implements TurntableService {
         buyerRepository.saveAndFlush(buyer);
         //处理抽到的奖品
         Integer type = turntableDetail1.getType();
+        turntableLog.setType(type);
+        turntableLog.setPrizeId(turntableDetail1.getPrizeId());
+        turntableLog.setPrizeName(turntableDetail1.getPrizeName());
+        turntableLog.setPrizeNum(turntableDetail1.getBaseNum());
+        turntableLog.setGold(turntable.getGold());
         String name = "";
         //判断奖品的类型
         switch (type) {
@@ -135,13 +140,14 @@ public class TurntableServiceImpl implements TurntableService {
             case 200:
                 //金币
                 buyer.setGold(buyer.getGold() + turntableDetail1.getBaseNum());
+                turntableLog.setPrizeName(turntableDetail1.getPrizeName());
                 name = "获得" + "金币" + "x" + turntableDetail1.getBaseNum();
                 GoldLog goldLog = new GoldLog();
                 goldLog.setBuyerId(buyerId);
                 goldLog.setMoney(0);
                 goldLog.setIsAvailable(true);
                 goldLog.setGold(turntableDetail1.getBaseNum());
-                goldLog.setMsg("抽奖获得金币x" + turntableDetail1.getBaseNum() );
+                goldLog.setMsg("抽奖获得金币x" + turntableDetail1.getBaseNum());
                 goldLog.setType(600);
                 goldLogRepository.save(goldLog);
                 break;

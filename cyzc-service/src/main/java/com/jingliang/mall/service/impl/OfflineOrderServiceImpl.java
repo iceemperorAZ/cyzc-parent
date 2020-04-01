@@ -8,6 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 线下订单ServiceImpl
@@ -34,5 +37,33 @@ public class OfflineOrderServiceImpl implements OfflineOrderService {
     @Override
     public Page<OfflineOrder> pageAll(Specification<OfflineOrder> specification, PageRequest pageRequest) {
         return offlineOrderRepository.findAll(specification, pageRequest);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<OfflineOrder> downExcel(Specification<OfflineOrder> specification) {
+        List<OfflineOrder> offlineOrders = offlineOrderRepository.findAll(specification);
+        //导出的同时锁定所有导出的订单
+        offlineOrders.forEach(offlineOrder -> offlineOrder.setEnable(true));
+        return offlineOrderRepository.saveAll(offlineOrders);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean unlock(Long id) {
+        OfflineOrder offlineOrder = offlineOrderRepository.findById(id).orElse(null);
+        assert offlineOrder != null;
+        offlineOrder.setEnable(false);
+        offlineOrderRepository.save(offlineOrder);
+        return true;
+    }
+
+    @Override
+    public Boolean success(Long id) {
+        OfflineOrder offlineOrder = offlineOrderRepository.findById(id).orElse(null);
+        assert offlineOrder != null;
+        offlineOrder.setRate(300);
+        offlineOrderRepository.save(offlineOrder);
+        return true;
     }
 }

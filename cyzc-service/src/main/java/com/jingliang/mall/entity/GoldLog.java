@@ -38,6 +38,13 @@ public class GoldLog implements Serializable {
     private Long buyerId;
 
     /**
+     * 商户
+     */
+    @OneToOne(targetEntity = Buyer.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "buyer_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Buyer buyer;
+
+    /**
      * 日志内容
      */
     @Column(name = "msg")
