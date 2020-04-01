@@ -26,7 +26,7 @@ import java.util.List;
  */
 @RestController
 @Slf4j
-@RequestMapping(value = "/back/carousel")
+@RequestMapping(value = "/front/carousel")
 @Api(tags = "轮播图配置")
 public class CarouselController {
     private final CarouselService carouselService;
