@@ -4,6 +4,7 @@ import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.UserReq;
+import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.resp.UserResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerService;
@@ -195,14 +196,16 @@ public class UserController {
      */
     @GetMapping("/findUserByBuyerId")
     @ApiOperation(value = "根据商户Id查询绑定销售信息")
-    public Result<UserResp> findUserByBuyerId(Long buyerId) {
+    public Result<BuyerResp> findUserByBuyerId(Long buyerId) {
         Buyer buyer = buyerService.findById(buyerId);
         if (Objects.isNull(buyer) || Objects.isNull(buyer.getSaleUserId())) {
             return Result.build(Constant.FAIL, Constant.TEXT_BUYER_FAIL);
         }
-        UserResp userResp = BeanMapper.map(userService.findById(buyer.getSaleUserId()), UserResp.class);
-        log.debug("返回结果：{}", userResp);
-        return Result.buildQueryOk(userResp);
+        BuyerResp buyerResp = BeanMapper.map(buyer, BuyerResp.class);
+        User user = userService.findById(buyer.getSaleUserId());
+        buyerResp.setUser(BeanMapper.map(user, UserResp.class));
+        log.debug("返回结果：{}", buyerResp);
+        return Result.buildQueryOk(buyerResp);
     }
 
     /**
