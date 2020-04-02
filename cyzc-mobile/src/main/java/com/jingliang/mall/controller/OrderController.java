@@ -84,8 +84,8 @@ public class OrderController {
         MUtils.addDateAndBuyer(orderReq, buyer);
         Order order = BeanMapper.map(orderReq, Order.class);
         assert order != null;
-        order.setTotalPrice(0L);
         order.setPayableFee(0L);
+        order.setTotalPrice(0L);
         order.setDeliverFee(0L);
         int productNum = 0;
         List<OrderDetail> orderDetails = new ArrayList<>();
