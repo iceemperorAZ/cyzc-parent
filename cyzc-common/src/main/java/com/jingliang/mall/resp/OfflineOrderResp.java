@@ -72,19 +72,19 @@ public class OfflineOrderResp implements Serializable {
 	 * 数量
 	 */
 	@ApiModelProperty(value = "数量")
-	private Integer num;
+	private String num;
 
 	/**
 	 * 单价(单位：分)
 	 */
 	@ApiModelProperty(value = "单价(单位：分)")
-	private Integer unitPrice;
+	private String unitPrice;
 
 	/**
 	 * 总价(单位：分)
 	 */
 	@ApiModelProperty(value = "总价(单位：分)")
-	private Integer totalPrice;
+	private String totalPrice;
 
 	/**
 	 * 省

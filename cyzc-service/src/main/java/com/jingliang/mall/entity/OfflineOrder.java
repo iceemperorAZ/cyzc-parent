@@ -69,19 +69,19 @@ public class OfflineOrder implements Serializable {
 	 * 数量
 	 */
 	@Column(name = "num")
-	private Integer num;
+	private String num;
 
 	/**
 	 * 单价(单位：分)
 	 */
 	@Column(name = "unit_price")
-	private Integer unitPrice;
+	private String unitPrice;
 
 	/**
 	 * 总价(单位：分)
 	 */
 	@Column(name = "total_price")
-	private Integer totalPrice;
+	private String totalPrice;
 
 	/**
 	 * 省
