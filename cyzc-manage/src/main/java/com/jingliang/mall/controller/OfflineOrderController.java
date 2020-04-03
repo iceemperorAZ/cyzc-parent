@@ -175,19 +175,19 @@ public class OfflineOrderController {
             celNum++;
 
             //数量
-            Integer num = offlineOrder.getNum();
+            String num = offlineOrder.getNum();
             cell = row.createCell(celNum);
             cell.setCellValue(num);
             celNum++;
 
             //单价(单位：分)
-            Integer unitPrice = offlineOrder.getUnitPrice();
+            String unitPrice = offlineOrder.getUnitPrice();
             cell = row.createCell(celNum);
             cell.setCellValue(unitPrice);
             celNum++;
 
             //总价(单位：分)
-            Integer totalPrice = offlineOrder.getTotalPrice();
+            String totalPrice = offlineOrder.getTotalPrice();
             cell = row.createCell(celNum);
             cell.setCellValue(totalPrice);
             celNum++;
