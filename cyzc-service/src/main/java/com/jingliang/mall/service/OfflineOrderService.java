@@ -56,4 +56,11 @@ public interface OfflineOrderService {
      * @return
      */
     Boolean success(Long id);
+
+    /**
+     * 不锁定查询
+     * @param specification
+     * @return
+     */
+    List<OfflineOrder> financeDown(Specification<OfflineOrder> specification);
 }

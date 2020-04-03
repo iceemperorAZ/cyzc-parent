@@ -66,4 +66,9 @@ public class OfflineOrderServiceImpl implements OfflineOrderService {
         offlineOrderRepository.save(offlineOrder);
         return true;
     }
+
+    @Override
+    public List<OfflineOrder> financeDown(Specification<OfflineOrder> specification) {
+        return  offlineOrderRepository.findAll(specification);
+    }
 }

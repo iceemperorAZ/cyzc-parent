@@ -192,8 +192,7 @@ public class WechatManageController {
     public Result<MallPage<ConfluenceDetailResp>> userBuyer(@ApiIgnore UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
         User user = (User) session.getAttribute(sessionUser);
-        //TODO 临时修改
-        PageRequest pageRequest = PageRequest.of(userReq.getPage(), 2000);
+        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         if (StringUtils.isNotBlank(userReq.getClause())) {
             pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         }
@@ -243,8 +242,7 @@ public class WechatManageController {
         if (Objects.isNull(user)) {
             return Result.build(Constant.DATA_FAIL, Constant.TEXT_USER_DATA_FAIL);
         }
-        //TODO   临时添加分页，后面恢复 谨记谨记！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-        PageRequest pageRequest = PageRequest.of(userReq.getPage(), 2000);
+        PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         if (StringUtils.isNotBlank(userReq.getClause())) {
             pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         }
