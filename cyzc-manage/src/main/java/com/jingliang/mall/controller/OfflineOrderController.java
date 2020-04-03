@@ -134,9 +134,10 @@ public class OfflineOrderController {
         XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
         CreationHelper createHelper = orderWorkbook.getCreationHelper();
         cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy/MM/dd HH:mm:ss"));
-        for (int i = 0; i < offlineOrderList.size(); i++) {
-            XSSFRow row = sheet.createRow(i + 1);
-            OfflineOrder offlineOrder = offlineOrderList.get(i);
+        int r = 1;
+        for (int i = 0; i < offlineOrderList.size(); i++, r++) {
+            XSSFRow row = sheet.createRow(r);
+            OfflineOrder offlineOrder = offlineOrderList.get(r);
             //商铺名称
             int celNum = 0;
             String shopName = offlineOrder.getShopName();
@@ -158,39 +159,76 @@ public class OfflineOrderController {
 
             //商品名称
             String productName = offlineOrder.getProductName();
+            String[] productNames = productName.split("/");
             cell = row.createCell(celNum);
             cell.setCellValue(productName);
             celNum++;
 
             //商品规格
             String productSpecification = offlineOrder.getProductSpecification();
+            String[] productSpecifications = productSpecification.split("/");
             cell = row.createCell(celNum);
             cell.setCellValue(productSpecification);
             celNum++;
 
             //单位
             String company = offlineOrder.getCompany();
+            String[] companys = company.split("/");
             cell = row.createCell(celNum);
             cell.setCellValue(company);
             celNum++;
 
             //数量
             String num = offlineOrder.getNum();
+            String[] nums = num.split("/");
             cell = row.createCell(celNum);
             cell.setCellValue(num);
             celNum++;
 
             //单价(单位：分)
             String unitPrice = offlineOrder.getUnitPrice();
+            String[] unitPrices = unitPrice.split("/");
             cell = row.createCell(celNum);
             cell.setCellValue(unitPrice);
             celNum++;
 
             //总价(单位：分)
             String totalPrice = offlineOrder.getTotalPrice();
+            String[] totalPrices = totalPrice.split("/");
             cell = row.createCell(celNum);
             cell.setCellValue(totalPrice);
             celNum++;
+
+            int detailCelNum = celNum;
+            XSSFRow detailRow = row;
+            for (int j = 0; j < productNames.length; j++) {
+                //商品规格
+                cell = detailRow.createCell(detailCelNum);
+                cell.setCellValue(productSpecifications[j]);
+                detailCelNum++;
+
+                //单位
+                cell = detailRow.createCell(detailCelNum);
+                cell.setCellValue(companys[j]);
+                detailCelNum++;
+
+                //数量
+                cell = detailRow.createCell(detailCelNum);
+                cell.setCellValue(nums[j]);
+                detailCelNum++;
+
+                //单价(单位：分)
+                cell = detailRow.createCell(detailCelNum);
+                cell.setCellValue(unitPrices[j]);
+                detailCelNum++;
+
+                //总价(单位：分)
+                cell = detailRow.createCell(detailCelNum);
+                cell.setCellValue(totalPrices[j]);
+                detailRow = sheet.createRow(r + j + 1);
+                detailCelNum = celNum;
+            }
+            celNum += 6;
 
             //省
             String province = offlineOrder.getProvince();
