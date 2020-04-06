@@ -41,8 +41,13 @@ public class BuyerSaleServiceImpl implements BuyerSaleService {
     }
 
     @Override
-    public BuyerSale findBySaleIdAndBuyerId(Long saleUserId, Long buyerId) {
-        return buyerSaleRepository.findAllBySaleIdAndBuyerIdAndUntyingTimeIsNullAndIsAvailable(saleUserId, buyerId, true);
+    public List<BuyerSale> saveAll(List<BuyerSale> buyerSale) {
+        return buyerSaleRepository.saveAll(buyerSale);
+    }
+
+    @Override
+    public List<BuyerSale> findAllBySaleIdAndBuyerIdAndIsAvailable(Long saleUserId, Long buyerId) {
+        return buyerSaleRepository.findAllBySaleIdAndBuyerIdAndIsAvailable(saleUserId, buyerId, true);
     }
 
     @Override
@@ -53,7 +58,6 @@ public class BuyerSaleServiceImpl implements BuyerSaleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Buyer bindingSale(BuyerSale buyerSale, Buyer buyer, BuyerAddress address) {
-        buyerSaleRepository.save(buyerSale);
         buyerSaleRepository.save(buyerSale);
         BuyerAddress buyerAddress = buyerAddressRepository.findFirstByBuyerIdAndIsDefaultAndIsAvailable(buyer.getId(), true, true);
         if (buyerAddress != null) {

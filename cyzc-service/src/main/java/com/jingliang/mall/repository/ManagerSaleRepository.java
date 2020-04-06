@@ -24,7 +24,7 @@ public interface ManagerSaleRepository extends BaseRepository<ManagerSale, Long>
      * @param isAvailable
      * @return
      */
-    ManagerSale findFirstByManagerIdAndSaleIdAndIsAvailableOrderByUntyingTime(Long managerId, Long saleId, Boolean isAvailable);
+    List<ManagerSale> findAllByManagerIdAndSaleIdAndIsAvailableOrderByUntyingTime(Long managerId, Long saleId, Boolean isAvailable);
 
     /**
      * 根据销售Id查询绑定关系（只有一条）

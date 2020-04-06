@@ -25,13 +25,21 @@ public interface BuyerSaleService {
     BuyerSale save(BuyerSale buyerSale);
 
     /**
+     * 保存
+     *
+     * @param buyerSale
+     * @return
+     */
+    List<BuyerSale> saveAll(List<BuyerSale> buyerSale);
+
+    /**
      * 根据销售Id查询
      *
      * @param saleUserId
      * @param buyerId
      * @return
      */
-    BuyerSale findBySaleIdAndBuyerId(Long saleUserId, Long buyerId);
+    public List<BuyerSale> findAllBySaleIdAndBuyerIdAndIsAvailable(Long saleUserId, Long buyerId);
 
     /**
      * 根据条件查询绑定信息

@@ -114,15 +114,17 @@ public class BuyerController {
         if (Objects.isNull(buyer)) {
             return Result.build(Constant.DATA_FAIL, Constant.TEXT_BUYER_DATA_FAIL);
         }
-        BuyerSale buyerSale = buyerSaleService.findBySaleIdAndBuyerId(buyer.getSaleUserId(), buyer.getId());
+        List<BuyerSale> buyerSales = buyerSaleService.findAllBySaleIdAndBuyerIdAndIsAvailable(buyer.getSaleUserId(), buyer.getId());
         User user = (User) session.getAttribute(sessionUser);
         Date date = new Date();
-        if (buyerSale != null) {
-            buyerSale.setUntyingTime(date);
-            buyerSale.setUpdateTime(date);
-            buyerSale.setUpdateUser(user.getUserName());
-            buyerSale.setUpdateUserId(user.getId());
-            buyerSaleService.save(buyerSale);
+        if (buyerSales.size() > 0) {
+            buyerSales.forEach(buyerSale -> {
+                buyerSale.setUntyingTime(date);
+                buyerSale.setUpdateTime(date);
+                buyerSale.setUpdateUser(user.getUserName());
+                buyerSale.setUpdateUserId(user.getId());
+            });
+            buyerSaleService.saveAll(buyerSales);
         }
         //更换销售后修改最后一次下单时间
         buyerReq.setLastOrderTime(date);
@@ -130,7 +132,7 @@ public class BuyerController {
         redisService.remove(tokenBuyerPrefix + buyer.getId());
         buyerReq.setLastOrderTime(date);
         BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
-        buyerSale = new BuyerSale();
+        BuyerSale buyerSale = new BuyerSale();
         buyerSale.setBuyerId(buyer.getId());
         buyerSale.setSaleId(buyerReq.getSaleUserId());
         buyerSale.setIsAvailable(true);
@@ -139,8 +141,6 @@ public class BuyerController {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, 2300);
         buyerSale.setUntyingTime(calendar.getTime());
-        buyerSale.setUpdateTime(date);
-        buyerSale.setUpdateTime(date);
         buyerSale.setUpdateTime(date);
         buyerSale = buyerSaleService.save(buyerSale);
         log.debug("返回结果：{}", buyerResp);

@@ -75,12 +75,9 @@ public class OfflineOrderController {
      */
     @GetMapping("/back/offlineOrder/page/all")
     public Result<MallPage<OfflineOrderResp>> pageAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize,
-                                                      @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
-                                                      @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeStart,
-                                                      @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
-                                                      @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeEnd,
-                                                      Integer rate,
-                                                      @ApiIgnore HttpSession session) {
+                                                      @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")Date createTimeStart,
+                                                      @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")Date createTimeEnd,
+                                                      Integer rate, @ApiIgnore HttpSession session) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         User user = (User) session.getAttribute(sessionUser);
         Specification<OfflineOrder> specification = (Specification<OfflineOrder>) (root, query, cb) -> {
@@ -99,5 +96,4 @@ public class OfflineOrderController {
         Page<OfflineOrder> offlineOrderPage = offlineOrderService.pageAll(specification, pageRequest);
         return Result.buildQueryOk(MallUtils.toMallPage(offlineOrderPage, OfflineOrderResp.class));
     }
-
 }

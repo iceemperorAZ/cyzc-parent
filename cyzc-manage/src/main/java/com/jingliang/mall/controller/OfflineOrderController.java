@@ -67,8 +67,7 @@ public class OfflineOrderController {
                                                       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeStart,
                                                       @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
                                                       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeEnd,
-                                                      Integer rate,
-                                                      @ApiIgnore HttpSession session) {
+                                                      Integer rate) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         Specification<OfflineOrder> specification = (Specification<OfflineOrder>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -126,6 +125,7 @@ public class OfflineOrderController {
             return query.getRestriction();
         };
         List<OfflineOrder> offlineOrderList = offlineOrderService.downExcel(specification);
+
         //生产excel
         XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("线下订单", Constant.offlineOrderExcelTitle);
         XSSFSheet sheet = orderWorkbook.getSheet("线下订单");
@@ -309,6 +309,7 @@ public class OfflineOrderController {
         XSSFCellStyle greenCellStyle = orderWorkbook.createCellStyle();
         greenCellStyle.setFillForegroundColor(IndexedColors.GREEN.getIndex());
         greenCellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
         //黄颜色背景
         XSSFCellStyle yellowCellStyle = orderWorkbook.createCellStyle();
         yellowCellStyle.setFillForegroundColor(IndexedColors.YELLOW.getIndex());
@@ -355,7 +356,6 @@ public class OfflineOrderController {
             //单价(单位：分)
             String unitPrice = order.getUnitPrice();
             String[] unitPrices = unitPrice.split("\\/");
-
 
             int detailCelNum = celNum;
             XSSFRow detailRow = row;
