@@ -596,22 +596,17 @@ public class WechatManageController {
             andPredicateList.add(cb.equal(root.get("managerId"), id));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
             Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
-            List<Predicate> orPredicateList = new ArrayList<>();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(endTime);
-            calendar.set(Calendar.HOUR_OF_DAY, 0);
-            calendar.set(Calendar.MINUTE, 0);
-            calendar.set(Calendar.SECOND, 0);
-            orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), calendar.getTime()));
-            orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), startTime));
-            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
-            query.where(andPredicate, orPredicate);
+            query.where(andPredicate);
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
-
         List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
-        List<User> collect = managerSales.stream().map(ManagerSale::getUser).collect(Collectors.toList());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(endTime);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        List<User> collect = managerSales.stream().filter(buyerSale -> buyerSale.getUntyingTime().compareTo(startTime) >= 0 && buyerSale.getCreateTime().compareTo(calendar.getTime()) <= 0).map(ManagerSale::getUser).collect(Collectors.toList());
         User user = userService.findById(id);
         Long buyerId = user.getBuyerId();
         if (buyerId != null) {
@@ -619,7 +614,6 @@ public class WechatManageController {
             if (buyer.getSaleUserId().equals(user.getId())) {
                 user.setUserName(user.getUserName() + "(自己)");
                 collect.add(user);
-
             }
         }
         List<UserResp> userResps = BeanMapper.mapList(collect, UserResp.class);
@@ -661,12 +655,7 @@ public class WechatManageController {
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         List<BuyerSale> buyerSales = buyerSaleService.finAll(buyerSaleSpecification);
-        List<Buyer> collect = buyerSales.stream().filter(buyerSale -> {
-            if (buyerSale.getUntyingTime().compareTo(creationTime) < 0 || buyerSale.getCreateTime().compareTo(calendar.getTime()) > 0) {
-                return false;
-            }
-            return true;
-        }).map(BuyerSale::getBuyer).collect(Collectors.toList());
+        List<Buyer> collect = buyerSales.stream().filter(buyerSale -> buyerSale.getUntyingTime().compareTo(creationTime) >= 0 && buyerSale.getCreateTime().compareTo(calendar.getTime()) <= 0).map(BuyerSale::getBuyer).collect(Collectors.toList());
         List<BuyerResp> buyerResps = BeanMapper.mapList(collect, BuyerResp.class);
         for (BuyerResp buyerResp : buyerResps) {
             BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyerResp.getId());
@@ -703,12 +692,7 @@ public class WechatManageController {
         List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
         //计算
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
-        managerSales.stream().filter(managerSale -> {
-            if (managerSale.getUntyingTime().compareTo(creationTime) < 0 || managerSale.getCreateTime().compareTo(endTime) > 0) {
-                return false;
-            }
-            return true;
-        }).collect(Collectors.toList()).forEach(managerSale -> {
+        managerSales.stream().filter(managerSale -> managerSale.getUntyingTime().compareTo(creationTime) >= 0 && managerSale.getCreateTime().compareTo(endTime) <= 0).collect(Collectors.toList()).forEach(managerSale -> {
             ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(managerSale.getUser()
                     , creationTime.before(managerSale.getCreateTime()) ? managerSale.getCreateTime() : creationTime
                     , endTime.before(managerSale.getUntyingTime()) ? endTime : managerSale.getUntyingTime());
