@@ -606,6 +606,7 @@ public class WechatManageController {
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
+        log.error("****************{}*************",startTime);
         log.error("{}",managerSales);
         List<User> collect = managerSales.stream().filter(managerSale -> managerSale.getUntyingTime().compareTo(startTime) >= 0 && managerSale.getCreateTime().compareTo(calendar.getTime()) <= 0).map(ManagerSale::getUser).collect(Collectors.toList());
         log.error("{}",managerSales);
