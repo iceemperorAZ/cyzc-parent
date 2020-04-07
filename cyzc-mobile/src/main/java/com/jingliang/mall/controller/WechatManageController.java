@@ -589,27 +589,29 @@ public class WechatManageController {
     @GetMapping("/manager/sales")
     @ApiOperation(value = "查看区域经理下的所有销售")
     public Result<List<UserResp>> managersSales(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id, HttpSession session) {
         Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
             andPredicateList.add(cb.equal(root.get("managerId"), id));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
             Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
-            query.where(andPredicate);
+            List<Predicate> orPredicateList = new ArrayList<>();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(endTime);
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+            calendar.set(Calendar.SECOND, 59);
+            orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), calendar.getTime()));
+            orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), creationTime));
+            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
+            query.where(andPredicate, orPredicate);
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
+
         List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(endTime);
-        calendar.set(Calendar.HOUR_OF_DAY, 23);
-        calendar.set(Calendar.MINUTE, 59);
-        calendar.set(Calendar.SECOND, 59);
-        log.error("****************{}*************",startTime);
-        log.error("{}",managerSales);
-        List<User> collect = managerSales.stream().filter(managerSale -> managerSale.getUntyingTime().compareTo(startTime) >= 0 && managerSale.getCreateTime().compareTo(calendar.getTime()) <= 0).map(ManagerSale::getUser).collect(Collectors.toList());
-        log.error("{}",managerSales);
+        List<User> collect = managerSales.stream().map(ManagerSale::getUser).collect(Collectors.toList());
         User user = userService.findById(id);
         Long buyerId = user.getBuyerId();
         if (buyerId != null) {
@@ -617,6 +619,7 @@ public class WechatManageController {
             if (buyer.getSaleUserId().equals(user.getId())) {
                 user.setUserName(user.getUserName() + "(自己)");
                 collect.add(user);
+
             }
         }
         List<UserResp> userResps = BeanMapper.mapList(collect, UserResp.class);
@@ -658,7 +661,12 @@ public class WechatManageController {
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
         List<BuyerSale> buyerSales = buyerSaleService.finAll(buyerSaleSpecification);
-        List<Buyer> collect = buyerSales.stream().filter(buyerSale -> buyerSale.getUntyingTime().compareTo(creationTime) >= 0 && buyerSale.getCreateTime().compareTo(calendar.getTime()) <= 0).map(BuyerSale::getBuyer).collect(Collectors.toList());
+        List<Buyer> collect = buyerSales.stream().filter(buyerSale -> {
+            if (buyerSale.getUntyingTime().compareTo(creationTime) < 0 || buyerSale.getCreateTime().compareTo(calendar.getTime()) > 0) {
+                return false;
+            }
+            return true;
+        }).map(BuyerSale::getBuyer).collect(Collectors.toList());
         List<BuyerResp> buyerResps = BeanMapper.mapList(collect, BuyerResp.class);
         for (BuyerResp buyerResp : buyerResps) {
             BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyerResp.getId());
@@ -695,7 +703,12 @@ public class WechatManageController {
         List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
         //计算
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
-        managerSales.stream().filter(managerSale -> managerSale.getUntyingTime().compareTo(creationTime) >= 0 && managerSale.getCreateTime().compareTo(endTime) <= 0).collect(Collectors.toList()).forEach(managerSale -> {
+        managerSales.stream().filter(managerSale -> {
+            if (managerSale.getUntyingTime().compareTo(creationTime) < 0 || managerSale.getCreateTime().compareTo(endTime) > 0) {
+                return false;
+            }
+            return true;
+        }).collect(Collectors.toList()).forEach(managerSale -> {
             ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(managerSale.getUser()
                     , creationTime.before(managerSale.getCreateTime()) ? managerSale.getCreateTime() : creationTime
                     , endTime.before(managerSale.getUntyingTime()) ? endTime : managerSale.getUntyingTime());
