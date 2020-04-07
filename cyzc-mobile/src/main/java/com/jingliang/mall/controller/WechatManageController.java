@@ -596,22 +596,17 @@ public class WechatManageController {
             andPredicateList.add(cb.equal(root.get("managerId"), id));
             andPredicateList.add(cb.equal(root.get("isAvailable"), true));
             Predicate andPredicate = cb.and(andPredicateList.toArray(new Predicate[0]));
-            List<Predicate> orPredicateList = new ArrayList<>();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(endTime);
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);
-            calendar.set(Calendar.SECOND, 59);
-            orPredicateList.add(cb.lessThanOrEqualTo(root.get("createTime"), calendar.getTime()));
-            orPredicateList.add(cb.greaterThanOrEqualTo(root.get("untyingTime"), creationTime));
-            Predicate orPredicate = cb.or(orPredicateList.toArray(new Predicate[0]));
-            query.where(andPredicate, orPredicate);
+            query.where(andPredicate);
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
-
         List<ManagerSale> managerSales = managerSaleService.findAll(managerSaleSpecification);
-        List<User> collect = managerSales.stream().map(ManagerSale::getUser).collect(Collectors.toList());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(endTime);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        calendar.set(Calendar.MINUTE, 59);
+        calendar.set(Calendar.SECOND, 59);
+        List<User> collect = managerSales.stream().filter(managerSale -> managerSale.getUntyingTime().compareTo(creationTime) >= 0 && managerSale.getCreateTime().compareTo(calendar.getTime()) <= 0).map(ManagerSale::getUser).collect(Collectors.toList());
         User user = userService.findById(id);
         Long buyerId = user.getBuyerId();
         if (buyerId != null) {
