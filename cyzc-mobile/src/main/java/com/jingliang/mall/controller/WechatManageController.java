@@ -606,7 +606,9 @@ public class WechatManageController {
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         calendar.set(Calendar.MINUTE, 59);
         calendar.set(Calendar.SECOND, 59);
-        List<User> collect = managerSales.stream().filter(buyerSale -> buyerSale.getUntyingTime().compareTo(startTime) >= 0 && buyerSale.getCreateTime().compareTo(calendar.getTime()) <= 0).map(ManagerSale::getUser).collect(Collectors.toList());
+        log.error("{}",managerSales);
+        List<User> collect = managerSales.stream().filter(managerSale -> managerSale.getUntyingTime().compareTo(startTime) >= 0 && managerSale.getCreateTime().compareTo(calendar.getTime()) <= 0).map(ManagerSale::getUser).collect(Collectors.toList());
+        log.error("{}",managerSales);
         User user = userService.findById(id);
         Long buyerId = user.getBuyerId();
         if (buyerId != null) {
