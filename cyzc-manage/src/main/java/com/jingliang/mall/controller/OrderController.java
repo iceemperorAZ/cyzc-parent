@@ -181,7 +181,7 @@ public class OrderController {
             if (Objects.nonNull(orderReq.getCreateTimeStart()) && Objects.nonNull(orderReq.getCreateTimeEnd())) {
                 predicateList.add(cb.between(root.get("createTime"), orderReq.getCreateTimeStart(), orderReq.getCreateTimeEnd()));
             }
-            if (CollectionUtils.isEmpty(orderStatuses)) {
+            if (CollectionUtils.isNotEmpty(orderStatuses)) {
                 for (Integer orderStatus : orderStatuses) {
                     orOredicateList.add(cb.equal(root.get("orderStatus"), orderStatus));
                 }
