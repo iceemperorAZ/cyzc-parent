@@ -1,6 +1,5 @@
 package com.jingliang.mall.controller;
 import java.util.Date;
-import com.jingliang.mall.entity.Region;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.*;
@@ -85,19 +84,19 @@ public class BuyerController {
     public Result<BuyerResp> login(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpServletResponse response) {
         log.debug("请求参数：{}", buyerReq);
         if (StringUtils.isBlank(buyerReq.getCode())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         //调用微信接口获取openid
         Map map = wechatService.getOpenId(buyerReq.getCode());
         if (Objects.isNull(map)) {
-            log.debug("返回结果：{}", Constant.TEXT_WECHAT_LOGIN_FAIL);
-            return Result.build(Constant.LOGIN_FAIL, Constant.TEXT_WECHAT_LOGIN_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_WECHAT_LOGIN_FAIL);
+            return Result.build(Msg.LOGIN_FAIL, Msg.TEXT_WECHAT_LOGIN_FAIL);
         }
         String openId = (String) map.get("openid");
         if (StringUtils.isBlank(openId)) {
-            log.debug("返回结果：{}", Constant.TEXT_WECHAT_LOGIN_FAIL);
-            return Result.build(Constant.LOGIN_FAIL, Constant.TEXT_WECHAT_LOGIN_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_WECHAT_LOGIN_FAIL);
+            return Result.build(Msg.LOGIN_FAIL, Msg.TEXT_WECHAT_LOGIN_FAIL);
         }
         Buyer buyer = buyerService.findByUniqueId(openId);
         if (Objects.isNull(buyer)) {
@@ -119,7 +118,7 @@ public class BuyerController {
         }
         //是否封停
         if (buyer.getIsSealUp()) {
-            return Result.build(Constant.LOGIN_FAIL, Constant.TEXT_IS_SEAL_UP_FAIL);
+            return Result.build(Msg.LOGIN_FAIL, Msg.TEXT_IS_SEAL_UP_FAIL);
         }
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("id", buyer.getId() + "");
@@ -146,7 +145,7 @@ public class BuyerController {
         response.setHeader("Authorization", token);
         log.debug("微信登录Token= {}", token);
         log.debug("返回结果：{}", buyerResp);
-        return Result.build(Constant.OK, Constant.TEXT_LOGIN_OK, buyerResp);
+        return Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, buyerResp);
     }
 
     /**
@@ -178,10 +177,10 @@ public class BuyerController {
         if (StringUtils.isNotBlank(decrypt) && StringUtils.isNotBlank(JSONObject.parseObject(decrypt).getString("purePhoneNumber"))) {
             String purePhoneNumber = JSONObject.parseObject(decrypt).getString("purePhoneNumber");
             log.debug("返回解析后的手机号：{}", purePhoneNumber);
-            return Result.build(Constant.OK, Constant.TEXT_OK, purePhoneNumber);
+            return Result.build(Msg.OK, Msg.TEXT_OK, purePhoneNumber);
         }
         log.debug("解析微信手机号失败");
-        return Result.build(Constant.WECHAT_FAIL, Constant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
+        return Result.build(Msg.WECHAT_FAIL, Msg.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
     }
 
     /**
@@ -204,10 +203,10 @@ public class BuyerController {
             log.debug("返回解析后的手机号：{}", purePhoneNumber);
             buyer.setPhone(purePhoneNumber);
             buyerService.save(buyer);
-            return Result.build(Constant.OK, Constant.TEXT_OK, purePhoneNumber);
+            return Result.build(Msg.OK, Msg.TEXT_OK, purePhoneNumber);
         }
         log.debug("解析微信手机号失败");
-        return Result.build(Constant.WECHAT_FAIL, Constant.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
+        return Result.build(Msg.WECHAT_FAIL, Msg.TEXT_WECHAT_SESSION_KEY_TIMEOUT_FAIL);
     }
 
     /**
@@ -226,8 +225,8 @@ public class BuyerController {
         if (StringUtils.isNotBlank(buyerReq.getHead())) {
             Base64Image base64Image = Base64Image.build(buyerReq.getHead());
             if (Objects.isNull(base64Image)) {
-                log.debug("返回结果：{}", Constant.TEXT_IMAGE_FAIL);
-                return Result.build(Constant.IMAGE_FAIL, Constant.TEXT_IMAGE_FAIL);
+                log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+                return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
             }
             if (StringUtils.isNotBlank(buyer.getHeadUri())) {
                 //新头像保存成功后把之前的头像从图片服务器删除
@@ -254,7 +253,7 @@ public class BuyerController {
         }
         User user = userService.findById(buyerReq.getSaleUserId());
         if (Objects.isNull(user)) {
-            return Result.build(Constant.FAIL, Constant.TEXT_BUYER_FAIL);
+            return Result.build(Msg.FAIL, Msg.TEXT_BUYER_FAIL);
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         buyer = buyerService.findById(buyer.getId());
@@ -299,7 +298,7 @@ public class BuyerController {
     @GetMapping("/exemption")
     @ApiOperation(value = "免责通知")
     public Result<String> analysisPhone() {
-        return Result.buildQueryOk(Constant.EXEMPTION);
+        return Result.buildQueryOk(Msg.EXEMPTION);
     }
 
     /**
@@ -313,11 +312,11 @@ public class BuyerController {
         SignIn signIn = signInService.findByBuyerIdAndLastDay(buyer.getId());
         if (signIn != null && localDate.equals(signIn.getLastDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
             //今天签到了就直接返回
-            return Result.build(Constant.FAIL, "今日已签到");
+            return Result.build(Msg.FAIL, "今日已签到");
         }
         signIn = signInService.signIn(buyer.getId());
         SignInResp signInResp = BeanMapper.map(signIn, SignInResp.class);
-        return Result.build(Constant.OK, "签到成功", signInResp);
+        return Result.build(Msg.OK, "签到成功", signInResp);
     }
 
     /**
@@ -368,7 +367,7 @@ public class BuyerController {
     public Result<BuyerResp> buyer(HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         //获取用户最新信息
-        return Result.build(Constant.OK, Constant.TEXT_LOGIN_OK, BeanMapper.map(buyerService.findById(buyer.getId()), BuyerResp.class));
+        return Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, BeanMapper.map(buyerService.findById(buyer.getId()), BuyerResp.class));
     }
 
 

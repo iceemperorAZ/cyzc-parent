@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.amqp.producer.RabbitProducer;
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.*;
@@ -140,18 +140,18 @@ public class PayController {
         Buyer buyer = (Buyer) session.getAttribute(buyerSessionKey);
         Order order = orderService.findByIdAndBuyerId(orderReq.getId(), buyer.getId());
         if (Objects.isNull(order)) {
-            return Result.build(Constant.PAY_FAIL, Constant.TEXT_PAY_NOTHINGNESS_FAIL);
+            return Result.build(Msg.PAY_FAIL, Msg.TEXT_PAY_NOTHINGNESS_FAIL);
         }
         //判断订单状态
         if (order.getOrderStatus() == 100) {
             String prepayId = order.getPayNo();
             if (StringUtils.isNotBlank(prepayId)) {
                 Map<String, String> map = wechatService.payUnifiedOrderSign(prepayId);
-                return Result.build(Constant.OK, Constant.TEXT_OK, map);
+                return Result.build(Msg.OK, Msg.TEXT_OK, map);
             }
-            return Result.build(Constant.PAY_FAIL, Constant.TEXT_PAY_OVERTIME_FAIL);
+            return Result.build(Msg.PAY_FAIL, Msg.TEXT_PAY_OVERTIME_FAIL);
         }
-        return Result.build(Constant.PAY_FAIL, Constant.TEXT_PAY_PAID);
+        return Result.build(Msg.PAY_FAIL, Msg.TEXT_PAY_PAID);
     }
 
     /**

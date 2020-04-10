@@ -81,7 +81,7 @@ public class UserController {
         log.debug("请求参数：{}", userReq);
         String oldPassword = userReq.getOldPassword();
         if (StringUtils.isBlank(oldPassword) || StringUtils.isBlank(userReq.getPassword())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -89,10 +89,10 @@ public class UserController {
         user = userService.findUserByLoginName(user.getLoginName());
         //判断用户密码是否匹配
         if (!passwordEncoder.matches(userReq.getOldPassword(), user.getPassword())) {
-            return Result.build(Constant.FAIL, Constant.TEXT_OLD_PASSWORD_FAIL);
+            return Result.build(Msg.FAIL, Msg.TEXT_OLD_PASSWORD_FAIL);
         }
         if (!MallUtils.checkPasswordSecurity(userReq.getPassword())) {
-            return Result.build(Constant.FAIL, Constant.TEXT_MODIFY_PASSWORD_UNSAFE_FAIL);
+            return Result.build(Msg.FAIL, Msg.TEXT_MODIFY_PASSWORD_UNSAFE_FAIL);
         }
         //设置
         userReq.setId(user.getId());
@@ -116,7 +116,7 @@ public class UserController {
     public Result<UserResp> changeOtherPassword(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
         if (Objects.isNull(userReq.getId())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -159,12 +159,12 @@ public class UserController {
         if (Objects.nonNull(userReq.getBuyerId())) {
             Buyer buyer = buyerService.findById(userReq.getBuyerId());
             if (Objects.isNull(buyer)) {
-                return Result.build(Constant.FAIL, Constant.TEXT_BUYER_FAIL);
+                return Result.build(Msg.FAIL, Msg.TEXT_BUYER_FAIL);
             }
             //查询是否传过来的销售是否已经绑定员工
             User user = userService.findByBuyerId(userReq.getBuyerId());
             if (Objects.nonNull(user) && !Objects.equals(user.getId(), userReq.getId())) {
-                return Result.build(Constant.FAIL, Constant.TEXT_BUYER_REPEAT_FAIL);
+                return Result.build(Msg.FAIL, Msg.TEXT_BUYER_REPEAT_FAIL);
             }
             if (Objects.isNull(userReq.getLevel())) {
                 userReq.setLevel(100);
@@ -173,7 +173,7 @@ public class UserController {
         User user = (User) session.getAttribute(sessionUser);
         if (StringUtils.isNotBlank(userReq.getPhone()) && !MallUtils.phoneCheck(userReq.getPhone())) {
             //手机号格式不正确
-            return Result.build(Constant.FAIL, Constant.TEXT_PHONE_FAIL);
+            return Result.build(Msg.FAIL, Msg.TEXT_PHONE_FAIL);
         }
         MallUtils.addDateAndUser(userReq, user);
         //未设置提成则默认提成为0
@@ -199,7 +199,7 @@ public class UserController {
     public Result<BuyerResp> findUserByBuyerId(Long buyerId) {
         Buyer buyer = buyerService.findById(buyerId);
         if (Objects.isNull(buyer) || Objects.isNull(buyer.getSaleUserId())) {
-            return Result.build(Constant.FAIL, Constant.TEXT_BUYER_FAIL);
+            return Result.build(Msg.FAIL, Msg.TEXT_BUYER_FAIL);
         }
         BuyerResp buyerResp = BeanMapper.map(buyer, BuyerResp.class);
         User user = userService.findById(buyer.getSaleUserId());

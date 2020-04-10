@@ -66,7 +66,7 @@ public class ProductZoneController {
     public Result<ProductZoneResp> save(@RequestBody ProductZoneReq productZoneReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productZoneReq);
         if (StringUtils.isBlank(productZoneReq.getProductZoneName())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
@@ -84,7 +84,7 @@ public class ProductZoneController {
     public Result<ProductZoneResp> addDetails(@RequestBody ProductZoneReq productZoneReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productZoneReq);
         if (Objects.isNull(productZoneReq.getId()) || Objects.isNull(productZoneReq.getType())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);

@@ -69,11 +69,11 @@ public class BuyerCouponController {
         log.debug("请求参数：{}", buyerCouponReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         if (buyerCouponService.countByCouponId(buyer.getId(), buyerCouponReq.getCouponId()) > 0) {
-            return Result.build(Constant.COUPON_FAIL, Constant.TEXT_COUPON_RECEIVE_FAIL);
+            return Result.build(Msg.COUPON_FAIL, Msg.TEXT_COUPON_RECEIVE_FAIL);
         }
         Coupon coupon = couponService.findById(buyerCouponReq.getCouponId());
         if (Objects.isNull(coupon)) {
-            return Result.build(Constant.COUPON_FAIL, Constant.TEXT_COUPON_INVALID_FAIL);
+            return Result.build(Msg.COUPON_FAIL, Msg.TEXT_COUPON_INVALID_FAIL);
         }
         Integer residueNumber = coupon.getResidueNumber();
         Integer receiveNum = coupon.getReceiveNum();
@@ -82,7 +82,7 @@ public class BuyerCouponController {
         Long decrement = redisService.couponDecrement(coupon.getId() + "", coupon.getReceiveNum());
         if (decrement < 0 && decrement + coupon.getReceiveNum() < 0) {
             redisService.couponIncrement(coupon.getId() + "", coupon.getReceiveNum());
-            return Result.build(Constant.COUPON_FAIL, Constant.TEXT_COUPON_ROB_FAIL);
+            return Result.build(Msg.COUPON_FAIL, Msg.TEXT_COUPON_ROB_FAIL);
         }
 
         //1.判断是否是新用户券

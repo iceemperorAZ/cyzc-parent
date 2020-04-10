@@ -240,7 +240,7 @@ public class WechatManageController {
         log.debug("请求参数：{}", userReq);
         User user = userService.findById(userReq.getId());
         if (Objects.isNull(user)) {
-            return Result.build(Constant.DATA_FAIL, Constant.TEXT_USER_DATA_FAIL);
+            return Result.build(Msg.DATA_FAIL, Msg.TEXT_USER_DATA_FAIL);
         }
         PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
         if (StringUtils.isNotBlank(userReq.getClause())) {
@@ -730,7 +730,7 @@ public class WechatManageController {
         log.debug("请求参数：{}", userReq);
         User user = userService.findById(userReq.getId());
         if (Objects.isNull(user)) {
-            return Result.build(Constant.DATA_FAIL, Constant.TEXT_USER_DATA_FAIL);
+            return Result.build(Msg.DATA_FAIL, Msg.TEXT_USER_DATA_FAIL);
         }
         List<ManagerSale> managerSales = managerSaleService.findByManagerIdAndSaleId(user.getId(), userReq.getId());
         List<ConfluenceDetail> confluenceDetails = new ArrayList<>();

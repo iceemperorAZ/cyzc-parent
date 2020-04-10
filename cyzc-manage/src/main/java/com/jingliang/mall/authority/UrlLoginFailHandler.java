@@ -1,7 +1,7 @@
 package com.jingliang.mall.authority;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.User;
@@ -63,7 +63,7 @@ public class UrlLoginFailHandler implements AuthenticationFailureHandler {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.LOGIN_LIMIT_FAIL, Constant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.LOGIN_LIMIT_FAIL, Msg.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
             return;
         }
         //登录验证失败
@@ -77,17 +77,17 @@ public class UrlLoginFailHandler implements AuthenticationFailureHandler {
         Long count = redisService.increment(loginFailCountPrefix + loginName + "-" + ip, 1);
         if (count == 3) {
             redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0, 300);
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.LOGIN_LIMIT_FAIL, Constant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.LOGIN_LIMIT_FAIL, Msg.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
         } else if (count == 4) {
             redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,1800);
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.LOGIN_LIMIT_FAIL, Constant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.LOGIN_LIMIT_FAIL, Msg.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
         } else if (count == 5) {
             redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,3600);
         } else if (count > 5) {
             redisService.setExpire(loginLimitPrefix + loginName+ "-" + ip, 0,86400);
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.LOGIN_LIMIT_FAIL, Constant.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.LOGIN_LIMIT_FAIL, Msg.TEXT_LIMIT_FAIL, dateFormat.format(new Date(redisService.getExpire(loginLimitPrefix + loginName+ "-" + ip) * 1000 - 28800000)))));
         } else {
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.LOGIN_FAIL, Constant.TEXT_LOGIN_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.LOGIN_FAIL, Msg.TEXT_LOGIN_FAIL)));
         }
     }
 

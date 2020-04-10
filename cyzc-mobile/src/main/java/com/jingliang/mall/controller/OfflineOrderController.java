@@ -18,10 +18,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
-import javax.swing.*;
-import java.awt.event.WindowAdapter;
-import java.io.File;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,7 +66,7 @@ public class OfflineOrderController {
         offlineOrderReq.setCreateTime(new Date());
         OfflineOrder offlineOrder = offlineOrderService.save(BeanMapper.map(offlineOrderReq, OfflineOrder.class));
         OfflineOrderResp offlineOrderResp = BeanMapper.map(offlineOrder, OfflineOrderResp.class);
-        return Result.build(Constant.OK, offlineOrderReq.getId() == null ? "保存成功" : "修改成功", offlineOrderResp);
+        return Result.build(Msg.OK, offlineOrderReq.getId() == null ? "保存成功" : "修改成功", offlineOrderResp);
     }
 
     /**
@@ -81,7 +77,7 @@ public class OfflineOrderController {
         User user = (User) session.getAttribute(sessionUser);
         OfflineOrder offlineOrder = offlineOrderService.delete(user.getId(), offlineOrderReq.getId());
         OfflineOrderResp offlineOrderResp = BeanMapper.map(offlineOrder, OfflineOrderResp.class);
-        return Result.build(Constant.OK, "删除成功", offlineOrderResp);
+        return Result.build(Msg.OK, "删除成功", offlineOrderResp);
     }
 
     /**

@@ -70,48 +70,48 @@ public class Result<T> implements Serializable {
      * build参数不全返回结果
      */
     public static <T> Result<T> buildParamFail() {
-        return new Result<T>(Constant.PARAM_FAIL, Constant.TEXT_PARAM_FAIL, null);
+        return new Result<T>(Msg.PARAM_FAIL, Msg.TEXT_PARAM_FAIL, null);
     }
     /**
      * build参数格式错误返回结果
      */
     public static <T> Result<T> buildParamFormatFail() {
-        return new Result<T>(Constant.PARAM_FAIL, Constant.TEXT_PARAM_FORMAT_FAIL, null);
+        return new Result<T>(Msg.PARAM_FAIL, Msg.TEXT_PARAM_FORMAT_FAIL, null);
     }
 
     /**
      * build保存成功返回结果
      */
     public static <T> Result<T> buildSaveOk(T data) {
-        return new Result<T>(Constant.OK, Constant.TEXT_SAVE_OK, data);
+        return new Result<T>(Msg.OK, Msg.TEXT_SAVE_OK, data);
     }
 
     /**
      * build修改成功返回结果
      */
     public static <T> Result<T> buildUpdateOk(T data) {
-        return new Result<T>(Constant.OK, Constant.TEXT_UPDATE_OK, data);
+        return new Result<T>(Msg.OK, Msg.TEXT_UPDATE_OK, data);
     }
 
     /**
      * build删除成功返回结果
      */
     public static <T> Result<T> buildDeleteOk(T data) {
-        return new Result<T>(Constant.OK, Constant.TEXT_DELETE_OK, data);
+        return new Result<T>(Msg.OK, Msg.TEXT_DELETE_OK, data);
     }
 
     /**
      * build保存失败返回结果
      */
     public static <T> Result<T> buildSaveFail() {
-        return new Result<T>(Constant.SAVE_FAIL, Constant.TEXT_SAVE_FAIL, null);
+        return new Result<T>(Msg.SAVE_FAIL, Msg.TEXT_SAVE_FAIL, null);
     }
 
     /**
      * build查询成功返回结果
      */
     public static <T> Result<T> buildQueryOk(T data) {
-        return new Result<T>(Constant.OK, Constant.TEXT_QUERY_OK, data);
+        return new Result<T>(Msg.OK, Msg.TEXT_QUERY_OK, data);
     }
 
     public Result(Integer code, String msg, T data) {
@@ -121,8 +121,8 @@ public class Result<T> implements Serializable {
     }
 
     public Result(T data) {
-        this.code = Constant.OK;
-        this.msg = Constant.TEXT_OK;
+        this.code = Msg.OK;
+        this.msg = Msg.TEXT_OK;
         this.data = data;
     }
 

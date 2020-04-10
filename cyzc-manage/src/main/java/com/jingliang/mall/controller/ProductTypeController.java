@@ -59,7 +59,7 @@ public class ProductTypeController {
     public Result<ProductTypeResp> saveProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productTypeReq);
         if (StringUtils.isBlank(productTypeReq.getProductTypeName())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
@@ -79,7 +79,7 @@ public class ProductTypeController {
     public Result<ProductTypeResp> deleteProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productTypeReq);
         if (Objects.isNull(productTypeReq.getId())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         //判断商品分类下是否有已经上架的商品
@@ -87,7 +87,7 @@ public class ProductTypeController {
         //2.无则正常删除
         Integer count = productService.countByProductTypeIdAnnShow(productTypeReq.getId(),true);
         if(count>0){
-            return Result.build(Constant.FAIL, Constant.TEXT_PRODUCT_DELETE_FAIL);
+            return Result.build(Msg.FAIL, Msg.TEXT_PRODUCT_DELETE_FAIL);
         }
         Long id = productTypeReq.getId();
         productTypeReq = new ProductTypeReq();
@@ -126,6 +126,6 @@ public class ProductTypeController {
         Page<ProductType> productTypeByPage = productTypeService.findAll(productTypeSpecification, pageRequest);
         MallPage<ProductTypeResp> productTypeRespPage = MallUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeRespPage);
-        return Result.build(Constant.OK, Constant.TEXT_QUERY_OK, productTypeRespPage);
+        return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeRespPage);
     }
 }

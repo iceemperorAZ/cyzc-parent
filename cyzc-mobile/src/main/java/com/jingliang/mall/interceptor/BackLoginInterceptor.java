@@ -1,7 +1,7 @@
 package com.jingliang.mall.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.JwtUtil;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.User;
@@ -54,7 +54,7 @@ public class BackLoginInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.TOKEN_FAIL, Constant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         }
@@ -65,7 +65,7 @@ public class BackLoginInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.TOKEN_FAIL, Constant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         }
@@ -76,7 +76,7 @@ public class BackLoginInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.TOKEN_FAIL, Constant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         }

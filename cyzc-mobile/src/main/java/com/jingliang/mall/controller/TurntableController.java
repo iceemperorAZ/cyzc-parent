@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerAddress;
@@ -59,14 +59,14 @@ public class TurntableController {
         //查询默认地址
         BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyer.getId());
         if (buyerAddress == null) {
-            return Result.build(Constant.OK, "请配置默认地址");
+            return Result.build(Msg.OK, "请配置默认地址");
         }
         try {
             TurntableDetail turntableDetail = turntableService.extract(turntableReq.getId(), buyer.getId());
-            return Result.build(Constant.OK, "抽奖成功", turntableDetail);
+            return Result.build(Msg.OK, "抽奖成功", turntableDetail);
         } catch (TurntableException e) {
             e.printStackTrace();
-            return Result.build(Constant.OK, e.getMessage());
+            return Result.build(Msg.OK, e.getMessage());
         }
     }
 }

@@ -5,7 +5,7 @@ import com.jingliang.mall.entity.SkuDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.SkuDetailService;
 import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.SkuDetailReq;
@@ -63,7 +63,7 @@ public class SkuDetailController {
         log.debug("请求参数：{}", skuDetailReq);
         if (Objects.isNull(skuDetailReq.getExpiredTime()) || Objects.isNull(skuDetailReq.getProductionTime()) || Objects.isNull(skuDetailReq.getPurchasePrice())
                 || Objects.isNull(skuDetailReq.getSkuId()) || Objects.isNull(skuDetailReq.getSkuAppendNum())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);

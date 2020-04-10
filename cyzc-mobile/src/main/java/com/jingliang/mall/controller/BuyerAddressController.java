@@ -56,7 +56,7 @@ public class BuyerAddressController {
         log.debug("请求参数：{}", buyerAddressReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         if (Objects.nonNull(buyerAddressReq.getId()) && buyerAddressService.countByIdAndBuyerId(buyerAddressReq.getId(), buyer.getId()) == 0) {
-            return Result.build(Constant.ADDRESS_FAIL, Constant.TEXT_ADDRESS_NOT_EXIST_FAIL);
+            return Result.build(Msg.ADDRESS_FAIL, Msg.TEXT_ADDRESS_NOT_EXIST_FAIL);
         }
         MUtils.addDateAndBuyer(buyerAddressReq, buyer);
         buyerAddressReq.setBuyerId(buyer.getId());

@@ -76,7 +76,7 @@ public class TurntableDetailController {
         if (turntableDetailReq.getType() == 400) {
             Product product = productService.findAllById(turntableDetailReq.getPrizeId());
             if (product == null) {
-                return Result.build(Constant.FAIL, "商品不存在");
+                return Result.build(Msg.FAIL, "商品不存在");
             }
         }
 

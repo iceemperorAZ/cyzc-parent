@@ -73,10 +73,10 @@ public class OfflinePaymentController {
         //确认订单是否存在
         Order order = orderService.findById(offlinePaymentReq.getOrderId());
         if (Objects.isNull(order)) {
-            return Result.build(Constant.DATA_FAIL, Constant.TEXT_ORDER_DATA_FAIL);
+            return Result.build(Msg.DATA_FAIL, Msg.TEXT_ORDER_DATA_FAIL);
         }
         if (Objects.nonNull(offlinePaymentService.findByOrderId(offlinePaymentReq.getOrderId())) && Objects.isNull(offlinePaymentReq.getId())) {
-            return Result.build(Constant.DATA_FAIL, Constant.TEXT_DATA_REPEAT_FAIL);
+            return Result.build(Msg.DATA_FAIL, Msg.TEXT_DATA_REPEAT_FAIL);
         }
         offlinePaymentReq.setOrderNo(order.getOrderNo());
         if (Objects.nonNull(offlinePaymentReq.getId())) {
@@ -97,8 +97,8 @@ public class OfflinePaymentController {
             String imgBase = offlinePaymentReq.getImgBase64s().get(i);
             Base64Image base64Image = Base64Image.build(imgBase);
             if (Objects.isNull(base64Image)) {
-                log.debug("返回结果：{}", Constant.TEXT_IMAGE_FAIL);
-                return Result.build(Constant.IMAGE_FAIL, Constant.TEXT_IMAGE_FAIL);
+                log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+                return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
             }
             base64Images.add(base64Image);
         }

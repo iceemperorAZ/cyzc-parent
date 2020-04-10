@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
-import javax.servlet.http.HttpSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -91,7 +90,7 @@ public class OfflineOrderController {
     @PostMapping("/back/offlineOrder/unlock")
     public Result<Boolean> unlock(@RequestBody Map<String, Long> map) {
         Long id = map.get("id");
-        return Result.build(Constant.OK, "解锁成功", offlineOrderService.unlock(id));
+        return Result.build(Msg.OK, "解锁成功", offlineOrderService.unlock(id));
     }
 
     /**
@@ -100,7 +99,7 @@ public class OfflineOrderController {
     @PostMapping("/back/offlineOrder/rate/success")
     public Result<Boolean> success(@RequestBody Map<String, Long> map) {
         Long id = map.get("id");
-        return Result.build(Constant.OK, "开具发票进度修改成功", offlineOrderService.success(id));
+        return Result.build(Msg.OK, "开具发票进度修改成功", offlineOrderService.success(id));
     }
 
     /**
@@ -127,7 +126,7 @@ public class OfflineOrderController {
         List<OfflineOrder> offlineOrderList = offlineOrderService.downExcel(specification);
 
         //生产excel
-        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("线下订单", Constant.offlineOrderExcelTitle);
+        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("线下订单", Msg.offlineOrderExcelTitle);
         XSSFSheet sheet = orderWorkbook.getSheet("线下订单");
         XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
         CreationHelper createHelper = orderWorkbook.getCreationHelper();
@@ -297,7 +296,7 @@ public class OfflineOrderController {
         };
         List<OfflineOrder> offlineOrderList = offlineOrderService.financeDown(specification);
         //生产excel
-        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("线下订单", Constant.offlineOrderExcelTitle2);
+        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("线下订单", Msg.offlineOrderExcelTitle2);
         XSSFSheet sheet = orderWorkbook.getSheet("线下订单");
         XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
         CreationHelper createHelper = orderWorkbook.getCreationHelper();

@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MUtils;
@@ -59,7 +59,7 @@ public class CartController {
             return Result.buildParamFail();
         }
         if (Objects.isNull(cartReq.getId()) && Objects.equals(cartReq.getProductNum(), 0)) {
-            return Result.build(Constant.SAVE_FAIL, Constant.TEXT_CART_ITEM_NUM_FAIL);
+            return Result.build(Msg.SAVE_FAIL, Msg.TEXT_CART_ITEM_NUM_FAIL);
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         MUtils.addDateAndBuyer(cartReq, buyer);

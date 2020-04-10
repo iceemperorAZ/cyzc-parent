@@ -1,6 +1,6 @@
 package com.jingliang.mall.authority;
 
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.exception.LoginFailException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -40,7 +40,7 @@ public class MallAuthenticationProvider implements AuthenticationProvider {
         UserDetails userInfo = userDetailsService.loadUserByUsername(loginName);
         boolean matches = new BCryptPasswordEncoder().matches(password, userInfo.getPassword());
         if (!matches) {
-            throw new LoginFailException(Constant.TEXT_LOGIN_FAIL);
+            throw new LoginFailException(Msg.TEXT_LOGIN_FAIL);
         }
         return new UsernamePasswordAuthenticationToken(loginName, userInfo.getPassword(), userInfo.getAuthorities());
     }

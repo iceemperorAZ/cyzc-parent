@@ -1,6 +1,6 @@
 package com.jingliang.mall.exception;
 
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -34,7 +34,7 @@ public class MallControllerAdvice {
         String uri = request.getRequestURI();
         log.error("服务器异常拦截，当前请求的uri：{}", uri);
         log.error("服务器异常拦截,错误信息=>{}", e.getMessage());
-        return Result.build(Constant.SYSTEM_FAIL, Constant.TEXT_SYSTEM_FAIL);
+        return Result.build(Msg.SYSTEM_FAIL, Msg.TEXT_SYSTEM_FAIL);
     }
 
     /**
@@ -50,7 +50,7 @@ public class MallControllerAdvice {
         log.error("请求格式异常拦截，当前请求的uri：{}", uri);
         log.error("请求格式异常拦截,错误信息=>{}", e.getMessage());
         String method = e.getMethod();
-        return Result.build(Constant.REQUEST_FAIL, Constant.TEXT_REQUEST_FAIL.replace("[#nowReq#]", "[" + method + "]")
+        return Result.build(Msg.REQUEST_FAIL, Msg.TEXT_REQUEST_FAIL.replace("[#nowReq#]", "[" + method + "]")
                 .replace("[#req#]", Arrays.toString(Objects.requireNonNull(e.getSupportedHttpMethods()).stream().map(Enum::name).toArray())));
     }
 }

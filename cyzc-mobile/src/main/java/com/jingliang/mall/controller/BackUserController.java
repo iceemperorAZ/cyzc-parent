@@ -63,7 +63,7 @@ public class BackUserController {
         User user = userService.findByUserNo(userReq.getUserNo());
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (user == null || !passwordEncoder.matches(userReq.getPassword(), user.getPassword())) {
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.FAIL, "工号或密码错误！")));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.FAIL, "工号或密码错误！")));
             return;
         }
         log.debug("登录成功，用户信息 = {}", user);
@@ -77,7 +77,7 @@ public class BackUserController {
         //存入redis 有效时长为1800秒（半小时）
         redisService.setExpire(tokenUserPrefix + user.getId(), user, tokenTimeOut);
         response.setHeader("Authorization", token);
-        response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.OK, Constant.TEXT_LOGIN_OK, BeanMapper.map(user, UserResp.class))));
+        response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, BeanMapper.map(user, UserResp.class))));
     }
 
     /**
@@ -92,8 +92,8 @@ public class BackUserController {
         user = userService.findById(user.getId());
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            return Result.build(Constant.FAIL, "原密码不正确", false);
+            return Result.build(Msg.FAIL, "原密码不正确", false);
         }
-        return Result.build(Constant.OK, "修改成功", userService.modifyPassword(user.getId(), passwordEncoder.encode(password)));
+        return Result.build(Msg.OK, "修改成功", userService.modifyPassword(user.getId(), passwordEncoder.encode(password)));
     }
 }

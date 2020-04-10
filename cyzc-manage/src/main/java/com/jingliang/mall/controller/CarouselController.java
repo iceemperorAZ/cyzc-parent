@@ -58,13 +58,13 @@ public class CarouselController {
     public Result<CarouselResp> save(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", carouselReq);
         if (StringUtils.isBlank(carouselReq.getImg()) || Objects.isNull(carouselReq.getType()) || Objects.isNull(carouselReq.getCarouselOrder())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         Base64Image base64Image = Base64Image.build(carouselReq.getImg());
         if (Objects.isNull(base64Image)) {
-            log.debug("返回结果：{}", Constant.TEXT_IMAGE_FAIL);
-            return Result.build(Constant.IMAGE_FAIL, Constant.TEXT_IMAGE_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+            return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
         }
         if (Objects.nonNull(carouselReq.getId())) {
             //如果是修改则删除原来的图片
@@ -142,13 +142,13 @@ public class CarouselController {
     public Result<CarouselResp> indexImg(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", carouselReq);
         if (StringUtils.isBlank(carouselReq.getImg())) {
-            log.debug("返回结果：{}", Constant.TEXT_PARAM_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
         Base64Image base64Image = Base64Image.build(carouselReq.getImg());
         if (Objects.isNull(base64Image)) {
-            log.debug("返回结果：{}", Constant.TEXT_IMAGE_FAIL);
-            return Result.build(Constant.IMAGE_FAIL, Constant.TEXT_IMAGE_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+            return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
         }
         if (Objects.nonNull(carouselReq.getId())) {
             //如果是修改则删除原来的图片
@@ -159,7 +159,7 @@ public class CarouselController {
         } else {
             Carousel carousel = carouselService.findByType(-100);
             if (Objects.nonNull(carousel)) {
-                return Result.build(Constant.DATA_FAIL, Constant.TEXT_DATA_REPEAT_FAIL);
+                return Result.build(Msg.DATA_FAIL, Msg.TEXT_DATA_REPEAT_FAIL);
             }
         }
         User user = (User) session.getAttribute(sessionUser);

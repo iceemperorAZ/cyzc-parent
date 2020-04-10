@@ -1,7 +1,7 @@
 package com.jingliang.mall.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
-import com.jingliang.mall.common.Constant;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ public class PassWordCheckInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.PASSWORD_FAIL, Constant.TEXT_PASSWORD_INIT_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.PASSWORD_FAIL, Msg.TEXT_PASSWORD_INIT_FAIL)));
             log.debug("用户密码为初始密码");
             return false;
         }

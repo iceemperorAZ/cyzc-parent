@@ -64,6 +64,6 @@ public class ProductTypeController {
         Page<ProductType> productTypeByPage = productTypeService.findAll(productTypeSpecification, pageRequest);
         MallPage<ProductTypeResp> productTypeRespPage = MUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeRespPage);
-        return Result.build(Constant.OK, Constant.TEXT_QUERY_OK, productTypeRespPage);
+        return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeRespPage);
     }
 }

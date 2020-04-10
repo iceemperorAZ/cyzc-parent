@@ -67,6 +67,6 @@ public class UrlLoginSuccessHandler implements AuthenticationSuccessHandler {
         String ip = MallUtils.getIpAddress(request);
         redisService.remove(loginLimitPrefix + user.getLoginName() + "-" + ip);
         redisService.remove(loginFailCountPrefix + user.getLoginName() + "-" + ip);
-        response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.OK, Constant.TEXT_LOGIN_OK, BeanMapper.map(user, UserResp.class))));
+        response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, BeanMapper.map(user, UserResp.class))));
     }
 }
