@@ -63,4 +63,12 @@ public interface OfflineOrderService {
      * @return
      */
     List<OfflineOrder> financeDown(Specification<OfflineOrder> specification);
+
+    /**
+     * 删除
+     * @param userId
+     * @param offlineOrderId
+     * @return
+     */
+    OfflineOrder delete(Long userId, Long offlineOrderId);
 }

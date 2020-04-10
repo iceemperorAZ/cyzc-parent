@@ -11,6 +11,7 @@ import com.jingliang.mall.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.xssf.usermodel.*;
@@ -159,7 +160,7 @@ public class OrderController {
      */
     @ApiOperation(value = "分页查询全部用户订单信息")
     @GetMapping("/page/all")
-    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq) {
+    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, List<Integer> orderStatuses) {
         log.debug("请求参数：{}", orderReq);
         PageRequest pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize());
         if (StringUtils.isNotBlank(orderReq.getClause())) {
@@ -167,6 +168,7 @@ public class OrderController {
         }
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
+            List<Predicate> orOredicateList = new ArrayList<>();
             if (Objects.nonNull(orderReq.getId())) {
                 predicateList.add(cb.equal(root.get("id"), orderReq.getId()));
             }
@@ -179,11 +181,13 @@ public class OrderController {
             if (Objects.nonNull(orderReq.getCreateTimeStart()) && Objects.nonNull(orderReq.getCreateTimeEnd())) {
                 predicateList.add(cb.between(root.get("createTime"), orderReq.getCreateTimeStart(), orderReq.getCreateTimeEnd()));
             }
-            if (Objects.nonNull(orderReq.getOrderStatus())) {
-                predicateList.add(cb.equal(root.get("orderStatus"), orderReq.getOrderStatus()));
+            if (CollectionUtils.isEmpty(orderStatuses)) {
+                for (Integer orderStatus : orderStatuses) {
+                    orOredicateList.add(cb.equal(root.get("orderStatus"), orderStatus));
+                }
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
-            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            query.where(cb.and(predicateList.toArray(new Predicate[0])), cb.or(orOredicateList.toArray(new Predicate[0])));
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };

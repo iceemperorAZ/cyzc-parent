@@ -156,6 +156,14 @@ public class RedisServiceImpl implements RedisService {
         return increment;
     }
 
+
+    @Override
+    public Long decrement(String key, Integer num) {
+        Long decrement = redisTemplate.opsForValue().decrement(defaultPrefix + key, num);
+        log.info("key为:[{}]，在redis中递减值为:[{}]", key, decrement);
+        return decrement;
+    }
+
     @Override
     public Long skuLineDecrement(String productId, Integer num) {
         Long decrement = redisTemplate.opsForValue().decrement(productSkuPrefix + productId, num);

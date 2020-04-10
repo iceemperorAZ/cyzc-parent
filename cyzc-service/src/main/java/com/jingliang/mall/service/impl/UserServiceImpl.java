@@ -112,4 +112,13 @@ public class UserServiceImpl implements UserService {
     public List<User> findByLevel(int level) {
         return userRepository.findAllByLevelAndIsAvailable(level, true);
     }
+
+    @Override
+    public Boolean modifyPassword(Long userId, String password) {
+        User user = userRepository.findById(userId).orElse(null);
+        assert user != null;
+        user.setPassword(password);
+        userRepository.save(user);
+        return true;
+    }
 }

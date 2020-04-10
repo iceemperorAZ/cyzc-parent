@@ -69,6 +69,17 @@ public class OfflineOrderServiceImpl implements OfflineOrderService {
 
     @Override
     public List<OfflineOrder> financeDown(Specification<OfflineOrder> specification) {
-        return  offlineOrderRepository.findAll(specification);
+        return offlineOrderRepository.findAll(specification);
+    }
+
+    @Override
+    public OfflineOrder delete(Long userId, Long offlineOrderId) {
+        OfflineOrder offlineOrder = offlineOrderRepository.findById(offlineOrderId).orElse(null);
+        assert offlineOrder != null;
+        if (userId.equals(offlineOrder.getSalesmanId())) {
+            offlineOrder.setIsAvailable(false);
+            return offlineOrderRepository.save(offlineOrder);
+        }
+        return null;
     }
 }

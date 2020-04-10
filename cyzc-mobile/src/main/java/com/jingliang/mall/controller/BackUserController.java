@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,11 @@ import java.util.Map;
 @RestController
 @Slf4j
 public class BackUserController {
-
+    /**
+     * session用户Key
+     */
+    @Value("${session.user.key}")
+    private String sessionUser;
     @Value("${login.fail.count.prefix}")
     private String loginFailCountPrefix;
     @Value("${login.limit.prefix}")
@@ -73,5 +78,22 @@ public class BackUserController {
         redisService.setExpire(tokenUserPrefix + user.getId(), user, tokenTimeOut);
         response.setHeader("Authorization", token);
         response.getWriter().write(JSONObject.toJSONString(Result.build(Constant.OK, Constant.TEXT_LOGIN_OK, BeanMapper.map(user, UserResp.class))));
+    }
+
+    /**
+     * 修改密码
+     */
+    @PostMapping("/back/user/password")
+    public Result<Boolean> modifyPassword(@RequestBody UserReq userReq, HttpSession session) {
+        User user = (User) session.getAttribute(sessionUser);
+        String password = userReq.getPassword();
+        String oldPassword = userReq.getOldPassword();
+        //获取最新的用户信息
+        user = userService.findById(user.getId());
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return Result.build(Constant.FAIL, "原密码不正确", false);
+        }
+        return Result.build(Constant.OK, "修改成功", userService.modifyPassword(user.getId(), passwordEncoder.encode(password)));
     }
 }

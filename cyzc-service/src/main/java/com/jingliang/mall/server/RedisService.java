@@ -115,6 +115,15 @@ public interface RedisService {
     public Long increment(String key, Integer num);
 
     /**
+     * redis中原子递减
+     *
+     * @param key key
+     * @param num 步长
+     * @return 返回递减后的值
+     */
+    public Long decrement(String key, Integer num);
+
+    /**
      * 返回 redis中的商品库存数
      *
      * @param key

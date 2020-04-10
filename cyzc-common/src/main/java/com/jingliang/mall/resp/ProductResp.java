@@ -261,6 +261,12 @@ public class ProductResp implements Serializable {
     private Integer weight;
 
     /**
+     * 每日购买上限
+     */
+    @ApiModelProperty(value = "每日购买上限")
+    private Integer limitNum;
+
+    /**
      * 商品图片字符串转集合
      */
     public void setProductImgUris(String productImgUris) {

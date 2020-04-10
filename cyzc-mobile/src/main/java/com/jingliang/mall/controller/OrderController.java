@@ -18,12 +18,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 /**
@@ -56,7 +61,10 @@ public class OrderController {
     private final ConfigService configService;
     private final GoldLogService goldLogService;
 
-    public OrderController(OrderService orderService, ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService, BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer, ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService) {
+    public OrderController(RedisTemplate<String, Object> redisTemplate, OrderService orderService,
+                           ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService,
+                           BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer,
+                           ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
@@ -102,19 +110,64 @@ public class OrderController {
                 for (OrderDetail detailReq : orderDetails) {
                     //如果本次有已经下架的商品就把减掉的库存加回去，并返回库存商品已下架
                     redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
+                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detailReq.getProductId() + "", detailReq.getProductNum());
                 }
                 return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_PRODUCT_FAIL);
             }
+            //判断商品是否已经售空
+            if (product.getIsSoonShow()) {
+                for (OrderDetail detailReq : orderDetails) {
+                    //如果本次有已经售空的商品就把减掉的库存加回去，并返回库存商品已售空
+                    redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
+                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detailReq.getProductId() + "", detailReq.getProductNum());
+                }
+                return Result.build(Constant.ORDER_FAIL, product.getProductName() + "已抢空");
+            }
+            //判断商品已经抢空
+            if (product.getIsNew()) {
+                for (OrderDetail detailReq : orderDetails) {
+                    //如果本次有已经售空的商品就把减掉的库存加回去，并返回库存商品已售空
+                    redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
+                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detailReq.getProductId() + "", detailReq.getProductNum());
+                }
+                return Result.build(Constant.ORDER_FAIL, product.getProductName() + "已售罄");
+            }
+
             //售价[商品价格*数量]
             long sellingPrice = product.getSellingPrice() * orderDetail.getProductNum();
             order.setTotalPrice(order.getTotalPrice() + sellingPrice);
             order.setPayableFee(order.getPayableFee() + sellingPrice);
-            //查询线上库存
-            Long skuNum = redisService.skuLineDecrement(String.valueOf(product.getId()), orderDetail.getProductNum());
             orderDetail.setSellingPrice(product.getSellingPrice());
             orderDetail.setCreateTime(date);
             orderDetail.setIsAvailable(true);
             orderDetails.add(orderDetail);
+            //查询已购买数量
+            Long increment = redisService.increment("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", orderDetail.getProductNum());
+            //查询线上库存
+            Long skuNum = redisService.skuLineDecrement(String.valueOf(product.getId()), orderDetail.getProductNum());
+            if (increment.intValue() == orderDetail.getProductNum()) {
+                //如果是第一次则进行倒计时（当天12点失效）
+                Duration duration = Duration.between(LocalDateTime.now(), LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)));
+                redisService.setExpire("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", duration.toMillis() / 1000);
+            }
+            //判断商品本次是否超过购买限制
+            if (orderDetail.getProductNum() > product.getLimitNum()) {
+                for (OrderDetail detailReq : orderDetails) {
+                    //如果本次有已经售空的商品就把减掉的库存加回去，并返回库存商品已售空
+                    redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
+                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detailReq.getProductId() + "", detailReq.getProductNum());
+                }
+                return Result.build(Constant.ORDER_FAIL, product.getProductName() + "今日限购" + product.getLimitNum() + product.getUnit());
+            }
+            //判断今天总共是否超过购买限制
+            if (increment > product.getLimitNum()) {
+                for (OrderDetail detailReq : orderDetails) {
+                    //如果本次有已经售空的商品就把减掉的库存加回去，并返回库存商品已售空
+                    redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
+                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detailReq.getProductId() + "", detailReq.getProductNum());
+                }
+                return Result.build(Constant.ORDER_FAIL, product.getProductName() + "超出今日购买上限");
+            }
             if (skuNum < productSkuInitInventedNum) {
                 hasSku = false;
             }
@@ -122,6 +175,7 @@ public class OrderController {
                 for (OrderDetail detail : orderDetails) {
                     //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                     redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detail.getProductId() + "", detail.getProductNum());
                 }
                 return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_SKU_FAIL);
             }
@@ -137,11 +191,21 @@ public class OrderController {
         //是否满足可以下单的订单额度
         Config config = configService.findByCode("300");
         if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+            for (OrderDetail detail : orderDetails) {
+                //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
+                redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+                redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detail.getProductId() + "", detail.getProductNum());
+            }
             return Result.build(Constant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
         }
         //是否满足可以下单的订单额度
         config = configService.findByCode("700");
         if (order.getTotalPrice() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+            for (OrderDetail detail : orderDetails) {
+                //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
+                redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+                redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detail.getProductId() + "", detail.getProductNum());
+            }
             return Result.build(Constant.ORDER_FAIL, config.getRemark().replace("#price#", (Integer.parseInt(config.getConfigValues())) + ""));
         }
         //计算赠品
@@ -181,7 +245,6 @@ public class OrderController {
                 }
             }
         }
-
         order.setPreferentialFee(0L);
         //计算使用优惠券后的支付价
         //优惠总价
@@ -191,9 +254,19 @@ public class OrderController {
             for (Long couponId : orderReq.getCouponIdList()) {
                 BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(couponId, buyer.getId());
                 if (Objects.isNull(buyerCoupon) || buyerCoupon.getReceiveNum() <= 0) {
+                    for (OrderDetail detail : orderDetails) {
+                        //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
+                        redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+                        redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detail.getProductId() + "", detail.getProductNum());
+                    }
                     return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_COUPON_FAIL);
                 }
                 if (!productPriceMap.containsKey(buyerCoupon.getProductTypeId())) {
+                    for (OrderDetail detail : orderDetails) {
+                        //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
+                        redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+                        redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detail.getProductId() + "", detail.getProductNum());
+                    }
                     return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_COUPON_FAIL);
                 }
                 //查询优惠券的限制使用张数
@@ -254,8 +327,9 @@ public class OrderController {
                 if (Objects.isNull(resultMap)) {
                     //调起支付失败
                     for (OrderDetail detail : orderDetails) {
-                        //失败就把减掉的库存加回去，并返回支付失败的信息
+                        //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                         redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+                        redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detail.getProductId() + "", detail.getProductNum());
                     }
                     return Result.build(Constant.ORDER_FAIL, Constant.TEXT_ORDER_FAIL);
                 }

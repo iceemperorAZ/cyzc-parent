@@ -128,6 +128,7 @@ public class OrderServiceImpl implements OrderService {
                     buyerCouponService.save(buyerCoupon);
                 }
             }
+            Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
             //查询订单详情
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
             for (OrderDetail orderDetail : orderDetails) {
@@ -140,8 +141,9 @@ public class OrderServiceImpl implements OrderService {
                 sku.setUpdateUserName("系统");
                 sku.setSkuLineNum(orderDetail.getProductNum());
                 rabbitProducer.sendSku(sku);
+                //把购买次数退回去
+                redisService.decrement("PRODUCT-BUYER-LIMIT-" + oldOrder.getBuyerId() + orderDetail.getProductId() + "", orderDetail.getProductNum());
             }
-            Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
             Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
             if (oldOrder.getIsGold() != null && oldOrder.getIsGold()) {
                 buyer.setGold(buyer.getGold() + oldOrder.getGold());

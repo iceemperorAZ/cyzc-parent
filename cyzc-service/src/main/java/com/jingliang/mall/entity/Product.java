@@ -237,4 +237,11 @@ public class Product implements Serializable {
      */
     @Column(name = "weight")
     private Integer weight;
+
+
+    /**
+     * 单用户每天购买上限制
+     */
+    @Column(name = "limit_num")
+    private Integer limitNum;
 }

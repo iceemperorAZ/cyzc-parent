@@ -1,6 +1,5 @@
 package com.jingliang.mall.controller;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.OfflineOrder;
 import com.jingliang.mall.entity.User;
@@ -14,12 +13,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
+import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.io.File;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,6 +65,7 @@ public class OfflineOrderController {
             offlineOrderReq.setRate(null);
         }
         offlineOrderReq.setEnable(false);
+        offlineOrderReq.setIsAvailable(true);
         offlineOrderReq.setSalesmanPhone(user.getPhone());
         offlineOrderReq.setCreateTime(new Date());
         OfflineOrder offlineOrder = offlineOrderService.save(BeanMapper.map(offlineOrderReq, OfflineOrder.class));
@@ -71,24 +74,36 @@ public class OfflineOrderController {
     }
 
     /**
+     * 删除
+     */
+    @PostMapping("/back/offlineOrder/delete")
+    public Result<OfflineOrderResp> delete(@RequestBody OfflineOrderReq offlineOrderReq, HttpSession session) {
+        User user = (User) session.getAttribute(sessionUser);
+        OfflineOrder offlineOrder = offlineOrderService.delete(user.getId(), offlineOrderReq.getId());
+        OfflineOrderResp offlineOrderResp = BeanMapper.map(offlineOrder, OfflineOrderResp.class);
+        return Result.build(Constant.OK, "删除成功", offlineOrderResp);
+    }
+
+    /**
      * 分页查询全部
      */
     @GetMapping("/back/offlineOrder/page/all")
     public Result<MallPage<OfflineOrderResp>> pageAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize,
-                                                      @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")Date createTimeStart,
-                                                      @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")Date createTimeEnd,
+                                                      Long createTimeStart,
+                                                      Long createTimeEnd,
                                                       Integer rate, @ApiIgnore HttpSession session) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         User user = (User) session.getAttribute(sessionUser);
         Specification<OfflineOrder> specification = (Specification<OfflineOrder>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
             if (createTimeStart != null && createTimeEnd != null) {
-                predicateList.add(cb.between(root.get("createTime"), createTimeStart, createTimeEnd));
+                predicateList.add(cb.between(root.get("createTime"), new Date(createTimeStart), new Date(createTimeEnd)));
             }
             if (rate != null) {
                 predicateList.add(cb.equal(root.get("rate"), rate));
             }
             predicateList.add(cb.equal(root.get("salesmanId"), user.getId()));
+            predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
