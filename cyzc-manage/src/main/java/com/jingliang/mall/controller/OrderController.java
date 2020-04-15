@@ -207,9 +207,10 @@ public class OrderController {
      */
     @ApiOperation(value = "导出订单excel")
     @GetMapping("/download/excel")
-    public ResponseEntity<byte[]> download(OrderReq orderReq) throws IOException {
+    public ResponseEntity<byte[]> download(OrderReq orderReq,@RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) throws IOException {
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
+            List<Predicate> orOredicateList = new ArrayList<>();
             if (Objects.nonNull(orderReq.getId())) {
                 predicateList.add(cb.equal(root.get("id"), orderReq.getId()));
             }
@@ -222,11 +223,17 @@ public class OrderController {
             if (Objects.nonNull(orderReq.getCreateTimeStart()) && Objects.nonNull(orderReq.getCreateTimeEnd())) {
                 predicateList.add(cb.between(root.get("createTime"), orderReq.getCreateTimeStart(), orderReq.getCreateTimeEnd()));
             }
-            if (Objects.nonNull(orderReq.getOrderStatus())) {
-                predicateList.add(cb.equal(root.get("orderStatus"), orderReq.getOrderStatus()));
+            if (!CollectionUtils.isEmpty(orderStatuses)) {
+                for (Integer orderStatus : orderStatuses) {
+                    orOredicateList.add(cb.equal(root.get("orderStatus"), orderStatus));
+                }
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
-            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            if (!CollectionUtils.isEmpty(orderStatuses)) {
+                query.where(cb.and(predicateList.toArray(new Predicate[0])), cb.or(orOredicateList.toArray(new Predicate[0])));
+            } else {
+                query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            }
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
