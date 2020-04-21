@@ -9,6 +9,7 @@ import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.service.BuyerService;
+import com.jingliang.mall.service.GoldLogService;
 import com.jingliang.mall.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,10 +34,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 会员表Controller
@@ -63,12 +61,14 @@ public class BuyerController {
     private final RedisService redisService;
     private final UserService userService;
     private final BuyerSaleService buyerSaleService;
+    private final GoldLogService goldLogService;
 
-    public BuyerController(BuyerService buyerService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService) {
+    public BuyerController(BuyerService buyerService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService, GoldLogService goldLogService) {
         this.buyerService = buyerService;
         this.redisService = redisService;
         this.userService = userService;
         this.buyerSaleService = buyerSaleService;
+        this.goldLogService = goldLogService;
     }
 
     /**
@@ -76,27 +76,27 @@ public class BuyerController {
      */
     @ApiOperation(value = "修改会员信息")
     @PostMapping("/save")
-    public MallResult<BuyerResp> save(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerResp> save(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         if (Objects.isNull(buyerReq.getId())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         if (buyerReq.getSaleUserId() != null) {
             User user = userService.findById(buyerReq.getSaleUserId());
             if (Objects.isNull(user)) {
-                return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_BUYER_FAIL);
+                return Result.build(Msg.FAIL, Msg.TEXT_BUYER_FAIL);
             }
         }
         Buyer buyer = buyerService.findById(buyerReq.getId());
         if (Objects.isNull(buyer)) {
-            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
+            return Result.build(Msg.DATA_FAIL, Msg.TEXT_BUYER_DATA_FAIL);
         }
         //修改会员信息后清空redis中的会员token
         redisService.remove(tokenBuyerPrefix + buyer.getId());
-        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
         log.debug("返回结果：{}", buyerResp);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
+        return Result.build(Msg.OK, Msg.TEXT_UPDATE_OK, buyerResp);
     }
 
     /**
@@ -104,43 +104,47 @@ public class BuyerController {
      */
     @ApiOperation(value = "重新绑定销售")
     @PostMapping("/update/saleUser")
-    public MallResult<BuyerResp> updateSaleUser(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerResp> updateSaleUser(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         if (Objects.isNull(buyerReq.getId())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         Buyer buyer = buyerService.findById(buyerReq.getId());
         if (Objects.isNull(buyer)) {
-            return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_BUYER_DATA_FAIL);
+            return Result.build(Msg.DATA_FAIL, Msg.TEXT_BUYER_DATA_FAIL);
         }
-        BuyerSale buyerSale = buyerSaleService.findBySaleIdAndBuyerId(buyer.getSaleUserId(), buyer.getId());
+        List<BuyerSale> buyerSales = buyerSaleService.findAllBySaleIdAndBuyerIdAndIsAvailable(buyer.getSaleUserId(), buyer.getId());
         User user = (User) session.getAttribute(sessionUser);
         Date date = new Date();
-        if (buyerSale != null) {
-            buyerSale.setUntyingTime(date);
-            buyerSale.setUpdateTime(date);
-            buyerSale.setUpdateUser(user.getUserName());
-            buyerSale.setUpdateUserId(user.getId());
-            buyerSaleService.save(buyerSale);
+        if (buyerSales.size() > 0) {
+            buyerSales.forEach(buyerSale -> {
+                buyerSale.setUntyingTime(date);
+                buyerSale.setUpdateTime(date);
+                buyerSale.setUpdateUser(user.getUserName());
+                buyerSale.setUpdateUserId(user.getId());
+            });
+            buyerSaleService.saveAll(buyerSales);
         }
         //更换销售后修改最后一次下单时间
         buyerReq.setLastOrderTime(date);
         //修改会员信息后清空redis中的会员token
         redisService.remove(tokenBuyerPrefix + buyer.getId());
         buyerReq.setLastOrderTime(date);
-        BuyerResp buyerResp = MallBeanMapper.map(buyerService.save(MallBeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
-        buyerSale = new BuyerSale();
+        BuyerResp buyerResp = BeanMapper.map(buyerService.save(BeanMapper.map(buyerReq, Buyer.class)), BuyerResp.class);
+        BuyerSale buyerSale = new BuyerSale();
         buyerSale.setBuyerId(buyer.getId());
         buyerSale.setSaleId(buyerReq.getSaleUserId());
         buyerSale.setIsAvailable(true);
         buyerSale.setCreateTime(date);
-        buyerSale.setUpdateTime(date);
-        buyerSale.setUpdateTime(date);
+        //将这个值设置的大一点
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, 2300);
+        buyerSale.setUntyingTime(calendar.getTime());
         buyerSale.setUpdateTime(date);
         buyerSale = buyerSaleService.save(buyerSale);
         log.debug("返回结果：{}", buyerResp);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_UPDATE_OK, buyerResp);
+        return Result.build(Msg.OK, Msg.TEXT_UPDATE_OK, buyerResp);
     }
 
     /**
@@ -148,7 +152,7 @@ public class BuyerController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部会员")
-    public MallResult<MallPage<BuyerResp>> pageAllProduct(BuyerReq buyerReq) {
+    public Result<MallPage<BuyerResp>> pageAllProduct(BuyerReq buyerReq) {
         log.debug("请求参数：{}", buyerReq);
         PageRequest pageRequest = PageRequest.of(buyerReq.getPage(), buyerReq.getPageSize());
         if (StringUtils.isNotBlank(buyerReq.getClause())) {
@@ -165,7 +169,7 @@ public class BuyerController {
         Page<Buyer> buyerPage = buyerService.findAll(buyerSpecification, pageRequest);
         MallPage<BuyerResp> buyerRespMallPage = BaseMallUtils.toMallPage(buyerPage, BuyerResp.class);
         log.debug("返回结果：{}", buyerRespMallPage);
-        return MallResult.buildQueryOk(buyerRespMallPage);
+        return Result.buildQueryOk(buyerRespMallPage);
     }
 
     /**
@@ -186,7 +190,7 @@ public class BuyerController {
             return query.getRestriction();
         };
         List<Buyer> buyers = buyerService.findAll(buyerSpecification);
-        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("商户信息", MallConstant.buyerExcelTitle);
+        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("商户信息", Msg.buyerExcelTitle);
         XSSFSheet sheet = orderWorkbook.getSheet("商户信息");
         XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
         CreationHelper createHelper = orderWorkbook.getCreationHelper();
@@ -227,5 +231,4 @@ public class BuyerController {
                 .contentLength(arrayOutputStream.size())
                 .body(arrayOutputStream.toByteArray());
     }
-
 }

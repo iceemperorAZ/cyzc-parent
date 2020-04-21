@@ -56,19 +56,19 @@ public class ProductTypeController {
      */
     @ApiOperation(value = "添加商品分类")
     @PostMapping("/save")
-    public MallResult<ProductTypeResp> saveProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
+    public Result<ProductTypeResp> saveProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productTypeReq);
         if (StringUtils.isBlank(productTypeReq.getProductTypeName())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(productTypeReq, user);
-        ProductType productType = MallBeanMapper.map(productTypeReq, ProductType.class);
+        ProductType productType = BeanMapper.map(productTypeReq, ProductType.class);
         productType = productTypeService.save(productType);
-        ProductTypeResp productTypeResp = MallBeanMapper.map(productType, ProductTypeResp.class);
+        ProductTypeResp productTypeResp = BeanMapper.map(productType, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeResp);
-        return MallResult.buildSaveOk(productTypeResp);
+        return Result.buildSaveOk(productTypeResp);
     }
 
     /**
@@ -76,18 +76,18 @@ public class ProductTypeController {
      */
     @ApiOperation(value = "删除商品分类")
     @PostMapping("/delete")
-    public MallResult<ProductTypeResp> deleteProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
+    public Result<ProductTypeResp> deleteProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productTypeReq);
         if (Objects.isNull(productTypeReq.getId())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         //判断商品分类下是否有已经上架的商品
         //1.有则不允许删除
         //2.无则正常删除
         Integer count = productService.countByProductTypeIdAnnShow(productTypeReq.getId(),true);
         if(count>0){
-            return MallResult.build(MallConstant.FAIL,MallConstant.TEXT_PRODUCT_DELETE_FAIL);
+            return Result.build(Msg.FAIL, Msg.TEXT_PRODUCT_DELETE_FAIL);
         }
         Long id = productTypeReq.getId();
         productTypeReq = new ProductTypeReq();
@@ -95,11 +95,11 @@ public class ProductTypeController {
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(productTypeReq, user);
         productTypeReq.setIsAvailable(false);
-        ProductType productType = MallBeanMapper.map(productTypeReq, ProductType.class);
+        ProductType productType = BeanMapper.map(productTypeReq, ProductType.class);
         productType = productTypeService.save(productType);
-        ProductTypeResp productTypeResp = MallBeanMapper.map(productType, ProductTypeResp.class);
+        ProductTypeResp productTypeResp = BeanMapper.map(productType, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeResp);
-        return MallResult.buildDeleteOk(productTypeResp);
+        return Result.buildDeleteOk(productTypeResp);
     }
 
     /**
@@ -107,7 +107,7 @@ public class ProductTypeController {
      */
     @ApiOperation(value = "分页查询所有商品分类")
     @GetMapping("/page/all")
-    public MallResult<MallPage<ProductTypeResp>> pageAllProductTypeResp(ProductTypeReq productTypeReq) {
+    public Result<MallPage<ProductTypeResp>> pageAllProductTypeResp(ProductTypeReq productTypeReq) {
         log.debug("请求参数：{}", productTypeReq);
         PageRequest pageRequest = PageRequest.of(productTypeReq.getPage(), productTypeReq.getPageSize());
         if (StringUtils.isNotBlank(productTypeReq.getClause())) {
@@ -126,6 +126,6 @@ public class ProductTypeController {
         Page<ProductType> productTypeByPage = productTypeService.findAll(productTypeSpecification, pageRequest);
         MallPage<ProductTypeResp> productTypeRespPage = MallUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeRespPage);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_QUERY_OK, productTypeRespPage);
+        return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeRespPage);
     }
 }

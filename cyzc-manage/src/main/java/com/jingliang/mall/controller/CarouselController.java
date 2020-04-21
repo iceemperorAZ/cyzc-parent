@@ -55,16 +55,16 @@ public class CarouselController {
      */
     @ApiOperation(value = "保存/修改轮播图配置")
     @PostMapping("/save")
-    public MallResult<CarouselResp> save(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
+    public Result<CarouselResp> save(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", carouselReq);
         if (StringUtils.isBlank(carouselReq.getImg()) || Objects.isNull(carouselReq.getType()) || Objects.isNull(carouselReq.getCarouselOrder())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         Base64Image base64Image = Base64Image.build(carouselReq.getImg());
         if (Objects.isNull(base64Image)) {
-            log.debug("返回结果：{}", MallConstant.TEXT_IMAGE_FAIL);
-            return MallResult.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+            return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
         }
         if (Objects.nonNull(carouselReq.getId())) {
             //如果是修改则删除原来的图片
@@ -75,12 +75,12 @@ public class CarouselController {
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(carouselReq, user);
-        Carousel carousel = MallBeanMapper.map(carouselReq, Carousel.class);
+        Carousel carousel = BeanMapper.map(carouselReq, Carousel.class);
         assert carousel != null;
         carousel.setImgUri(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
-        CarouselResp carouselResp = MallBeanMapper.map(carouselService.save(carousel), CarouselResp.class);
+        CarouselResp carouselResp = BeanMapper.map(carouselService.save(carousel), CarouselResp.class);
         log.debug("返回结果：{}", carouselResp);
-        return MallResult.buildSaveOk(carouselResp);
+        return Result.buildSaveOk(carouselResp);
     }
 
     /**
@@ -88,7 +88,7 @@ public class CarouselController {
      */
     @ApiOperation(value = "分页查询全部轮播图配置")
     @GetMapping("/page/all")
-    public MallResult<MallPage<CarouselResp>> pageAllCoupon(CarouselReq carouselReq) {
+    public Result<MallPage<CarouselResp>> pageAllCoupon(CarouselReq carouselReq) {
         log.debug("请求参数：{}", carouselReq);
         PageRequest pageRequest = PageRequest.of(carouselReq.getPage(), carouselReq.getPageSize());
         if (StringUtils.isNotBlank(carouselReq.getClause())) {
@@ -105,7 +105,7 @@ public class CarouselController {
         Page<Carousel> carouselPage = carouselService.findAll(carouselSpecification, pageRequest);
         MallPage<CarouselResp> carouselRespMallPage = MallUtils.toMallPage(carouselPage, CarouselResp.class);
         log.debug("返回结果：{}", carouselRespMallPage);
-        return MallResult.buildQueryOk(carouselRespMallPage);
+        return Result.buildQueryOk(carouselRespMallPage);
     }
 
     /**
@@ -113,12 +113,12 @@ public class CarouselController {
      */
     @ApiOperation(value = "删除轮播图配置")
     @PostMapping("/delete")
-    public MallResult<CarouselResp> delete(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
+    public Result<CarouselResp> delete(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", carouselReq);
         User user = (User) session.getAttribute(sessionUser);
         Carousel carousel = carouselService.findById(carouselReq.getId());
         if (Objects.isNull(carousel)) {
-            return MallResult.buildDeleteOk(null);
+            return Result.buildDeleteOk(null);
         }
         if (StringUtils.isNotBlank(carousel.getImgUri())) {
             //如果是修改则删除原来的图片
@@ -128,10 +128,10 @@ public class CarouselController {
         }
         MallUtils.addDateAndUser(carouselReq, user);
         carouselReq.setIsAvailable(false);
-        carousel = MallBeanMapper.map(carouselReq, Carousel.class);
-        CarouselResp carouselResp = MallBeanMapper.map(carouselService.save(carousel), CarouselResp.class);
+        carousel = BeanMapper.map(carouselReq, Carousel.class);
+        CarouselResp carouselResp = BeanMapper.map(carouselService.save(carousel), CarouselResp.class);
         log.debug("返回结果：{}", carouselResp);
-        return MallResult.buildDeleteOk(carouselResp);
+        return Result.buildDeleteOk(carouselResp);
     }
 
     /**
@@ -139,16 +139,16 @@ public class CarouselController {
      */
     @ApiOperation(value = "保存/修改首页图配置")
     @PostMapping("/index/img/save")
-    public MallResult<CarouselResp> indexImg(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
+    public Result<CarouselResp> indexImg(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", carouselReq);
         if (StringUtils.isBlank(carouselReq.getImg())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         Base64Image base64Image = Base64Image.build(carouselReq.getImg());
         if (Objects.isNull(base64Image)) {
-            log.debug("返回结果：{}", MallConstant.TEXT_IMAGE_FAIL);
-            return MallResult.build(MallConstant.IMAGE_FAIL, MallConstant.TEXT_IMAGE_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+            return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
         }
         if (Objects.nonNull(carouselReq.getId())) {
             //如果是修改则删除原来的图片
@@ -159,19 +159,19 @@ public class CarouselController {
         } else {
             Carousel carousel = carouselService.findByType(-100);
             if (Objects.nonNull(carousel)) {
-                return MallResult.build(MallConstant.DATA_FAIL, MallConstant.TEXT_DATA_REPEAT_FAIL);
+                return Result.build(Msg.DATA_FAIL, Msg.TEXT_DATA_REPEAT_FAIL);
             }
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(carouselReq, user);
         carouselReq.setCarouselOrder(-100);
         carouselReq.setType(-100);
-        Carousel carousel = MallBeanMapper.map(carouselReq, Carousel.class);
+        Carousel carousel = BeanMapper.map(carouselReq, Carousel.class);
         assert carousel != null;
         carousel.setImgUri(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
-        CarouselResp carouselResp = MallBeanMapper.map(carouselService.save(carousel), CarouselResp.class);
+        CarouselResp carouselResp = BeanMapper.map(carouselService.save(carousel), CarouselResp.class);
         log.debug("返回结果：{}", carouselResp);
-        return MallResult.buildSaveOk(carouselResp);
+        return Result.buildSaveOk(carouselResp);
     }
 
     /**
@@ -179,7 +179,7 @@ public class CarouselController {
      */
     @ApiOperation(value = "查询首页图配置")
     @GetMapping("/index/img")
-    public MallResult<CarouselResp> indexImg() {
-        return MallResult.buildQueryOk(MallBeanMapper.map(carouselService.findByType(-100), CarouselResp.class));
+    public Result<CarouselResp> indexImg() {
+        return Result.buildQueryOk(BeanMapper.map(carouselService.findByType(-100), CarouselResp.class));
     }
 }

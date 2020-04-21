@@ -65,15 +65,15 @@ public class BuyerCouponController {
      */
     @ApiOperation(value = "领取优惠券")
     @PostMapping("/save")
-    public MallResult<BuyerCouponResp> add(@RequestBody BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerCouponResp> add(@RequestBody BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         if (buyerCouponService.countByCouponId(buyer.getId(), buyerCouponReq.getCouponId()) > 0) {
-            return MallResult.build(MallConstant.COUPON_FAIL, MallConstant.TEXT_COUPON_RECEIVE_FAIL);
+            return Result.build(Msg.COUPON_FAIL, Msg.TEXT_COUPON_RECEIVE_FAIL);
         }
         Coupon coupon = couponService.findById(buyerCouponReq.getCouponId());
         if (Objects.isNull(coupon)) {
-            return MallResult.build(MallConstant.COUPON_FAIL, MallConstant.TEXT_COUPON_INVALID_FAIL);
+            return Result.build(Msg.COUPON_FAIL, Msg.TEXT_COUPON_INVALID_FAIL);
         }
         Integer residueNumber = coupon.getResidueNumber();
         Integer receiveNum = coupon.getReceiveNum();
@@ -82,7 +82,7 @@ public class BuyerCouponController {
         Long decrement = redisService.couponDecrement(coupon.getId() + "", coupon.getReceiveNum());
         if (decrement < 0 && decrement + coupon.getReceiveNum() < 0) {
             redisService.couponIncrement(coupon.getId() + "", coupon.getReceiveNum());
-            return MallResult.build(MallConstant.COUPON_FAIL, MallConstant.TEXT_COUPON_ROB_FAIL);
+            return Result.build(Msg.COUPON_FAIL, Msg.TEXT_COUPON_ROB_FAIL);
         }
 
         //1.判断是否是新用户券
@@ -101,7 +101,7 @@ public class BuyerCouponController {
                 buyerService.save(buyer);
             }
         }
-        BuyerCoupon buyerCoupon = MallBeanMapper.map(coupon, BuyerCoupon.class);
+        BuyerCoupon buyerCoupon = BeanMapper.map(coupon, BuyerCoupon.class);
         assert buyerCoupon != null;
         buyerCoupon.setCouponId(coupon.getId());
         buyerCoupon.setId(null);
@@ -114,9 +114,9 @@ public class BuyerCouponController {
         //通过消息异步减优惠券数量
         coupon.setResidueNumber(-buyerCoupon.getReceiveNum());
         rabbitProducer.sendCoupon(coupon);
-        BuyerCouponResp buyerCouponResp = MallBeanMapper.map(buyerCoupon, BuyerCouponResp.class);
+        BuyerCouponResp buyerCouponResp = BeanMapper.map(buyerCoupon, BuyerCouponResp.class);
         log.debug("返回结果：{}", buyerCouponResp);
-        return MallResult.buildSaveOk(buyerCouponResp);
+        return Result.buildSaveOk(buyerCouponResp);
     }
 
     /**
@@ -124,11 +124,11 @@ public class BuyerCouponController {
      */
     @ApiOperation(value = "分页查询所有领取优惠券")
     @GetMapping("/page/all")
-    public MallResult<MallPage<BuyerCouponResp>> pageAll(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
+    public Result<MallPage<BuyerCouponResp>> pageAll(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponReq);
         PageRequest pageRequest = PageRequest.of(buyerCouponReq.getPage(), buyerCouponReq.getPageSize());
         if (StringUtils.isNotBlank(buyerCouponReq.getClause())) {
-            pageRequest = PageRequest.of(buyerCouponReq.getPage(), buyerCouponReq.getPageSize(), Sort.by(MallUtils.separateOrder(buyerCouponReq.getClause())));
+            pageRequest = PageRequest.of(buyerCouponReq.getPage(), buyerCouponReq.getPageSize(), Sort.by(MUtils.separateOrder(buyerCouponReq.getClause())));
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<BuyerCoupon> buyerCouponSpecification = (Specification<BuyerCoupon>) (root, query, cb) -> {
@@ -166,9 +166,9 @@ public class BuyerCouponController {
             return query.getRestriction();
         };
         Page<BuyerCoupon> buyerCouponPage = buyerCouponService.findAll(buyerCouponSpecification, pageRequest);
-        MallPage<BuyerCouponResp> buyerCouponRespMallPage = MallUtils.toMallPage(buyerCouponPage, BuyerCouponResp.class);
+        MallPage<BuyerCouponResp> buyerCouponRespMallPage = MUtils.toMallPage(buyerCouponPage, BuyerCouponResp.class);
         log.debug("返回结果：{}", buyerCouponRespMallPage);
-        return MallResult.buildQueryOk(buyerCouponRespMallPage);
+        return Result.buildQueryOk(buyerCouponRespMallPage);
     }
 
     /**
@@ -178,7 +178,7 @@ public class BuyerCouponController {
      */
     @ApiOperation(value = "查询所有领取优惠券，按商品分类分组返回")
     @GetMapping("/group/all")
-    public MallResult<List<Map<String, Object>>> groupAll(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
+    public Result<List<Map<String, Object>>> groupAll(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<BuyerCoupon> buyerCouponSpecification = (Specification<BuyerCoupon>) (root, query, cb) -> {
@@ -212,9 +212,9 @@ public class BuyerCouponController {
             Map<String, Object> map = new HashMap<>(2);
             map.put("productTypeId", entry.getKey().getId());
             map.put("productTypeName", entry.getKey().getProductTypeName());
-            map.put("data", MallBeanMapper.mapList(entry.getValue(), BuyerCouponResp.class));
+            map.put("data", BeanMapper.mapList(entry.getValue(), BuyerCouponResp.class));
             list.add(map);
         }
-        return MallResult.buildQueryOk(list);
+        return Result.buildQueryOk(list);
     }
 }

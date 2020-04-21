@@ -2,8 +2,8 @@ package com.jingliang.mall.interceptor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.JwtUtil;
-import com.jingliang.mall.common.MallConstant;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Msg;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.server.RedisService;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,7 @@ public class FrontLoginInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         }
@@ -65,7 +65,7 @@ public class FrontLoginInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         }
@@ -76,7 +76,7 @@ public class FrontLoginInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.TOKEN_FAIL, MallConstant.TEXT_TOKEN_INVALID_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
         }
@@ -87,7 +87,7 @@ public class FrontLoginInterceptor implements HandlerInterceptor {
             //设置编码格式
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(MallResult.build(MallConstant.LOGIN_FAIL, MallConstant.TEXT_IS_SEAL_UP_FAIL)));
+            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.LOGIN_FAIL, Msg.TEXT_IS_SEAL_UP_FAIL)));
             log.debug("用户token失效");
             return false;
         }

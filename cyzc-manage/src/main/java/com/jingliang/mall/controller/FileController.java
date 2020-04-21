@@ -4,8 +4,8 @@ import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.FileRecord;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.FileRecordService;
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.FileRecordReq;
 import com.jingliang.mall.resp.FileRecordResp;
 import com.jingliang.mall.server.FastdfsService;
@@ -52,7 +52,7 @@ public class FileController {
      */
     @PostMapping("/upload")
     @ApiOperation(value = "文件上传")
-    public MallResult<FileRecordResp> uploadFile(MultipartFile file, @ApiIgnore HttpSession session) throws IOException {
+    public Result<FileRecordResp> uploadFile(MultipartFile file, @ApiIgnore HttpSession session) throws IOException {
         log.debug("请求参数：{}", file);
         //1.保存到到文件服务器
         //2.保存上传记录到数据库
@@ -64,9 +64,9 @@ public class FileController {
         fileRecordReq.setType(100);
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(fileRecordReq, user);
-        FileRecordResp fileUploadRecordResp = MallBeanMapper.map(fileRecordService.save(MallBeanMapper.map(fileRecordReq, FileRecord.class)), FileRecordResp.class);
+        FileRecordResp fileUploadRecordResp = BeanMapper.map(fileRecordService.save(BeanMapper.map(fileRecordReq, FileRecord.class)), FileRecordResp.class);
         log.debug("返回结果：{}", fileUploadRecordResp);
-        return MallResult.buildSaveOk(fileUploadRecordResp);
+        return Result.buildSaveOk(fileUploadRecordResp);
     }
 
     /**
@@ -74,7 +74,7 @@ public class FileController {
      */
     @PostMapping("/delete")
     @ApiOperation(value = "文件删除")
-    public MallResult<FileRecordResp> deleteFile(String fileUri, @ApiIgnore HttpSession session) throws IOException {
+    public Result<FileRecordResp> deleteFile(String fileUri, @ApiIgnore HttpSession session) throws IOException {
         log.debug("请求参数：{}", fileUri);
         //1.保存到到文件服务器
         //2.保存上传记录到数据库
@@ -84,9 +84,9 @@ public class FileController {
         fileRecordReq.setType(200);
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(fileRecordReq, user);
-        FileRecordResp fileUploadRecordResp = MallBeanMapper.map(fileRecordService.save(MallBeanMapper.map(fileRecordReq, FileRecord.class)), FileRecordResp.class);
+        FileRecordResp fileUploadRecordResp = BeanMapper.map(fileRecordService.save(BeanMapper.map(fileRecordReq, FileRecord.class)), FileRecordResp.class);
         log.debug("返回结果：{}", fileUploadRecordResp);
-        return MallResult.buildSaveOk(fileUploadRecordResp);
+        return Result.buildSaveOk(fileUploadRecordResp);
     }
 
 

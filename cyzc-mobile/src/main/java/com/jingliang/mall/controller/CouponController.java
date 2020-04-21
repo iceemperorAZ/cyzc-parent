@@ -1,9 +1,7 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerCoupon;
 import com.jingliang.mall.entity.Coupon;
@@ -16,9 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,7 +55,7 @@ public class CouponController {
      */
     @ApiOperation(value = "查询全部优惠券")
     @GetMapping("/all")
-    public MallResult<List<CouponResp>> pageAllCoupon(CouponReq couponReq, @ApiIgnore HttpSession session) {
+    public Result<List<CouponResp>> pageAllCoupon(CouponReq couponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", couponReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         Specification<Coupon> couponSpecification = (Specification<Coupon>) (root, query, cb) -> {
@@ -91,7 +86,7 @@ public class CouponController {
         List<Coupon> couponList = couponService.findAll(couponSpecification);
         List<BuyerCoupon> buyerCoupons = buyerCouponService.findAll(buyer.getId());
         List<Long> buyerCouponIds = buyerCoupons.stream().map(BuyerCoupon::getCouponId).collect(Collectors.toList());
-        List<CouponResp> couponRespList = MallBeanMapper.mapList(couponList, CouponResp.class);
+        List<CouponResp> couponRespList = BeanMapper.mapList(couponList, CouponResp.class);
         //处理领取优惠券
         couponRespList = couponRespList.stream().filter(couponResp -> {
             if (buyerCouponIds.contains(couponResp.getId())) {
@@ -102,7 +97,7 @@ public class CouponController {
             return true;
         }).sorted(Comparator.comparing(CouponResp::getIsReceive)).collect(Collectors.toList());
         log.debug("返回结果：{}", couponRespList);
-        return MallResult.buildQueryOk(couponRespList);
+        return Result.buildQueryOk(couponRespList);
     }
 
 }

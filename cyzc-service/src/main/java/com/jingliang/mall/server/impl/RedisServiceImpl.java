@@ -13,6 +13,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -106,7 +107,12 @@ public class RedisServiceImpl implements RedisService {
 
     @Override
     public String getOrderNo() {
-        return orderNoValuePrefix + getNo(orderNoPrefix);
+        Random random = new Random();
+        int nextInt1 = random.nextInt(9);
+        int nextInt2 = random.nextInt(9);
+        int nextInt3 = random.nextInt(9);
+        //订单后缀为3位随机数
+        return orderNoValuePrefix + getNo(orderNoPrefix) + nextInt1 + nextInt2 + nextInt3;
     }
 
     @Override
@@ -148,6 +154,14 @@ public class RedisServiceImpl implements RedisService {
         Long increment = redisTemplate.opsForValue().increment(defaultPrefix + key, num);
         log.info("key为:[{}]，在redis中自增值为:[{}]", key, increment);
         return increment;
+    }
+
+
+    @Override
+    public Long decrement(String key, Integer num) {
+        Long decrement = redisTemplate.opsForValue().decrement(defaultPrefix + key, num);
+        log.info("key为:[{}]，在redis中递减值为:[{}]", key, decrement);
+        return decrement;
     }
 
     @Override

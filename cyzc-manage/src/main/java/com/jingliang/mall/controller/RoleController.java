@@ -1,16 +1,13 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
-import com.jingliang.mall.entity.Role;
 import com.jingliang.mall.entity.Role;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.entity.UserRole;
 import com.jingliang.mall.req.RoleReq;
-import com.jingliang.mall.req.RoleReq;
-import com.jingliang.mall.resp.RoleResp;
 import com.jingliang.mall.resp.RoleResp;
 import com.jingliang.mall.service.RoleService;
 import com.jingliang.mall.service.UserRoleService;
@@ -63,7 +60,7 @@ public class RoleController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部角色")
-    public MallResult<MallPage<RoleResp>> pageAllProduct(RoleReq roleReq) {
+    public Result<MallPage<RoleResp>> pageAllProduct(RoleReq roleReq) {
         log.debug("请求参数：{}", roleReq);
         PageRequest pageRequest = PageRequest.of(roleReq.getPage(), roleReq.getPageSize());
         if (StringUtils.isNotBlank(roleReq.getClause())) {
@@ -91,33 +88,33 @@ public class RoleController {
             });
         }
         log.debug("返回结果：{}", roleRespMallPage);
-        return MallResult.buildQueryOk(roleRespMallPage);
+        return Result.buildQueryOk(roleRespMallPage);
     }
     @PostMapping("/save")
     @ApiOperation(value = "保存/更新角色")
-    public MallResult<RoleResp> save(@RequestBody RoleReq roleReq, @ApiIgnore HttpSession session) {
+    public Result<RoleResp> save(@RequestBody RoleReq roleReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", roleReq);
         if (StringUtils.isBlank(roleReq.getRoleName()) || StringUtils.isBlank(roleReq.getRoleNameZh())|| StringUtils.isBlank(roleReq.getRemark())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(roleReq, user);
-        RoleResp roleResp = MallBeanMapper.map(roleService.save(MallBeanMapper.map(roleReq, Role.class)), RoleResp.class);
+        RoleResp roleResp = BeanMapper.map(roleService.save(BeanMapper.map(roleReq, Role.class)), RoleResp.class);
         log.debug("返回参数：{}", roleResp);
-        return MallResult.buildSaveOk(roleResp);
+        return Result.buildSaveOk(roleResp);
     }
     @PostMapping("/delete")
     @ApiOperation(value = "删除角色")
-    public MallResult<RoleResp> delete(@RequestBody RoleReq roleReq, @ApiIgnore HttpSession session) {
+    public Result<RoleResp> delete(@RequestBody RoleReq roleReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", roleReq);
         if (Objects.isNull(roleReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(roleReq, user);
         roleReq.setIsAvailable(false);
-        RoleResp roleResp = MallBeanMapper.map(roleService.save(MallBeanMapper.map(roleReq, Role.class)), RoleResp.class);
+        RoleResp roleResp = BeanMapper.map(roleService.save(BeanMapper.map(roleReq, Role.class)), RoleResp.class);
         log.debug("返回参数：{}", roleResp);
-        return MallResult.buildDeleteOk(roleResp);
+        return Result.buildDeleteOk(roleResp);
     }
 }

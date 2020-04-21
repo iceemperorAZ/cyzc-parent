@@ -87,6 +87,7 @@ public class Product implements Serializable {
     /**
      * 是否新品 0：否，1：是
      */
+    //TODO isNew临时调整为已售空
     @Column(name = "is_new")
     private Boolean isNew;
 
@@ -220,6 +221,7 @@ public class Product implements Serializable {
      * 是否即将上架
      */
     @Column(name = "is_soon_show")
+    //TODO isSoonShow临时调整为已抢光
     private Boolean isSoonShow;
 
     public Boolean getIsSoonShow() {
@@ -235,4 +237,11 @@ public class Product implements Serializable {
      */
     @Column(name = "weight")
     private Integer weight;
+
+
+    /**
+     * 单用户每天购买上限制
+     */
+    @Column(name = "limit_num")
+    private Integer limitNum;
 }

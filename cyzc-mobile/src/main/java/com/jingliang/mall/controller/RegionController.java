@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Region;
 import com.jingliang.mall.resp.RegionResp;
 import com.jingliang.mall.service.RegionService;
@@ -35,12 +35,12 @@ public class RegionController {
 
     @ApiOperation(value = "查询行政区域")
     @GetMapping("/find")
-    public MallResult<List<RegionResp>> findByParentCode(String parentCode) {
+    public Result<List<RegionResp>> findByParentCode(String parentCode) {
         log.debug("请求参数：{}", parentCode);
         List<Region> regions = regionService.findByParentCode(parentCode);
-        List<RegionResp> regionRespList = MallBeanMapper.mapList(regions, RegionResp.class);
+        List<RegionResp> regionRespList = BeanMapper.mapList(regions, RegionResp.class);
         log.debug("返回结果：{}", regionRespList);
-        return MallResult.buildQueryOk(regionRespList);
+        return Result.buildQueryOk(regionRespList);
     }
 
 

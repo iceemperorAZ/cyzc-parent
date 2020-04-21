@@ -416,6 +416,18 @@ public class OrderReq extends BaseReq implements Serializable {
     private String storehouse;
 
     /**
+     * 是否使用金币
+     */
+    @ApiModelProperty(value = "是否使用金币")
+    private Boolean isGold;
+
+    /**
+     * 使用金币数
+     */
+    @ApiModelProperty(value = "使用金币数")
+    private Integer gold;
+
+    /**
      * 订单详情集合
      */
     @ApiModelProperty(value = "订单详情集合")

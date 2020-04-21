@@ -1,8 +1,8 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallConstant;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Msg;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.entity.UserRole;
 import com.jingliang.mall.req.UserRoleReq;
@@ -50,15 +50,15 @@ public class UserRoleController {
      */
     @PostMapping("/save")
     @ApiOperation(value = "保存/修改用户角色关系")
-    public MallResult<UserRoleResp> pageAllProduct(@RequestBody UserRoleReq userRoleReq, @ApiIgnore HttpSession session) {
+    public Result<UserRoleResp> pageAllProduct(@RequestBody UserRoleReq userRoleReq, @ApiIgnore HttpSession session) {
         Boolean isAvailable = userRoleReq.getIsAvailable();
         if (Objects.isNull(userRoleReq.getUserId()) || Objects.isNull(userRoleReq.getRoleId()) || Objects.isNull(isAvailable)) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
 
         UserRole userRole = userRoleService.findAllByUserIdAndRoleId(userRoleReq.getUserId(), userRoleReq.getRoleId());
         if (Objects.isNull(userRole) && !isAvailable) {
-            return MallResult.build(MallConstant.FAIL, MallConstant.TEXT_DATA_FAIL);
+            return Result.build(Msg.FAIL, Msg.TEXT_DATA_FAIL);
         }
         Date date = new Date();
         User user = (User) session.getAttribute(sessionUser);
@@ -72,18 +72,18 @@ public class UserRoleController {
         userRoleReq.setUpdateTime(date);
         userRoleReq.setUpdateUserId(user.getId());
         userRoleReq.setUpdateUserName(user.getUserName());
-        userRole = MallBeanMapper.map(userRoleReq, UserRole.class);
+        userRole = BeanMapper.map(userRoleReq, UserRole.class);
         assert userRole != null;
         userRole.setIsAvailable(isAvailable);
         //赋权时有就更新没有就新增
         //撤权时直接设置为不可用
-        UserRoleResp userRoleResp = MallBeanMapper.map(userRoleService.save(userRole), UserRoleResp.class);
+        UserRoleResp userRoleResp = BeanMapper.map(userRoleService.save(userRole), UserRoleResp.class);
         if (isAvailable) {
             //授权成功
-            return MallResult.build(MallConstant.OK, MallConstant.TEXT_AUTHORIZE_OK, userRoleResp);
+            return Result.build(Msg.OK, Msg.TEXT_AUTHORIZE_OK, userRoleResp);
         }
         //撤权成功
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_RECOVERY_AUTHORITY_OK, userRoleResp);
+        return Result.build(Msg.OK, Msg.TEXT_RECOVERY_AUTHORITY_OK, userRoleResp);
     }
 
 }

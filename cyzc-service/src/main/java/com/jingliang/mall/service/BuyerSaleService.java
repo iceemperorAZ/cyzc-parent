@@ -1,8 +1,11 @@
 package com.jingliang.mall.service;
 
+import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.BuyerAddress;
 import com.jingliang.mall.entity.BuyerSale;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
 
 /**
  * 商户销售绑定表Service
@@ -22,11 +25,37 @@ public interface BuyerSaleService {
     BuyerSale save(BuyerSale buyerSale);
 
     /**
+     * 保存
+     *
+     * @param buyerSale
+     * @return
+     */
+    List<BuyerSale> saveAll(List<BuyerSale> buyerSale);
+
+    /**
      * 根据销售Id查询
      *
      * @param saleUserId
      * @param buyerId
      * @return
      */
-    BuyerSale findBySaleIdAndBuyerId(Long saleUserId, Long buyerId);
+    public List<BuyerSale> findAllBySaleIdAndBuyerIdAndIsAvailable(Long saleUserId, Long buyerId);
+
+    /**
+     * 根据条件查询绑定信息
+     *
+     * @param buyerSaleSpecification
+     */
+    List<BuyerSale> finAll(Specification<BuyerSale> buyerSaleSpecification);
+
+    /**
+     * 绑定销售
+     *
+     * @param buyerSale
+     * @param buyer
+     * @param address
+     * @return
+     */
+    Buyer bindingSale(BuyerSale buyerSale, Buyer buyer, BuyerAddress address);
+
 }

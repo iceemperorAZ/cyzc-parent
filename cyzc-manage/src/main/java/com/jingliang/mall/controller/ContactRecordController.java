@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.ContactRecord;
 import com.jingliang.mall.entity.User;
@@ -47,29 +47,29 @@ public class ContactRecordController {
 
 
     @PostMapping("/save")
-    public MallResult<ContactRecordResp> save(ContactRecordReq contactRecordReq, @ApiIgnore HttpSession session) {
+    public Result<ContactRecordResp> save(ContactRecordReq contactRecordReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", contactRecordReq);
         if (StringUtils.isBlank(contactRecordReq.getRemark()) || contactRecordReq.getResult() == null || contactRecordReq.getBuyerId() == null) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(contactRecordReq, user);
         contactRecordReq.setCreateTime(new Date());
-        ContactRecord contactRecord = contactRecordService.save(MallBeanMapper.map(contactRecordReq, ContactRecord.class));
-        ContactRecordResp contactRecordResp = MallBeanMapper.map(contactRecord, ContactRecordResp.class);
+        ContactRecord contactRecord = contactRecordService.save(BeanMapper.map(contactRecordReq, ContactRecord.class));
+        ContactRecordResp contactRecordResp = BeanMapper.map(contactRecord, ContactRecordResp.class);
         log.debug("返回参数：{}", contactRecordResp);
-        return MallResult.buildSaveOk(contactRecordResp);
+        return Result.buildSaveOk(contactRecordResp);
     }
 
     @GetMapping("/find/buyer_id")
-    public MallResult<List<ContactRecordResp>> find(Long buyerId) {
+    public Result<List<ContactRecordResp>> find(Long buyerId) {
         log.debug("请求参数：{}", buyerId);
         if (buyerId == null) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         List<ContactRecord> contactRecords = contactRecordService.findByBuyerId(buyerId);
-        List<ContactRecordResp> contactRecordResps = MallBeanMapper.mapList(contactRecords, ContactRecordResp.class);
+        List<ContactRecordResp> contactRecordResps = BeanMapper.mapList(contactRecords, ContactRecordResp.class);
         log.debug("返回参数：{}", contactRecordResps);
-        return MallResult.buildSaveOk(contactRecordResps);
+        return Result.buildSaveOk(contactRecordResps);
     }
 }

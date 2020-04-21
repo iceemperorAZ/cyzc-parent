@@ -11,8 +11,8 @@ import org.springframework.util.DigestUtils;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
-import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
@@ -74,8 +74,8 @@ public abstract class BaseMallUtils {
      */
     public static <T> MallPage<T> toMallPage(Page page, Class<T> aClass) {
         MallPage<T> mallPage = new MallPage<>();
-        MallBeanMapper.map(page, mallPage);
-        mallPage.setContent(MallBeanMapper.mapList(page.getContent(), aClass));
+        BeanMapper.map(page, mallPage);
+        mallPage.setContent(BeanMapper.mapList(page.getContent(), aClass));
         return mallPage;
     }
 
@@ -216,6 +216,29 @@ public abstract class BaseMallUtils {
             e.printStackTrace();
         }
         return null;
+    }
+    /**
+     * 获取真实Ip地址
+     *
+     * @param request 请求
+     * @return 返回得到的真实Ip
+     */
+    public static String getIpAddress(HttpServletRequest request) {
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        if (ip.contains(",")) {
+            return ip.split(",")[0];
+        } else {
+            return ip;
+        }
     }
 
     /**

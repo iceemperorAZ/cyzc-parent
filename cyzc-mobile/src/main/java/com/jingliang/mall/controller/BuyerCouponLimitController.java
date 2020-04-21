@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.BuyerCouponLimit;
 import com.jingliang.mall.entity.ProductType;
@@ -58,10 +58,10 @@ public class BuyerCouponLimitController {
     @ApiOperation(value = "根据商品分类Id集合查询全部用户优惠券使用限制")
     @GetMapping("/all")
     @ApiImplicitParam(name = "商品分类Id集合", value = "productTypeIds", required = true, paramType = "list")
-    public MallResult<List<BuyerCouponLimitResp>> findAll(@ApiIgnore BuyerCouponLimitReq buyerCouponLimitReq, @ApiIgnore HttpSession session) {
+    public Result<List<BuyerCouponLimitResp>> findAll(@ApiIgnore BuyerCouponLimitReq buyerCouponLimitReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponLimitReq.getBuyerId());
         if (Objects.isNull(buyerCouponLimitReq.getProductTypeIds()) || buyerCouponLimitReq.getProductTypeIds().isEmpty()) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         //查询所有商品分类
@@ -79,8 +79,8 @@ public class BuyerCouponLimitController {
             buyerCouponLimit.setUseLimit(couponUseLimit);
             buyerCouponLimits.add(buyerCouponLimit);
         }
-        List<BuyerCouponLimitResp> buyerCouponLimitResps = MallBeanMapper.mapList(buyerCouponLimits, BuyerCouponLimitResp.class);
+        List<BuyerCouponLimitResp> buyerCouponLimitResps = BeanMapper.mapList(buyerCouponLimits, BuyerCouponLimitResp.class);
         log.debug("返回结果：{}", buyerCouponLimitResps);
-        return MallResult.buildQueryOk(buyerCouponLimitResps);
+        return Result.buildQueryOk(buyerCouponLimitResps);
     }
 }

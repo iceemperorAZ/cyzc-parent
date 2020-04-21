@@ -1,11 +1,8 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.service.ProductTypeService;
-import com.jingliang.mall.common.MallConstant;
-import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
-import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.req.ProductTypeReq;
 import com.jingliang.mall.resp.ProductTypeResp;
 import io.swagger.annotations.Api;
@@ -48,11 +45,11 @@ public class ProductTypeController {
      */
     @ApiOperation(value = "分页查询所有商品分类")
     @GetMapping("/page/all")
-    public MallResult<MallPage<ProductTypeResp>> pageAllProductTypeResp(ProductTypeReq productTypeReq) {
+    public Result<MallPage<ProductTypeResp>> pageAllProductTypeResp(ProductTypeReq productTypeReq) {
         log.debug("请求参数：{}", productTypeReq);
         PageRequest pageRequest = PageRequest.of(productTypeReq.getPage(), productTypeReq.getPageSize());
         if (StringUtils.isNotBlank(productTypeReq.getClause())) {
-            pageRequest = PageRequest.of(productTypeReq.getPage(), productTypeReq.getPageSize(), Sort.by(MallUtils.separateOrder(productTypeReq.getClause())));
+            pageRequest = PageRequest.of(productTypeReq.getPage(), productTypeReq.getPageSize(), Sort.by(MUtils.separateOrder(productTypeReq.getClause())));
         }
         Specification<ProductType> productTypeSpecification = (Specification<ProductType>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -65,8 +62,8 @@ public class ProductTypeController {
             return query.getRestriction();
         };
         Page<ProductType> productTypeByPage = productTypeService.findAll(productTypeSpecification, pageRequest);
-        MallPage<ProductTypeResp> productTypeRespPage = MallUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
+        MallPage<ProductTypeResp> productTypeRespPage = MUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeRespPage);
-        return MallResult.build(MallConstant.OK, MallConstant.TEXT_QUERY_OK, productTypeRespPage);
+        return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeRespPage);
     }
 }

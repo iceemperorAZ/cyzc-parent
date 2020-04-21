@@ -1,9 +1,9 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
-import com.jingliang.mall.common.MallUtils;
+import com.jingliang.mall.common.Result;
+import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.req.ProductReq;
 import com.jingliang.mall.resp.ProductResp;
@@ -49,11 +49,11 @@ public class ProductController {
      */
     @GetMapping("/page/all")
     @ApiOperation(value = "分页查询全部商品")
-    public MallResult<MallPage<ProductResp>> pageAllProduct(ProductReq productReq) {
+    public Result<MallPage<ProductResp>> pageAllProduct(ProductReq productReq) {
         log.debug("请求参数：{}", productReq);
         PageRequest pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize());
         if (StringUtils.isNotBlank(productReq.getClause())) {
-            pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize(), Sort.by(MallUtils.separateOrder(productReq.getClause())));
+            pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize(), Sort.by(MUtils.separateOrder(productReq.getClause())));
         }
         Specification<Product> productSpecification = (Specification<Product>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -73,9 +73,9 @@ public class ProductController {
             return query.getRestriction();
         };
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
-        MallPage<ProductResp> productRespPage = MallUtils.toMallPage(productPage, ProductResp.class);
+        MallPage<ProductResp> productRespPage = MUtils.toMallPage(productPage, ProductResp.class);
         log.debug("返回结果：{}", productRespPage);
-        return MallResult.buildQueryOk(productRespPage);
+        return Result.buildQueryOk(productRespPage);
     }
 
     /**
@@ -83,10 +83,10 @@ public class ProductController {
      */
     @ApiOperation(value = "根据Id查询商品信息")
     @GetMapping("/id")
-    public MallResult<ProductResp> findById(Long id) {
+    public Result<ProductResp> findById(Long id) {
         log.debug("请求参数：{}", id);
-        ProductResp productResp = MallBeanMapper.map(productService.findAllById(id), ProductResp.class);
+        ProductResp productResp = BeanMapper.map(productService.findAllById(id), ProductResp.class);
         log.debug("返回结果：{}", productResp);
-        return MallResult.buildSaveOk(productResp);
+        return Result.buildSaveOk(productResp);
     }
 }

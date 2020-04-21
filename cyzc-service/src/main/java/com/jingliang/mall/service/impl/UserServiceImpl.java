@@ -48,18 +48,17 @@ public class UserServiceImpl implements UserService {
         Date date = new Date();
         if (user.getManagerId() != null) {
             if (id != null) {
-                ManagerSale managerSale = managerSaleRepository.findFirstByManagerIdAndSaleIdAndIsAvailableOrderByUntyingTime(user.getManagerId(), id, true);
-                if (managerSale != null) {
-                    if (!managerSale.getManagerId().equals(user.getManagerId())) {
+                List<ManagerSale> managerSales = managerSaleRepository.findAllByManagerIdAndSaleIdAndIsAvailableOrderByUntyingTime(user.getManagerId(), id, true);
+                if (managerSales.size() > 0) {
+                    User finalUser = user;
+                    managerSales.forEach(managerSale -> {
                         managerSale.setIsAvailable(false);
                         managerSale.setUntyingTime(date);
                         managerSale.setUpdateTime(date);
-                        managerSale.setUpdateUser(user.getUpdateUserName());
-                        managerSale.setUpdateUserId(user.getUpdateUserId());
-                        managerSaleRepository.save(managerSale);
-                    } else {
-                        return user;
-                    }
+                        managerSale.setUpdateUser(finalUser.getUpdateUserName());
+                        managerSale.setUpdateUserId(finalUser.getUpdateUserId());
+                    });
+                    managerSaleRepository.saveAll(managerSales);
                 }
             }
             ManagerSale managerSale = new ManagerSale();
@@ -111,6 +110,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findByLevel(int level) {
-        return userRepository.findAllByLevelAndIsAvailable(level,true);
+        return userRepository.findAllByLevelAndIsAvailable(level, true);
+    }
+
+    @Override
+    public Boolean modifyPassword(Long userId, String password) {
+        User user = userRepository.findById(userId).orElse(null);
+        assert user != null;
+        user.setPassword(password);
+        userRepository.save(user);
+        return true;
     }
 }

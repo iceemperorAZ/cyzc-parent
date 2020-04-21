@@ -82,8 +82,17 @@ public interface UserService {
 
     /**
      * 根据等级查询用户
+     *
      * @param level
      * @return
      */
     List<User> findByLevel(int level);
+
+    /**
+     * 修改密码
+     * @param userId
+     * @param password
+     * @return
+     */
+    Boolean modifyPassword(Long userId, String password);
 }

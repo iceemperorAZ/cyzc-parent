@@ -1,6 +1,6 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Config;
 import com.jingliang.mall.service.ConfigService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,9 +21,9 @@ public class ConfigController {
     }
 
     @GetMapping("/config/minimum")
-    public MallResult<Config> findMinimum(){
+    public Result<Config> findMinimum(){
         //是否满足可以下单的订单额度
         Config config = configService.findByCode("300");
-        return MallResult.buildQueryOk(config);
+        return Result.buildQueryOk(config);
     }
 }

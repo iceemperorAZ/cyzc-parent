@@ -11,6 +11,7 @@ import com.jingliang.mall.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.xssf.usermodel.*;
@@ -70,11 +71,15 @@ public class OrderController {
      */
     @ApiOperation(value = "发货")
     @PostMapping("/deliver")
-    public MallResult<OrderResp> deliver(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<OrderResp> deliver(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId()) || StringUtils.isBlank(orderReq.getDeliveryName())
                 || StringUtils.isBlank(orderReq.getDeliveryPhone()) || StringUtils.isBlank(orderReq.getStorehouse())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
+        }
+        Order order1 = orderService.findById(orderReq.getId());
+        if (order1.getOrderStatus() > 300) {
+            return Result.build(Msg.FAIL, "此订单已完成发货");
         }
         Order order = new Order();
         order.setId(orderReq.getId());
@@ -88,12 +93,12 @@ public class OrderController {
         order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
         if (Objects.isNull(order)) {
-            log.debug("返回结果：{}", MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
-            return MallResult.build(MallConstant.ORDER_FAIL, MallConstant.TEXT_ORDER_DELIVER_SKU_FAIL);
+            log.debug("返回结果：{}", Msg.TEXT_ORDER_DELIVER_SKU_FAIL);
+            return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_DELIVER_SKU_FAIL);
         }
-        OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.buildUpdateOk(orderResp);
+        return Result.buildUpdateOk(orderResp);
     }
 
     /**
@@ -101,10 +106,10 @@ public class OrderController {
      */
     @ApiOperation(value = "退货(不扣绩效)")
     @PostMapping("/refunds")
-    public MallResult<OrderResp> refunds(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<OrderResp> refunds(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Date date = new Date();
         Order order = new Order();
@@ -118,9 +123,9 @@ public class OrderController {
         order.setUpdateUserId(user.getId());
         order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
-        OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.buildUpdateOk(orderResp);
+        return Result.buildUpdateOk(orderResp);
     }
 
     /**
@@ -128,10 +133,10 @@ public class OrderController {
      */
     @ApiOperation(value = "退货(扣绩效)")
     @PostMapping("/refunds/money")
-    public MallResult<OrderResp> refundsMoney(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<OrderResp> refundsMoney(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         if (Objects.isNull(orderReq.getId())) {
-            return MallResult.buildParamFail();
+            return Result.buildParamFail();
         }
         Date date = new Date();
         Order order = new Order();
@@ -145,9 +150,9 @@ public class OrderController {
         order.setUpdateUserId(user.getId());
         order.setUpdateUserName(user.getUserName());
         order = orderService.update(order);
-        OrderResp orderResp = MallBeanMapper.map(order, OrderResp.class);
+        OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
         log.debug("返回结果：{}", orderResp);
-        return MallResult.buildUpdateOk(orderResp);
+        return Result.buildUpdateOk(orderResp);
     }
 
     /**
@@ -155,7 +160,7 @@ public class OrderController {
      */
     @ApiOperation(value = "分页查询全部用户订单信息")
     @GetMapping("/page/all")
-    public MallResult<MallPage<OrderResp>> pageAll(OrderReq orderReq) {
+    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, @RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) {
         log.debug("请求参数：{}", orderReq);
         PageRequest pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize());
         if (StringUtils.isNotBlank(orderReq.getClause())) {
@@ -163,6 +168,7 @@ public class OrderController {
         }
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
+            List<Predicate> orOredicateList = new ArrayList<>();
             if (Objects.nonNull(orderReq.getId())) {
                 predicateList.add(cb.equal(root.get("id"), orderReq.getId()));
             }
@@ -175,18 +181,24 @@ public class OrderController {
             if (Objects.nonNull(orderReq.getCreateTimeStart()) && Objects.nonNull(orderReq.getCreateTimeEnd())) {
                 predicateList.add(cb.between(root.get("createTime"), orderReq.getCreateTimeStart(), orderReq.getCreateTimeEnd()));
             }
-            if (Objects.nonNull(orderReq.getOrderStatus())) {
-                predicateList.add(cb.equal(root.get("orderStatus"), orderReq.getOrderStatus()));
+            if (!CollectionUtils.isEmpty(orderStatuses)) {
+                for (Integer orderStatus : orderStatuses) {
+                    orOredicateList.add(cb.equal(root.get("orderStatus"), orderStatus));
+                }
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
-            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            if (!CollectionUtils.isEmpty(orderStatuses)) {
+                query.where(cb.and(predicateList.toArray(new Predicate[0])), cb.or(orOredicateList.toArray(new Predicate[0])));
+            } else {
+                query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            }
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
         Page<Order> orderPage = orderService.findAll(orderSpecification, pageRequest);
         MallPage<OrderResp> orderRespMallPage = MallUtils.toMallPage(orderPage, OrderResp.class);
         log.debug("返回结果：{}", orderRespMallPage);
-        return MallResult.buildQueryOk(orderRespMallPage);
+        return Result.buildQueryOk(orderRespMallPage);
     }
 
 
@@ -195,9 +207,10 @@ public class OrderController {
      */
     @ApiOperation(value = "导出订单excel")
     @GetMapping("/download/excel")
-    public ResponseEntity<byte[]> download(OrderReq orderReq) throws IOException {
+    public ResponseEntity<byte[]> download(OrderReq orderReq,@RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) throws IOException {
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
+            List<Predicate> orOredicateList = new ArrayList<>();
             if (Objects.nonNull(orderReq.getId())) {
                 predicateList.add(cb.equal(root.get("id"), orderReq.getId()));
             }
@@ -210,16 +223,22 @@ public class OrderController {
             if (Objects.nonNull(orderReq.getCreateTimeStart()) && Objects.nonNull(orderReq.getCreateTimeEnd())) {
                 predicateList.add(cb.between(root.get("createTime"), orderReq.getCreateTimeStart(), orderReq.getCreateTimeEnd()));
             }
-            if (Objects.nonNull(orderReq.getOrderStatus())) {
-                predicateList.add(cb.equal(root.get("orderStatus"), orderReq.getOrderStatus()));
+            if (!CollectionUtils.isEmpty(orderStatuses)) {
+                for (Integer orderStatus : orderStatuses) {
+                    orOredicateList.add(cb.equal(root.get("orderStatus"), orderStatus));
+                }
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
-            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            if (!CollectionUtils.isEmpty(orderStatuses)) {
+                query.where(cb.and(predicateList.toArray(new Predicate[0])), cb.or(orOredicateList.toArray(new Predicate[0])));
+            } else {
+                query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            }
             query.orderBy(cb.desc(root.get("createTime")));
             return query.getRestriction();
         };
         List<Order> orders = orderService.findAll(orderSpecification);
-        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("销货单", MallConstant.orderExcelTitle);
+        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("销货单", Msg.orderExcelTitle);
         XSSFSheet sheet = orderWorkbook.getSheet("销货单");
         XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
         CreationHelper createHelper = orderWorkbook.getCreationHelper();
@@ -285,7 +304,9 @@ public class OrderController {
                 String productName = orderDetail.getProduct().getProductName();
                 row.createCell(++productCelNum).setCellValue(productName);
                 //商品型号
-                ++productCelNum;
+                String specs = orderDetail.getProduct().getSpecs();
+                row.createCell(++productCelNum).setCellValue(specs);
+//                ++productCelNum;
                 //属性(商品分类)
                 String productTypeName = orderDetail.getProduct().getProductTypeName();
                 row.createCell(++productCelNum).setCellValue(productTypeName);
@@ -308,8 +329,8 @@ public class OrderController {
                 //仓库
                 String storehouse = order.getStorehouse();
                 row.createCell(++productCelNum).setCellValue(storehouse);
-                //备注（放收货地址）
-                row.createCell(++productCelNum).setCellValue(order.getDetailAddress());
+                //备注（放收货地址 + 收货人 + 电话）
+                row.createCell(++productCelNum).setCellValue(order.getDetailAddress() + " " + order.getReceiverName() + " " + order.getReceiverPhone());
                 row = sheet.createRow(++rowNum);
             }
         }
@@ -330,6 +351,4 @@ public class OrderController {
                 .contentLength(arrayOutputStream.size())
                 .body(arrayOutputStream.toByteArray());
     }
-
-
 }

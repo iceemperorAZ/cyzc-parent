@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.BuyerCoupon;
 import com.jingliang.mall.entity.User;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
-import java.util.Date;
 
 /**
  * 用户优惠券Controller
@@ -49,15 +48,15 @@ public class BuyerCouponController {
      */
     @ApiOperation(value = "发放优惠券")
     @PostMapping("/save")
-    public MallResult<BuyerCouponResp> add(@RequestBody BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerCouponResp> add(@RequestBody BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponReq);
         buyerCouponReq.setBuyerId(buyerCouponReq.getBuyerId());
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(buyerCouponReq, user);
-        BuyerCoupon buyerCoupon = MallBeanMapper.map(buyerCouponReq, BuyerCoupon.class);
+        BuyerCoupon buyerCoupon = BeanMapper.map(buyerCouponReq, BuyerCoupon.class);
         buyerCoupon = buyerCouponService.save(buyerCoupon);
-        BuyerCouponResp buyerCouponResp = MallBeanMapper.map(buyerCoupon, BuyerCouponResp.class);
+        BuyerCouponResp buyerCouponResp = BeanMapper.map(buyerCoupon, BuyerCouponResp.class);
         log.debug("返回结果：{}", buyerCouponResp);
-        return MallResult.buildSaveOk(buyerCouponResp);
+        return Result.buildSaveOk(buyerCouponResp);
     }
 }

@@ -1,6 +1,8 @@
 package com.jingliang.mall.common;
 
 import com.jingliang.mall.entity.Buyer;
+import com.jingliang.mall.entity.Turntable;
+import com.jingliang.mall.entity.TurntableDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BaseReq;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +31,7 @@ import java.util.*;
  * @date 2019-09-19 15:19
  */
 @Slf4j
-public class MallUtils extends BaseMallUtils {
+public class MUtils extends BaseMallUtils {
 
     /**
      * 添加时间和用户信息

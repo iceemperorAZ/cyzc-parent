@@ -19,7 +19,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Lazy
-public class MallBeanMapper {
+public class BeanMapper {
     private static Mapper mapper = DozerBeanMapperSingletonWrapper.getInstance();
 
     /**

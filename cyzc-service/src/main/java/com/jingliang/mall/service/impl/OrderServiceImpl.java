@@ -1,12 +1,8 @@
 package com.jingliang.mall.service.impl;
 
 import com.jingliang.mall.amqp.producer.RabbitProducer;
-import com.jingliang.mall.entity.BuyerCoupon;
-import com.jingliang.mall.entity.Order;
-import com.jingliang.mall.entity.OrderDetail;
-import com.jingliang.mall.entity.Sku;
-import com.jingliang.mall.repository.OrderDetailRepository;
-import com.jingliang.mall.repository.OrderRepository;
+import com.jingliang.mall.entity.*;
+import com.jingliang.mall.repository.*;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerCouponService;
 import com.jingliang.mall.service.OrderDetailService;
@@ -41,8 +37,11 @@ public class OrderServiceImpl implements OrderService {
     private final BuyerCouponService buyerCouponService;
     private final OrderDetailRepository orderDetailRepository;
     private final SkuService skuService;
+    private final ConfigRepository configRepository;
+    private final BuyerRepository buyerRepository;
+    private final GoldLogRepository goldLogRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, RabbitProducer rabbitProducer, RedisService redisService, OrderDetailService orderDetailService, BuyerCouponService buyerCouponService, OrderDetailRepository orderDetailRepository, SkuService skuService) {
+    public OrderServiceImpl(OrderRepository orderRepository, RabbitProducer rabbitProducer, RedisService redisService, OrderDetailService orderDetailService, BuyerCouponService buyerCouponService, OrderDetailRepository orderDetailRepository, SkuService skuService, ConfigRepository configRepository, BuyerRepository buyerRepository, GoldLogRepository goldLogRepository) {
         this.orderRepository = orderRepository;
         this.rabbitProducer = rabbitProducer;
         this.redisService = redisService;
@@ -50,11 +49,28 @@ public class OrderServiceImpl implements OrderService {
         this.buyerCouponService = buyerCouponService;
         this.orderDetailRepository = orderDetailRepository;
         this.skuService = skuService;
+        this.configRepository = configRepository;
+        this.buyerRepository = buyerRepository;
+        this.goldLogRepository = goldLogRepository;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Order save(Order order) {
+        Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(order.getBuyerId(), true);
+        if (order.getIsGold() != null && order.getIsGold()) {
+            buyer.setGold(buyer.getGold() - order.getGold());
+            buyerRepository.save(buyer);
+        }
+        if (order.getPayableFee() > 0 && buyer.getOrderSpecificNum() > 0) {
+            buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() - 1);
+            //计算返金币比例
+            Config config = configRepository.findFirstByCodeAndIsAvailable("800", true);
+            double percentage = Integer.parseInt(config.getConfigValues()) * 0.01;
+            //返的金币数
+            int gold = (int) ((order.getPayableFee() / 100.00) * percentage);
+            order.setReturnGold(gold);
+        }
         order = orderRepository.save(order);
         //减库存
         List<OrderDetail> orderDetails = order.getOrderDetails();
@@ -112,6 +128,7 @@ public class OrderServiceImpl implements OrderService {
                     buyerCouponService.save(buyerCoupon);
                 }
             }
+            Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
             //查询订单详情
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
             for (OrderDetail orderDetail : orderDetails) {
@@ -124,6 +141,16 @@ public class OrderServiceImpl implements OrderService {
                 sku.setUpdateUserName("系统");
                 sku.setSkuLineNum(orderDetail.getProductNum());
                 rabbitProducer.sendSku(sku);
+                //把购买次数退回去
+                redisService.decrement("PRODUCT-BUYER-LIMIT-" + oldOrder.getBuyerId() + orderDetail.getProductId() + "", orderDetail.getProductNum());
+            }
+            Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
+            if (oldOrder.getIsGold() != null && oldOrder.getIsGold()) {
+                buyer.setGold(buyer.getGold() + oldOrder.getGold());
+                buyerRepository.save(buyer);
+            }
+            if (order.getPayableFee() > 0 && order.getReturnGold() != null && order.getReturnGold() > 0) {
+                buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() + 1);
             }
         } else if (order.getOrderStatus() == 400) {
             //如果为发货状态，则减去实际库存
@@ -168,6 +195,45 @@ public class OrderServiceImpl implements OrderService {
                     skuService.updateRealitySkuByProductId(sku1);
                 }
             }
+            if (oldOrder.getGold() != null) {
+                //退还的金币数
+                int gold = oldOrder.getGold();
+                Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
+                buyer.setGold(buyer.getGold() + gold);
+                buyerRepository.save(buyer);
+                GoldLog goldLog = new GoldLog();
+                goldLog.setGold(gold);
+                goldLog.setIsAvailable(true);
+                goldLog.setMoney(oldOrder.getPayableFee().intValue());
+                goldLog.setType(500);
+                goldLog.setCreateTime(new Date());
+                goldLog.setPayNo(oldOrder.getOrderNo());
+                goldLog.setBuyerId(oldOrder.getBuyerId());
+                goldLog.setMsg("订单[" + oldOrder.getOrderNo() + "]退货返还" + gold + "金币");
+                goldLogRepository.save(goldLog);
+            }
+        } else if (order.getOrderStatus() == 600) {
+            Order oldOrder = orderRepository.findAllByIdAndIsAvailable(order.getId(), true);
+            if (oldOrder.getReturnGold() != null && oldOrder.getReturnGold() > 0) {
+                //订单完成之后返金币
+                //返的金币数
+                int gold = oldOrder.getReturnGold();
+                Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
+                buyer.setGold(buyer.getGold() + gold);
+                buyerRepository.save(buyer);
+                GoldLog goldLog = new GoldLog();
+                goldLog.setGold(gold);
+                goldLog.setIsAvailable(true);
+                goldLog.setMoney(oldOrder.getPayableFee().intValue());
+                goldLog.setType(400);
+                goldLog.setCreateTime(new Date());
+                goldLog.setPayNo(oldOrder.getOrderNo());
+                goldLog.setBuyerId(oldOrder.getBuyerId());
+                goldLog.setMsg("微信支付订单[" + oldOrder.getOrderNo() + "]￥" + (oldOrder.getPayableFee() / 100.00) + "元,获得" + gold + "金币");
+                goldLogRepository.save(goldLog);
+            }
+            //留着退货会用到
+//            order.setReturnGold(0);
         }
         order = orderRepository.save(order);
         return order;

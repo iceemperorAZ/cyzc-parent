@@ -1,6 +1,7 @@
 package com.jingliang.mall.entity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ import java.util.List;
 @Table(name = "tb_order")
 @Entity
 @Data
+@Accessors(chain = true)
 public class Order implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -199,6 +201,23 @@ public class Order implements Serializable {
     @Column(name = "storehouse")
     private String storehouse;
 
+    /**
+     * 是否使用金币
+     */
+    @Column(name = "is_gold")
+    private Boolean isGold;
+
+    /**
+     * 使用金币数
+     */
+    @Column(name = "gold")
+    private Integer gold;
+
+    /**
+     * 返金币数
+     */
+    @Column(name = "return_gold")
+    private Integer returnGold;
 
     /**
      * 修改时间

@@ -4,10 +4,10 @@ import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.entity.AttributeType;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.AttributeTypeService;
-import com.jingliang.mall.common.MallBeanMapper;
-import com.jingliang.mall.common.MallConstant;
+import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.MallResult;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.AttributeTypeReq;
 import com.jingliang.mall.resp.AttributeTypeResp;
 import io.swagger.annotations.Api;
@@ -56,18 +56,18 @@ public class AttributeTypeController {
      */
     @PostMapping("/save")
     @ApiOperation(value = "保存属性分类")
-    public MallResult<AttributeTypeResp> save(@RequestBody AttributeTypeReq attributeTypeReq, @ApiIgnore HttpSession session) {
+    public Result<AttributeTypeResp> save(@RequestBody AttributeTypeReq attributeTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", attributeTypeReq);
         if (Objects.isNull(attributeTypeReq.getProductTypeId()) || StringUtils.isBlank(attributeTypeReq.getAttributeTypeName())) {
-            log.debug("返回结果：{}",  MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}",  Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(attributeTypeReq, user);
-        AttributeTypeResp attributeTypeResp = MallBeanMapper.map(attributeTypeService.save(MallBeanMapper
+        AttributeTypeResp attributeTypeResp = BeanMapper.map(attributeTypeService.save(BeanMapper
                 .map(attributeTypeReq, AttributeType.class)), AttributeTypeResp.class);
         log.debug("返回结果：{}", attributeTypeResp);
-        return MallResult.buildSaveOk(attributeTypeResp);
+        return Result.buildSaveOk(attributeTypeResp);
     }
 
     /**
@@ -75,7 +75,7 @@ public class AttributeTypeController {
      */
     @ApiOperation(value = "分页查询全部属性分类")
     @GetMapping("/page/all")
-    public MallResult<MallPage<AttributeTypeResp>> pageAllAttributeType(AttributeTypeReq attributeTypeReq) {
+    public Result<MallPage<AttributeTypeResp>> pageAllAttributeType(AttributeTypeReq attributeTypeReq) {
         log.debug("请求参数：{}", attributeTypeReq);
         PageRequest pageRequest = PageRequest.of(attributeTypeReq.getPage(), attributeTypeReq.getPageSize());
         if (StringUtils.isNotBlank(attributeTypeReq.getClause())) {
@@ -95,14 +95,14 @@ public class AttributeTypeController {
         Page<AttributeType> attributeTypePage = attributeTypeService.findAll(attributeTypeSpecification, pageRequest);
         MallPage<AttributeTypeResp> attributeTypeResPage = MallUtils.toMallPage(attributeTypePage, AttributeTypeResp.class);
         log.debug("返回结果：{}", attributeTypeResPage);
-        return MallResult.buildQueryOk(attributeTypeResPage);
+        return Result.buildQueryOk(attributeTypeResPage);
     }
     /**
      * 分页查询全部属性分类及属性值
      */
     @ApiOperation(value = "分页查询全部属性分类及属性值")
     @GetMapping("/page/sub/all")
-    public MallResult<MallPage<AttributeTypeResp>> pageSubAllAttributeType(AttributeTypeReq attributeTypeReq) {
+    public Result<MallPage<AttributeTypeResp>> pageSubAllAttributeType(AttributeTypeReq attributeTypeReq) {
         log.debug("请求参数：{}", attributeTypeReq);
         PageRequest pageRequest = PageRequest.of(attributeTypeReq.getPage(), attributeTypeReq.getPageSize());
         if (StringUtils.isNotBlank(attributeTypeReq.getClause())) {
@@ -122,6 +122,6 @@ public class AttributeTypeController {
         Page<AttributeType> attributeTypePage = attributeTypeService.queryAll(attributeTypeSpecification, pageRequest);
         MallPage<AttributeTypeResp> attributeTypeResPage = MallUtils.toMallPage(attributeTypePage, AttributeTypeResp.class);
         log.debug("返回结果：{}", attributeTypeResPage);
-        return MallResult.buildQueryOk(attributeTypeResPage);
+        return Result.buildQueryOk(attributeTypeResPage);
     }
 }

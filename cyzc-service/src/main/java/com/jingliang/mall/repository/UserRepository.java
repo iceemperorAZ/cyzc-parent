@@ -25,7 +25,7 @@ public interface UserRepository extends BaseRepository<User, Long> {
     /**
      * 根据会员Id查询员工信息
      *
-     * @param buyerId 会员Id
+     * @param buyerId     会员Id
      * @param isAvailable 是否可用
      * @return 员工Id
      */
@@ -42,6 +42,7 @@ public interface UserRepository extends BaseRepository<User, Long> {
 
     /**
      * 根据等级查询
+     *
      * @param level
      * @param isAvailable
      * @return

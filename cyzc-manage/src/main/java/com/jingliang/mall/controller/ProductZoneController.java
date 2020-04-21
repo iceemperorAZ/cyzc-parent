@@ -63,17 +63,17 @@ public class ProductZoneController {
      */
     @ApiOperation(value = "添加商品区")
     @PostMapping("/save")
-    public MallResult<ProductZoneResp> save(@RequestBody ProductZoneReq productZoneReq, @ApiIgnore HttpSession session) {
+    public Result<ProductZoneResp> save(@RequestBody ProductZoneReq productZoneReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productZoneReq);
         if (StringUtils.isBlank(productZoneReq.getProductZoneName())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(productZoneReq, user);
-        ProductZoneResp productZoneResp = MallBeanMapper.map(productZoneService.save(MallBeanMapper.map(productZoneReq, ProductZone.class)), ProductZoneResp.class);
+        ProductZoneResp productZoneResp = BeanMapper.map(productZoneService.save(BeanMapper.map(productZoneReq, ProductZone.class)), ProductZoneResp.class);
         log.debug("返回结果：{}", productZoneResp);
-        return MallResult.buildSaveOk(productZoneResp);
+        return Result.buildSaveOk(productZoneResp);
     }
 
     /**
@@ -81,14 +81,14 @@ public class ProductZoneController {
      */
     @ApiOperation(value = "保存商品区目标列表")
     @PostMapping("/save/details")
-    public MallResult<ProductZoneResp> addDetails(@RequestBody ProductZoneReq productZoneReq, @ApiIgnore HttpSession session) {
+    public Result<ProductZoneResp> addDetails(@RequestBody ProductZoneReq productZoneReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productZoneReq);
         if (Objects.isNull(productZoneReq.getId()) || Objects.isNull(productZoneReq.getType())) {
-            log.debug("返回结果：{}", MallConstant.TEXT_PARAM_FAIL);
-            return MallResult.buildParamFail();
+            log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
+            return Result.buildParamFail();
         }
         User user = (User) session.getAttribute(sessionUser);
-        ProductZoneResp productZoneResp = MallBeanMapper.map(productZoneReq, ProductZoneResp.class);
+        ProductZoneResp productZoneResp = BeanMapper.map(productZoneReq, ProductZoneResp.class);
         List<Long> targetIds = productZoneReq.getTargetIds();
         Date date = new Date();
         if (Objects.equals(productZoneReq.getType(), 100)) {
@@ -143,7 +143,7 @@ public class ProductZoneController {
            couponService.saveAll(couponList);
         }
         log.debug("返回结果：{}", productZoneResp);
-        return MallResult.buildSaveOk(productZoneResp);
+        return Result.buildSaveOk(productZoneResp);
     }
 
     /**
@@ -151,7 +151,7 @@ public class ProductZoneController {
      */
     @ApiOperation(value = "分页查询所有商品区")
     @GetMapping("/page/all")
-    public MallResult<MallPage<ProductZoneResp>> pageAll(ProductZoneReq productZoneReq) {
+    public Result<MallPage<ProductZoneResp>> pageAll(ProductZoneReq productZoneReq) {
         log.debug("请求参数：{}", productZoneReq);
         List<Sort.Order> orders = new ArrayList<>();
         if (StringUtils.isNotBlank(productZoneReq.getClause())) {
@@ -173,7 +173,7 @@ public class ProductZoneController {
         Page<ProductZone> productZonePage = productZoneService.findAll(productZoneSpecification, pageRequest);
         MallPage<ProductZoneResp> productZoneRespMallPage = MallUtils.toMallPage(productZonePage, ProductZoneResp.class);
         log.debug("返回结果：{}", productZoneRespMallPage);
-        return MallResult.buildQueryOk(productZoneRespMallPage);
+        return Result.buildQueryOk(productZoneRespMallPage);
     }
 
     /**
@@ -181,7 +181,7 @@ public class ProductZoneController {
      */
     @ApiOperation(value = "批量删除商品区")
     @PostMapping("/batch/delete")
-    public MallResult<List<ProductZoneResp>> batchDelete(@RequestParam List<Long> ids, @ApiIgnore HttpSession session) {
+    public Result<List<ProductZoneResp>> batchDelete(@RequestParam List<Long> ids, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", ids);
         List<ProductZone> productZones = new ArrayList<>();
         User user = (User) session.getAttribute(sessionUser);
@@ -195,8 +195,8 @@ public class ProductZoneController {
             productZone.setUpdateUserName(user.getUserName());
             productZones.add(productZone);
         }
-        List<ProductZoneResp> productZoneRespList = MallBeanMapper.mapList(productZoneService.batchDelete(productZones), ProductZoneResp.class);
+        List<ProductZoneResp> productZoneRespList = BeanMapper.mapList(productZoneService.batchDelete(productZones), ProductZoneResp.class);
         log.debug("返回参数：{}", productZoneRespList);
-        return MallResult.buildDeleteOk(productZoneRespList);
+        return Result.buildDeleteOk(productZoneRespList);
     }
 }
