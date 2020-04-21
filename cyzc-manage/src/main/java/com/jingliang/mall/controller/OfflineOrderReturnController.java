@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2020-04-20 17:57:20
  */
 @RestController
-@RequestMapping(value = "/back/offlineOrderReturn")
 @Api(tags = "退货表")
 @Slf4j
 public class OfflineOrderReturnController {

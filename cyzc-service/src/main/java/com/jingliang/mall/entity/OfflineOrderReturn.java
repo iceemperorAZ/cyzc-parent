@@ -101,4 +101,11 @@ public class OfflineOrderReturn implements Serializable {
 	@Column(name = "refund_time")
 	private Date refundTime;
 
+
+	/**
+	 * 是否可用 0：否，1：是
+	 */
+	@Column(name = "is_available")
+	private Boolean isAvailable;
+
 }
