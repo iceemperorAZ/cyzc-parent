@@ -8,8 +8,11 @@ import com.jingliang.mall.service.OfflineOrderService;
 import com.jingliang.mall.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -62,11 +65,13 @@ public class OfflineOrderController {
      */
     @GetMapping("/back/offlineOrder/page/all")
     public Result<MallPage<OfflineOrderResp>> pageAll(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize,
-                                                      @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
-                                                      @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeStart,
-                                                      @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
-                                                      @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeEnd,
-                                                      Integer rate) {
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @RequestParam(name = "createTimeStart", required = false) Date createTimeStart,
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @RequestParam(name = "createTimeEnd", required = false) Date createTimeEnd,
+                                                      Integer rate, @RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses,
+                                                      @RequestParam(value = "regions", required = false) List<String> regions,
+                                                      @RequestParam(value = "provinces", required = false) List<String> provinces,
+                                                      @RequestParam(value = "cities", required = false) List<String> cities,
+                                                      @RequestParam(value = "counties", required = false) List<String> counties) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         Specification<OfflineOrder> specification = (Specification<OfflineOrder>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -75,6 +80,41 @@ public class OfflineOrderController {
             }
             if (rate != null) {
                 predicateList.add(cb.equal(root.get("rate"), rate));
+            }
+            List<Predicate> orderStatusList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(orderStatuses)) {
+                for (Integer orderStatus : orderStatuses) {
+                    orderStatusList.add(cb.equal(root.get("orderStatus"), orderStatus));
+                }
+                predicateList.add(cb.or(orderStatusList.toArray(new Predicate[0])));
+            }
+            List<Predicate> regionList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(regions)) {
+                for (String region : regions) {
+                    regionList.add(cb.equal(root.get("region"), region));
+                }
+                predicateList.add(cb.or(regionList.toArray(new Predicate[0])));
+            }
+            List<Predicate> provinceList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(provinces)) {
+                for (String province : provinces) {
+                    provinceList.add(cb.equal(root.get("province"), province));
+                }
+                predicateList.add(cb.or(provinceList.toArray(new Predicate[0])));
+            }
+            List<Predicate> cityList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(cities)) {
+                for (String city : cities) {
+                    cityList.add(cb.equal(root.get("city"), city));
+                }
+                predicateList.add(cb.or(cityList.toArray(new Predicate[0])));
+            }
+            List<Predicate> countyList = new ArrayList<>();
+            if (!CollectionUtils.isEmpty(counties)) {
+                for (String county : counties) {
+                    countyList.add(cb.equal(root.get("county"), county));
+                }
+                predicateList.add(cb.or(countyList.toArray(new Predicate[0])));
             }
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
             query.orderBy(cb.desc(root.get("createTime")));
@@ -94,6 +134,16 @@ public class OfflineOrderController {
     }
 
     /**
+     * 修改订单状态
+     */
+    @PostMapping("/back/offlineOrder/status")
+    public Result<Boolean> status(@RequestBody Map<String, Object> map) {
+        Long id = (Long) map.get("id");
+        Integer status = (Integer) map.get("status");
+        return Result.build(Msg.OK, "修改订单状态成功", offlineOrderService.status(id, status));
+    }
+
+    /**
      * 修改发票进度为已完成
      */
     @PostMapping("/back/offlineOrder/rate/success")
@@ -106,10 +156,8 @@ public class OfflineOrderController {
      * excel导出全部 (同时会进行订单锁定)
      */
     @GetMapping("/back/offlineOrder/down")
-    public ResponseEntity<byte[]> down(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
-                                       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeStart,
-                                       @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
-                                       @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeEnd,
+    public ResponseEntity<byte[]> down(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @RequestParam(name = "createTimeStart", required = false) Date createTimeStart,
+                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @RequestParam(name = "createTimeEnd", required = false) Date createTimeEnd,
                                        Integer rate) throws IOException {
         Specification<OfflineOrder> specification = (Specification<OfflineOrder>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -277,10 +325,10 @@ public class OfflineOrderController {
      * excel导出全部 (同时会进行订单锁定)
      */
     @GetMapping("/back/offlineOrder/finance/down")
-    public ResponseEntity<byte[]> financeDown(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
-                                              @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeStart,
-                                              @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:dd")
-                                              @JsonFormat(pattern = "yyyy-MM-dd HH:mm:dd", timezone = "GMT+8") Date createTimeEnd,
+    public ResponseEntity<byte[]> financeDown(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                              @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8") Date createTimeStart,
+                                              @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                              @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8") Date createTimeEnd,
                                               Integer rate) throws IOException {
         Specification<OfflineOrder> specification = (Specification<OfflineOrder>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();

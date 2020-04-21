@@ -9,6 +9,7 @@ import com.jingliang.mall.service.OfflineOrderService;
 import com.jingliang.mall.service.UserService;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -64,7 +65,22 @@ public class OfflineOrderController {
         offlineOrderReq.setIsAvailable(true);
         offlineOrderReq.setSalesmanPhone(user.getPhone());
         offlineOrderReq.setCreateTime(new Date());
-        OfflineOrder offlineOrder = offlineOrderService.save(BeanMapper.map(offlineOrderReq, OfflineOrder.class));
+        OfflineOrder offlineOrder = BeanMapper.map(offlineOrderReq, OfflineOrder.class);
+        String region = user.getRegion();
+        if ((StringUtils.isBlank(region) || "-".equals(region)) && user.getManagerId() != null) {
+            //查询大区
+            User manage = userService.findById(user.getManagerId());
+            if (manage != null) {
+                assert offlineOrder != null;
+                offlineOrder.setRegion(manage.getRegion());
+            }
+        } else {
+            assert offlineOrder != null;
+            offlineOrder.setRegion(region);
+        }
+        //状态为待发货
+        offlineOrder.setOrderStatus(300);
+        offlineOrder = offlineOrderService.save(offlineOrder);
         OfflineOrderResp offlineOrderResp = BeanMapper.map(offlineOrder, OfflineOrderResp.class);
         return Result.build(Msg.OK, offlineOrderReq.getId() == null ? "保存成功" : "修改成功", offlineOrderResp);
     }

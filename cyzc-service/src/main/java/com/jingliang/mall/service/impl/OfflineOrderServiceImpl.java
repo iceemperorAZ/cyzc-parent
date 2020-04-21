@@ -82,4 +82,13 @@ public class OfflineOrderServiceImpl implements OfflineOrderService {
         }
         return null;
     }
+
+    @Override
+    public Boolean status(Long id, Integer status) {
+        OfflineOrder offlineOrder = offlineOrderRepository.findById(id).orElse(null);
+        assert offlineOrder != null;
+        offlineOrder.setOrderStatus(status);
+        offlineOrderRepository.save(offlineOrder);
+        return true;
+    }
 }

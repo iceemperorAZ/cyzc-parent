@@ -351,6 +351,4 @@ public class OrderController {
                 .contentLength(arrayOutputStream.size())
                 .body(arrayOutputStream.toByteArray());
     }
-
-
 }

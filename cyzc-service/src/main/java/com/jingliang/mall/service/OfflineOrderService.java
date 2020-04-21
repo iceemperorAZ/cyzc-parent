@@ -59,6 +59,7 @@ public interface OfflineOrderService {
 
     /**
      * 不锁定查询
+     *
      * @param specification
      * @return
      */
@@ -66,9 +67,19 @@ public interface OfflineOrderService {
 
     /**
      * 删除
+     *
      * @param userId
      * @param offlineOrderId
      * @return
      */
     OfflineOrder delete(Long userId, Long offlineOrderId);
+
+    /**
+     * 修改订单状态
+     *
+     * @param id
+     * @param status
+     * @return
+     */
+    Boolean status(Long id, Integer status);
 }
