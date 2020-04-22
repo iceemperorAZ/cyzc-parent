@@ -95,55 +95,55 @@ public class ProductReq extends BaseReq implements Serializable {
      * 市场价
      */
     @ApiModelProperty(value = "市场价")
-    private Double marketPrice;
+    private Float marketPrice;
 
     /**
      * 市场价-开始
      */
     @ApiModelProperty(value = "市场价-开始")
-    private Double purchasePriceStart;
+    private Float purchasePriceStart;
 
     /**
      * 市场价-结束
      */
     @ApiModelProperty(value = "市场价-结束")
-    private Double purchasePriceEnd;
+    private Float purchasePriceEnd;
 
     /**
      * 销价
      */
     @ApiModelProperty(value = "销价")
-    private Double sellingPrice;
+    private Float sellingPrice;
 
     /**
      * 销价-开始
      */
     @ApiModelProperty(value = "销价-开始")
-    private Double sellingPriceStart;
+    private Float sellingPriceStart;
 
     /**
      * 销价-结束
      */
     @ApiModelProperty(value = "销价-结束")
-    private Double sellingPriceEnd;
+    private Float sellingPriceEnd;
 
     /**
      * 会员折扣率
      */
     @ApiModelProperty(value = "会员折扣率")
-    private Double discount;
+    private Float discount;
 
     /**
      * 会员折扣率-开始
      */
     @ApiModelProperty(value = "会员折扣率-开始")
-    private Double discountStart;
+    private Float discountStart;
 
     /**
      * 会员折扣率-结束
      */
     @ApiModelProperty(value = "会员折扣率-结束")
-    private Double discountEnd;
+    private Float discountEnd;
 
     /**
      * 是否新品 0：否，1：是
@@ -396,27 +396,27 @@ public class ProductReq extends BaseReq implements Serializable {
     @ApiModelProperty(value = "重量")
     private Integer weight;
 
-    public void setMarketPrice(Double marketPrice) {
+    public void setMarketPrice(Float marketPrice) {
         this.marketPrice = marketPrice * 100;
     }
 
-    public void setPurchasePriceStart(Double purchasePriceStart) {
+    public void setPurchasePriceStart(Float purchasePriceStart) {
         this.purchasePriceStart = purchasePriceStart * 100;
     }
 
-    public void setPurchasePriceEnd(Double purchasePriceEnd) {
+    public void setPurchasePriceEnd(Float purchasePriceEnd) {
         this.purchasePriceEnd = purchasePriceEnd * 100;
     }
 
-    public void setSellingPrice(Double sellingPrice) {
+    public void setSellingPrice(Float sellingPrice) {
         this.sellingPrice = sellingPrice * 100;
     }
 
-    public void setSellingPriceStart(Double sellingPriceStart) {
+    public void setSellingPriceStart(Float sellingPriceStart) {
         this.sellingPriceStart = sellingPriceStart * 100;
     }
 
-    public void setSellingPriceEnd(Double sellingPriceEnd) {
+    public void setSellingPriceEnd(Float sellingPriceEnd) {
         this.sellingPriceEnd = sellingPriceEnd * 100;
     }
 }
