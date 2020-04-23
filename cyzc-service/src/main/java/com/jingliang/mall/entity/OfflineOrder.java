@@ -229,7 +229,7 @@ public class OfflineOrder implements Serializable {
     private Boolean enable;
 
     /**
-     * 订单状态
+     * 订单状态 (待发货：300，已发货：400，已完成：600，退货（退全款）：700，退货（退款）：701，部分退货（退全款）：710，部分退货(退款)：711)
      */
     @Column(name = "order_status")
     private Integer orderStatus;

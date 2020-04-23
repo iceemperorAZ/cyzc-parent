@@ -2,6 +2,8 @@ package com.jingliang.mall.repository;
 
 import com.jingliang.mall.entity.AttributeTypeDetail;
 import com.jingliang.mall.repository.base.BaseRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * 属性表Repository

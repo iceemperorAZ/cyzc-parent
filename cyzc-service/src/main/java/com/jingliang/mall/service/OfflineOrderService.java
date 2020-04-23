@@ -82,4 +82,12 @@ public interface OfflineOrderService {
      * @return
      */
     Boolean status(Long id, Integer status);
+
+    /**
+     * 根据主键Id查询
+     *
+     * @param id
+     * @return
+     */
+    OfflineOrder findById(Long id);
 }

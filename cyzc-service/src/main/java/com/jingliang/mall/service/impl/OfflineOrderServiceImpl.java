@@ -91,4 +91,9 @@ public class OfflineOrderServiceImpl implements OfflineOrderService {
         offlineOrderRepository.save(offlineOrder);
         return true;
     }
+
+    @Override
+    public OfflineOrder findById(Long id) {
+        return offlineOrderRepository.findAllByIdAndIsAvailable(id, true);
+    }
 }

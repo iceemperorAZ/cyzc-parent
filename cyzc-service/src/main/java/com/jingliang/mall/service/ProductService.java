@@ -113,4 +113,13 @@ public interface ProductService {
      * @return 返回统计到的商品数量
      */
     public Integer countByProductTypeIdAnnShow(Long productTypeId, Boolean isShow);
+
+    /**
+     * 根据商品分类和序号查询
+     *
+     * @param productTypeId
+     * @param productSort
+     * @return
+     */
+    Product findAllByProductTypeIdAndSort(Long productTypeId, Integer productSort);
 }

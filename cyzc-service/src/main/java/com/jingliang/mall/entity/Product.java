@@ -1,5 +1,6 @@
 package com.jingliang.mall.entity;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -41,6 +42,12 @@ public class Product implements Serializable {
      */
     @Column(name = "product_type_name")
     private String productTypeName;
+
+    /**
+     * 商品排序
+     */
+    @Column(name = "product_sort")
+    private Integer productSort;
 
     /**
      * 商品区Id
@@ -237,7 +244,6 @@ public class Product implements Serializable {
      */
     @Column(name = "weight")
     private Integer weight;
-
 
     /**
      * 单用户每天购买上限制

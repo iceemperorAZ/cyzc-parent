@@ -44,6 +44,12 @@ public class ProductResp implements Serializable {
     private Long productTypeId;
 
     /**
+     * 商品排序
+     */
+    @ApiModelProperty(value = "商品排序")
+    private Integer productSort;
+
+    /**
      * 商品分类名称
      */
     @ApiModelProperty(value = "商品分类名称")

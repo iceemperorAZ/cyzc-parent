@@ -40,18 +40,6 @@ public class ProductReq extends BaseReq implements Serializable {
     private Long id;
 
     /**
-     * 主键-开始
-     */
-    @ApiModelProperty(value = "主键-开始")
-    private Long idStart;
-
-    /**
-     * 主键-结束
-     */
-    @ApiModelProperty(value = "主键-结束")
-    private Long idEnd;
-
-    /**
      * 商品分类Id
      */
     @ApiModelProperty(value = "商品分类Id")
@@ -62,6 +50,12 @@ public class ProductReq extends BaseReq implements Serializable {
      */
     @ApiModelProperty(value = "商品分类名称")
     private String productTypeName;
+
+    /**
+     * 商品排序
+     */
+    @ApiModelProperty(value = "商品排序")
+    private Integer productSort;
 
     /**
      * 商品区Id
@@ -224,18 +218,6 @@ public class ProductReq extends BaseReq implements Serializable {
     private Integer examineStatus;
 
     /**
-     * 审核状态 100:未提交审核，110：提交审核（审核中），120：审核通过，121：审核驳回-开始
-     */
-    @ApiModelProperty(value = "审核状态 100:未提交审核，110：提交审核（审核中），120：审核通过，121：审核驳回-开始")
-    private Integer examineStatusStart;
-
-    /**
-     * 审核状态 100:未提交审核，110：提交审核（审核中），120：审核通过，121：审核驳回-结束
-     */
-    @ApiModelProperty(value = "审核状态 100:未提交审核，110：提交审核（审核中），120：审核通过，121：审核驳回-结束")
-    private Integer examineStatusEnd;
-
-    /**
      * 是否可用 0：否，1：是
      */
     @ApiModelProperty(value = "是否可用 0：否，1：是")
@@ -287,22 +269,6 @@ public class ProductReq extends BaseReq implements Serializable {
     private Date createTime;
 
     /**
-     * 创建时间-开始
-     */
-    @ApiModelProperty(value = "创建时间-开始")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createTimeStart;
-
-    /**
-     * 创建时间-结束
-     */
-    @ApiModelProperty(value = "创建时间-结束")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date createTimeEnd;
-
-    /**
      * 修改人
      */
     @ApiModelProperty(value = "修改人")
@@ -333,22 +299,6 @@ public class ProductReq extends BaseReq implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
-
-    /**
-     * 修改时间-开始
-     */
-    @ApiModelProperty(value = "修改时间-开始")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateTimeStart;
-
-    /**
-     * 修改时间-结束
-     */
-    @ApiModelProperty(value = "修改时间-结束")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date updateTimeEnd;
 
     /**
      * 上架人

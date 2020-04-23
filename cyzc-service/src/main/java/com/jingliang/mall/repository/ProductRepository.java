@@ -68,4 +68,14 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
      * @return 返回查询到商品列表
      */
     Integer countAllByProductTypeIdAndIsShow(Long productTypeId, Boolean isShow);
+
+    /**
+     * 是否上架查询商品列表
+     *
+     * @param productTypeId 商品分类Id
+     * @param productSort   商品序号
+     * @param isAvailable   是否可用
+     * @return 返回查询到商品
+     */
+    Product findAllByProductTypeIdAndProductSortAndIsAvailable(Long productTypeId, Integer productSort, Boolean isAvailable);
 }

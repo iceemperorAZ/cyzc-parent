@@ -72,7 +72,7 @@ public class ProductController {
         log.debug("请求参数：{}", productReq);
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
                 || productReq.getProductImgs().isEmpty() || StringUtils.isBlank(productReq.getProductName())
-                || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs())
+                || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs()) || productReq.getProductSort() == null
                 || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())) {
             log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
@@ -101,6 +101,11 @@ public class ProductController {
                 }
             }
         }
+        Product product = productService.findAllByProductTypeIdAndSort(productReq.getProductTypeId(), productReq.getProductSort());
+        if (product != null && !product.getId().equals(productReq.getId())) {
+            //序号重复
+            return Result.build(Msg.FAIL, "序号重复");
+        }
         List<Base64Image> base64Images = new ArrayList<>();
         for (String productImg : productReq.getProductImgs()) {
             Base64Image base64Image = Base64Image.build(productImg);
@@ -123,7 +128,7 @@ public class ProductController {
         productReq.setSalesVolume(0);
         productReq.setProductZoneId(-1L);
         productReq.setExamineStatus(ExamineStatus.NOT_SUBMITTED.getValue());
-        Product product = BeanMapper.map(productReq, Product.class);
+        product = BeanMapper.map(productReq, Product.class);
         ProductResp productResp = new ProductResp();
         BeanMapper.map(productService.save(product), productResp);
         log.debug("返回结果：{}", productResp);
@@ -142,7 +147,7 @@ public class ProductController {
             pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize(), Sort.by(MallUtils.separateOrder(productReq.getClause())));
         }
         if (StringUtils.isNotBlank(productReq.getProductName())) {
-            productReq.setProductName(URLDecoder.decode(productReq.getProductName(),"UTF-8"));
+            productReq.setProductName(URLDecoder.decode(productReq.getProductName(), "UTF-8"));
         }
         Specification<Product> productSpecification = (Specification<Product>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -150,7 +155,7 @@ public class ProductController {
                 predicateList.add(cb.equal(root.get("productTypeId"), productReq.getProductTypeId()));
             }
             if (StringUtils.isNotBlank(productReq.getProductName())) {
-                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"),cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%")));
+                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"), cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%")));
             }
             if (Objects.nonNull(productReq.getProductZoneId())) {
                 predicateList.add(cb.equal(root.get("productZoneId"), productReq.getProductZoneId()));

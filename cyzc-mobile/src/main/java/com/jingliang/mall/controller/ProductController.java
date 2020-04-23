@@ -1,9 +1,9 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.BeanMapper;
+import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
-import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.req.ProductReq;
 import com.jingliang.mall.resp.ProductResp;
@@ -69,7 +69,7 @@ public class ProductController {
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             predicateList.add(cb.equal(root.get("isShow"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.desc(root.get("isHot")),cb.asc(root.get("productName")), cb.asc(root.get("weight")));
+            query.orderBy(cb.desc(root.get("isHot")), cb.asc(root.get("productSort")));
             return query.getRestriction();
         };
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
