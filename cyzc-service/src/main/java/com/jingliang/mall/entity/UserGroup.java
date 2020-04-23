@@ -7,21 +7,21 @@ import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 
 /**
- * 组与区域映射关系表
+ * 员工与组关系映射表
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
  * @date 2020-04-23 15:33:55
  */
 @Entity
+@Table(name = "tb_user_group")
 @Data
-@Table(name = "tb_group_region")
-public class GroupRegion implements Serializable {
+public class UserGroup implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 主键ID
+	 * 主键Id
 	 */
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "idGenerator")
@@ -30,16 +30,16 @@ public class GroupRegion implements Serializable {
 	private Long id;
 
 	/**
+	 * 员工Id
+	 */
+	@Column(name = "user_id")
+	private Long userId;
+
+	/**
 	 * 组Id
 	 */
 	@Column(name = "group_id")
 	private Long groupId;
-
-	/**
-	 * 区域Id
-	 */
-	@Column(name = "region_id")
-	private Long regionId;
 
 	/**
 	 * 创建时间

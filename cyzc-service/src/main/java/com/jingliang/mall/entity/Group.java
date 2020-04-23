@@ -10,7 +10,7 @@ import java.io.Serializable;
  * 
  * @author Zhenfeng Li
  * @version 1.0.0
- * @date 2020-04-16 11:38:50
+ * @date 2020-04-23 15:33:55
  */
 @Table(name = "tb_group")
 @Entity
@@ -35,9 +35,27 @@ public class Group implements Serializable {
 	private String groupName;
 
 	/**
+	 * 父组Id
+	 */
+	@Column(name = "parent_group_id")
+	private Long parentGroupId;
+
+	/**
 	 * 是否可用 0：否，1：是
 	 */
 	@Column(name = "is_available")
 	private Boolean isAvailable;
+
+	/**
+	 * 组编码
+	 */
+	@Column(name = "group_no")
+	private String groupNo;
+
+	/**
+	 * 是否有子节点
+	 */
+	@Column(name = "child")
+	private Boolean child;
 
 }

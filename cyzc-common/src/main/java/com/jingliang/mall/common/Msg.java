@@ -41,6 +41,7 @@ public interface Msg {
     String TEXT_PHONE_FAIL = "手机号格式错误";
     String TEXT_COUPON_RELEASE_FAIL = "发布失败，优惠券已过期或不可领取";
     String TEXT_COUPON_SAVE_FAIL = "保存失败，优惠券时间段选择不符合逻辑";
+    String TEXT_IS_AVAILABLE_FAIL = "组不可用";
 
     Integer PARAM_FAIL = 310;
     String TEXT_PARAM_FAIL = "参数不全";
@@ -122,6 +123,8 @@ public interface Msg {
     String TEXT_EXCEL_DOWNLOAD_FAIL = "excel下载异常";
     String TEXT_EXCEL_UPLOAD_FAIL = "excel上传异常";
     String TEXT_EXCEL_ANALYSIS_FAIL = "excel解析异常";
+
+    String TEXT_USERGROUP_QUERY_FAIL = "查询用户分组表异常";
 
     Integer SYSTEM_FAIL = 500;
     String TEXT_SYSTEM_FAIL = "当前访问人数过多，请稍后重试！";

@@ -3,6 +3,7 @@ package com.jingliang.mall;
 import com.jingliang.mall.common.SpringUtils;
 import com.jingliang.mall.repository.base.impl.BaseRepositoryImpl;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -15,7 +16,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * @date 2019-09-18 9:41
  */
 @SpringBootApplication
-
 @EnableJpaRepositories(repositoryBaseClass = BaseRepositoryImpl.class)
 public class TobMallManageApplication {
     /**
