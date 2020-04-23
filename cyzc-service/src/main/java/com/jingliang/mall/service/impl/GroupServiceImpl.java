@@ -38,4 +38,15 @@ public class GroupServiceImpl implements GroupService {
     public List<Group> getGroupWithFather(Long parentGroupId,Boolean isAvailable) {
         return groupRepository.findGroupsByParentGroupIdAndIsAvailable(parentGroupId,isAvailable);
     }
+
+    @Override
+    public Group save(Group group) {
+        return groupRepository.save(group);
+    }
+
+    @Override
+    public Group findFartherGroup(Long parentGroupId) {
+        return groupRepository.findGroupById(parentGroupId);
+    }
+
 }

@@ -18,4 +18,9 @@ public interface GroupService {
     public Group getFatherGroup();
 
     public List<Group> getGroupWithFather(Long parentGroupId,Boolean isAvailable);
+
+    public Group save(Group group);
+
+    public Group findFartherGroup(Long parentGroupId);
+
 }

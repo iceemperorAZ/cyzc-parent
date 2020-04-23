@@ -8,13 +8,11 @@ import com.jingliang.mall.req.GroupReq;
 import com.jingliang.mall.resp.GroupResp;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.RestController;
 import com.jingliang.mall.service.GroupService;
+import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Objects;
@@ -73,4 +71,33 @@ public class GroupController {
 		log.debug("返回结果：{}",groupResps);
 		return Result.buildQueryOk(groupResps);
 	}
+	@PostMapping("/save")
+    @ApiOperation(value = "新增分组")
+    public Result<GroupResp> saveGroup(@RequestBody GroupReq groupReq){
+        log.debug("请求参数:{}",groupReq);
+        //判断是否填写组名
+        if (Objects.isNull(groupReq.getGroupName())){
+            return Result.buildParamFail();
+        }
+        //寻找该组的父组并修改节点
+		Group fartherGroup = groupService.findFartherGroup(groupReq.getParentGroupId());
+        //判断父组节点是否为true,若不是，修改为false
+		if(!fartherGroup.getChild()){
+			fartherGroup.setChild(true);
+			//更新father节点
+			groupService.save(fartherGroup);
+		}
+		//类型转换
+		Group group = BeanMapper.map(groupReq, Group.class);
+		//修改该组节点
+		group.setChild(false);
+		group = groupService.save(group);
+		GroupResp groupResp = BeanMapper.map(group, GroupResp.class);
+
+        /*//开始保存数据
+        GroupResp groupResp = BeanMapper.map(groupService.save(BeanMapper.map(groupReq,Group.class)),GroupResp.class);
+        */
+		log.debug("返回结果：{}",groupResp);
+		return Result.buildSaveOk(groupResp);
+    }
 }
