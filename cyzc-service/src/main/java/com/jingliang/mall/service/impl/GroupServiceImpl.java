@@ -27,23 +27,13 @@ public class GroupServiceImpl implements GroupService {
 	public GroupServiceImpl (GroupRepository groupRepository) {
 		this.groupRepository = groupRepository;
 	}
-    /**
-     * 根据父组ID编号查询可用组信息
-     *
-     * @return 返回查询到的组信息z
-     */
+
     @Override
     public Group getFatherGroup() {
         Group FatherGroup = groupRepository.findByParentGroupId(-1L);
         return groupRepository.findGroupByParentGroupIdAndIsAvailable(-1L,FatherGroup.getIsAvailable());
     }
-    /**
-     * 根据父组ID编号查询可用组信息
-     *
-     * @param parentGroupId      父组id
-     * @param isAvailable      是否可用
-     * @return 返回查询到的组信息z
-     */
+
     @Override
     public List<Group> getGroupWithFather(Long parentGroupId,Boolean isAvailable) {
         return groupRepository.findGroupsByParentGroupIdAndIsAvailable(parentGroupId,isAvailable);
