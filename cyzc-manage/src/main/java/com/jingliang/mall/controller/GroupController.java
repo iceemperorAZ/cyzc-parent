@@ -105,4 +105,18 @@ public class GroupController {
 		log.debug("返回结果：{}",groupResp);
 		return Result.buildSaveOk(groupResp);
     }
+    @PostMapping("/delete")
+	@ApiOperation(value = "删除分组")
+	public Result<GroupResp> delete(@RequestBody GroupReq groupReq){
+		log.debug("请求参数：{}",groupReq);
+		//查询该组是否存在
+		if (Objects.isNull(groupReq.getId())){
+			return Result.buildParamFail();
+		}
+		//将组状态设置为不可用
+		groupReq.setIsAvailable(false);
+		//进行保存操作,并进行类型转换操作
+		GroupResp groupResp = BeanMapper.map(groupService.save(BeanMapper.map(groupReq,Group.class)),GroupResp.class);
+		return Result.buildDeleteOk(groupResp);
+	}
 }
