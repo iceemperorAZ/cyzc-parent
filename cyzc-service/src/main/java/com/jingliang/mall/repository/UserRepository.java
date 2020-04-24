@@ -64,5 +64,5 @@ public interface UserRepository extends BaseRepository<User, Long> {
      * @param isAvailable 是否可用
      * @return
      */
-    public User findUserByIdAndIsAvailable(Long id,Boolean isAvailable);
+    public User findFirstByIdAndIsAvailable(Long id,Boolean isAvailable);
 }

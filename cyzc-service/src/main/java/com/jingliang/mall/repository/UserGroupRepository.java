@@ -17,6 +17,6 @@ public interface UserGroupRepository extends BaseRepository<UserGroup, Long> {
      *
      * @return
      */
-    public UserGroup findUserGroupByUserId();
+    public UserGroup findUserGroupByUserId(Long id);
 
 }

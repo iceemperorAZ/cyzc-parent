@@ -7,14 +7,12 @@ import com.jingliang.mall.repository.GroupRepository;
 import com.jingliang.mall.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import com.jingliang.mall.repository.UserGroupRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import com.jingliang.mall.service.UserGroupService;
 
-import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,8 +49,8 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public UserGroup delete(UserGroup userGroup) {
 	    //找到需要删除用户组数据的相关用户表数据，进行删除操作
-        User user = userRepository.findUserByIdAndIsAvailable(userGroup.getUserId(), true);
-        user.setGroupNo("-1");
+        User user = userRepository.findFirstByIdAndIsAvailable(userGroup.getUserId(), true);
+        user.setGroupNo("1000000000");
         userRepository.save(user);
         return userGroupRepository.save(userGroup);
     }
@@ -64,7 +62,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         //先根据用户中的组编码查出所在组
         Group group = groupRepository.findGroupByGroupNoLike(user.getGroupNo());
         //判断之前是否有操作数据，将之前的操作数据状态设置为不可用
-        UserGroup userGroup1 = userGroupRepository.findUserGroupByUserId();
+        UserGroup userGroup1 = userGroupRepository.findUserGroupByUserId(user.getId());
         if (!userGroup1.getIsAvailable()){
             userGroup1.setIsAvailable(false);
             userGroupRepository.save(userGroup1);
