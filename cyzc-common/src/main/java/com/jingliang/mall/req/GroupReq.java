@@ -1,6 +1,8 @@
 package com.jingliang.mall.req;
 
 import lombok.Data;
+
+import javax.persistence.Column;
 import java.io.Serializable;
 
 /**

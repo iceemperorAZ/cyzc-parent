@@ -12,4 +12,11 @@ import com.jingliang.mall.repository.base.BaseRepository;
  */
 public interface UserGroupRepository extends BaseRepository<UserGroup, Long> {
 
+    /**
+     * 根据UserId查询用户
+     *
+     * @return
+     */
+    public UserGroup findUserGroupByUserId();
+
 }

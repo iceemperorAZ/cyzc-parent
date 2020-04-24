@@ -48,4 +48,21 @@ public interface UserRepository extends BaseRepository<User, Long> {
      * @return
      */
     List<User> findAllByLevelAndIsAvailable(Integer level, Boolean isAvailable);
+
+    /**
+     * 根据组编号
+     *
+     * @param groupNo 组编号
+     * @return
+     */
+    public List<User> findUsersByGroupNo(String groupNo);
+
+    /**
+     * 根据用户id
+     *
+     * @param id 用户id
+     * @param isAvailable 是否可用
+     * @return
+     */
+    public User findUserByIdAndIsAvailable(Long id,Boolean isAvailable);
 }

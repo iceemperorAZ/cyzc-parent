@@ -172,6 +172,12 @@ public class User implements Serializable {
     @Column(name = "region")
     private String region;
 
+    /**
+     * 分组编码（-1：未分配）
+     */
+    @Column(name = "group_no")
+    private String groupNo;
+
     public String getRegion() {
         return StringUtils.isBlank(region) ? "-" : region;
     }

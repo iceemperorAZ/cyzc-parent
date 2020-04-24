@@ -8,13 +8,11 @@ import com.jingliang.mall.req.GroupReq;
 import com.jingliang.mall.resp.GroupResp;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.RestController;
 import com.jingliang.mall.service.GroupService;
+import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Objects;
@@ -72,5 +70,53 @@ public class GroupController {
 		List<GroupResp> groupResps = BeanMapper.mapList(groupWithFathers, GroupResp.class);
 		log.debug("返回结果：{}",groupResps);
 		return Result.buildQueryOk(groupResps);
+	}
+	@PostMapping("/save")
+    @ApiOperation(value = "新增分组")
+    public Result<GroupResp> saveGroup(@RequestBody GroupReq groupReq){
+        log.debug("请求参数:{}",groupReq);
+        //判断是否填写组名
+        if (Objects.isNull(groupReq.getGroupName())){
+            return Result.buildParamFail();
+        }
+        //寻找该组的父组并修改节点
+		Group fartherGroup = groupService.findFartherGroup(groupReq.getParentGroupId());
+		System.out.println(fartherGroup);
+        //判断父组节点是否为true,若不是，修改为false
+		if(!fartherGroup.getChild()){
+			fartherGroup.setChild(true);
+			//更新father节点
+			groupService.save(fartherGroup);
+		}
+		//类型转换
+		Group group = BeanMapper.map(groupReq, Group.class);
+		//修改该组节点
+		group.setChild(false);
+		//判断是否有重复组名
+		List<Group> groups = groupService.findAll();
+		for (Group group1 : groups){
+			//组名重复，无法保存
+			if (Objects.equals(group1.getGroupName(),group.getGroupName())){
+				return Result.buildParamFail();
+			}
+		}
+		group = groupService.save(group);
+		GroupResp groupResp = BeanMapper.map(group, GroupResp.class);
+		log.debug("返回结果：{}",groupResp);
+		return Result.buildSaveOk(groupResp);
+    }
+    @PostMapping("/delete")
+	@ApiOperation(value = "删除分组")
+	public Result<GroupResp> delete(@RequestBody GroupReq groupReq){
+		log.debug("请求参数：{}",groupReq);
+		//查询该组是否存在
+		if (Objects.isNull(groupReq.getId())){
+			return Result.buildParamFail();
+		}
+		//将组状态设置为不可用
+		groupReq.setIsAvailable(false);
+		//进行保存操作,并进行类型转换操作
+		GroupResp groupResp = BeanMapper.map(groupService.save(BeanMapper.map(groupReq,Group.class)),GroupResp.class);
+		return Result.buildDeleteOk(groupResp);
 	}
 }
