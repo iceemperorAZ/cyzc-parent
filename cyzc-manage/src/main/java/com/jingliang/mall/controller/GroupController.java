@@ -81,6 +81,7 @@ public class GroupController {
         }
         //寻找该组的父组并修改节点
 		Group fartherGroup = groupService.findFartherGroup(groupReq.getParentGroupId());
+		System.out.println(fartherGroup);
         //判断父组节点是否为true,若不是，修改为false
 		if(!fartherGroup.getChild()){
 			fartherGroup.setChild(true);
@@ -91,12 +92,16 @@ public class GroupController {
 		Group group = BeanMapper.map(groupReq, Group.class);
 		//修改该组节点
 		group.setChild(false);
+		//判断是否有重复组名
+		List<Group> groups = groupService.findAll();
+		for (Group group1 : groups){
+			//组名重复，无法保存
+			if (Objects.equals(group1.getGroupName(),group.getGroupName())){
+				return Result.buildParamFail();
+			}
+		}
 		group = groupService.save(group);
 		GroupResp groupResp = BeanMapper.map(group, GroupResp.class);
-
-        /*//开始保存数据
-        GroupResp groupResp = BeanMapper.map(groupService.save(BeanMapper.map(groupReq,Group.class)),GroupResp.class);
-        */
 		log.debug("返回结果：{}",groupResp);
 		return Result.buildSaveOk(groupResp);
     }

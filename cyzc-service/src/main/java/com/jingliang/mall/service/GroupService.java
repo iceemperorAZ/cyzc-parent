@@ -23,4 +23,5 @@ public interface GroupService {
 
     public Group findFartherGroup(Long parentGroupId);
 
+    public List<Group> findAll();
 }

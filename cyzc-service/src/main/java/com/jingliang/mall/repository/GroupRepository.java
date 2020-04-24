@@ -19,11 +19,35 @@ import java.util.List;
  */
 public interface GroupRepository extends BaseRepository<Group, Long> {
 
+    /**
+     * 组关系表Repository
+     *
+     * @author Xiaobing Li
+     * @version 1.0.0
+     * @date 2020-04-24 09:00:00
+     */
     public Group findByParentGroupId (Long parentGroupId);
-
+    /**
+     * 根据父组ID编号查询可用组信息
+     *
+     * @param parentGroupId      父组ID
+     * @param isAvailable 是否可用
+     * @return 返回查询到的组信息z
+     */
     public Group findGroupByParentGroupIdAndIsAvailable(@Param("parentGroupId") Long parentGroupId,@Param("isAvailable") Boolean isAvailable);
-
+    /**
+     * 根据父组ID编号查询可用组信息
+     *
+     * @param parentGroupId      父组ID
+     * @param isAvailable 是否可用
+     * @return 返回查询到的组信息z
+     */
     public List<Group> findGroupsByParentGroupIdAndIsAvailable(Long parentGroupId,Boolean isAvailable);
-
+    /**
+     * 根据父组ID编号查询可用组信息
+     *
+     * @param parentGroupId      父组ID
+     * @return 返回查询到的组信息z
+     */
     public Group findGroupById(Long parentGroupId);
 }
