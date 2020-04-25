@@ -9,7 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import com.jingliang.mall.repository.UserGroupRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.jingliang.mall.service.UserGroupService;
 
@@ -36,14 +37,6 @@ public class UserGroupServiceImpl implements UserGroupService {
 		this.userGroupRepository = userGroupRepository;
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
-    }
-
-    @Override
-    public Page<User> findGroup(Group group, Specification<User> userSpecification, PageRequest pageRequest) {
-	    //先根据编号查询所在组的所有成员
-        List<User> usersByGroup = userRepository.findUsersByGroupNo(group.getGroupNo());
-
-        return null;
     }
 
     @Override
@@ -75,5 +68,13 @@ public class UserGroupServiceImpl implements UserGroupService {
         userGroup.setCreateTime(date);
         userGroup.setIsAvailable(true);
         return userGroupRepository.save(userGroup);
+    }
+
+    @Override
+    public Page<User> findUserByGroupNo(String groupNo) {
+	    //创建分页数据
+        Pageable pageable = PageRequest.of(0,10,Sort.by("level"));
+        Page<User> userPage = userRepository.findAllByGroupNoAndIsAvailable(groupNo,pageable,true);
+        return userPage;
     }
 }

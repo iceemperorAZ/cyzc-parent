@@ -2,6 +2,7 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MallPage;
+import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Group;
 import com.jingliang.mall.entity.User;
@@ -9,26 +10,22 @@ import com.jingliang.mall.entity.UserGroup;
 import com.jingliang.mall.req.GroupReq;
 import com.jingliang.mall.req.UserGroupReq;
 import com.jingliang.mall.req.UserReq;
-import com.jingliang.mall.resp.GroupResp;
 import com.jingliang.mall.resp.UserGroupResp;
 import com.jingliang.mall.resp.UserResp;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 import com.jingliang.mall.service.UserGroupService;
 
-import javax.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * 员工与组关系映射表Controller
  * 
- * @author Zhenfeng Li
+ * @author XiaoBing Li
  * @version 1.0.0
  * @date 2020-04-23 10:14:57
  */
@@ -87,11 +84,13 @@ public class UserGroupController {
 		if (StringUtils.isBlank(groupReq.getGroupNo())){
 			return Result.buildParamFail();
 		}
-
         Group group = BeanMapper.map(groupReq, Group.class);
-		//首先要通过编号查询组，查询到组之后要通过编号对该组成员进行分页查询
-        /*Group inGroup = userGroupService.findGroup(groupReq.getGroupNo());*/
-        return null;
+		//通过组编号分页查询用户数据
+		Page<User> userByGroupNo = userGroupService.findUserByGroupNo(group.getGroupNo());
+		//进行转换
+		MallPage<UserResp> userResp = MallUtils.toMallPage(userByGroupNo, UserResp.class);
+		log.debug("返回数据：{}",userResp);
+		return Result.buildQueryOk(userResp);
 	}
 
 }

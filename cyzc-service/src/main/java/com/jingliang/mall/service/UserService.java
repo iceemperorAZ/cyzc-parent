@@ -95,4 +95,5 @@ public interface UserService {
      * @return
      */
     Boolean modifyPassword(Long userId, String password);
+
 }

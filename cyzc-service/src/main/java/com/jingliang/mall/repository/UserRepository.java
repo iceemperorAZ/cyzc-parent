@@ -2,6 +2,9 @@ package com.jingliang.mall.repository;
 
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.base.BaseRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
@@ -12,7 +15,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2019-09-22 14:40:54
  */
-public interface UserRepository extends BaseRepository<User, Long> {
+public interface UserRepository extends BaseRepository<User, Long>,PagingAndSortingRepository<User, Long> {
     /**
      * 根据员工编号查询可用用户信息
      *
@@ -50,12 +53,12 @@ public interface UserRepository extends BaseRepository<User, Long> {
     List<User> findAllByLevelAndIsAvailable(Integer level, Boolean isAvailable);
 
     /**
-     * 根据组编号
+     * 根据组编号分页查询用户
      *
      * @param groupNo 组编号
      * @return
      */
-    public List<User> findUsersByGroupNo(String groupNo);
+    public Page<User> findAllByGroupNoAndIsAvailable(String groupNo, Pageable pageable, Boolean isAvailable);
 
     /**
      * 根据用户id
