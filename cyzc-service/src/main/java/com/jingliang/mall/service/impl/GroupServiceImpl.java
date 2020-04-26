@@ -1,11 +1,12 @@
 package com.jingliang.mall.service.impl;
 
-import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Group;
+import com.jingliang.mall.entity.GroupRegion;
+import com.jingliang.mall.entity.Region;
+import com.jingliang.mall.repository.GroupRegionRepository;
 import com.jingliang.mall.repository.GroupRepository;
-import com.jingliang.mall.resp.GroupResp;
+import com.jingliang.mall.repository.RegionRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 import com.jingliang.mall.service.GroupService;
 
@@ -14,8 +15,10 @@ import java.util.List;
 /**
  * 组ServiceImpl
  * 
+ * @author Mengde Liu
  * @author Zhenfeng Li
  * @version 1.0.0
+ * @date 2020-04-24 11:18:08
  * @date 2020-04-23 10:14:57
  */
 @Service
@@ -24,10 +27,20 @@ public class GroupServiceImpl implements GroupService {
 
 	private final GroupRepository groupRepository;
 
-	public GroupServiceImpl (GroupRepository groupRepository) {
+	public GroupServiceImpl(GroupRepository groupRepository) {
 		this.groupRepository = groupRepository;
 	}
 
+	/**
+	 * 查询所有可用的组
+	 * @return
+	 */
+	@Override
+	public List<Group> findGroupAll(){
+		List<Group> list = groupRepository.findGroupsByIsAvailable(true);
+		System.out.println(list);
+		return list;
+	}
     @Override
     public Group getFatherGroup() {
         Group FatherGroup = groupRepository.findByParentGroupId(-1L);
