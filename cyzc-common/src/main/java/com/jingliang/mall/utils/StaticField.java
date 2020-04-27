@@ -8,9 +8,9 @@ package com.jingliang.mall.utils;
  */
 public class StaticField {
     /**
-     * 地址常量
+     * 前端地址常量
      */
-    public static final String ADDRESS = "address";
+    public static final String ADDRESS = "desc";
     /**
      * 状态常量
      */
@@ -31,4 +31,13 @@ public class StaticField {
      * 常量维度
      */
     public static final String LAT = "lat";
+    /**
+     * 前端常量经度2
+     */
+    public static final String LONGITUDE = "longitude";
+    /**
+     * 前端常量维度2
+     */
+    public static final String LATITUDE = "latitude";
+
 }
