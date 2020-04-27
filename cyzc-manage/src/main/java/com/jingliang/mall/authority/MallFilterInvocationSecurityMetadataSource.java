@@ -1,5 +1,6 @@
 package com.jingliang.mall.authority;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.entity.Menu;
 import com.jingliang.mall.service.MenuService;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,8 @@ public class MallFilterInvocationSecurityMetadataSource implements FilterInvocat
         String requestUrl = ((FilterInvocation) o).getHttpRequest().getServletPath();
         log.debug("请求URI = {} ", requestUrl);
         List<String> menuUrl = menuService.findAll().stream().map(Menu::getUrl).collect(Collectors.toList());
-        menuUrl.parallelStream().forEach(url -> {
+        menuUrl.parallelStream().forEach(url ->
+        {
             if (antPathMatcher.match(url, requestUrl)) {
                 //当前请求需要的权限
                 List<String> roleNames = menuService.findAllRoleNameByUrl(url);

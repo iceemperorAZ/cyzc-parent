@@ -4,7 +4,6 @@ import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
@@ -15,7 +14,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2019-09-22 14:40:54
  */
-public interface UserRepository extends BaseRepository<User, Long>,PagingAndSortingRepository<User, Long> {
+public interface UserRepository extends BaseRepository<User, Long> {
     /**
      * 根据员工编号查询可用用户信息
      *

@@ -1,18 +1,17 @@
 package com.jingliang.mall.entity;
 
-import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
+import javax.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+import java.io.Serializable;
 
 /**
  * 区域表
  * 
- * @author Zhenfeng Li
+ * @author Mengde Liu
  * @version 1.0.0
- * @date 2019-09-25 19:09:47
+ * @date 2020-04-24 11:39:41
  */
 @Table(name = "tb_region")
 @Entity
@@ -55,7 +54,7 @@ public class Region implements Serializable {
 	private Boolean isAvailable;
 
 	/**
-	 * 创建日期
+	 * 创建时间
 	 */
 	@Column(name = "create_time")
 	private Date createTime;

@@ -3,9 +3,10 @@ package com.jingliang.mall.service.impl;
 //import com.jingliang.mall.common.MallBeanMapper;
 //import com.jingliang.mall.dao.EsKeywordRepository;
 //import com.jingliang.mall.dao.EsProductRepository;
-
 import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.entity.Sku;
+//import com.jingliang.mall.esdocument.EsKeyword;
+//import com.jingliang.mall.esdocument.EsProduct;
 import com.jingliang.mall.repository.ProductRepository;
 import com.jingliang.mall.repository.SkuRepository;
 import com.jingliang.mall.server.RedisService;
@@ -23,9 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-//import com.jingliang.mall.esdocument.EsKeyword;
-//import com.jingliang.mall.esdocument.EsProduct;
-
 /**
  * 商品表ServiceImpl
  *
@@ -42,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final SkuRepository skuRepository;
-    //    private final EsProductRepository esProductRepository;
+//    private final EsProductRepository esProductRepository;
 //    private final EsKeywordRepository esKeywordRepository;
     private final RedisService redisService;
 

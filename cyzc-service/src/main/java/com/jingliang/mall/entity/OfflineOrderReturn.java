@@ -1,15 +1,14 @@
 package com.jingliang.mall.entity;
 
-import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
-import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
+import javax.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
+import java.io.Serializable;
 
 /**
  * 退货表
- *
+ * 
  * @author Zhenfeng Li
  * @version 1.0.0
  * @date 2020-04-20 17:57:20
@@ -19,16 +18,16 @@ import java.util.Date;
 @Data
 public class OfflineOrderReturn implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键Id
-     */
-    @Column(name = "id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "idGenerator")
-    @GenericGenerator(name = "idGenerator", strategy = "com.jingliang.mall.common.IdGenerator")
-    @Id
-    private Long id;
+	/**
+	 * 主键Id
+	 */
+	@Column(name = "id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "idGenerator")
+	@GenericGenerator(name = "idGenerator", strategy = "com.jingliang.mall.common.IdGenerator")
+	@Id
+	private Long id;
 
 	/**
 	 * 原订单Id

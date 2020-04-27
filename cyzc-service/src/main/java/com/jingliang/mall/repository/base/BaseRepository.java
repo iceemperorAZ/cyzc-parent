@@ -43,5 +43,4 @@ public interface BaseRepository<T, ID> extends JpaRepository<T, ID>, JpaSpecific
      * @return 返回查询到的数据
      */
     T findAllByIdAndIsAvailable(Long id, Boolean isAvailable);
-
 }

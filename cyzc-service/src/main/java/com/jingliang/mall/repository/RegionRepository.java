@@ -21,4 +21,10 @@ public interface RegionRepository extends BaseRepository<Region, Long> {
      * @return 返回查询到的区域列表
      */
     List<Region> findAllByParentCodeAndIsAvailable(String parentCode, Boolean isAvailable);
+
+    /**
+     * 根据区域id查询区域
+     */
+    Region findRegionByIdAndIsAvailable(Long regionId,Boolean isAvailable);
+
 }

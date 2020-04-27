@@ -1,12 +1,8 @@
 package com.jingliang.mall.repository;
 
-import com.jingliang.mall.common.Result;
-import com.jingliang.mall.repository.base.BaseRepository;
 import com.jingliang.mall.entity.Group;
-import com.jingliang.mall.resp.GroupResp;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.jingliang.mall.repository.base.BaseRepository;
+import io.lettuce.core.dynamic.annotation.Param;
 
 import java.util.List;
 
@@ -21,7 +17,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
 
     public Group findByParentGroupId (Long parentGroupId);
 
-    public Group findGroupByParentGroupIdAndIsAvailable(@Param("parentGroupId") Long parentGroupId,@Param("isAvailable") Boolean isAvailable);
+    public Group findGroupByParentGroupIdAndIsAvailable(@Param("parentGroupId") Long parentGroupId, @Param("isAvailable") Boolean isAvailable);
 
     public List<Group> findGroupsByParentGroupIdAndIsAvailable(Long parentGroupId,Boolean isAvailable);
     /**
@@ -38,5 +34,11 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * @return 返回查询到的组信息z
      */
     public Group findGroupByGroupNoLike(String groupNo);
+
+    /**
+     * 查询所有可用的组
+     * @return
+     */
+    List<Group> findGroupsByIsAvailable(boolean isAvailable);
 
 }
