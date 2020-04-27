@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -256,6 +255,6 @@ public class UserReq extends BaseReq implements Serializable {
     /**
      * 分组编码（-1：未分配）
      */
-    @Column(name = "group_no")
+    @ApiModelProperty(value = "分组编码（-1：未分配）")
     private String groupNo;
 }

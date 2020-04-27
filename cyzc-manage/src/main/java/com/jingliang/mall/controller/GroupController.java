@@ -8,21 +8,20 @@ import com.jingliang.mall.req.GroupReq;
 import com.jingliang.mall.resp.GroupResp;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.Api;
 import com.jingliang.mall.service.GroupService;
-import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * 组Controller
  * 
- * @author XiaoBing Li
+ * @author Mengde Liu
  * @version 1.0.0
- * @date 2020-04-23 10:14:57
+ * @date 2020-04-24 11:18:08
  */
 @Api(tags = "组")
 @RestController
@@ -36,6 +35,12 @@ public class GroupController {
 		this.groupService = groupService;
 	}
 
+	@PostMapping("/groupAll")
+	@ApiOperation(value = "查询所有可用的组")
+	public List<Group> groupAll(){
+		List<Group> list = groupService.findGroupAll();
+		return list;
+	}
 	@GetMapping("/getFatherGroup")
 	@ApiOperation(value = "查询出顶级父组")
 	public Result<GroupResp> getAllGroup(){
@@ -72,17 +77,17 @@ public class GroupController {
 		return Result.buildQueryOk(groupResps);
 	}
 	@PostMapping("/save")
-    @ApiOperation(value = "新增分组")
-    public Result<GroupResp> saveGroup(@RequestBody GroupReq groupReq){
-        log.debug("请求参数:{}",groupReq);
-        //判断是否填写组名
-        if (Objects.isNull(groupReq.getGroupName())){
-            return Result.buildParamFail();
-        }
-        //寻找该组的父组并修改节点
+	@ApiOperation(value = "新增分组")
+	public Result<GroupResp> saveGroup(@RequestBody GroupReq groupReq){
+		log.debug("请求参数:{}",groupReq);
+		//判断是否填写组名
+		if (Objects.isNull(groupReq.getGroupName())){
+			return Result.buildParamFail();
+		}
+		//寻找该组的父组并修改节点
 		Group fartherGroup = groupService.findFartherGroup(groupReq.getParentGroupId());
 		System.out.println(fartherGroup);
-        //判断父组节点是否为true,若不是，修改为false
+		//判断父组节点是否为true,若不是，修改为false
 		if(!fartherGroup.getChild()){
 			fartherGroup.setChild(true);
 			//更新father节点
@@ -104,8 +109,8 @@ public class GroupController {
 		GroupResp groupResp = BeanMapper.map(group, GroupResp.class);
 		log.debug("返回结果：{}",groupResp);
 		return Result.buildSaveOk(groupResp);
-    }
-    @PostMapping("/delete")
+	}
+	@PostMapping("/delete")
 	@ApiOperation(value = "删除分组")
 	public Result<GroupResp> delete(@RequestBody GroupReq groupReq){
 		log.debug("请求参数：{}",groupReq);
@@ -119,4 +124,5 @@ public class GroupController {
 		GroupResp groupResp = BeanMapper.map(groupService.save(BeanMapper.map(groupReq,Group.class)),GroupResp.class);
 		return Result.buildDeleteOk(groupResp);
 	}
+
 }

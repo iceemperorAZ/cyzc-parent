@@ -124,8 +124,6 @@ public interface Msg {
     String TEXT_EXCEL_UPLOAD_FAIL = "excel上传异常";
     String TEXT_EXCEL_ANALYSIS_FAIL = "excel解析异常";
 
-    String TEXT_USERGROUP_QUERY_FAIL = "查询用户分组表异常";
-
     Integer SYSTEM_FAIL = 500;
     String TEXT_SYSTEM_FAIL = "当前访问人数过多，请稍后重试！";
 

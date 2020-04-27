@@ -1,8 +1,6 @@
 package com.jingliang.mall.service;
 
-import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Group;
-import com.jingliang.mall.resp.GroupResp;
 
 import java.util.List;
 
@@ -24,5 +22,11 @@ public interface GroupService {
     public Group findFartherGroup(Long parentGroupId);
 
     public List<Group> findAll();
+
+    /**
+     * 查询所有可用的组
+     * @return
+     */
+    List<Group> findGroupAll();
 
 }

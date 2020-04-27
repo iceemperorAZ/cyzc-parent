@@ -25,7 +25,6 @@ public class ExcelUtils {
 
     /**
      * 生成 xlsx格式的excel
-     *
      * @param sheetName sheet名称
      * @param titleList 标题列集合
      * @return 返回创建成功的excel
@@ -58,7 +57,6 @@ public class ExcelUtils {
 
     /**
      * 按照excel真实后缀获取内容
-     *
      * @param cell        单元格
      * @param rowCellType 单元格类型
      * @return
