@@ -77,5 +77,5 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
      * @param isAvailable   是否可用
      * @return 返回查询到商品
      */
-    Product findAllByProductTypeIdAndProductSortAndIsAvailable(Long productTypeId, Integer productSort, Boolean isAvailable);
+    Product findFirstByProductTypeIdAndProductSortAndIsAvailable(Long productTypeId, Integer productSort, Boolean isAvailable);
 }
