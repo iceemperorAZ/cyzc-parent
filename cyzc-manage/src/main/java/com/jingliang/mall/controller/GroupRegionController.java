@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.GroupRegion;
 import com.jingliang.mall.entity.Region;
 import com.jingliang.mall.req.GroupRegionReq;
@@ -33,13 +34,13 @@ public class GroupRegionController {
 
 	@PostMapping("/getGroupRegion")
 	@ApiOperation(value = "根据组id查询映射表,获取区域id，查询对应区域")
-	public Region getGroupRegion(@RequestParam("groupId") Long groupId){
-		return groupRegionService.findRegionByGroupId(groupId);
+	public Result<Region> getGroupRegion(@RequestParam("groupId") Long groupId){
+		return Result.buildQueryOk(groupRegionService.findRegionByGroupId(groupId));
 	}
 
 	@PostMapping("/saveGroupRegion")
 	@ApiOperation(value = "保存组与区域映射关系表")
-	public GroupRegion save(@RequestBody GroupRegionReq groupRegionReq){
+	public Result<GroupRegion> save(@RequestBody GroupRegionReq groupRegionReq){
 		//获取传递对象，并保存
 		GroupRegion groupRegion = new GroupRegion();
 		groupRegion.setGroupId(groupRegionReq.getGroupId());
@@ -47,12 +48,12 @@ public class GroupRegionController {
 		groupRegion.setCreateTime(new Date());
 		//默认为真
 		groupRegion.setIsAvailable(true);
-		return groupRegionService.saveGroupRegion(groupRegion);
+		return Result.buildSaveOk(groupRegionService.saveGroupRegion(groupRegion));
 	}
 
 	@PostMapping("/updateGroupRegion")
 	@ApiOperation(value = "修改组与区域映射关系表")
-	public GroupRegion update(@RequestBody GroupRegionReq groupRegionReq){
+	public Result<GroupRegion> update(@RequestBody GroupRegionReq groupRegionReq){
 		//获取传递对象，并保存
 		GroupRegion groupRegion = new GroupRegion();
 		groupRegion.setGroupId(groupRegionReq.getGroupId());
@@ -60,13 +61,13 @@ public class GroupRegionController {
 		groupRegion.setCreateTime(new Date());
 		//获取数据库中的可用性
 		groupRegion.setIsAvailable(groupRegionReq.getIsAvailable());
-		return groupRegionService.saveGroupRegion(groupRegion);
+		return Result.buildUpdateOk(groupRegionService.saveGroupRegion(groupRegion));
 	}
 
 	@PutMapping("/updateIs")
 	@ApiOperation(value = "删除组和区域的绑定关系（修改可用性）")
-	public GroupRegion updateIs(@RequestBody GroupRegion groupRegion){
-		return groupRegionService.updateIsAvailable(groupRegion);
+	public Result<GroupRegion> updateIs(@RequestBody GroupRegion groupRegion){
+		return Result.buildDeleteOk(groupRegionService.updateIsAvailable(groupRegion));
 	}
 
 

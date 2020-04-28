@@ -3,6 +3,7 @@ package com.jingliang.mall.service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lmd
@@ -16,5 +17,5 @@ public interface MapService {
      *
      * @return
      */
-    List<Object> getlngAndLat(MultipartFile multipartFile);
+    List<Map<String, Object>> getlngAndLat(MultipartFile multipartFile);
 }
