@@ -4,12 +4,11 @@ import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.GroupRegion;
 import com.jingliang.mall.entity.Region;
 import com.jingliang.mall.req.GroupRegionReq;
-import com.jingliang.mall.service.GroupService;
+import com.jingliang.mall.service.GroupRegionService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import com.jingliang.mall.service.GroupRegionService;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.Api;
 
 import java.util.Date;
 
