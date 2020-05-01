@@ -53,7 +53,7 @@ public class Group implements Serializable {
 	private String groupNo;
 
 	/**
-	 * 是否有子节点
+	 * 是否为叶子节点
 	 */
 	@Column(name = "child")
 	private Boolean child;

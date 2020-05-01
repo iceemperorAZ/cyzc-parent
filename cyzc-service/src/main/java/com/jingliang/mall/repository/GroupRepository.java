@@ -20,13 +20,21 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
     public Group findGroupByParentGroupIdAndIsAvailable(@Param("parentGroupId") Long parentGroupId, @Param("isAvailable") Boolean isAvailable);
 
     public List<Group> findGroupsByParentGroupIdAndIsAvailable(Long parentGroupId,Boolean isAvailable);
+
+    /**
+     * 统计子节点数量
+     * @param parentGroupId
+     * @param isAvailable
+     * @return
+     */
+    public Integer countAllByParentGroupIdAndIsAvailable(Long parentGroupId,Boolean isAvailable);
     /**
      * 根据父组ID编号查询可用组信息
      *
      * @param parentGroupId      父组ID
      * @return 返回查询到的组信息z
      */
-    public Group findGroupById(Long parentGroupId);
+    public Group findFirstGroupById(Long parentGroupId);
     /**
      * 根据组编号查询所在分组
      *
