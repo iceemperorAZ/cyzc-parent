@@ -25,10 +25,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 员工表Controller
@@ -236,5 +234,46 @@ public class UserController {
         MallPage<UserResp> userRespPage = MallUtils.toMallPage(userPage, UserResp.class);
         log.debug("返回结果：{}", userRespPage);
         return Result.buildQueryOk(userRespPage);
+    }
+
+    /**
+     * 根据分组编号查询用户
+     */
+    @GetMapping("/all/groupNo")
+    @ApiOperation(value = "根据分组编号查询用户")
+    public Result<List<UserResp>> allGroupNo(String groupNo) {
+        return Result.buildQueryOk(BeanMapper.mapList(userService.likeAllByGroupNo(groupNo.replaceAll("0*$", "")), UserResp.class));
+    }
+
+    /**
+     * 查询所有未分配的用户
+     */
+    @GetMapping("/all/ungrouped")
+    @ApiOperation(value = "查询所有未分配的用户")
+    public Result<List<UserResp>> allUngrouped() {
+        return Result.buildQueryOk(BeanMapper.mapList(userService.allUngrouped(), UserResp.class));
+    }
+
+    /**
+     * 移动/分配用户到组
+     */
+    @PostMapping("/distribution")
+    @ApiOperation(value = "移动/分配用户到组")
+    public Result<Boolean> distribution(@RequestBody Map<String, Object> map) {
+        String groupNo = (String) map.get("groupNo");
+        List<Long> userIds  = ((List<?>) map.get("userIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
+        userService.distribution(groupNo,userIds);
+        return Result.build(Msg.OK,"操作成功",true);
+    }
+
+    /**
+     * 移除用户到未分配
+     */
+    @PostMapping("/remove/ungrouped")
+    @ApiOperation(value = "移除用户到未分配")
+    public Result<Boolean> removeToUngrouped(@RequestBody Map<String, Object> map) {
+        List<Long> userIds  = ((List<?>) map.get("userIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
+        userService.removeToUngrouped(userIds);
+        return Result.build(Msg.OK,"已成功从该分组移除",true);
     }
 }

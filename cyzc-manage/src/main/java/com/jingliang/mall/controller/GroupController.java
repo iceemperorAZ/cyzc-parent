@@ -7,6 +7,7 @@ import com.jingliang.mall.entity.Group;
 import com.jingliang.mall.req.GroupReq;
 import com.jingliang.mall.resp.GroupResp;
 import com.jingliang.mall.service.GroupService;
+import com.jingliang.mall.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +30,11 @@ import java.util.Objects;
 public class GroupController {
 
     private final GroupService groupService;
+    private final UserService userService;
 
-    public GroupController(GroupService groupService) {
+    public GroupController(GroupService groupService, UserService userService) {
         this.groupService = groupService;
+        this.userService = userService;
     }
 
     @PostMapping("/groupAll")
@@ -95,12 +98,12 @@ public class GroupController {
             groupService.save(fartherGroup);
         }
         //判断同级分组是否有重复组名
-        Group group = groupService.findByGroupNameAndParentId(groupReq.getGroupName(),groupReq.getParentGroupId());
-        if(group!=null&&group.getId().equals(groupReq.getId())){
-            return Result.build(Msg.FAIL,"组名重复");
+        Group group = groupService.findByGroupNameAndParentId(groupReq.getGroupName(), groupReq.getParentGroupId());
+        if (group != null && group.getId().equals(groupReq.getId())) {
+            return Result.build(Msg.FAIL, "组名重复");
         }
         //类型转换
-         group = BeanMapper.map(groupReq, Group.class);
+        group = BeanMapper.map(groupReq, Group.class);
         //修改该组节点
         group.setChild(true);
         group.setIsAvailable(true);
@@ -118,9 +121,22 @@ public class GroupController {
         if (Objects.isNull(groupReq.getId())) {
             return Result.buildParamFail();
         }
+        //判断该组下是否还有成员
+        Integer count = userService.countByGroupNo(groupService.findByGroupById(groupReq.getId()).getGroupNo());
+        if (count > 0) {
+            return Result.build(Msg.FAIL, "删除失败，该组下还有成员未移出，请移出后再试！");
+        }
         //进行保存操作,并进行类型转换操作
         GroupResp groupResp = BeanMapper.map(groupService.delete(BeanMapper.map(groupReq, Group.class)), GroupResp.class);
         return Result.buildDeleteOk(groupResp);
     }
 
+    /**
+     * 根据组名或编号模糊查询
+     */
+    @ApiOperation(value = "根据组名或编号模糊查询")
+    @GetMapping("/like/search")
+    public Result<List<GroupResp>> likeSearch(String search) {
+        return Result.buildQueryOk(BeanMapper.mapList(groupService.likeSearch(search), GroupResp.class));
+    }
 }

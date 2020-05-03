@@ -90,9 +90,42 @@ public interface UserService {
 
     /**
      * 修改密码
+     *
      * @param userId
      * @param password
      * @return
      */
     Boolean modifyPassword(Long userId, String password);
+
+    /**
+     * 根据分组编号查询用户
+     *
+     * @param groupNo
+     * @return
+     */
+    List<User> likeAllByGroupNo(String groupNo);
+
+    /**
+     * 查询所有未分组的用户
+     *
+     * @return
+     */
+    List<User> allUngrouped();
+
+    void distribution(String groupNo, List<Long> userIds);
+
+    /**
+     * 移除用户到未分配
+     *
+     * @param userIds
+     */
+    void removeToUngrouped(List<Long> userIds);
+
+    /**
+     * 统计组下的成员
+     *
+     * @param groupNo
+     * @return
+     */
+    Integer countByGroupNo(String groupNo);
 }

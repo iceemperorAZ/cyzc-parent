@@ -49,4 +49,12 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      */
     List<Group> findGroupsByIsAvailable(boolean isAvailable);
 
+    /**
+     * 根据组名和父组Id查询
+     * @param groupName
+     * @param parentGroupId
+     * @param isAvailable
+     * @return
+     */
+    Group findFirstByGroupNameAndParentGroupIdAndIsAvailable(String groupName, Long parentGroupId, boolean isAvailable);
 }

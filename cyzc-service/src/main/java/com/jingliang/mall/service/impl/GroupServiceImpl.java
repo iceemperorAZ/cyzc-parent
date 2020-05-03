@@ -4,9 +4,12 @@ import com.jingliang.mall.entity.Group;
 import com.jingliang.mall.repository.GroupRepository;
 import com.jingliang.mall.service.GroupService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.Predicate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,14 +63,30 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group findByGroupNameAndParentId(String groupName, Long parentGroupId) {
-        groupRepository.findByGroupNameAndParentId(groupName,);
-        return null;
+        return groupRepository.findFirstByGroupNameAndParentGroupIdAndIsAvailable(groupName, parentGroupId, true);
+    }
+
+    @Override
+    public List<Group> likeSearch(String search) {
+        Specification<Group> groupSpecification = (Specification<Group>) (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(cb.like(root.get("groupName"), "%" + search + "%"));
+            predicates.add(cb.like(root.get("groupNo"), search + "%"));
+            query.where(cb.and(cb.equal(root.get("isAvailable"), true), cb.or(predicates.toArray(new Predicate[0]))));
+            return query.getRestriction();
+        };
+        return groupRepository.findAll(groupSpecification);
+    }
+
+    @Override
+    public Group findByGroupById(Long id) {
+        return groupRepository.findAllByIdAndIsAvailable(id, true);
     }
 
     @Override
     public Group getFatherGroup() {
-        Group FatherGroup = groupRepository.findByParentGroupId(-1L);
-        return groupRepository.findGroupByParentGroupIdAndIsAvailable(-1L, FatherGroup.getIsAvailable());
+        Group fatherGroup = groupRepository.findByParentGroupId(-1L);
+        return groupRepository.findGroupByParentGroupIdAndIsAvailable(-1L, fatherGroup.getIsAvailable());
     }
 
     @Override

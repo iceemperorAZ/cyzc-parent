@@ -46,4 +46,20 @@ public interface GroupService {
      * @return
      */
     Group findByGroupNameAndParentId(String groupName, Long parentGroupId);
+
+    /**
+     * 根据组名或编号模糊查询
+     *
+     * @param search
+     * @return
+     */
+    List<Group> likeSearch(String search);
+
+    /**
+     * 根据Id查询组
+     * @param id
+     * @return
+     */
+    Group findByGroupById(Long id);
+
 }

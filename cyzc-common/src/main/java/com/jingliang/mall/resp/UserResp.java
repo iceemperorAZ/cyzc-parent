@@ -159,4 +159,10 @@ public class UserResp implements Serializable {
      */
     @ApiModelProperty(value = "负责区域")
     private String region;
+
+    /**
+     * 分组编码（-1：未分配）
+     */
+    @ApiModelProperty(value = "分组编码（-1：未分配）")
+    private String groupNo;
 }
