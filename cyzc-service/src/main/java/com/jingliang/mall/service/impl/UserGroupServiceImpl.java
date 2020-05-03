@@ -14,9 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import com.jingliang.mall.service.UserGroupService;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 员工与组关系映射表ServiceImpl
@@ -53,7 +51,7 @@ public class UserGroupServiceImpl implements UserGroupService {
 	    UserGroup userGroup = new UserGroup();
 	    Date date = new Date();
         //先根据用户中的组编码查出所在组
-        Group group = groupRepository.findGroupByGroupNoLike(user.getGroupNo());
+        Group group = groupRepository.findFirstByGroupNoAndIsAvailable(user.getGroupNo(),true);
         //判断之前是否有操作数据，将之前的操作数据状态设置为不可用
         UserGroup userGroup1 = userGroupRepository.findUserGroupByUserId(user.getId());
         if (!userGroup1.getIsAvailable()){

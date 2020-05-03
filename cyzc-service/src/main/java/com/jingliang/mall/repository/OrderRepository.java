@@ -1,7 +1,9 @@
 package com.jingliang.mall.repository;
 
-import com.jingliang.mall.repository.base.BaseRepository;
 import com.jingliang.mall.entity.Order;
+import com.jingliang.mall.repository.base.BaseRepository;
+
+import java.util.List;
 
 /**
  * 订单表Repository
@@ -28,4 +30,12 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      */
     Order findFirstByOrderNo(String orderNo);
 
+    /**
+     * 查询分组下的所有订单
+     *
+     * @param isAvailable
+     * @param groupNo
+     * @return
+     */
+    List<Order> findAllByIsAvailableAndGroupNoLike(boolean isAvailable, String groupNo);
 }

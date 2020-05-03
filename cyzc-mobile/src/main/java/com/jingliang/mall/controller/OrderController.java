@@ -60,11 +60,12 @@ public class OrderController {
     private final BuyerCouponLimitService buyerCouponLimitService;
     private final ConfigService configService;
     private final GoldLogService goldLogService;
+    private final UserService userService;
 
     public OrderController(RedisTemplate<String, Object> redisTemplate, OrderService orderService,
                            ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService,
                            BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer,
-                           ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService) {
+                           ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService, UserService userService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
@@ -75,6 +76,7 @@ public class OrderController {
         this.configService = configService;
         this.buyerCouponLimitService = buyerCouponLimitService;
         this.goldLogService = goldLogService;
+        this.userService = userService;
     }
 
 
@@ -358,6 +360,16 @@ public class OrderController {
             instance.add(Calendar.DAY_OF_MONTH, 3);
         }
         order.setExpectedDeliveryTime(instance.getTime());
+        //查询出当前商户所属的销售和当前销售所在的分组
+        User saleUser = userService.findById(buyer.getSaleUserId());
+        //当前分组
+        String groupNo = saleUser.getGroupNo();
+        order.setGroupNo(groupNo);
+        //销售Id
+        order.setSaleUserId(buyer.getSaleUserId());
+        //当前提成
+        order.setRatio(saleUser.getRatio());
+
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {

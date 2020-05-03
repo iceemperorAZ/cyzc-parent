@@ -220,10 +220,28 @@ public class Order implements Serializable {
     private Integer returnGold;
 
     /**
+     * 所在分组编号
+     */
+    @Column(name = "group_no")
+    private String groupNo;
+
+    /**
+     * 销售人员Id
+     */
+    @Column(name = "sale_user_id")
+    private Long saleUserId;
+
+    /**
      * 修改时间
      */
     @Column(name = "update_time")
     private Date updateTime;
+
+    /**
+     * 提成比例（千分）
+     */
+    @Column(name = "ratio")
+    private Integer ratio;
 
     /**
      * 订单详情集合

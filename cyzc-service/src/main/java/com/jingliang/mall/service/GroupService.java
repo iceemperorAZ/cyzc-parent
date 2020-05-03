@@ -31,14 +31,6 @@ public interface GroupService {
     List<Group> findGroupAll();
 
     /**
-     * 删除分组
-     *
-     * @param group
-     * @return
-     */
-    Boolean delete(Group group);
-
-    /**
      * 根据组名和父组Id查询
      *
      * @param groupName
@@ -57,9 +49,25 @@ public interface GroupService {
 
     /**
      * 根据Id查询组
+     *
      * @param id
      * @return
      */
     Group findByGroupById(Long id);
 
+    /**
+     * 根据组编号查询
+     *
+     * @param groupNo
+     * @return
+     */
+    Group findByGroupNo(String groupNo);
+
+    /**
+     * 合并分组(包括子组一同合并到指定的组)
+     *
+     * @param groupNo
+     * @param mergeGroupNos
+     */
+    void mergeGroups(String groupNo, List<String> mergeGroupNos);
 }

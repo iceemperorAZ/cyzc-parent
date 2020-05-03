@@ -14,7 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * 组Controller
@@ -92,43 +94,34 @@ public class GroupController {
         //寻找该组的父组并修改节点
         Group fartherGroup = groupService.findFartherGroup(groupReq.getParentGroupId());
         //判断父组节点是否为true,若不是，修改为false
-        if (!fartherGroup.getChild()) {
+        if (fartherGroup != null && !fartherGroup.getChild()) {
             fartherGroup.setChild(true);
             //更新father节点
             groupService.save(fartherGroup);
         }
         //判断同级分组是否有重复组名
         Group group = groupService.findByGroupNameAndParentId(groupReq.getGroupName(), groupReq.getParentGroupId());
-        if (group != null && group.getId().equals(groupReq.getId())) {
+        if (group != null && !group.getId().equals(groupReq.getId())) {
             return Result.build(Msg.FAIL, "组名重复");
+        }
+        //判断组编号否有重复
+        group = groupService.findByGroupNo(groupReq.getGroupNo());
+        if (group != null && !group.getId().equals(groupReq.getId())) {
+            return Result.build(Msg.FAIL, "组编号重复");
         }
         //类型转换
         group = BeanMapper.map(groupReq, Group.class);
-        //修改该组节点
-        group.setChild(true);
+        assert group != null;
+        if (group.getId() == null) {
+            //修改该组节点
+            group.setChild(true);
+
+        }
         group.setIsAvailable(true);
         group = groupService.save(group);
         GroupResp groupResp = BeanMapper.map(group, GroupResp.class);
         log.debug("返回结果：{}", groupResp);
         return Result.buildSaveOk(groupResp);
-    }
-
-    @PostMapping("/delete")
-    @ApiOperation(value = "删除分组")
-    public Result<GroupResp> delete(@RequestBody GroupReq groupReq) {
-        log.debug("请求参数：{}", groupReq);
-        //查询该组是否存在
-        if (Objects.isNull(groupReq.getId())) {
-            return Result.buildParamFail();
-        }
-        //判断该组下是否还有成员
-        Integer count = userService.countByGroupNo(groupService.findByGroupById(groupReq.getId()).getGroupNo());
-        if (count > 0) {
-            return Result.build(Msg.FAIL, "删除失败，该组下还有成员未移出，请移出后再试！");
-        }
-        //进行保存操作,并进行类型转换操作
-        GroupResp groupResp = BeanMapper.map(groupService.delete(BeanMapper.map(groupReq, Group.class)), GroupResp.class);
-        return Result.buildDeleteOk(groupResp);
     }
 
     /**
@@ -139,4 +132,18 @@ public class GroupController {
     public Result<List<GroupResp>> likeSearch(String search) {
         return Result.buildQueryOk(BeanMapper.mapList(groupService.likeSearch(search), GroupResp.class));
     }
+
+
+    /**
+     * 合并分组(包括子组一同合并到指定的组)
+     */
+    @PostMapping("/merge")
+    @ApiOperation(value = "合并分组")
+    public Result<Boolean> mergeGroups(@RequestBody Map<String, Object> map) {
+        String groupNo = (String) map.get("groupNo");
+        List<String> mergeGroupNos = ((List<?>) map.get("mergeGroupNos")).stream().map(p -> String.valueOf(p.toString())).collect(Collectors.toList());
+        groupService.mergeGroups(groupNo, mergeGroupNos);
+        return Result.build(Msg.OK, "操作成功", true);
+    }
+
 }

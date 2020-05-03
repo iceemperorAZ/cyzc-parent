@@ -82,24 +82,34 @@ public class WechatManageController {
             @ApiImplicitParam(value = "开始时间", name = "startTime", dataType = "date", paramType = "query", required = true),
             @ApiImplicitParam(value = "结束时间", name = "endTime", dataType = "date", paramType = "query", required = true),
     })
-    public Result<ConfluenceResp> bossConfluence(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date startTime,
-                                                 @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime) {
-        List<User> users = userService.findAll();
+    public Result<ConfluenceResp> bossConfluence(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8") Date startTime,
+                                                 @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+                                                 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8") Date endTime) {
+        Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            predicateList.add(cb.between(root.get("orderStatus"), 300, 700));
+            predicateList.add(cb.between(root.get("createTime"), startTime, endTime));
+            predicateList.add(cb.equal(root.get("isAvailable"), true));
+            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            return query.getRestriction();
+        };
+        List<Order> orders = orderService.findAll(orderSpecification);
         Confluence confluence = new Confluence();
         confluence.setTotalPrice(0L);
         confluence.setRoyalty(0L);
         confluence.setProfit(0L);
-        users.forEach(user -> {
-            ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(user, startTime, endTime);
-            //总价
-            confluence.setTotalPrice(confluenceDetail.getTotalPrice() + confluence.getTotalPrice());
-            //计算销售提成价格
-            confluence.setRoyalty(confluence.getRoyalty() + (long) (user.getRatio() * 0.01 * confluenceDetail.getTotalPrice()));
-            //净利润=总价-优惠券-提成
-            confluence.setProfit(confluenceDetail.getProfit() + confluence.getProfit());
-        });
+        for (Order order : orders) {
+            //收益
+            long totalPrice = order.getPayableFee() - order.getPreferentialFee();
+            //提成
+            long royalty = (long) (order.getTotalPrice() * order.getRatio() * 0.001);
+            //净利
+            long profit = totalPrice - royalty;
+            confluence.setTotalPrice(confluence.getTotalPrice() + totalPrice);
+            confluence.setRoyalty(confluence.getRoyalty() + royalty);
+            confluence.setProfit(confluence.getProfit() + profit);
+        }
         ConfluenceResp confluenceResp = BeanMapper.map(confluence, ConfluenceResp.class);
         return Result.buildQueryOk(confluenceResp);
     }
