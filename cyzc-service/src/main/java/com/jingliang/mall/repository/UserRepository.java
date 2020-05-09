@@ -4,6 +4,8 @@ import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -62,9 +64,55 @@ public interface UserRepository extends BaseRepository<User, Long> {
     /**
      * 根据用户id
      *
-     * @param id 用户id
+     * @param id          用户id
      * @param isAvailable 是否可用
      * @return
      */
-    public User findFirstByIdAndIsAvailable(Long id,Boolean isAvailable);
+    public User findFirstByIdAndIsAvailable(Long id, Boolean isAvailable);
+
+    /**
+     * 根据分组编号查询
+     *
+     * @param b
+     * @param groupNo
+     * @return
+     */
+    List<User> findAllByIsAvailableAndGroupNoLikeOrderByGroupNoAsc(boolean isAvailable, String groupNo);
+
+    /**
+     * 查询所有未分组的用户
+     *
+     * @param b
+     * @param groupNo
+     * @return
+     */
+    List<User> findAllByIsAvailableAndGroupNo(boolean isAvailable, String groupNo);
+
+    /**
+     * 分配用户到组
+     *
+     * @param groupNo
+     * @param userIds
+     */
+    @Modifying
+    @Query(value = "UPDATE User u SET u.groupNo=:groupNo WHERE u.id IN(:userIds)")
+    void distribution(String groupNo, List<Long> userIds);
+
+    /**
+     * 移除用户到未分配
+     *
+     * @param userIds
+     */
+    @Modifying
+    @Query(value = "UPDATE User u SET u.groupNo='-1' WHERE u.id IN(:userIds)")
+    void removeToUngrouped(List<Long> userIds);
+
+    /**
+     * 统计组下的成员
+     *
+     * @param groupNo
+     * @param isAvailable
+     * @return
+     */
+    Integer countByGroupNoAndIsAvailable(String groupNo, boolean isAvailable);
 }

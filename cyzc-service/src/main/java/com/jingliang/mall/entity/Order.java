@@ -52,6 +52,30 @@ public class Order implements Serializable {
     private Long buyerId;
 
     /**
+     * 收货地址：省
+     */
+    @Column(name = "detail_address_province")
+    private String detailAddressProvince;
+
+    /**
+     * 收货地址：市
+     */
+    @Column(name = "detail_address_city")
+    private String detailAddressCity;
+
+    /**
+     * 收货地址：区
+     */
+    @Column(name = "detail_address_area")
+    private String detailAddressArea;
+
+    /**
+     * 收货地址：街道
+     */
+    @Column(name = "detail_address_street")
+    private String detailAddressStreet;
+
+    /**
      * 收货详细地址信息
      */
     @Column(name = "detail_address")
@@ -220,10 +244,28 @@ public class Order implements Serializable {
     private Integer returnGold;
 
     /**
+     * 所在分组编号
+     */
+    @Column(name = "group_no")
+    private String groupNo;
+
+    /**
+     * 销售人员Id
+     */
+    @Column(name = "sale_user_id")
+    private Long saleUserId;
+
+    /**
      * 修改时间
      */
     @Column(name = "update_time")
     private Date updateTime;
+
+    /**
+     * 提成比例（千分）
+     */
+    @Column(name = "ratio")
+    private Integer ratio;
 
     /**
      * 订单详情集合

@@ -43,5 +43,10 @@ public class RegionController {
         return Result.buildQueryOk(regionRespList);
     }
 
+    /**
+     * 分配区域到组
+     */
+
+
 
 }

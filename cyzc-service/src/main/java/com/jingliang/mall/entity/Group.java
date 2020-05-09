@@ -2,6 +2,8 @@ package com.jingliang.mall.entity;
 
 import lombok.Data;
 import javax.persistence.*;
+
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
 
@@ -15,6 +17,7 @@ import java.io.Serializable;
 @Table(name = "tb_group")
 @Entity
 @Data
+@Accessors(chain = true)
 public class Group implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -53,7 +56,7 @@ public class Group implements Serializable {
 	private String groupNo;
 
 	/**
-	 * 是否有子节点
+	 * 是否为叶子节点
 	 */
 	@Column(name = "child")
 	private Boolean child;

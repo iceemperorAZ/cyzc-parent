@@ -79,6 +79,17 @@ public class BuyerAddressReq extends BaseReq implements Serializable {
 	private String areaCode;
 
 	/**
+	 * 街道编码：0-99999
+	 */
+	@ApiModelProperty(value = "街道编码：0-99999")
+	private String streetCode;
+
+	/**
+	 * 街道信息
+	 */
+	@ApiModelProperty(value = "街道信息")
+	private String street;
+	/**
 	 * 详细地址
 	 */
 	@ApiModelProperty(value = "详细地址")

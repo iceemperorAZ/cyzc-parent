@@ -29,4 +29,9 @@ public class RegionServiceImpl implements RegionService {
     public List<Region> findByParentCode(String parentCode) {
         return regionRepository.findAllByParentCodeAndIsAvailable(parentCode, true);
     }
+
+    @Override
+    public String findByCode(String code) {
+        return regionRepository.findRegionByCodeAndIsAvailable(code,true).getName();
+    }
 }

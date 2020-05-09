@@ -121,4 +121,31 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return true;
     }
+
+    @Override
+    public List<User> likeAllByGroupNo(String groupNo) {
+        return userRepository.findAllByIsAvailableAndGroupNoLikeOrderByGroupNoAsc(true, groupNo + "%");
+    }
+
+    @Override
+    public List<User> allUngrouped() {
+        return userRepository.findAllByIsAvailableAndGroupNo(true, "-1");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void distribution(String groupNo, List<Long> userIds) {
+        userRepository.distribution(groupNo, userIds);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void removeToUngrouped(List<Long> userIds) {
+        userRepository.removeToUngrouped(userIds);
+    }
+
+    @Override
+    public Integer countByGroupNo(String groupNo) {
+        return userRepository.countByGroupNoAndIsAvailable(groupNo,true);
+    }
 }

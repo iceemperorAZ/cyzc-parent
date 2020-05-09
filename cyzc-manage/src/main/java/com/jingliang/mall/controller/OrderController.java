@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
@@ -32,10 +33,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 订单表Controller
@@ -101,6 +100,65 @@ public class OrderController {
         return Result.buildUpdateOk(orderResp);
     }
 
+    /**
+     * 发货
+     */
+    @ApiOperation(value = "批量发货")
+    @PostMapping("/deliverAll")
+    public Result<List<OrderResp>> deliverAll(@RequestBody Map<String,Object> map, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", map);
+        List<Long> orderIds  = ((List<?>) map.get("orderIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
+        //获取map集合中的配送员参数
+        String house = (String) map.get("storehouseName");
+        String deliveryName = (String) map.get("expressUser");
+        String deliveryPhone = (String) map.get("expressPhone");
+        //创建订单类，方便根据id查询后存储。
+        Order order2 = new Order();
+        //创建订单请求类，对该类进行循环遍历
+        List<OrderReq> orderReqs = new ArrayList<>();
+        //创建订单返回类，进行订单返回结果的存储
+        List<OrderResp> orderResps = new ArrayList<>();
+        //对订单类进行查询，并存储到list中
+        for (Long id : orderIds){
+            order2 = orderService.findById(id);
+            order2.setStorehouse(house);
+            order2.setDeliveryName(deliveryName);
+            order2.setDeliveryPhone(deliveryPhone);
+            orderReqs.add(BeanMapper.map(order2,OrderReq.class));
+        }
+        //开始对每个订单进行发货操作
+        for (OrderReq orderReq : orderReqs){
+            if (Objects.isNull(orderReq.getId()) || StringUtils.isBlank(orderReq.getDeliveryName())
+                    || StringUtils.isBlank(orderReq.getDeliveryPhone()) || StringUtils.isBlank(orderReq.getStorehouse())) {
+                return Result.buildParamFail();
+            }
+            Order order1 = orderService.findById(orderReq.getId());
+            if (order1.getOrderStatus() > 300) {
+                return Result.build(Msg.FAIL, "此订单已完成发货");
+            }
+            Order order = new Order();
+            order.setId(orderReq.getId());
+            order.setDeliveryName(orderReq.getDeliveryName());
+            order.setStorehouse(orderReq.getStorehouse());
+            order.setOrderStatus(400);
+            order.setDeliveryPhone(orderReq.getDeliveryPhone());
+            order.setUpdateTime(new Date());
+            User user = (User) session.getAttribute(sessionUser);
+            order.setUpdateUserId(user.getId());
+            order.setUpdateUserName(user.getUserName());
+            order = orderService.update(order);
+            if (Objects.isNull(order)) {
+                log.debug("返回结果：{}", Msg.TEXT_ORDER_DELIVER_SKU_FAIL);
+                return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_DELIVER_SKU_FAIL);
+            }
+            OrderResp orderResp = BeanMapper.map(order, OrderResp.class);
+            orderResps.add(orderResp);
+        }
+        System.out.println(orderResps);
+        log.debug("返回结果：{}", orderResps);
+        //此处返回一个订单返回类的list
+        return Result.buildUpdateOk(orderResps);
+    }
     /**
      * 退货(不扣绩效)
      */

@@ -1,6 +1,7 @@
 package com.jingliang.mall.entity;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -18,6 +19,7 @@ import java.util.Date;
 @Entity
 @Table(name = "tb_user")
 @Data
+@Accessors(chain = true)
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
