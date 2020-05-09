@@ -328,7 +328,7 @@ public class OrderController {
             order.setDeliverFee((long) (Double.parseDouble(config.getConfigValues()) * 100));
             order.setPayableFee((order.getPayableFee() + (long) (Double.parseDouble(config.getConfigValues()) * 100)));
         }
-        /*//微信支付
+        //微信支付
         if (Objects.equals(order.getPayWay(), 100)) {
             if (!order.getPayableFee().equals(0L)) {
                 //调起微信预支付
@@ -343,7 +343,7 @@ public class OrderController {
                     return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_FAIL);
                 }
             }
-        }*/
+        }
         if (order.getPayableFee().equals(0L)) {
             order.setOrderStatus(300);
         }
