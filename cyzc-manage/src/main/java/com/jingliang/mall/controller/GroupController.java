@@ -95,7 +95,7 @@ public class GroupController {
         Group fartherGroup = groupService.findFartherGroup(groupReq.getParentGroupId());
         //判断父组节点是否为true,若不是，修改为false
         if (fartherGroup != null && !fartherGroup.getChild()) {
-            fartherGroup.setChild(true);
+            fartherGroup.setChild(false);
             //更新father节点
             groupService.save(fartherGroup);
         }
