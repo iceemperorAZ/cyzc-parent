@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -61,11 +62,14 @@ public class OrderController {
     private final ConfigService configService;
     private final GoldLogService goldLogService;
     private final UserService userService;
+    private final BuyerAddressService buyerAddressService;
+    private final RegionService regionService;
 
     public OrderController(RedisTemplate<String, Object> redisTemplate, OrderService orderService,
                            ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService,
                            BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer,
-                           ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService, UserService userService) {
+                           ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService, UserService userService,
+                           BuyerAddressService buyerAddressService,RegionService regionService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
@@ -77,6 +81,8 @@ public class OrderController {
         this.buyerCouponLimitService = buyerCouponLimitService;
         this.goldLogService = goldLogService;
         this.userService = userService;
+        this.buyerAddressService = buyerAddressService;
+        this.regionService = regionService;
     }
 
 
@@ -92,6 +98,7 @@ public class OrderController {
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         MUtils.addDateAndBuyer(orderReq, buyer);
+
         Order order = BeanMapper.map(orderReq, Order.class);
         assert order != null;
         order.setPayableFee(0L);
@@ -321,7 +328,7 @@ public class OrderController {
             order.setDeliverFee((long) (Double.parseDouble(config.getConfigValues()) * 100));
             order.setPayableFee((order.getPayableFee() + (long) (Double.parseDouble(config.getConfigValues()) * 100)));
         }
-        //微信支付
+        /*//微信支付
         if (Objects.equals(order.getPayWay(), 100)) {
             if (!order.getPayableFee().equals(0L)) {
                 //调起微信预支付
@@ -336,7 +343,7 @@ public class OrderController {
                     return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_FAIL);
                 }
             }
-        }
+        }*/
         if (order.getPayableFee().equals(0L)) {
             order.setOrderStatus(300);
         }
@@ -369,7 +376,23 @@ public class OrderController {
         order.setSaleUserId(buyer.getSaleUserId());
         //当前提成
         order.setRatio(saleUser.getRatio());
-
+        //创建购买者地址类，寻找购买者的所有地址
+        BuyerAddress buyerAddress = new BuyerAddress();
+        //根据购买者id寻找地址
+        buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(buyer.getId());
+        //根据购买者地址，往订单中存入相应的地址数据
+        order.setDetailAddressProvince(buyerAddress.getProvinceCode());
+        order.setDetailAddressCity(buyerAddress.getCityCode());
+        order.setDetailAddressArea(buyerAddress.getAreaCode());
+        order.setDetailAddressStreet(buyerAddress.getStreetCode());
+        String DetailAddress = regionService.findByCode(buyerAddress.getProvinceCode())
+                .concat("/")
+                .concat(regionService.findByCode(buyerAddress.getCityCode()))
+                .concat("/")
+                .concat(regionService.findByCode(buyerAddress.getAreaCode()))
+                .concat("/")
+                .concat(regionService.findByCode(buyerAddress.getStreetCode()));
+        order.setDetailAddress(DetailAddress);
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {
@@ -383,7 +406,6 @@ public class OrderController {
         log.debug("返回结果：{}", orderResp);
         return Result.buildSaveOk(resultMap);
     }
-
     /**
      * 取消订单
      */

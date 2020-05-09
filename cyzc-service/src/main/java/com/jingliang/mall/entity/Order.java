@@ -52,6 +52,30 @@ public class Order implements Serializable {
     private Long buyerId;
 
     /**
+     * 收货地址：省
+     */
+    @Column(name = "detail_address_province")
+    private String detailAddressProvince;
+
+    /**
+     * 收货地址：市
+     */
+    @Column(name = "detail_address_city")
+    private String detailAddressCity;
+
+    /**
+     * 收货地址：区
+     */
+    @Column(name = "detail_address_area")
+    private String detailAddressArea;
+
+    /**
+     * 收货地址：街道
+     */
+    @Column(name = "detail_address_street")
+    private String detailAddressStreet;
+
+    /**
      * 收货详细地址信息
      */
     @Column(name = "detail_address")

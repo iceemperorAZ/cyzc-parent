@@ -76,6 +76,18 @@ public class BuyerAddressResp implements Serializable {
     @ApiModelProperty(value = "区/县信息")
     private RegionResp area;
 
+	/**
+	 * 街道编码：0-99999
+	 */
+	@ApiModelProperty(value = "街道编码：0-99999")
+	private String streetCode;
+
+	/**
+	 * 街道信息
+	 */
+	@ApiModelProperty(value = "街道信息")
+	private String street;
+
     /**
      * 详细地址
      */

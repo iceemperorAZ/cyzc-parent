@@ -21,4 +21,5 @@ public interface RegionService {
      */
     List<Region> findByParentCode(String parentCode);
 
+    String findByCode(String provinceCode);
 }

@@ -27,4 +27,5 @@ public interface RegionRepository extends BaseRepository<Region, Long> {
      */
     Region findRegionByIdAndIsAvailable(Long regionId,Boolean isAvailable);
 
+    Region findRegionByCodeAndIsAvailable(String code, boolean b);
 }

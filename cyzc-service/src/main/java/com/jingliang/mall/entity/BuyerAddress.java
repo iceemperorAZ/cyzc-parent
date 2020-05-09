@@ -69,11 +69,24 @@ public class BuyerAddress implements Serializable {
     private String areaCode;
 
     /**
-     * 市信息
+     * 区/县信息
      */
     @OneToOne(targetEntity = Region.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "area_code", referencedColumnName = "code", insertable = false, updatable = false)
     private Region area;
+
+	/**
+	 * 街道编码：0-99999
+	 */
+	@Column(name = "street_code")
+	private String streetCode;
+
+	/**
+	 * 街道信息
+	 */
+	@OneToOne(targetEntity = Region.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@JoinColumn(name = "street_code", referencedColumnName = "code", insertable = false, updatable = false)
+	private Region street;
 
     /**
      * 详细地址

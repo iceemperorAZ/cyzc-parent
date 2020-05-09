@@ -58,6 +58,30 @@ public class OrderResp implements Serializable {
     private Long buyerId;
 
     /**
+     * 收获地址：省
+     */
+    @ApiModelProperty(value = "收获地址：省")
+    private String detailAddressProvince;
+
+    /**
+     * 收获地址：市
+     */
+    @ApiModelProperty(value = "收获地址：市")
+    private String detailAddressCity;
+
+    /**
+     * 收获地址：区
+     */
+    @ApiModelProperty(value = "收获地址：区")
+    private String detailAddressArea;
+
+    /**
+     * 收获地址：街道
+     */
+    @ApiModelProperty(value = "收获地址：街道")
+    private String detailAddressStreet;
+
+    /**
      * 收货详细地址信息
      */
     @ApiModelProperty(value = "收货详细地址信息")
