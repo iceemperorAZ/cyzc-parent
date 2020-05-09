@@ -307,7 +307,7 @@ public class OrderController {
             XSSFRow row = sheet.createRow(rowNum);
             //"单据日期", "单据编号", "客户编号", "客户名称", "销售人员"
             //            , "优惠金额", "客户承担费用", "本次收款", "结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
-            //            "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库", "备注"
+            //            "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库","收货地址", "收货人","电话","备注"
             //单据日期
             int celNum = 0;
             Date createTime = order.getCreateTime();
@@ -353,6 +353,7 @@ public class OrderController {
                 ++celNum;
             }
             List<OrderDetail> orderDetails = orderDetailService.findByOrderId(order.getId());
+            boolean flag = false;
             for (OrderDetail orderDetail : orderDetails) {
                 int productCelNum = celNum;
                 //商品编号
@@ -387,11 +388,24 @@ public class OrderController {
                 //仓库
                 String storehouse = order.getStorehouse();
                 row.createCell(++productCelNum).setCellValue(storehouse);
-                //备注（放收货地址 + 收货人 + 电话）
-                row.createCell(++productCelNum).setCellValue(order.getDetailAddress() + " " + order.getReceiverName() + " " + order.getReceiverPhone());
+                //重复地址只写入一次
+                if (!flag) {
+                    //备注（收货地址
+                    String detailAddress = order.getDetailAddress();
+                    row.createCell(++productCelNum).setCellValue(detailAddress);
+                    //收货人
+                    String receiverName = order.getReceiverName();
+                    row.createCell(++productCelNum).setCellValue(receiverName);
+                    //电话
+                    String receiverPhone = order.getReceiverPhone();
+                    row.createCell(++productCelNum).setCellValue(receiverPhone);
+                    flag = true;
+                }
+                //创建一行
                 row = sheet.createRow(++rowNum);
             }
         }
+
         ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
         orderWorkbook.write(arrayOutputStream);
         String newName = URLEncoder.encode("销货单明细-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ".xlsx", "utf-8")
