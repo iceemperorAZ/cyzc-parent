@@ -387,11 +387,11 @@ public class OrderController {
         order.setDetailAddressStreet(buyerAddress.getStreetCode());
         String DetailAddress = regionService.findByCode(buyerAddress.getProvinceCode())
                 .concat("/")
-                .concat(regionService.findByCode(buyerAddress.getCityCode()))
+                .concat(buyerAddress.getCityCode())
                 .concat("/")
-                .concat(regionService.findByCode(buyerAddress.getAreaCode()))
+                .concat(buyerAddress.getAreaCode())
                 .concat("/")
-                .concat(regionService.findByCode(buyerAddress.getStreetCode()));
+                .concat(StringUtils.isNotBlank(buyerAddress.getStreetCode())?buyerAddress.getStreetCode():"");
         order.setDetailAddress(DetailAddress);
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
