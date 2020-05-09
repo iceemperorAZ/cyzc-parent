@@ -183,6 +183,7 @@ public class UserController {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             userReq.setPassword(passwordEncoder.encode(userReq.getLoginName()));
             userReq.setIsInitPassword(true);
+            userReq.setGroupNo("-1");
         }
         UserResp userResp = BeanMapper.map(userService.save(BeanMapper.map(userReq, User.class)), UserResp.class);
         log.debug("返回结果：{}", userResp);

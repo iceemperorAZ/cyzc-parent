@@ -15,10 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -193,6 +190,67 @@ public class WechatManageServiceImpl implements WechatManageService {
             confluence.setProfit(confluence.getProfit() - deductionSecondConfluenceDetail.getProfit());
         }
         return confluence;
+    }
+
+    @Override
+    public List<Map<String, Object>> bossONeGroupAchievement(String groupNO, Date startTime, Date endTime) {
+        return orderRepository.bossONeGroupAchievement(groupNO, startTime, endTime);
+    }
+
+
+    @Override
+    public List<Map<String, Object>> bossGroupAchievement(Long parentGroupId, Date startTime, Date endTime) {
+        return orderRepository.bossGroupAchievement(parentGroupId, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> bossGroupUserAchievement(String groupNo, Date startTime, Date endTime) {
+        return orderRepository.bossGroupUserAchievement(groupNo, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> bossUserBuyerAchievement(String groupNo, Long saleUserId, Date startTime, Date endTime) {
+        return orderRepository.bossUserBuyerAchievement(groupNo, saleUserId, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> bossSelfBuyerAchievement(Long saleUserId, Date startTime, Date endTime) {
+        return orderRepository.bossSelfBuyerAchievement(saleUserId, startTime, endTime);
+    }
+
+    @Override
+    public Map<String, Object> bossSelfAchievement(Long saleUserId, Date startTime, Date endTime) {
+        return orderRepository.bossSelfAchievement(saleUserId, startTime, endTime);
+    }
+
+    @Override
+    public Map<String, Object> bossUserAchievement(String groupNo, Long saleUserId, Date startTime, Date endTime) {
+        return orderRepository.bossUserAchievement(groupNo, saleUserId, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> bossSelfBuyerOrderAchievement(Long saleUserId, Long buyerId, Date startTime, Date endTime) {
+        return orderRepository.bossSelfBuyerOrderAchievement(saleUserId, buyerId, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> bossUserBuyerOrderAchievement(String groupNo, Long buyerId, Date startTime, Date endTime) {
+        return orderRepository.bossUserBuyerOrderAchievement(groupNo, buyerId, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> bossBuyerOrderDetailAchievement(Long orderId, Date startTime, Date endTime) {
+        return orderRepository.bossBuyerOrderDetailAchievement(orderId, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> bossGroupProductTypeAchievement(String groupNo, Date startTime, Date endTime) {
+        return orderRepository.bossGroupProductTypeAchievement(groupNo, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> bossGroupProductAchievement(String groupNo, Date startTime, Date endTime) {
+        return orderRepository.bossGroupProductAchievement(groupNo, startTime, endTime);
     }
 
     public ConfluenceDetail doBuyerPerformanceSummary(Buyer buyer, User user, Date startTime, Date endTime) {

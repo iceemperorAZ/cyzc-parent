@@ -1,7 +1,6 @@
 package com.jingliang.mall.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jingliang.mall.bean.Confluence;
 import com.jingliang.mall.bean.ConfluenceDetail;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
@@ -10,7 +9,6 @@ import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.req.UserReq;
 import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.resp.ConfluenceDetailResp;
-import com.jingliang.mall.resp.ConfluenceResp;
 import com.jingliang.mall.resp.UserResp;
 import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
@@ -32,6 +30,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -59,10 +58,11 @@ public class WechatManageController {
     private final BuyerAddressService buyerAddressService;
     private final ManagerSaleService managerSaleService;
     private final BuyerSaleService buyerSaleService;
+    private final GroupService groupService;
 
 
     public WechatManageController(UserService userService, BuyerService buyerService, OrderService orderService,
-                                  OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerAddressService buyerAddressService, ManagerSaleService managerSaleService, BuyerSaleService buyerSaleService) {
+                                  OrderDetailService orderDetailService, WechatManageService wechatManageService, BuyerAddressService buyerAddressService, ManagerSaleService managerSaleService, BuyerSaleService buyerSaleService, GroupService groupService) {
         this.userService = userService;
         this.buyerService = buyerService;
         this.orderService = orderService;
@@ -71,75 +71,288 @@ public class WechatManageController {
         this.buyerAddressService = buyerAddressService;
         this.managerSaleService = managerSaleService;
         this.buyerSaleService = buyerSaleService;
+        this.groupService = groupService;
     }
 
     /**
-     * 查询汇总信息
+     * 根据父分组分组统计组下业绩
      */
-    @GetMapping("/boss/confluence")
-    @ApiOperation(value = "查询汇总信息（老板身份）")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "开始时间", name = "startTime", dataType = "date", paramType = "query", required = true),
-            @ApiImplicitParam(value = "结束时间", name = "endTime", dataType = "date", paramType = "query", required = true),
-    })
-    public Result<ConfluenceResp> bossConfluence(@ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8") Date startTime,
-                                                 @ApiIgnore @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-                                                 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8") Date endTime) {
-        Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
-            List<Predicate> predicateList = new ArrayList<>();
-            predicateList.add(cb.between(root.get("orderStatus"), 300, 700));
-            predicateList.add(cb.between(root.get("createTime"), startTime, endTime));
-            predicateList.add(cb.equal(root.get("isAvailable"), true));
-            query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            return query.getRestriction();
-        };
-        List<Order> orders = orderService.findAll(orderSpecification);
-        Confluence confluence = new Confluence();
-        confluence.setTotalPrice(0L);
-        confluence.setRoyalty(0L);
-        confluence.setProfit(0L);
-        for (Order order : orders) {
-            //收益
-            long totalPrice = order.getPayableFee() - order.getPreferentialFee();
-            //提成
-            long royalty = (long) (order.getTotalPrice() * order.getRatio() * 0.001);
-            //净利
-            long profit = totalPrice - royalty;
-            confluence.setTotalPrice(confluence.getTotalPrice() + totalPrice);
-            confluence.setRoyalty(confluence.getRoyalty() + royalty);
-            confluence.setProfit(confluence.getProfit() + profit);
+    @GetMapping("/boss/group/achievement")
+    @ApiOperation(value = "根据父分组分组统计组下业绩")
+    public Result<List<Map<String, Object>>> bossGroupAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                  String parentGroupNo,
+                                                                  HttpSession session) {
+        //1.判断是否是管理员
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
         }
-        ConfluenceResp confluenceResp = BeanMapper.map(confluence, ConfluenceResp.class);
-        return Result.buildQueryOk(confluenceResp);
+        //2.如果未传父分组编号，则查询自己组的业绩
+        if (StringUtils.isBlank(parentGroupNo)) {
+            List<Map<String, Object>> achievements = wechatManageService.bossONeGroupAchievement(user.getGroupNo(), startTime, endTime);
+            return Result.buildQueryOk(achievements);
+        }
+        //return Result.buildQueryOk(achievements);
+        //3.如果传父分组编号，判断查看的是否是自己的子分组
+        Group group = groupService.findByGroupNo(parentGroupNo);
+        if (!parentGroupNo.startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //3.分组统计子分组的绩效
+        List<Map<String, Object>> achievements = wechatManageService.bossGroupAchievement(group.getId(), startTime, endTime);
+        return Result.buildQueryOk(achievements);
     }
 
     /**
-     * 查询所有销售（领导身份）
+     * 分组统计分组及子分组下的销售（销售、区域经理、老板）业绩
      */
-    @GetMapping("/boss/user/all")
-    @ApiOperation(value = "查询所有销售（老板身份）")
+    @GetMapping("/boss/group/user/achievement")
+    @ApiOperation(value = "分组统计分组及子分组下的销售（销售、区域经理、老板）业绩")
     @ApiImplicitParams({
             @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
             @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
     })
-    public Result<List<ConfluenceDetailResp>> bossPageAllUser(@ApiIgnore UserReq userReq) {
-        log.debug("请求参数：{}", userReq);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(userReq.getCreateTimeEnd());
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        List<User> userPage = userService.findAll();
-        //计算
-        List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
-        userPage.forEach(user -> {
-            ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(user, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
-            confluenceDetails.add(confluenceDetail);
+    public Result<List<Map<String, Object>>> bossGroupUserAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                      String groupNo, HttpSession session) {
+
+        if (StringUtils.isBlank(groupNo)) {
+            return Result.buildQueryOk(new ArrayList<>());
+        }
+        //1.判断是否是管理员
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //2.判断查看的是否是自己的分组或自己的子分组
+        Group group = groupService.findByGroupNo(groupNo);
+        if (!groupNo.startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //3.查询组下及子组下的销售
+        List<Map<String, Object>> achievements = wechatManageService.bossGroupUserAchievement(group.getGroupNo().replaceAll("0*$", "") + "%", startTime, endTime);
+        //4.处理不是本组直接管理的销售
+        achievements = achievements.stream().map((Function<Map<String, Object>, Map<String, Object>>) HashMap::new).collect(Collectors.toList());
+
+        achievements.forEach(map -> {
+            if (groupNo.equals(map.get("groupNo"))) {
+                map.put("direct", true);
+            } else {
+                map.put("direct", false);
+            }
         });
-        List<ConfluenceDetailResp> confluenceDetailResps = BeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
-        confluenceDetailResps = confluenceDetailResps.stream().sorted(Comparator.comparing(ConfluenceDetailResp::getTotalPrice).reversed()).collect(Collectors.toList());
-        log.debug("返回结果：{}", confluenceDetailResps);
-        return Result.buildQueryOk(confluenceDetailResps);
+        return Result.buildQueryOk(achievements);
     }
+
+    /**
+     * 统计指定销售下商户的所产生的总绩效
+     */
+    @GetMapping("/boss/user/achievement")
+    @ApiOperation(value = "统计指定销售下商户的所产生的总绩效")
+    public Result<Map<String, Object>> bossUserAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                           Long saleUserId, HttpSession session) {
+        //当前操作人
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        //要查询的销售员
+        User saleUser = userService.findById(saleUserId);
+        //1.判断是否查询的是自己的商户
+        if (user.getId().equals(saleUserId)) {
+            //1.1.查询销售自己所有商户产生的总绩效
+            Map<String, Object> achievement = wechatManageService.bossSelfAchievement(saleUserId, startTime, endTime);
+            achievement = new HashMap<>(achievement);
+            achievement.put("userName", saleUser.getUserName());
+            return Result.buildQueryOk(achievement);
+        }
+        //1.2.不是查询的是自己的商户，判断要查询的销售是否是自己分组下的人
+        if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+        }
+        //1.3.查询指定销售在自己组下所有商户产生的总绩效
+        Map<String, Object> achievement = wechatManageService.bossUserAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", saleUserId, startTime, endTime);
+        achievement = new HashMap<>(achievement);
+        achievement.put("userName", saleUser.getUserName());
+        return Result.buildQueryOk(achievement);
+    }
+
+
+    /**
+     * 统计指定销售下商户的所产生的绩效
+     */
+    @GetMapping("/boss/user/buyer/achievement")
+    @ApiOperation(value = "统计指定销售下商户的所产生的绩效")
+    public Result<List<Map<String, Object>>> bossUserBuyerAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                      Long saleUserId, HttpSession session) {
+        //当前操作人
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        //要查询的销售员
+        User saleUser = userService.findById(saleUserId);
+        //1.判断是否查询的是自己的商户
+        if (user.getId().equals(saleUserId)) {
+            //1.1.查询销售自己所有商户产生的绩效
+            List<Map<String, Object>> achievements = wechatManageService.bossSelfBuyerAchievement(saleUserId, startTime, endTime);
+            return Result.buildQueryOk(achievements);
+        }
+        //1.2.不是查询的是自己的商户，判断要查询的销售是否是自己分组下的人
+        if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+        }
+        //1.3.查询指定销售在自己组下所有商户产生的绩效
+        List<Map<String, Object>> achievements = wechatManageService.bossUserBuyerAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", saleUserId, startTime, endTime);
+        return Result.buildQueryOk(achievements);
+    }
+
+
+    /**
+     * 统计指定商户下所有的订单产生的绩效
+     */
+    @GetMapping("/boss/buyer/order/achievement")
+    @ApiOperation(value = "统计指定商户下所有的订单产生的绩效")
+    public Result<List<Map<String, Object>>> bossBuyerOrderAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                       Long buyerId, HttpSession session) {
+        //当前操作人
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        //要查询的销售员
+        Buyer buyer = buyerService.findById(buyerId);
+        Long saleUserId = buyer.getSaleUserId();
+        if (saleUserId == null) {
+            return Result.build(Msg.FAIL, "无查看此商户信息权限");
+        }
+        User saleUser = userService.findById(saleUserId);
+        if (saleUser == null) {
+            return Result.build(Msg.FAIL, "无查看此商户信息权限");
+        }
+        //1.判断是否查询的是自己的商户
+        if (user.getId().equals(saleUserId)) {
+            //1.1.查询销售自己的商户所有订单产生的绩效
+            List<Map<String, Object>> achievements = wechatManageService.bossSelfBuyerOrderAchievement(saleUserId, buyer.getId(), startTime, endTime);
+            return Result.buildQueryOk(achievements);
+        }
+        //1.2.不是查询的是自己的商户，判断要查询的销售是否是自己分组下的人
+        if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+        }
+        //1.3.查询指定销售在自己组下的商户所有订单产生的绩效
+        List<Map<String, Object>> achievements = wechatManageService.bossUserBuyerOrderAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", buyer.getId(), startTime, endTime);
+        return Result.buildQueryOk(achievements);
+    }
+
+
+    /**
+     * 统计指定商户下的订单的详情产生的绩效
+     */
+    @GetMapping("/boss/buyer/order/detail/achievement")
+    @ApiOperation(value = "统计指定商户下所有的订单产生的绩效")
+    public Result<List<Map<String, Object>>> bossBuyerOrderDetailAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                             Long orderId, HttpSession session) {
+        //当前操作人
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        //要查询的销售员
+        Order order = orderService.findById(orderId);
+        Long saleUserId = order.getSaleUserId();
+        if (saleUserId == null) {
+            return Result.build(Msg.FAIL, "无查看此商户信息权限");
+        }
+        //1.判断是否查询的是自己的或自己组下的商户订单详情
+        if ((user.getId().equals(saleUserId)) || !order.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+            //1.1.查询订单详情产生的绩效
+            List<Map<String, Object>> achievements = wechatManageService.bossBuyerOrderDetailAchievement(orderId ,startTime, endTime);
+            return Result.buildQueryOk(achievements);
+        }
+        return Result.build(Msg.FAIL, "无查看此销售信息权限");
+    }
+
+    /**
+     * 查询分组统计各个组下的商品大类所产生的绩效
+     */
+    @GetMapping("/boss/group/product/type/achievement")
+    @ApiOperation(value = "查询分组统计各个组下的商品大类所产生的绩效")
+    public Result<List<Map<String, Object>>> bossGroupProductTypeAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                             String groupNo, HttpSession session) {
+        if (StringUtils.isBlank(groupNo)) {
+            return Result.buildQueryOk(new ArrayList<>());
+        }
+        //1.判断是否是管理员
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //2.判断查看的是否是自己的分组或自己的子分组
+        Group group = groupService.findByGroupNo(groupNo);
+        if (!groupNo.startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //3.查询组下及子组下的销售
+        List<Map<String, Object>> achievements = wechatManageService.bossGroupProductTypeAchievement(group.getGroupNo().replaceAll("0*$", "") + "%", startTime, endTime);
+        return Result.buildQueryOk(achievements);
+    }
+
+    /**
+     * 查询分组统计各个组下的商品所产生的绩效
+     */
+    @GetMapping("/boss/group/product/achievement")
+    @ApiOperation(value = "查询分组统计各个组下的商品所产生的绩效")
+    public Result<List<Map<String, Object>>> bossGroupProductAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                             String groupNo, HttpSession session) {
+        if (StringUtils.isBlank(groupNo)) {
+            return Result.buildQueryOk(new ArrayList<>());
+        }
+        //1.判断是否是管理员
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //2.判断查看的是否是自己的分组或自己的子分组
+        Group group = groupService.findByGroupNo(groupNo);
+        if (!groupNo.startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //3.查询组下及子组下的销售
+        List<Map<String, Object>> achievements = wechatManageService.bossGroupProductAchievement(group.getGroupNo().replaceAll("0*$", "") + "%", startTime, endTime);
+        return Result.buildQueryOk(achievements);
+    }
+
+
+//    /**
+//     * 查询所有销售（领导身份）
+//     */
+//    @GetMapping("/boss/user/all")
+//    @ApiOperation(value = "查询所有销售（老板身份）")
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
+//            @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
+//    })
+//    public Result<List<ConfluenceDetailResp>> bossPageAllUser(@ApiIgnore UserReq userReq) {
+//        log.debug("请求参数：{}", userReq);
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(userReq.getCreateTimeEnd());
+//        calendar.add(Calendar.DAY_OF_MONTH, 1);
+//        List<User> userPage = userService.findAll();
+//        //计算
+//        List<ConfluenceDetail> confluenceDetails = new ArrayList<>();
+//        userPage.forEach(user -> {
+//            ConfluenceDetail confluenceDetail = wechatManageService.userPerformanceSummary(user, userReq.getCreateTimeStart(), userReq.getCreateTimeEnd());
+//            confluenceDetails.add(confluenceDetail);
+//        });
+//        List<ConfluenceDetailResp> confluenceDetailResps = BeanMapper.mapList(confluenceDetails, ConfluenceDetailResp.class);
+//        confluenceDetailResps = confluenceDetailResps.stream().sorted(Comparator.comparing(ConfluenceDetailResp::getTotalPrice).reversed()).collect(Collectors.toList());
+//        log.debug("返回结果：{}", confluenceDetailResps);
+//        return Result.buildQueryOk(confluenceDetailResps);
+//    }
 
     /**
      * 查询指定销售员绩效（领导/区域经理）
@@ -199,7 +412,8 @@ public class WechatManageController {
             @ApiImplicitParam(value = "分页", name = "page", dataType = "int", paramType = "query", defaultValue = "1"),
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
-    public Result<MallPage<ConfluenceDetailResp>> userBuyer(@ApiIgnore UserReq userReq, @ApiIgnore HttpSession session) {
+    public Result<MallPage<ConfluenceDetailResp>> userBuyer(@ApiIgnore UserReq userReq, @ApiIgnore HttpSession
+            session) {
         log.debug("请求参数：{}", userReq);
         User user = (User) session.getAttribute(sessionUser);
         PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
@@ -351,7 +565,8 @@ public class WechatManageController {
             @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
             @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
     })
-    public Result<List<ConfluenceDetailResp>> userProducts(@ApiIgnore UserReq userReq, @ApiIgnore HttpSession session) {
+    public Result<List<ConfluenceDetailResp>> userProducts(@ApiIgnore UserReq userReq, @ApiIgnore HttpSession
+            session) {
         log.debug("请求参数：{}", userReq);
         User user = (User) session.getAttribute(sessionUser);
         Calendar calendar = Calendar.getInstance();
@@ -417,7 +632,8 @@ public class WechatManageController {
             @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
             @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
     })
-    public Result<MallPage<ConfluenceDetailResp>> userBuyerOrdersr(@ApiIgnore BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+    public Result<MallPage<ConfluenceDetailResp>> userBuyerOrdersr(@ApiIgnore BuyerReq
+                                                                           buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         User user = (User) session.getAttribute(sessionUser);
         PageRequest pageRequest = PageRequest.of(buyerReq.getPage(), buyerReq.getPageSize());
@@ -480,7 +696,8 @@ public class WechatManageController {
     @ApiImplicitParams({
             @ApiImplicitParam(value = "商户Id", name = "id", dataType = "long", paramType = "query", required = true),
     })
-    public Result<List<ConfluenceDetailResp>> userBuyerOrderDetail(@ApiIgnore OrderReq orderReq, @ApiIgnore HttpSession session) {
+    public Result<List<ConfluenceDetailResp>> userBuyerOrderDetail(@ApiIgnore OrderReq
+                                                                           orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
         User user = (User) session.getAttribute(sessionUser);
         List<OrderDetail> orderDetails = orderDetailService.findByOrderId(orderReq.getId());
@@ -599,7 +816,8 @@ public class WechatManageController {
     @GetMapping("/manager/sales")
     @ApiOperation(value = "查看区域经理下的所有销售")
     public Result<List<UserResp>> managersSales(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date
+                                                        creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id, HttpSession session) {
         Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
@@ -643,7 +861,8 @@ public class WechatManageController {
             @ApiImplicitParam(value = "每页条数", name = "pageSize", dataType = "int", paramType = "query", defaultValue = "10")
     })
     public Result<List<BuyerResp>> salePageBuyer(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                 @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date
+                                                         creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                  @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, Long id) {
         Specification<BuyerSale> buyerSaleSpecification = (Specification<BuyerSale>) (root, query, cb) -> {
             List<Predicate> andPredicateList = new ArrayList<>();
@@ -689,7 +908,8 @@ public class WechatManageController {
     @GetMapping("/manager/volume")
     @ApiOperation(value = "区域经理查看自己的销量")
     public Result<List<ConfluenceDetailResp>> managersVolume(@DateTimeFormat(pattern = "yyyy-MM-dd")
-                                                             @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
+                                                             @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date
+                                                                     creationTime, @DateTimeFormat(pattern = "yyyy-MM-dd")
                                                              @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8") Date endTime, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Specification<ManagerSale> managerSaleSpecification = (Specification<ManagerSale>) (root, query, cb) -> {
