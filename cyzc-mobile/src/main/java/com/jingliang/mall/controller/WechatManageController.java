@@ -236,7 +236,7 @@ public class WechatManageController {
             List<Map<String, Object>> achievements = wechatManageService.bossSelfBuyerOrderAchievement(saleUserId, buyer.getId(), startTime, endTime);
             return Result.buildQueryOk(achievements);
         }
-        //1.2.不是查询的是自己的商户，判断要查询的销售是否是自己分组下的人
+        //1.2.不是查询自己的商户，判断要查询的销售是否是自己分组下的人
         if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
             return Result.build(Msg.FAIL, "无查看此销售信息权限");
         }
@@ -261,10 +261,10 @@ public class WechatManageController {
         Order order = orderService.findById(orderId);
         Long saleUserId = order.getSaleUserId();
         if (saleUserId == null) {
-            return Result.build(Msg.FAIL, "无查看此商户信息权限");
+            return Result.build(Msg.FAIL, "无查看此商户订单详情的权限");
         }
         //1.判断是否查询的是自己的或自己组下的商户订单详情
-        if ((user.getId().equals(saleUserId)) || !order.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
+        if ((user.getId().equals(saleUserId)) || order.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
             //1.1.查询订单详情产生的绩效
             List<Map<String, Object>> achievements = wechatManageService.bossBuyerOrderDetailAchievement(orderId ,startTime, endTime);
             return Result.buildQueryOk(achievements);
