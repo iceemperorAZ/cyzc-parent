@@ -194,7 +194,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
             "0 AS preferentialFee," +
             "FORMAT( SUM(IFNULL(  o_d.selling_price * o_d.product_num * o.ratio * 0.001 , 0 )) * 0.01  ,2)  AS royaltyPrice \n" +
             "FROM tb_order_detail AS o_d  JOIN tb_order o ON o_d.order_id = o.id JOIN tb_group g ON o.group_no LIKE :groupNo JOIN tb_product p ON o_d.product_id = p.id JOIN tb_product_type p_t ON p.product_type_id = p_t.id " +
-            "WHERE o.order_status BETWEEN 300 AND 700 AND o.create_time BETWEEN  :startTime AND :endTime AND o.is_available = 1 AND o_d.is_available = 1 AND  p.is_available = 1 AND p_t.is_available = 1 GROUP BY p_t.product_type_name;\n", nativeQuery = true)
+            "WHERE o.order_status BETWEEN 300 AND 700 AND o.create_time BETWEEN  :startTime AND :endTime AND o.is_available = 1 AND o_d.is_available = 1 AND  p.is_available = 1 AND p_t.is_available = 1 GROUP BY p_t.product_type_name ORDER BY FORMAT( SUM( IFNULL(  o_d.selling_price * o_d.product_num, 0 )) * 0.01 ,2) DESC\n", nativeQuery = true)
     List<Map<String, Object>> bossGroupProductTypeAchievement(String groupNo, Date startTime, Date endTime);
 
     /**
@@ -207,6 +207,6 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      */
     @Query(value = "SELECT  p.product_name AS productName, FORMAT( SUM( IFNULL(  o_d.selling_price * o_d.product_num, 0 )) * 0.01,2) AS totalPrice, FORMAT( SUM( IFNULL(  o_d.selling_price * o_d.product_num, 0 )) * 0.01 ,2) AS payableFee, 0 AS preferentialFee, FORMAT( SUM(IFNULL(  o_d.selling_price * o_d.product_num * o.ratio * 0.001 , 0 )) * 0.01  ,2)  AS royaltyPrice \n" +
             "FROM tb_order_detail AS o_d  JOIN tb_order o ON o_d.order_id = o.id JOIN tb_group g ON o.group_no LIKE :groupNo  JOIN tb_product p ON o_d.product_id = p.id  " +
-            "WHERE o.order_status BETWEEN 300 AND 700 AND o.create_time BETWEEN :startTime AND :endTime AND  o.is_available = 1 AND o_d.is_available = 1 AND  p.is_available = 1 GROUP BY p.product_name", nativeQuery = true)
+            "WHERE o.order_status BETWEEN 300 AND 700 AND o.create_time BETWEEN :startTime AND :endTime AND  o.is_available = 1 AND o_d.is_available = 1 AND  p.is_available = 1 GROUP BY p.product_name ORDER BY FORMAT( SUM( IFNULL(  o_d.selling_price * o_d.product_num, 0 )) * 0.01 ,2) DESC", nativeQuery = true)
     List<Map<String, Object>> bossGroupProductAchievement(String groupNo, Date startTime, Date endTime);
 }
