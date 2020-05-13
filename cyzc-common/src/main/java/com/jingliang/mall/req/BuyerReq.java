@@ -296,4 +296,16 @@ public class BuyerReq extends BaseReq implements Serializable {
     @ApiModelProperty(value = "详细地址")
     private String detailedAddress;
 
+    /**
+     * 经度
+     */
+    @ApiModelProperty(value = "经度")
+    private String latitude;
+
+    /**
+     * 纬度
+     */
+    @ApiModelProperty(value = "纬度")
+    private String longitude;
+
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * 会员收货地址表
- * 
+ *
  * @author Zhenfeng Li
  * @version 1.0.0
  * @date 2019-10-23 16:51:26
@@ -19,28 +19,28 @@ import java.util.Date;
 @Data
 public class BuyerAddress implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * 主键
-	 */
-	@Column(name = "id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY, generator = "idGenerator")
-	@GenericGenerator(name = "idGenerator", strategy = "com.jingliang.mall.common.IdGenerator")
-	@Id
-	private Long id;
+    /**
+     * 主键
+     */
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "idGenerator")
+    @GenericGenerator(name = "idGenerator", strategy = "com.jingliang.mall.common.IdGenerator")
+    @Id
+    private Long id;
 
-	/**
-	 * 会员Id
-	 */
-	@Column(name = "buyer_id")
-	private Long buyerId;
+    /**
+     * 会员Id
+     */
+    @Column(name = "buyer_id")
+    private Long buyerId;
 
-	/**
-	 * 省编码
-	 */
-	@Column(name = "province_code")
-	private String provinceCode;
+    /**
+     * 省编码
+     */
+    @Column(name = "province_code")
+    private String provinceCode;
 
     /**
      * 省信息
@@ -75,18 +75,18 @@ public class BuyerAddress implements Serializable {
     @JoinColumn(name = "area_code", referencedColumnName = "code", insertable = false, updatable = false)
     private Region area;
 
-	/**
-	 * 街道编码：0-99999
-	 */
-	@Column(name = "street_code")
-	private String streetCode;
+    /**
+     * 街道编码：0-99999
+     */
+    @Column(name = "street_code")
+    private String streetCode;
 
-	/**
-	 * 街道信息
-	 */
-	@OneToOne(targetEntity = Region.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "street_code", referencedColumnName = "code", insertable = false, updatable = false)
-	private Region street;
+    /**
+     * 街道信息
+     */
+    @OneToOne(targetEntity = Region.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "street_code", referencedColumnName = "code", insertable = false, updatable = false)
+    private Region street;
 
     /**
      * 详细地址
@@ -94,46 +94,57 @@ public class BuyerAddress implements Serializable {
     @Column(name = "detailed_address")
     private String detailedAddress;
 
-	/**
-	 * 是否默认 0：否，1：是
-	 */
-	@Column(name = "is_default")
-	private Boolean isDefault;
+    /**
+     * 是否默认 0：否，1：是
+     */
+    @Column(name = "is_default")
+    private Boolean isDefault;
 
-	/**
-	 * 是否可用 0：否，1：是
-	 */
-	@Column(name = "is_available")
-	private Boolean isAvailable;
+    /**
+     * 是否可用 0：否，1：是
+     */
+    @Column(name = "is_available")
+    private Boolean isAvailable;
 
-	/**
-	 * 创建时间
-	 */
-	@Column(name = "create_time")
-	private Date createTime;
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Date createTime;
 
-	/**
-	 * 修改时间
-	 */
-	@Column(name = "update_time")
-	private Date updateTime;
+    /**
+     * 修改时间
+     */
+    @Column(name = "update_time")
+    private Date updateTime;
 
-	/**
-	 * 收货人名称
-	 */
-	@Column(name = "consignee_name")
-	private String consigneeName;
+    /**
+     * 收货人名称
+     */
+    @Column(name = "consignee_name")
+    private String consigneeName;
 
-	/**
-	 * 收货人电话
-	 */
-	@Column(name = "phone")
-	private String phone;
+    /**
+     * 收货人电话
+     */
+    @Column(name = "phone")
+    private String phone;
 
-	/**
-	 * 邮编
-	 */
-	@Column(name = "post_code")
-	private String postCode;
+    /**
+     * 邮编
+     */
+    @Column(name = "post_code")
+    private String postCode;
 
+    /**
+     * 经度
+     */
+    @Column(name = "longitude")
+    private Double longitude;
+
+    /**
+     * 纬度
+     */
+    @Column(name = "latitude")
+    private Double latitude;
 }
