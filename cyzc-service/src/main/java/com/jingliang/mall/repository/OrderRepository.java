@@ -210,4 +210,8 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
             "FROM tb_order_detail AS o_d  JOIN tb_order o ON o_d.order_id = o.id JOIN tb_group g ON o.group_no LIKE :groupNo  JOIN tb_product p ON o_d.product_id = p.id  " +
             "WHERE o.order_status BETWEEN 300 AND 700 AND o.create_time BETWEEN :startTime AND :endTime AND  o.is_available = 1 AND o_d.is_available = 1 AND  p.is_available = 1 GROUP BY p.product_name ORDER BY SUM(o_d.product_num) DESC", nativeQuery = true)
     List<Map<String, Object>> bossGroupProductAchievement(String groupNo, Date startTime, Date endTime);
+    @Query(value = "SELECT @cdate \\:= date_add(@cdate,interval -1 day) days from   \n" +
+            "(SELECT @cdate \\:= CURDATE() from tb_order limit 10) t1  ", nativeQuery = true)
+
+    List<Map<String, Object>>  x();
 }
