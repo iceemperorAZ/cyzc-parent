@@ -46,16 +46,13 @@ public class MapController {
     public Result<AddressUserHistory> addressTolngAndlat(@RequestBody MapReq mapReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", mapReq);
         User user = (User) session.getAttribute(sessionUser);
+        if (Objects.isNull(mapReq.getLongitude()) || Objects.isNull(mapReq.getLatitude())) {
+            return Result.buildOk();
+        }
         //创建经纬度记录表
         AddressUserHistory addressUserHistory = new AddressUserHistory();
         addressUserHistory.setUserId(user.getId());
         addressUserHistory.setAddress(mapReq.getAddress());
-        if (!Objects.isNull(mapReq.getLongitude())) {
-            addressUserHistory.setLongitude(mapReq.getLongitude());
-        }
-        if (!Objects.isNull(mapReq.getLatitude())) {
-            addressUserHistory.setLatitude(mapReq.getLatitude());
-        }
         addressUserHistory.setCreateTime(new Date());
         addressUserHistory.setIsAvailable(true);
         addressUserHistory.setLevel(user.getLevel());
