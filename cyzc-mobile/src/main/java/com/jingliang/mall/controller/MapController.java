@@ -50,10 +50,10 @@ public class MapController {
         AddressUserHistory addressUserHistory = new AddressUserHistory();
         addressUserHistory.setUserId(user.getId());
         addressUserHistory.setAddress(mapReq.getAddress());
-        if (Objects.isNull(mapReq.getLongitude())) {
+        if (!Objects.isNull(mapReq.getLongitude())) {
             addressUserHistory.setLongitude(mapReq.getLongitude());
         }
-        if (Objects.isNull(mapReq.getLatitude())) {
+        if (!Objects.isNull(mapReq.getLatitude())) {
             addressUserHistory.setLatitude(mapReq.getLatitude());
         }
         addressUserHistory.setCreateTime(new Date());
