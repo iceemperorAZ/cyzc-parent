@@ -206,9 +206,10 @@ public class MapByQQServiceImpl implements MapService {
      */
     @Override
     public List<Map<String, Object>> findAddressByGroupNo(String groupNo) {
-        //截取组编号前3位010，补上%，模糊查询
-        String grougNo = groupNo.substring(0, 3) + "%";
-        return buyerAddressRepository.findAddressByGroupNo(grougNo);
+        //将组编码前3位010改为01%
+        StringBuilder stringBuilder = new StringBuilder(groupNo);
+        stringBuilder.replace(0, 2,"01%");
+        return buyerAddressRepository.findAddressByGroupNo(stringBuilder.toString());
     }
 
 
