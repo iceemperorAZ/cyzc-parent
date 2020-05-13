@@ -173,4 +173,17 @@ public class BuyerAddressReq extends BaseReq implements Serializable {
 	@ApiModelProperty(value = "邮编")
 	private String postCode;
 
+
+	/**
+	 * 经度
+	 */
+	@ApiModelProperty(value = "经度")
+	private String latitude;
+
+	/**
+	 * 纬度
+	 */
+	@ApiModelProperty(value = "纬度")
+	private String longitude;
+
 }

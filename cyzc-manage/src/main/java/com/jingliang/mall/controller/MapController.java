@@ -82,8 +82,8 @@ public class MapController {
      * @param groupNo
      * @return
      */
-    @PostMapping("/mapTogroupNo")
+    @GetMapping("/mapTogroupNo")
     public Result<List<Map<String, Object>>> getMapBygroupNo(@RequestParam("groupNo") String groupNo) {
-        return Result.buildOk(mapService.findAddressByGroupNo(groupNo));
+        return Result.buildOk(mapService.findAddressByGroupNo(groupNo.replaceAll("0*$", "") + "%"));
     }
 }

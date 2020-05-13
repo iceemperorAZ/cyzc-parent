@@ -421,8 +421,8 @@ public class OrderController {
         if (Objects.isNull(order)) {
             return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_NOT_EXIST_FAIL);
         }
-        if (order.getOrderStatus() == 200) {
-            return Result.build(Msg.ORDER_FAIL, "订单已经取消");
+        if (order.getOrderStatus() >= 200) {
+            return Result.build(Msg.ORDER_FAIL, "订单已经支付成功或取消");
         }
         order.setFinishTime(new Date());
         order.setOrderStatus(200);
