@@ -13,6 +13,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 地图记录表controller
@@ -49,8 +50,12 @@ public class MapController {
         AddressUserHistory addressUserHistory = new AddressUserHistory();
         addressUserHistory.setUserId(user.getId());
         addressUserHistory.setAddress(mapReq.getAddress());
-        addressUserHistory.setLongitude(mapReq.getLongitude());
-        addressUserHistory.setLatitude(mapReq.getLatitude());
+        if (Objects.isNull(mapReq.getLongitude())) {
+            addressUserHistory.setLongitude(mapReq.getLongitude());
+        }
+        if (Objects.isNull(mapReq.getLatitude())) {
+            addressUserHistory.setLatitude(mapReq.getLatitude());
+        }
         addressUserHistory.setCreateTime(new Date());
         addressUserHistory.setIsAvailable(true);
         addressUserHistory.setLevel(user.getLevel());
@@ -65,11 +70,11 @@ public class MapController {
      * @return
      */
     @PostMapping("/readMap")
-    public Result<List<AddressUserHistory>> readMap(@RequestParam("userId") Long userId,@ApiIgnore HttpSession session) {
-        log.debug("请求参数：{}",userId);
+    public Result<List<AddressUserHistory>> readMap(@RequestParam("userId") Long userId, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", userId);
         User user = (User) session.getAttribute(sessionUser);
         List<AddressUserHistory> addressUserHistories = mapService.readMap(userId);
-        log.debug("返回参数：{}",addressUserHistories);
+        log.debug("返回参数：{}", addressUserHistories);
         return Result.buildQueryOk(addressUserHistories);
     }
 }
