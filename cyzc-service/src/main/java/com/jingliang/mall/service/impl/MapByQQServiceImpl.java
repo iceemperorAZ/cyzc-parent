@@ -166,7 +166,7 @@ public class MapByQQServiceImpl implements MapService {
         List<BuyerAddress> buyerAddressList = buyerAddressRepository.findAll();
         for (BuyerAddress buyerAddress : buyerAddressList) {
             if (buyerAddress.getIsDefault()) {
-                if (buyerAddress.getLat() == null || buyerAddress.getLng() == null) {
+                if (buyerAddress.getLongitude() == null || buyerAddress.getLatitude() == null) {
                     //获取省份
                     String province = regionRepository.findRegionByCodeAndIsAvailable(buyerAddress.getProvinceCode(), true).getName();
                     //获取市

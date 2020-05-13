@@ -33,12 +33,12 @@ public class MapReq extends BaseReq implements Serializable {
      * 经度
      */
     @ApiModelProperty(value = "经度")
-    private Double lng;
+    private Double longitude;
     /**
      * 纬度
      */
     @ApiModelProperty(value = "纬度")
-    private Double lat;
+    private Double latitude;
     /**
      * 时间
      */

@@ -45,14 +45,14 @@ public class AddressUserHistory implements Serializable {
     /**
      * lng经度
      */
-    @Column(name = "lng")
-    private Double lng;
+    @Column(name = "longitude")
+    private Double longitude;
 
     /**
      * lat纬度
      */
-    @Column(name = "lat")
-    private Double lat;
+    @Column(name = "latitude")
+    private Double latitude;
 
     /**
      * 地址信息

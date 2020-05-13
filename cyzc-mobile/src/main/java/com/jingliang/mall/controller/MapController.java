@@ -49,8 +49,8 @@ public class MapController {
         AddressUserHistory addressUserHistory = new AddressUserHistory();
         addressUserHistory.setUserId(user.getId());
         addressUserHistory.setAddress(mapReq.getAddress());
-        addressUserHistory.setLng(mapReq.getLng());
-        addressUserHistory.setLat(mapReq.getLat());
+        addressUserHistory.setLongitude(mapReq.getLongitude());
+        addressUserHistory.setLatitude(mapReq.getLatitude());
         addressUserHistory.setCreateTime(new Date());
         addressUserHistory.setIsAvailable(true);
         addressUserHistory.setLevel(user.getLevel());
