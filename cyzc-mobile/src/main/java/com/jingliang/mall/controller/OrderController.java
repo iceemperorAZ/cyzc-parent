@@ -385,14 +385,14 @@ public class OrderController {
         order.setDetailAddressCity(buyerAddress.getCityCode());
         order.setDetailAddressArea(buyerAddress.getAreaCode());
         order.setDetailAddressStreet(buyerAddress.getStreetCode());
-        String DetailAddress = regionService.findByCode(buyerAddress.getProvinceCode())
-                .concat("/")
-                .concat(buyerAddress.getCityCode())
-                .concat("/")
-                .concat(buyerAddress.getAreaCode())
-                .concat("/")
-                .concat(StringUtils.isNotBlank(buyerAddress.getStreetCode())?buyerAddress.getStreetCode():"");
-        order.setDetailAddress(DetailAddress);
+//        String DetailAddress = regionService.findByCode(buyerAddress.getProvinceCode())
+//                .concat("/")
+//                .concat(buyerAddress.getCity().getName())
+//                .concat("/")
+//                .concat(buyerAddress.getArea().getName())
+//                .concat("/")
+//                .concat(StringUtils.isNotBlank(buyerAddress.getStreetCode())?buyerAddress.getStreetCode():"");
+//        order.setDetailAddress(DetailAddress);
         order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {

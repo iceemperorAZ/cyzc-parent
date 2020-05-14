@@ -174,7 +174,7 @@ public class WechatManageController {
         }
         //1.2.不是查询的是自己的商户，判断要查询的销售是否是自己分组下的人
         if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
-            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+            return Result.build(Msg.FAIL, "无查看此商户信息权限");
         }
         //1.3.查询指定销售在自己组下所有商户产生的总绩效
         Map<String, Object> achievement = wechatManageService.bossUserAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", saleUserId, startTime, endTime);
@@ -205,7 +205,7 @@ public class WechatManageController {
         }
         //1.2.不是查询的是自己的商户，判断要查询的销售是否是自己分组下的人
         if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
-            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+            return Result.build(Msg.FAIL, "无查看此商信息权限");
         }
         //1.3.查询指定销售在自己组下所有商户产生的绩效
         List<Map<String, Object>> achievements = wechatManageService.bossUserBuyerAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", saleUserId, startTime, endTime);
@@ -242,7 +242,7 @@ public class WechatManageController {
         }
         //1.2.不是查询自己的商户，判断要查询的销售是否是自己分组下的人
         if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
-            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+            return Result.build(Msg.FAIL, "无查看此商户信息权限");
         }
         //1.3.查询指定销售在自己组下的商户所有订单产生的绩效
         List<Map<String, Object>> achievements = wechatManageService.bossUserBuyerOrderAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", buyer.getId(), startTime, endTime);
@@ -273,7 +273,7 @@ public class WechatManageController {
             List<Map<String, Object>> achievements = wechatManageService.bossBuyerOrderDetailAchievement(orderId, startTime, endTime);
             return Result.buildQueryOk(achievements);
         }
-        return Result.build(Msg.FAIL, "无查看此销售信息权限");
+        return Result.build(Msg.FAIL, "无查看此商户订单详情的权限");
     }
 
     /**
