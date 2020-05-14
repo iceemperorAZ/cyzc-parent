@@ -151,7 +151,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * */
     @Query(value = " SELECT  " +
             " a.eday AS date," +
-            " IF(temp.id IS NULL, 0, temp.id) AS id," +
+            " IF(a.id IS NULL, 0, a.id) AS id," +
             " a.group_name AS groupName," +
             " IF(temp.totalPrice IS NULL, 0, temp.totalPrice) AS totalPrice " +
             " FROM ( SELECT dd.eday , tg.id , tg.group_name , tg.parent_group_id, tg.group_no FROM  " +
@@ -186,7 +186,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * */
     @Query(value = " SELECT  " +
             " a.eday AS date," +
-            " IF(temp.id IS NULL, 0, temp.id) AS id, " +
+            " IF(a.id IS NULL, 0, a.id) AS id, " +
             " a.group_name AS groupName, " +
             " IF(temp.totalPrice IS NULL, 0, temp.totalPrice) AS totalPrice " +
             " FROM ( SELECT dd.eday, tg.id , tg.group_name , tg.parent_group_id , tg.group_no " +
@@ -221,7 +221,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * */
     @Query(value = " SELECT  " +
             " a.eday AS date , " +
-            " IF(temp.id IS NULL, 0, temp.id) AS id, " +
+            " IF(a.id IS NULL, 0, a.id) AS id, " +
             " a.group_name AS groupName , " +
             " IF(temp.totalPrice IS NULL, 0, temp.totalPrice) AS totalPrice " +
             " FROM ( SELECT dd.eday , tg.id , tg.group_name , tg.parent_group_id, tg.group_no FROM  " +
@@ -294,7 +294,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * */
     @Query(value = " SELECT  " +
             " a.eday AS date, " +
-            " IF(temp.id IS NULL, 0, temp.id) AS id, " +
+            " IF(a.id IS NULL, 0, a.id) AS id, " +
             " a.group_name AS groupName, " +
             " IF(temp.counts IS NULL, 0,temp.counts) AS counts " +
             " FROM ( SELECT dd.eday , tg.id , tg.group_name , tg.parent_group_id, tg.group_no FROM  " +
@@ -329,7 +329,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * */
     @Query(value = " SELECT  " +
             " a.eday AS date," +
-            " IF(temp.id IS NULL, 0, temp.id) AS id, " +
+            " IF(a.id IS NULL, 0, a.id) AS id, " +
             " a.group_name AS groupName , " +
             " IF(temp.counts IS NULL, 0, temp.counts) AS counts " +
             " FROM ( SELECT dd.eday , tg.id , tg.group_name , tg.parent_group_id, tg.group_no FROM  " +
@@ -363,54 +363,54 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * 根据日期查询订单量
      * */
     @Query(value = "SELECT   " +
-            "a.eday AS date, " +
-            "IF(temp.id IS NULL, 0, temp.id) AS id, " +
-            "a.group_name AS groupName, " +
-            "IF(temp.counts IS NULL, 0,temp.counts) AS counts" +
-            "FROM ( SELECT dd.eday , tg.id , tg.group_name , tg.parent_group_id, tg.group_no FROM   " +
-            "(SELECT 1 AS eday UNION  " +
-            "SELECT 2 UNION  " +
-            "SELECT 3 UNION   " +
-            "SELECT 4 UNION   " +
-            "SELECT 5 UNION   " +
-            "SELECT 6 UNION   " +
-            "SELECT 7 UNION   " +
-            "SELECT 8 UNION   " +
-            "SELECT 9 UNION   " +
-            "SELECT 10 UNION   " +
-            "SELECT 11 UNION   " +
-            "SELECT 12 UNION   " +
-            "SELECT 13 UNION   " +
-            "SELECT 14 UNION   " +
-            "SELECT 15 UNION   " +
-            "SELECT 16 UNION   " +
-            "SELECT 17 UNION   " +
-            "SELECT 18 UNION   " +
-            "SELECT 19 UNION   " +
-            "SELECT 20 UNION   " +
-            "SELECT 21 UNION   " +
-            "SELECT 22 UNION   " +
-            "SELECT 23 UNION   " +
-            "SELECT 24 UNION   " +
-            "SELECT 25 UNION   " +
-            "SELECT 26 UNION   " +
-            "SELECT 27 UNION   " +
-            "SELECT 28 UNION   " +
-            "SELECT 29 UNION   " +
-            "SELECT 30 UNION   " +
-            "SELECT 31) dd ,tb_group tg) a LEFT JOIN ( SELECT   " +
-            "ANY_VALUE(g.id) as id , ANY_VALUE(g.group_name) as group_name , DATE_FORMAT( o.create_time, '%e' ) as create_time , COUNT(o.id) AS counts " +
-            "FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
-            "WHERE  " +
-            "g.parent_group_id = :parentGroupId " +
-            "AND o.create_time BETWEEN :startTime  AND :endTime  " +
-            "AND o.order_status BETWEEN 300 AND 700    " +
-            "GROUP BY g.group_name,g.group_no, " +
-            "DATE_FORMAT( o.create_time, '%e' )) as temp ON a.eday = temp.create_time  " +
-            "AND a.id = temp.id " +
-            "WHERE  a.parent_group_id = :parentGroupId " +
-            "AND a.eday BETWEEN DATE_FORMAT( :startTime , '%e' )   " +
-            "AND DATE_FORMAT( :endTime , '%e' ) ", nativeQuery = true)
+            " a.eday AS date, " +
+            " IF(a.id IS NULL, 0, a.id) AS id, " +
+            " a.group_name AS groupName, " +
+            " IF(temp.counts IS NULL, 0,temp.counts) AS counts" +
+            " FROM ( SELECT dd.eday , tg.id , tg.group_name , tg.parent_group_id, tg.group_no FROM   " +
+            " (SELECT 1 AS eday UNION  " +
+            " SELECT 2 UNION  " +
+            " SELECT 3 UNION   " +
+            " SELECT 4 UNION   " +
+            " SELECT 5 UNION   " +
+            " SELECT 6 UNION   " +
+            " SELECT 7 UNION   " +
+            " SELECT 8 UNION   " +
+            " SELECT 9 UNION   " +
+            " SELECT 10 UNION   " +
+            " SELECT 11 UNION   " +
+            " SELECT 12 UNION   " +
+            " SELECT 13 UNION   " +
+            " SELECT 14 UNION   " +
+            " SELECT 15 UNION   " +
+            " SELECT 16 UNION   " +
+            " SELECT 17 UNION   " +
+            " SELECT 18 UNION   " +
+            " SELECT 19 UNION   " +
+            " SELECT 20 UNION   " +
+            " SELECT 21 UNION   " +
+            " SELECT 22 UNION   " +
+            " SELECT 23 UNION   " +
+            " SELECT 24 UNION   " +
+            " SELECT 25 UNION   " +
+            " SELECT 26 UNION   " +
+            " SELECT 27 UNION   " +
+            " SELECT 28 UNION   " +
+            " SELECT 29 UNION   " +
+            " SELECT 30 UNION   " +
+            " SELECT 31) dd ,tb_group tg) a LEFT JOIN ( SELECT   " +
+            " ANY_VALUE(g.id) as id , ANY_VALUE(g.group_name) as group_name , DATE_FORMAT( o.create_time, '%e' ) as create_time , COUNT(o.id) AS counts " +
+            " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
+            " WHERE  " +
+            " g.parent_group_id = :parentGroupId " +
+            " AND o.create_time BETWEEN :startTime  AND :endTime  " +
+            " AND o.order_status BETWEEN 300 AND 700    " +
+            " GROUP BY g.group_name,g.group_no, " +
+            " DATE_FORMAT( o.create_time, '%e' )) as temp ON a.eday = temp.create_time  " +
+            " AND a.id = temp.id " +
+            " WHERE  a.parent_group_id = :parentGroupId " +
+            " AND a.eday BETWEEN DATE_FORMAT( :startTime , '%e' )   " +
+            " AND DATE_FORMAT( :endTime , '%e' ) ", nativeQuery = true)
     List<Map<String, Object>> findOrdersTotalByGroupAndDay(Long parentGroupId, Date startTime, Date endTime);
 
 
@@ -519,7 +519,8 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             "AND a.id = temp.groupId  " +
             "WHERE a.parent_group_id =:parentGroupId  " +
             "AND a.days BETWEEN DATE_FORMAT(:startTime, '%Y')    " +
-            "AND DATE_FORMAT(:endTime, '%Y')", nativeQuery = true)
+            "AND DATE_FORMAT(:endTime, '%Y') " +
+            "ORDER BY days ", nativeQuery = true)
     List<Map<String, Object>> yearByDateAndParentGroupIdAchievement(Date startTime, Date endTime, Long parentGroupId);
 
     /**
