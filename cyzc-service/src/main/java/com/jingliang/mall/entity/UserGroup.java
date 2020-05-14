@@ -1,10 +1,11 @@
 package com.jingliang.mall.entity;
 
-import java.util.Date;
 import lombok.Data;
-import javax.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 员工与组关系映射表
@@ -53,4 +54,9 @@ public class UserGroup implements Serializable {
 	@Column(name = "is_available")
 	private Boolean isAvailable;
 
+	/**
+	 * 组编码
+	 */
+	@Column(name = "group_no")
+	private String groupNo;
 }

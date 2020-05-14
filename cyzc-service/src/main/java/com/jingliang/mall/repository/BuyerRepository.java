@@ -56,6 +56,8 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
      * @return
      */
     @Query("SELECT buyer FROM Buyer buyer  WHERE buyer.id in(SELECT DISTINCT buyerId  FROM BuyerSale WHERE saleId = :saleUserId and isAvailable=:isAvailable) and buyer.isAvailable=:isAvailable  ORDER BY buyer.id")
-    Page<Buyer> findAllBySaleIdAndIsAvailable( @Param("saleUserId") Long saleUserId, @Param("isAvailable") Boolean isAvailable, Pageable pageRequest);
+    Page<Buyer> findAllBySaleIdAndIsAvailable(@Param("saleUserId") Long saleUserId, @Param("isAvailable") Boolean isAvailable, Pageable pageRequest);
+
+    Buyer findBuyersByIdAndAndIsAvailable(Long id, Boolean isAvailable);
 
 }
