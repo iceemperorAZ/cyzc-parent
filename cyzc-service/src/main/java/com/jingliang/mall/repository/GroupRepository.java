@@ -81,10 +81,10 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * 柱状图-查询每个大区下的绩效
      * */
     @Query(value = "SELECT  " +
-            "g.group_name AS groupName, " +
-            "g.id AS id, " +
-            "g.group_no AS groupNo, " +
-            "g.parent_group_id AS parentGroupId, " +
+            "ANY_VALUE(g.group_name) AS groupName, " +
+            "ANY_VALUE(g.id AS id), " +
+            "ANY_VALUE(g.group_no) AS groupNo, " +
+            "ANY_VALUE(g.parent_group_id) AS parentGroupId, " +
             "CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice " +
             "FROM tb_order o " +
             "JOIN tb_group g " +
@@ -104,10 +104,10 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * 柱状图-查询每个大区下的子分组绩效
      * */
     @Query(value = "SELECT " +
-            "g.group_name AS groupName, " +
-            "g.id AS id, " +
-            "g.group_no AS groupNo, " +
-            "g.parent_group_id AS parentGroupId, " +
+            "ANY_VALUE(g.group_name) AS groupName, " +
+            "ANY_VALUE(g.id) AS id, " +
+            "ANY_VALUE(g.group_no) AS groupNo, " +
+            "ANY_VALUE(g.parent_group_id) AS parentGroupId, " +
             "CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice " +
             "FROM tb_order o " +
             "LEFT JOIN tb_group g " +
@@ -129,7 +129,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      *
      * */
     @Query(value = "SELECT " +
-            "u.user_name AS userName, " +
+            "ANY_VALUE(u.user_name) AS userName, " +
             "CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice " +
             "FROM tb_order o " +
             "JOIN tb_user u " +
@@ -167,7 +167,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " SELECT 2019 UNION" +
             " SELECT 2020 UNION" +
             " SELECT 2021) dd ,tb_group tg) a LEFT JOIN ( SELECT  " +
-            " g.id as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%Y' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice" +
+            " ANY_VALUE(g.id) as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%Y' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice" +
             " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' ) " +
             " WHERE " +
             " g.parent_group_id = :parentGroupId " +
@@ -202,7 +202,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " SELECT 10 UNION " +
             " SELECT 11 UNION " +
             " SELECT 12 ) dd ,tb_group tg ) a LEFT JOIN ( SELECT  " +
-            " g.id as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%c' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice" +
+            " ANY_VALUE(g.id) as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%c' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice" +
             " FROM  tb_group g JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' ) " +
             " WHERE " +
             " g.parent_group_id = :parentGroupId " +
@@ -256,7 +256,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " SELECT 29 UNION  " +
             " SELECT 30 UNION  " +
             " SELECT 31 ) dd ,tb_group tg) a LEFT JOIN ( SELECT  " +
-            " g.id as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%e' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice " +
+            " ANY_VALUE(g.id) as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%e' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice " +
             " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' ) " +
             " WHERE " +
             " g.parent_group_id = :parentGroupId " +
@@ -274,9 +274,9 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * 查询总销售量-柱-饼
      * */
     @Query(value = "SELECT " +
-            "g.group_name AS groupName, " +
+            "ANY_VALUE(g.group_name) AS groupName, " +
             "count( o.id ) AS counts, " +
-            "g.id AS id " +
+            "ANY_VALUE(g.id) AS id " +
             "FROM tb_order o " +
             "JOIN tb_group g ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
             "AND o.order_status BETWEEN 300  " +
@@ -310,7 +310,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " SELECT 2019 UNION " +
             " SELECT 2020 UNION " +
             " SELECT 2021) dd ,tb_group tg) a LEFT JOIN ( SELECT  " +
-            " g.id as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%Y' ) as create_time , COUNT(o.id) AS counts " +
+            " ANY_VALUE(g.id) as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%Y' ) as create_time , COUNT(o.id) AS counts " +
             " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' ) " +
             " WHERE " +
             " g.parent_group_id = :parentGroupId " +
@@ -345,7 +345,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " SELECT 10 UNION " +
             " SELECT 11 UNION " +
             " SELECT 12) dd ,tb_group tg) a LEFT JOIN ( SELECT  " +
-            " g.id as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%c' ) as create_time , COUNT(o.id) AS counts " +
+            " ANY_VALUE(g.id) as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%c' ) as create_time , COUNT(o.id) AS counts " +
             " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' ) " +
             " WHERE " +
             " g.parent_group_id = :parentGroupId " +
@@ -399,7 +399,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             "SELECT 29 UNION   " +
             "SELECT 30 UNION   " +
             "SELECT 31) dd ,tb_group tg) a LEFT JOIN ( SELECT   " +
-            "g.id as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%e' ) as create_time , COUNT(o.id) AS counts " +
+            "ANY_VALUE(g.id) as id , g.group_name as group_name , DATE_FORMAT( o.create_time, '%e' ) as create_time , COUNT(o.id) AS counts " +
             "FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
             "WHERE  " +
             "g.parent_group_id = :parentGroupId " +
