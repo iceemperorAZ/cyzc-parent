@@ -52,6 +52,8 @@ public class MapController {
         //创建经纬度记录表
         AddressUserHistory addressUserHistory = new AddressUserHistory();
         addressUserHistory.setUserId(user.getId());
+        addressUserHistory.setLongitude(mapReq.getLongitude());
+        addressUserHistory.setLatitude(mapReq.getLatitude());
         addressUserHistory.setAddress(mapReq.getAddress());
         addressUserHistory.setCreateTime(new Date());
         addressUserHistory.setIsAvailable(true);
