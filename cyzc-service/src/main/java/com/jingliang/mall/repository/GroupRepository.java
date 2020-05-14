@@ -488,10 +488,10 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * @return
      */
     @Query(value = "SELECT    " +
-            "a.days,  " +
-            "temp.groupId,  " +
-            "a.group_name,  " +
-            "temp.counts  " +
+            "a.days AS days,  " +
+            "a.id AS id,  " +
+            "a.group_name AS groupName,  " +
+            "temp.counts AS counts  " +
             "FROM (  " +
             "SELECT dd.days,tg.id,tg.group_name,tg.parent_group_id,tg.group_no FROM    " +
             "  (SELECT 2015 AS days UNION  " +
@@ -531,10 +531,10 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * @return
      */
     @Query(value = "SELECT    " +
-            "a.days,  " +
-            "temp.groupId,  " +
-            "a.group_name,  " +
-            "temp.counts  " +
+            "a.days AS days,  " +
+            "a.id AS id,  " +
+            "a.group_name AS groupName,  " +
+            "temp.counts AS counts  " +
             "FROM (  " +
             "SELECT dd.days,tg.id,tg.group_name,tg.parent_group_id,tg.group_no FROM    " +
             "  (SELECT 1 AS days UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION    " +
@@ -572,10 +572,10 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * @return
      */
     @Query(value = "SELECT    " +
-            "a.days,  " +
-            "temp.groupId,  " +
-            "a.group_name,  " +
-            "temp.counts  " +
+            "a.days AS days,  " +
+            "a.id AS id,  " +
+            "a.group_name AS groupName,  " +
+            "temp.counts AS counts  " +
             "FROM (  " +
             "SELECT dd.days,tg.id,tg.group_name,tg.parent_group_id,tg.group_no FROM    " +
             "  (SELECT 1 AS days UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION    " +
