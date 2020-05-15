@@ -1,6 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.Result;
+import com.jingliang.mall.entity.AddressUserHistory;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.service.MapService;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -86,4 +88,43 @@ public class MapController {
     public Result<List<Map<String, Object>>> getMapBygroupNo(@RequestParam("groupNo") String groupNo) {
         return Result.buildOk(mapService.findAddressByGroupNo(groupNo.replaceAll("0*$", "") + "%"));
     }
+
+    /**
+     * 通过用户id获取经纬度记录
+     *
+     * @return
+     */
+    @GetMapping("/readMapToUserId")
+    public Result<List<AddressUserHistory>> readMap(@RequestParam("userId") Long userId) {
+        log.debug("请求参数：{}", userId);
+        List<AddressUserHistory> addressUserHistories = mapService.readMap(userId);
+        log.debug("返回参数：{}", addressUserHistories);
+        return Result.buildQueryOk(addressUserHistories);
+    }
+
+    /**
+     * 查询销售员的最后一条记录
+     *
+     * @param
+     * @return
+     */
+    @GetMapping("/readMapToEndtime")
+    public Result<?> userAddressHistoryToEndTime() {
+        List<Map<String, Object>> mapList = mapService.userAddressHistoryToEndTime();
+        Map<String, Map<String, Object>> map = new HashMap<>(156);
+        mapList.forEach(stringObjectMap -> {
+            if (map.containsKey(String.valueOf(stringObjectMap.get("userId")))) {
+                return;
+            }
+            map.put(String.valueOf(stringObjectMap.get("userId")), stringObjectMap);
+
+        });
+        mapList = new ArrayList<>();
+        List<Map<String, Object>> finalTest = mapList;
+        map.forEach((s, stringObjectMap) -> {
+            finalTest.add(stringObjectMap);
+        });
+        return Result.buildOk(finalTest);
+    }
+
 }

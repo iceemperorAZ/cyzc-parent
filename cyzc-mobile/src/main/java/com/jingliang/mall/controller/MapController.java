@@ -63,17 +63,5 @@ public class MapController {
         return Result.buildOk();
     }
 
-    /**
-     * 通过用户id获取经纬度记录
-     *
-     * @return
-     */
-    @PostMapping("/readMap")
-    public Result<List<AddressUserHistory>> readMap(@RequestParam("userId") Long userId, @ApiIgnore HttpSession session) {
-        log.debug("请求参数：{}", userId);
-        User user = (User) session.getAttribute(sessionUser);
-        List<AddressUserHistory> addressUserHistories = mapService.readMap(userId);
-        log.debug("返回参数：{}", addressUserHistories);
-        return Result.buildQueryOk(addressUserHistories);
-    }
+
 }

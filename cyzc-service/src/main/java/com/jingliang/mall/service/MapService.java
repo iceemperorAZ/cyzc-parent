@@ -58,4 +58,12 @@ public interface MapService {
      * @return
      */
     List<Map<String, Object>> findAddressByGroupNo(String groupNo);
+
+    /**
+     * 查询销售员的最后一条记录
+     *
+     * @param userId
+     * @return
+     */
+    List<Map<String, Object>> userAddressHistoryToEndTime();
 }

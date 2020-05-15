@@ -148,16 +148,6 @@ public class MapByQQServiceImpl implements MapService {
         return addressUserHistoryRepository.save(addressUserHistory);
     }
 
-    /**
-     * 通过商户id获取经纬度记录
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public List<AddressUserHistory> readMap(Long userId) {
-        return addressUserHistoryRepository.findAllByUserIdAndIsAvailableOrderByCreateTimeAsc(userId, true);
-    }
 
     @Transactional
     @Override
@@ -211,6 +201,27 @@ public class MapByQQServiceImpl implements MapService {
         return buyerAddressRepository.findAddressByGroupNo(groupNo);
     }
 
+    /**
+     * 查询销售员的最后一条记录
+     *
+     * @param
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> userAddressHistoryToEndTime() {
+        return addressUserHistoryRepository.userAddressHistoryToEndTime();
+    }
+
+    /**
+     * 通过商户id获取经纬度记录
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<AddressUserHistory> readMap(Long userId) {
+        return addressUserHistoryRepository.findAllByUserIdAndIsAvailableOrderByCreateTimeAsc(userId, true);
+    }
 
     /**
      * 解析url地址
