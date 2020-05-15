@@ -64,23 +64,9 @@ public class ManagerController {
             return Result.build(Msg.FAIL, "无查看此分组的权限");
         }
         //2.判断传参是查总绩效还是分区绩效
-        if (Objects.isNull(parentGroupId) || parentGroupId.equals(-1L)) {
-            parentGroupId = -1L;
+        if (!Objects.isNull(parentGroupId)) {
             //未传父组id，查询总绩效
-            List<Map<String, Object>> achievements = managerService.findAchievementsByMyself(startTime, endTime);
-            log.debug("返回参数:{}", achievements);
-            return Result.buildQueryOk(achievements);
-        }
-        //判断是否是晶粮集团下的大区
-        if (parentGroupId.equals(1L)) {
-            //id为1，查询各个分组的绩效
-            List<Map<String, Object>> achievements = managerService.findGroupAchievement(parentGroupId, startTime, endTime);
-            log.debug("返回参数:{}", achievements);
-            return Result.buildQueryOk(achievements);
-        }
-        //判断是否是其他分区
-        else if (parentGroupId != null && parentGroupId != -1L && parentGroupId != 1L) {
-            List<Map<String, Object>> achievements = managerService.findGroupAchievement(parentGroupId, startTime, endTime);
+            List<Map<String, Object>> achievements = managerService.findGroupAchievement(parentGroupId,startTime, endTime);
             log.debug("返回参数:{}", achievements);
             return Result.buildQueryOk(achievements);
         }

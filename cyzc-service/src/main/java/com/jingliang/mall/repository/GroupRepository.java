@@ -103,25 +103,24 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
     /*
      * 柱状图-查询每个大区下的子分组绩效
      * */
-    @Query(value = "SELECT " +
-            "ANY_VALUE(g.group_name) AS groupName, " +
-            "ANY_VALUE(g.id) AS id, " +
-            "ANY_VALUE(g.group_no) AS groupNo, " +
-            "ANY_VALUE(g.parent_group_id) AS parentGroupId, " +
-            "CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice " +
-            "FROM tb_order o " +
-            "LEFT JOIN tb_group g " +
-            "ON o.group_no " +
-            "LIKE CONCAT(regexp_replace(g.group_no,'0*$',''), '%' ) " +
-            "AND o.order_status " +
-            "BETWEEN 300 AND 700 " +
-            "AND o.is_available = 1 " +
-            "AND o.create_time " +
-            "BETWEEN :startTime " +
-            "AND :endTime " +
-            "WHERE g.parent_group_id = :parentGroupId " +
-            "AND g.is_available = 1 " +
-            "GROUP BY  g.id", nativeQuery = true)
+    @Query(value = " SELECT " +
+            " ANY_VALUE(g.id) AS id, " +
+            " ANY_VALUE(g.parent_group_id) AS parentGroupId, " +
+            " ANY_VALUE(g.group_name) AS groupName, " +
+            " CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice   " +
+            " FROM " +
+            " tb_group g " +
+            " LEFT JOIN tb_order o ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
+            " AND o.order_status BETWEEN 300  " +
+            " AND 700  " +
+            " AND o.is_available = 1  " +
+            " AND o.create_time BETWEEN :startTime " +
+            " AND :endTime " +
+            " WHERE " +
+            " g.parent_group_id = :parentGroupId " +
+            " AND g.is_available = 1   " +
+            " GROUP BY " +
+            " g.id,g.group_name ", nativeQuery = true)
     List<Map<String, Object>> findGroupAchievement(Long parentGroupId, Date startTime, Date endTime);
 
     /*
@@ -273,20 +272,21 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
     /*
      * 查询总销售量-柱-饼
      * */
-    @Query(value = "SELECT " +
-            "ANY_VALUE(g.group_name) AS groupName, " +
-            "count( o.id ) AS counts, " +
-            "ANY_VALUE(g.id) AS id " +
-            "FROM tb_order o " +
-            "JOIN tb_group g ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
-            "AND o.order_status BETWEEN 300  " +
-            "AND 700  " +
-            "AND o.is_available = 1  " +
-            "AND o.create_time BETWEEN :startTime  " +
-            "AND :endTime  " +
-            "WHERE g.is_available = 1  " +
-            "AND g.parent_group_id = :parentGroupId " +
-            "GROUP BY g.id;", nativeQuery = true)
+    @Query(value = "SELECT    " +
+            "      ANY_VALUE(g.group_name) AS groupName,    " +
+            "      ANY_VALUE(g.parent_group_id) AS parentGroupId,    " +
+            "      ANY_VALUE(g.id) AS id,   " +
+            "      count(o.id) AS counts    " +
+            "      FROM  tb_group g " +
+            "      LEFT JOIN  tb_order o   " +
+            "      ON o.group_no LIKE CONCAT(regexp_replace(g.group_no ,'0*$',''), '%' )    " +
+            "      AND o.order_status BETWEEN 300  " +
+            "      AND 700 " +
+            "      AND o.is_available = 1 " +
+            "      AND o.create_time BETWEEN :startTime AND :endTime " +
+            "      WHERE  g.is_available = 1  " +
+            "      AND g.parent_group_id = :parentGroupId   " +
+            "            GROUP BY g.id ", nativeQuery = true)
     List<Map<String, Object>> findOrdersTotalByGroup(Long parentGroupId, Date startTime, Date endTime);
 
     /*

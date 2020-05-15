@@ -8,7 +8,7 @@ public interface ManagerService {
 
     public List<Map<String, Object>> findAchievementsByMyself(Date startTime, Date endTime);
 
-    public List<Map<String, Object>> findGroupAchievement(Long id, Date startTime, Date endTime);
+    public List<Map<String, Object>> findGroupAchievement(Long parentGroupId, Date startTime, Date endTime);
 
     public List<Map<String, Object>> findUserAchievement(String groupNo, Date startTime, Date endTime);
 

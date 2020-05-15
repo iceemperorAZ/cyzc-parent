@@ -32,9 +32,9 @@ public class ManagerServiceImpl implements ManagerService {
     * 根据大区下的子分组查询绩效
     * */
     @Override
-    public List<Map<String, Object>> findGroupAchievement(Long id, Date startTime, Date endTime) {
+    public List<Map<String, Object>> findGroupAchievement(Long parentGroupId, Date startTime, Date endTime) {
         //根据大区下的子分组查询绩效
-        return groupRepository.findGroupAchievement(id,startTime,endTime);
+        return groupRepository.findGroupAchievement(parentGroupId,startTime,endTime);
     }
 
     /*
