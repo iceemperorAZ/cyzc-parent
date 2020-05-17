@@ -1,11 +1,20 @@
 package com.jingliang.mall.controller;
 
+import com.alibaba.fastjson.JSONArray;
+import com.jingliang.mall.common.Result;
 import com.jingliang.mall.service.BuyerSaleService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 商户销售绑定表Controller
@@ -26,4 +35,22 @@ public class BuyerSaleController {
 		this.buyerSaleService = buyerSaleService;
 	}
 
+	@GetMapping("/getAllBuyerAndSaleByTimeToHtml")
+	@ApiOperation("根据时间查询商户信息和绑定的销售以及所在大区展示到前台页面")
+	public Result<?> getAllBuyerAndSaleByTime(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date startTime,
+											  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date endTime){
+		List<Map<String, Object>> buyerSaleByTime = buyerSaleService.findBuyerSaleByTimeToHtml(startTime, endTime);
+		return  Result.buildQueryOk(buyerSaleByTime);
+	}
+
+	@GetMapping("/getAllBuyerAndSaleByTimeToExcel")
+	@ApiOperation("根据时间查询商户信息和绑定的销售以及所在大区展示到前台页面")
+	public Result<?> getAllBuyerAndSaleByTimeToExcel(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date startTime,
+											  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date endTime){
+		Boolean flg = buyerSaleService.findBuyerSaleByTime(startTime, endTime);
+		if (!flg){
+			return  Result.buildParamFail();
+		}
+		return Result.buildQueryOk("导出excel成功！");
+	}
 }

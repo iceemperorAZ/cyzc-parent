@@ -5,7 +5,9 @@ import com.jingliang.mall.entity.BuyerAddress;
 import com.jingliang.mall.entity.BuyerSale;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商户销售绑定表Service
@@ -58,4 +60,8 @@ public interface BuyerSaleService {
      */
     Buyer bindingSale(BuyerSale buyerSale, Buyer buyer, BuyerAddress address);
 
+
+    public Boolean findBuyerSaleByTime(Date startTime, Date endTime);
+
+    public List<Map<String,Object>> findBuyerSaleByTimeToHtml(Date startTime, Date endTime);
 }
