@@ -13,7 +13,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,7 +68,7 @@ public class OrderController {
                            ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService,
                            BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer,
                            ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService, UserService userService,
-                           BuyerAddressService buyerAddressService,RegionService regionService) {
+                           BuyerAddressService buyerAddressService, RegionService regionService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
@@ -406,6 +405,7 @@ public class OrderController {
         log.debug("返回结果：{}", orderResp);
         return Result.buildSaveOk(resultMap);
     }
+
     /**
      * 取消订单
      */

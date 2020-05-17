@@ -218,7 +218,7 @@ public class OrderController {
      */
     @ApiOperation(value = "分页查询全部用户订单信息")
     @GetMapping("/page/all")
-    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, @RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) {
+    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, String region,@RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) {
         log.debug("请求参数：{}", orderReq);
         PageRequest pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize());
         if (StringUtils.isNotBlank(orderReq.getClause())) {
@@ -243,6 +243,10 @@ public class OrderController {
                 for (Integer orderStatus : orderStatuses) {
                     orOredicateList.add(cb.equal(root.get("orderStatus"), orderStatus));
                 }
+            }
+
+            if (StringUtils.isNotBlank(region)) {
+                predicateList.add(cb.like(root.get("detailAddressArea"), region.replaceAll("0*$", "") + "%"));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             if (!CollectionUtils.isEmpty(orderStatuses)) {
