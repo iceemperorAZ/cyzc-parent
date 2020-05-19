@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.common.ExcelUtils;
 import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.User;
@@ -9,13 +10,24 @@ import com.jingliang.mall.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -230,4 +242,138 @@ public class BuyerManageController {
         return Result.buildParamFail();
     }
 
+    /**
+     * 当前年销售下单量top
+     *
+     * @param startTime
+     * @param endTime
+     * @param topNum
+     * @return
+     */
+    @ApiOperation(value = "当前年销售下单量top")
+    @GetMapping("/topOrderCounts")
+    public Result<List<Map<String, Object>>> topOfOrderCountsByUser(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                    Integer topNum,
+                                                                    HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        List<Map<String, Object>> mapList = buyerManageService.topOfOrderCountsByUser(startTime, endTime, topNum);
+        return Result.buildQueryOk(mapList);
+    }
+
+    /**
+     * 当前年商品销售量top
+     *
+     * @param startTime
+     * @param endTime
+     * @param topNum
+     * @return
+     */
+    @ApiOperation(value = "当前年商品销售量top")
+    @GetMapping("/year/topProductCounts")
+    public Result<List<Map<String, Object>>> yeartopOfProductCountsByOrder(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                           Integer topNum,
+                                                                           HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        List<Map<String, Object>> mapList = buyerManageService.yeartopOfProductCountsByOrder(startTime, endTime, topNum);
+        return Result.buildQueryOk(mapList);
+    }
+
+    /**
+     * 当前月商品销售量top
+     *
+     * @param startTime
+     * @param endTime
+     * @param topNum
+     * @return
+     */
+    @ApiOperation(value = "当前月商品销售量top")
+    @GetMapping("/month/topProductCounts")
+    public Result<List<Map<String, Object>>> monthtopOfProductCountsByOrder(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                            Integer topNum,
+                                                                            HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        List<Map<String, Object>> mapList = buyerManageService.monthtopOfProductCountsByOrder(startTime, endTime, topNum);
+        return Result.buildQueryOk(mapList);
+    }
+
+    /**
+     * 销售新增商户统计
+     *
+     * @return
+     */
+    @GetMapping("/countsByUserId")
+    public Result<List<Map<String, String>>> countsByUserId() {
+        List<Map<String, String>> maps = buyerManageService.countsByUserId();
+        log.debug("返回参数:{}", maps);
+        return Result.buildOk(maps);
+    }
+
+    /**
+     * 导出销售新增商户统计的excel
+     *
+     * @return
+     */
+    @GetMapping("/download/excel")
+    public ResponseEntity<byte[]> download() throws IOException {
+        List<Map<String, String>> maps = buyerManageService.countsByUserId();
+        XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("销售新增商户统计", Msg.buyerCountsToUserExcelTitle);
+        XSSFSheet sheet = orderWorkbook.getSheet("销售新增商户统计");
+        XSSFCellStyle cellStyle = orderWorkbook.createCellStyle();
+        int rowNum = 1;
+        for (Map<String, String> map : maps) {
+            XSSFRow row = sheet.createRow(rowNum);
+            /*
+             * "时间","新增数量","销售员ID","销售员","区域经理","区域"
+             * */
+            int celNum = 0;
+            //时间
+            row.createCell(celNum).setCellValue(map.get("createTime"));
+            //新增数量
+            row.createCell(++celNum).setCellValue(map.get("counts"));
+            //销售员ID
+            row.createCell(++celNum).setCellValue(map.get("userId"));
+            //销售员
+            row.createCell(++celNum).setCellValue(map.get("userName"));
+            //区域经理
+            row.createCell(++celNum).setCellValue(map.get("manageName"));
+            //区域
+            row.createCell(++celNum).setCellValue(map.get("groupName"));
+            //创建一行
+            row = sheet.createRow(++rowNum);
+        }
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        orderWorkbook.write(arrayOutputStream);
+        String newName = URLEncoder.encode("销售新增商户统计-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".xlsx", "utf-8")
+                .replaceAll("\\+", "%20").replaceAll("%28", "\\(")
+                .replaceAll("%29", "\\)").replaceAll("%3B", ";")
+                .replaceAll("%40", "@").replaceAll("%23", "\\#")
+                .replaceAll("%26", "\\&").replaceAll("%2C", "\\,");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", newName));
+        headers.add("Expires", "0");
+        headers.add("Pragma", "no-cache");
+        return ResponseEntity.ok().headers(headers)
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentLength(arrayOutputStream.size())
+                .body(arrayOutputStream.toByteArray());
+    }
 }

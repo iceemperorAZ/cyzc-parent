@@ -72,4 +72,42 @@ public interface BuyerManageService {
      * @return
      */
     List<Map<String, Object>> daysByDateAndParentGroupIdAchievement(Date startTime, Date endTime, Long parentGroupId);
+
+    /**
+     * 销售新增商户统计
+     *
+     * @return
+     */
+    List<Map<String, String>> countsByUserId();
+
+    /**
+     * 当前年销售下单量top
+     *
+     * @param startTime
+     * @param endTime
+     * @param topNum
+     * @return
+     */
+    List<Map<String, Object>> topOfOrderCountsByUser(Date startTime, Date endTime, Integer topNum);
+
+    /**
+     * 当前年商品销售量top
+     *
+     * @param startTime
+     * @param endTime
+     * @param topNum
+     * @return
+     */
+    List<Map<String, Object>> yeartopOfProductCountsByOrder(Date startTime, Date endTime, Integer topNum);
+
+    /**
+     * 当前月商品销售量top
+     *
+     * @param startTime
+     * @param endTime
+     * @param topNum
+     * @return
+     */
+    List<Map<String, Object>> monthtopOfProductCountsByOrder(Date startTime, Date endTime, Integer topNum);
+
 }

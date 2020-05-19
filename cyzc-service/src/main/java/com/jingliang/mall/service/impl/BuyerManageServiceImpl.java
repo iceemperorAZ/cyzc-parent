@@ -1,5 +1,6 @@
 package com.jingliang.mall.service.impl;
 
+import com.jingliang.mall.repository.BuyerRepository;
 import com.jingliang.mall.repository.GroupRepository;
 import com.jingliang.mall.service.BuyerManageService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +23,11 @@ import java.util.Map;
 public class BuyerManageServiceImpl implements BuyerManageService {
 
     private final GroupRepository groupRepository;
+    private final BuyerRepository buyerRepository;
 
-    public BuyerManageServiceImpl(GroupRepository groupRepository) {
+    public BuyerManageServiceImpl(GroupRepository groupRepository, BuyerRepository buyerRepository) {
         this.groupRepository = groupRepository;
+        this.buyerRepository = buyerRepository;
     }
 
     /**
@@ -104,4 +107,30 @@ public class BuyerManageServiceImpl implements BuyerManageService {
     public List<Map<String, Object>> daysByDateAndParentGroupIdAchievement(Date startTime, Date endTime, Long parentGroupId) {
         return groupRepository.daysByDateAndParentGroupIdAchievement(startTime, endTime, parentGroupId);
     }
+
+    /**
+     * 销售新增商户统计
+     *
+     * @return
+     */
+    @Override
+    public List<Map<String, String>> countsByUserId() {
+        return buyerRepository.countsByUserId();
+    }
+
+    @Override
+    public List<Map<String, Object>> topOfOrderCountsByUser(Date startTime, Date endTime, Integer topNum) {
+        return buyerRepository.topOfOrderCountsByUser(startTime, endTime, topNum);
+    }
+
+    @Override
+    public List<Map<String, Object>> yeartopOfProductCountsByOrder(Date startTime, Date endTime, Integer topNum) {
+        return buyerRepository.yeartopOfProductCountsByOrder(startTime, endTime, topNum);
+    }
+
+    @Override
+    public List<Map<String, Object>> monthtopOfProductCountsByOrder(Date startTime, Date endTime, Integer topNum) {
+        return buyerRepository.monthtopOfProductCountsByOrder(startTime, endTime, topNum);
+    }
+
 }
