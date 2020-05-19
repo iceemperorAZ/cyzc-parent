@@ -101,4 +101,9 @@ public class ManagerServiceImpl implements ManagerService {
     public List<Map<String, Object>> findOrdersTotalByGroupAndDay(Long parentGroupId, Date startTime, Date endTime) {
         return groupRepository.findOrdersTotalByGroupAndDay(parentGroupId,startTime,endTime);
     }
+
+    @Override
+    public List<Map<String, Object>> getBuyerTop30() {
+        return groupRepository.getBuyerTop30();
+    }
 }

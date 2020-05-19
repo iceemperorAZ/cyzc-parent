@@ -352,4 +352,16 @@ public class ManagerController {
         }
         return Result.buildParamFail();
     }
+
+    @GetMapping("/getBuyerTop30")
+    @ApiOperation(value = "查询最新增加的商户数量的前三十")
+    public Result<List<Map<String,Object>>> getBuyerTop30(){
+        List<Map<String,Object>> getBuyer = managerService.getBuyerTop30();
+        if (Objects.isNull(getBuyer)){
+            log.debug("返回结果:{}",getBuyer);
+            return Result.buildParamFail();
+        }
+        log.debug("返回结果:{}",getBuyer);
+        return Result.buildQueryOk(getBuyer);
+    }
 }

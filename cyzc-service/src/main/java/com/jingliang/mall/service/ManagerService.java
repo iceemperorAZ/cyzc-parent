@@ -25,4 +25,6 @@ public interface ManagerService {
     public List<Map<String, Object>> findOrdersTotalByGroupAndMonth(Long parentGroupId, Date startTime, Date endTime);
 
     public List<Map<String, Object>> findOrdersTotalByGroupAndDay(Long parentGroupId, Date startTime, Date endTime);
+
+    public List<Map<String, Object>> getBuyerTop30();
 }
