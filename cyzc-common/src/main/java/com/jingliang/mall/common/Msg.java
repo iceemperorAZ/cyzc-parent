@@ -130,8 +130,8 @@ public interface Msg {
     Integer REQUEST_FAIL = 501;
     String TEXT_REQUEST_FAIL = "请求方式错误，当前请求方式为[#nowReq#],实际支持请求方式为[#req#]";
 
-    List<String> orderExcelTitle = Lists.newArrayList("单据日期", "单据编号", "客户编号", "客户名称", "销售人员"
-            , "优惠金额", "客户承担费用", "本次收款", "结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
+    List<String> orderExcelTitle = Lists.newArrayList("单据日期", "单据编号", "大区", "客户编号", "客户名称", "销售人员"
+            , "优惠金额", "客户承担费用", "订单金额", "本次收款", "使用金币数", "待返金币数", "已返金币数", "结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
             "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库", "收货地址", "收货人", "电话", "备注");
 
     List<String> buyerCountsToUserExcelTitle = Lists.newArrayList("时间", "新增数量", "销售员ID", "销售员", "区域经理", "区域");
