@@ -109,6 +109,11 @@ public class OrderController {
         //是否有真实库存
         boolean hasSku = true;
         Map<Long, Long> productPriceMap = new HashMap<>(100);
+        //返币初始化为0
+        order.setReturnGold(0);
+        Long drinksPrice = 0L;
+        List<OrderDetail> drinksDetails = new ArrayList<>();
+
         //计算商品总价
         for (OrderDetail orderDetail : order.getOrderDetails()) {
             orderDetail.setId(null);
@@ -143,11 +148,18 @@ public class OrderController {
 
             //售价[商品价格*数量]
             long sellingPrice = product.getSellingPrice() * orderDetail.getProductNum();
-            order.setTotalPrice(order.getTotalPrice() + sellingPrice);
-            order.setPayableFee(order.getPayableFee() + sellingPrice);
             orderDetail.setSellingPrice(product.getSellingPrice());
             orderDetail.setCreateTime(date);
             orderDetail.setIsAvailable(true);
+            //TODO 临时使用商品分类Id进行区分
+            if (product.getProductTypeId().equals(2020030121L)) {
+                //饮料类的价格不进行累加，单独出来计算
+                drinksDetails.add(orderDetail);
+                orderDetail.setDifference(product.getSellingPrice() - product.getMarketPrice());
+                drinksPrice += sellingPrice;
+            }
+            order.setTotalPrice(order.getTotalPrice() + sellingPrice);
+            order.setPayableFee(order.getPayableFee() + sellingPrice);
             orderDetails.add(orderDetail);
             //查询已购买数量
             Long increment = redisService.increment("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", orderDetail.getProductNum());
@@ -198,7 +210,7 @@ public class OrderController {
         order.setProductNum(productNum);
         //是否满足可以下单的订单额度
         Config config = configService.findByCode("300");
-        if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+        if (order.getTotalPrice() + drinksPrice < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             for (OrderDetail detail : orderDetails) {
                 //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                 redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
@@ -208,7 +220,7 @@ public class OrderController {
         }
         //是否满足可以下单的订单额度
         config = configService.findByCode("700");
-        if (order.getTotalPrice() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+        if (order.getTotalPrice() + drinksPrice > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             for (OrderDetail detail : orderDetails) {
                 //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                 redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
@@ -301,23 +313,25 @@ public class OrderController {
         order.setOrderStatus(100);
         order.setPayStartTime(date);
         order.setUpdateTime(date);
-        Map<String, String> resultMap = new HashMap<>();
+        Map<String, String> resultMap = new HashMap<>(156);
         if (order.getIsGold() != null && order.getIsGold()) {
             //选择使用金币后
             //扣除金币
             buyer = buyerService.findById(buyer.getId());
             Integer gold = buyer.getGold();
             //金币小于等于订单支付数
-            if (order.getPayableFee() / 100 >= gold / 10) {
-                order.setPayableFee((order.getPayableFee() / 10 - gold) * 10);
+            if ((order.getPayableFee()) / 100 >= gold / 10) {
+                order.setPayableFee(((order.getPayableFee()) / 10 - gold) * 10);
                 order.setGold(gold);
             } else {
                 //使用了对应钱数的金币
-                order.setGold(order.getPayableFee().intValue() / 10);
+                order.setGold((order.getPayableFee().intValue() / 10));
                 //金币大于订单支付数
                 order.setPayableFee(0L);
             }
         }
+
+
         //计算运费
         config = configService.findByCode("100");
         if (order.getTotalPrice() >= (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
@@ -392,7 +406,8 @@ public class OrderController {
 //                .concat("/")
 //                .concat(StringUtils.isNotBlank(buyerAddress.getStreetCode())?buyerAddress.getStreetCode():"");
 //        order.setDetailAddress(DetailAddress);
-        order = orderService.save(order);
+
+        order = orderService.save(order, drinksDetails, drinksPrice);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {
             return Result.build(Msg.PAY_GOLD_OK, "");

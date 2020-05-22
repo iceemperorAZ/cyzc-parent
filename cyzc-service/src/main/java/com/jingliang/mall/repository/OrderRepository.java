@@ -214,4 +214,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
             "(SELECT @cdate \\:= CURDATE() from tb_order limit 10) t1  ", nativeQuery = true)
 
     List<Map<String, Object>>  x();
+
+    @Query(value = "SELECT o.id as id ,o.order_no as orderNo,o.buyer_id as bid ,p.product_name FROM tb_order o JOIN tb_order_detail od ON o.order_no = od.order_no JOIN tb_product p ON p.id = od.product_id JOIN tb_product_type pt ON p.product_type_id = 2020030121 WHERE o.id = :id ",nativeQuery = true)
+    List<Map<String, Object>> orderHasDrunk(Integer id);
 }

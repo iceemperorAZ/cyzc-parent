@@ -1,6 +1,7 @@
 package com.jingliang.mall.service;
 
 import com.jingliang.mall.entity.Order;
+import com.jingliang.mall.entity.OrderDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,9 +21,11 @@ public interface OrderService {
      * 保存订单信息
      *
      * @param order 订单对象
+     * @param drinksDetails
+     * @param drinksPrice
      * @return 返回保存后的订单信息
      */
-    Order save(Order order);
+    Order save(Order order, List<OrderDetail> drinksDetails, Long drinksPrice);
 
     /**
      * 根据订单Id和会员Id查询订单信息
