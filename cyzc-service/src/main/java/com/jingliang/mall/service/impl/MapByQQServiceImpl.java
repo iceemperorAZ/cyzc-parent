@@ -212,6 +212,11 @@ public class MapByQQServiceImpl implements MapService {
         return addressUserHistoryRepository.userAddressHistoryToEndTime();
     }
 
+    @Override
+    public List<Map<String, Object>> searchSaleByGroup(String groupNo) {
+        return addressUserHistoryRepository.searchSaleByGroup(groupNo);
+    }
+
     /**
      * 通过商户id获取经纬度记录
      *

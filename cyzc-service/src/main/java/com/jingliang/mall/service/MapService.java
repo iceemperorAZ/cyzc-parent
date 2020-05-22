@@ -66,4 +66,6 @@ public interface MapService {
      * @return
      */
     List<Map<String, Object>> userAddressHistoryToEndTime();
+
+    List<Map<String, Object>> searchSaleByGroup(String groupNo);
 }

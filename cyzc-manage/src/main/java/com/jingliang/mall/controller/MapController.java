@@ -5,6 +5,7 @@ import com.jingliang.mall.entity.AddressUserHistory;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.service.MapService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
@@ -127,4 +128,26 @@ public class MapController {
         return Result.buildOk(finalTest);
     }
 
+    /*
+    * 根据分区查询销售员定位的最后一条记录
+    * */
+    @GetMapping("/searchSaleByGroup")
+    @ApiOperation("根据分区查询销售员定位的最后一条记录")
+    public Result<?> searchSaleByGroup(String groupNo) {
+        List<Map<String, Object>> mapList = mapService.searchSaleByGroup(groupNo);
+        Map<String, Map<String, Object>> map = new HashMap<>(156);
+        mapList.forEach(stringObjectMap -> {
+            if (map.containsKey(String.valueOf(stringObjectMap.get("userId")))) {
+                return;
+            }
+            map.put(String.valueOf(stringObjectMap.get("userId")), stringObjectMap);
+
+        });
+        mapList = new ArrayList<>();
+        List<Map<String, Object>> finalTest = mapList;
+        map.forEach((s, stringObjectMap) -> {
+            finalTest.add(stringObjectMap);
+        });
+        return Result.buildOk(finalTest);
+    }
 }

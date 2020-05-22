@@ -39,4 +39,21 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
             " GROUP BY userId,auh.create_time " +
             " ORDER BY auh.create_time DESC", nativeQuery = true)
     List<Map<String, Object>> userAddressHistoryToEndTime();
+
+    @Query(value = "SELECT  " +
+            "             ANY_VALUE(g.group_name) AS groupName,  " +
+            "             ANY_VALUE(g.group_no) AS groupNo,  " +
+            "             ANY_VALUE(u.id) AS userId,  " +
+            "             ANY_VALUE(u.user_name) AS userName,  " +
+            "             ANY_VALUE(u.phone) AS phone,  " +
+            "             ANY_VALUE(auh.longitude) AS longitude,  " +
+            "             ANY_VALUE(auh.latitude) AS latitude,  " +
+            "             ANY_VALUE(auh.create_time) AS createTime  " +
+            "             FROM tb_group g  " +
+            "             LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level`=100  " +
+            "             INNER JOIN tb_address_user_history auh ON auh.user_id = u.id  " +
+            "             WHERE u.group_no = :groupNo " +
+            "             GROUP BY userId,auh.create_time  " +
+            "             ORDER BY auh.create_time DESC  ",nativeQuery = true)
+    List<Map<String, Object>> searchSaleByGroup(String groupNo);
 }
