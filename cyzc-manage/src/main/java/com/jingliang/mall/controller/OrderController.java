@@ -310,7 +310,7 @@ public class OrderController {
             XSSFRow row = sheet.createRow(rowNum);
             //"单据日期", "单据编号","大区", "客户编号", "客户名称", "销售人员"
             //            , "优惠金额", "客户承担费用", "订单金额","本次收款","使用金币数","返金币数","结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
-            //            "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库","收货地址", "收货人","电话","备注"
+            //            "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库","收货地址+收货人+电话","备注"
             //单据日期
             int celNum = 0;
             Date createTime = order.getCreateTime();
@@ -424,15 +424,13 @@ public class OrderController {
                 row.createCell(++productCelNum).setCellValue(storehouse);
                 //重复地址只写入一次
                 if (!flag) {
-                    //备注（收货地址
+                    //收货地址
                     String detailAddress = order.getDetailAddress();
-                    row.createCell(++productCelNum).setCellValue(detailAddress);
                     //收货人
                     String receiverName = order.getReceiverName();
-                    row.createCell(++productCelNum).setCellValue(receiverName);
                     //电话
                     String receiverPhone = order.getReceiverPhone();
-                    row.createCell(++productCelNum).setCellValue(receiverPhone);
+                    row.createCell(++productCelNum).setCellValue(detailAddress.concat("   ").concat(receiverName).concat("   ").concat(receiverPhone));
                     flag = true;
                 }
                 //创建一行

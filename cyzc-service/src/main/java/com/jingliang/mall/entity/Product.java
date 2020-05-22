@@ -250,4 +250,10 @@ public class Product implements Serializable {
      */
     @Column(name = "limit_num")
     private Integer limitNum;
+
+    /**
+     * 每个用户每天最低购买量
+     */
+    @Column(name = "min_num")
+    private Integer minNum;
 }
