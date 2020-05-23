@@ -65,18 +65,23 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
      *
      * @return
      */
-    @Query(value = "SELECT res.createTime,res.counts,res.userId,res.userName,tu.user_name AS manageName,   " +
-            "res.groupName FROM (SELECT    " +
-            "  ANY_VALUE(u.id) AS userId,   " +
-            "  DATE_FORMAT(ANY_VALUE(b.create_time),'%Y-%m-%d') AS createTime,   " +
-            "  count(b.id) AS counts,   " +
-            "  ANY_VALUE(u.user_name) AS userName,   " +
-            "  ANY_VALUE(g.group_name) AS groupName,   " +
-            "  ANY_VALUE(g.group_no) AS groupNo   " +
-            "  FROM tb_user u LEFT JOIN tb_buyer b ON b.sale_user_id = u.id   " +
-            "  INNER JOIN tb_group g ON u.group_no = g.group_no AND g.parent_group_id=1   " +
-            "  GROUP BY u.id,createTime   " +
-            ") res INNER JOIN tb_user tu ON tu.group_no = res.groupNo AND tu.`level`=110   " +
+    @Query(value = "SELECT res.createTime,res.counts,res.buyerId,res.userName,tu.user_name AS manageName,  " +
+            "res.groupName,res.address FROM (SELECT   " +
+            "  ANY_VALUE(b.id) AS buyerId,  " +
+            "  DATE_FORMAT(ANY_VALUE(b.create_time),'%Y-%m-%d') AS createTime,  " +
+            "  count(b.id) AS counts,  " +
+            "  ANY_VALUE(u.user_name) AS userName,  " +
+            "  ANY_VALUE(g.group_name) AS groupName,  " +
+            "  ANY_VALUE(g.group_no) AS groupNo,  " +
+            "  ANY_VALUE(u.manager_id) AS managerId,  " +
+            "  ANY_VALUE(r.`name`) AS address  " +
+            "  FROM tb_user u LEFT JOIN tb_buyer b ON b.sale_user_id = u.id  " +
+            "  INNER JOIN tb_group g ON u.group_no = g.group_no AND g.parent_group_id=1  " +
+            "  INNER JOIN tb_buyer_address bad ON bad.buyer_id=b.id  " +
+            "  INNER JOIN tb_region r ON bad.area_code=r.`code`  " +
+            "  WHERE b.create_time BETWEEN '2020-05-01 00:00:00' AND '2020-05-24 00:00:00'  " +
+            "  GROUP BY u.id,createTime  " +
+            ") res JOIN tb_user tu ON tu.id = res.managerId  " +
             "ORDER BY res.createTime DESC", nativeQuery = true)
     List<Map<String, String>> countsByUserId();
 

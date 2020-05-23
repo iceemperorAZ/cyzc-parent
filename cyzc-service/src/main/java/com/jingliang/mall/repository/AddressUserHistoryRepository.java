@@ -4,6 +4,7 @@ import com.jingliang.mall.entity.AddressUserHistory;
 import com.jingliang.mall.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +35,12 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
             " ANY_VALUE(auh.latitude) AS latitude, " +
             " ANY_VALUE(auh.create_time) AS createTime " +
             " FROM tb_group g " +
-            " LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level`=100 " +
+            " LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level` BETWEEN 0 AND 199 " +
+            " WHERE DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(:time,'%Y-%m-%d') " +
             " INNER JOIN tb_address_user_history auh ON auh.user_id = u.id " +
             " GROUP BY userId,auh.create_time " +
-            " ORDER BY auh.create_time DESC", nativeQuery = true)
-    List<Map<String, Object>> userAddressHistoryToEndTime();
+            " ORDER BY userName,auh.create_time DESC", nativeQuery = true)
+    List<Map<String, Object>> userAddressHistoryToEndTime(Date time);
 
     @Query(value = "SELECT  " +
             "             ANY_VALUE(g.group_name) AS groupName,  " +
@@ -54,6 +56,6 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
             "             INNER JOIN tb_address_user_history auh ON auh.user_id = u.id  " +
             "             WHERE u.group_no = :groupNo " +
             "             GROUP BY userId,auh.create_time  " +
-            "             ORDER BY auh.create_time DESC  ",nativeQuery = true)
+            "             ORDER BY auh.create_time DESC  ", nativeQuery = true)
     List<Map<String, Object>> searchSaleByGroup(String groupNo);
 }

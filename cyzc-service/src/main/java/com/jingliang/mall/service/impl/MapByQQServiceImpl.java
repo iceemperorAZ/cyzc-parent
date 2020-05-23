@@ -24,10 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.jingliang.mall.utils.MultipartFileToFile.delteTempFile;
 import static com.jingliang.mall.utils.MultipartFileToFile.multipartFileToFile;
@@ -209,7 +206,7 @@ public class MapByQQServiceImpl implements MapService {
      */
     @Override
     public List<Map<String, Object>> userAddressHistoryToEndTime() {
-        return addressUserHistoryRepository.userAddressHistoryToEndTime();
+        return addressUserHistoryRepository.userAddressHistoryToEndTime(new Date());
     }
 
     @Override
