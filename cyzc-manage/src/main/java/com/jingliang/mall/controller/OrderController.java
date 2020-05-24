@@ -339,9 +339,9 @@ public class OrderController {
             //客户承担费用
             ++celNum;
             //订单金额
-            row.createCell(++celNum).setCellValue(order.getTotalPrice());
+            row.createCell(++celNum).setCellValue((order.getTotalPrice() * 1.00) / 100);
             //本次收款
-            row.createCell(++celNum).setCellValue(order.getPayableFee());
+            row.createCell(++celNum).setCellValue((order.getPayableFee() * 1.00) / 100);
             //判断是否使用金币
             if (order.getIsGold()) {
                 //使用金币数
