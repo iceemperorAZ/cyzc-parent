@@ -80,15 +80,6 @@ public class WechatManagerInterceptor implements HandlerInterceptor {
             response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.TOKEN_FAIL, Msg.TEXT_TOKEN_INVALID_FAIL)));
             log.debug("用户token失效");
             return false;
-        } else if (Objects.isNull(user.getLevel()) || (user.getLevel() < 110)) {
-            //重置response
-            response.reset();
-            //设置编码格式
-            response.setCharacterEncoding("UTF-8");
-            response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write(JSONObject.toJSONString(Result.build(Msg.AUTHORITY_FAIL, Msg.TEXT_AUTHORITY_FAIL)));
-            log.debug("权限不足");
-            return false;
         }
         //token 验证通过则延长token过期时间
         redisService.setExpire(tokenUserPrefix + "FRONT-" + map.get("userId"), tokenTimeOut);

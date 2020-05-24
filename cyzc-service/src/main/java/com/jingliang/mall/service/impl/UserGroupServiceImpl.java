@@ -18,7 +18,7 @@ import java.util.Date;
 
 /**
  * 员工与组关系映射表ServiceImpl
- * 
+ *
  * @author Zhenfeng Li
  * @version 1.0.0
  * @date 2020-04-23 10:14:57
@@ -27,19 +27,19 @@ import java.util.Date;
 @Slf4j
 public class UserGroupServiceImpl implements UserGroupService {
 
-	private final UserGroupRepository userGroupRepository;
-	private final GroupRepository groupRepository;
-	private final UserRepository userRepository;
+    private final UserGroupRepository userGroupRepository;
+    private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
 
-	public UserGroupServiceImpl(UserGroupRepository userGroupRepository, GroupRepository groupRepository, UserRepository userRepository) {
-		this.userGroupRepository = userGroupRepository;
+    public UserGroupServiceImpl(UserGroupRepository userGroupRepository, GroupRepository groupRepository, UserRepository userRepository) {
+        this.userGroupRepository = userGroupRepository;
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
     }
 
     @Override
     public UserGroup delete(UserGroup userGroup) {
-	    //找到需要删除用户组数据的相关用户表数据，进行删除操作
+        //找到需要删除用户组数据的相关用户表数据，进行删除操作
         User user = userRepository.findFirstByIdAndIsAvailable(userGroup.getUserId(), true);
         user.setGroupNo("1000000000");
         userRepository.save(user);
@@ -48,13 +48,13 @@ public class UserGroupServiceImpl implements UserGroupService {
 
     @Override
     public UserGroup saveU(User user) {
-	    UserGroup userGroup = new UserGroup();
-	    Date date = new Date();
+        UserGroup userGroup = new UserGroup();
+        Date date = new Date();
         //先根据用户中的组编码查出所在组
-        Group group = groupRepository.findFirstByGroupNoAndIsAvailable(user.getGroupNo(),true);
+        Group group = groupRepository.findFirstByGroupNoAndIsAvailable(user.getGroupNo(), true);
         //判断之前是否有操作数据，将之前的操作数据状态设置为不可用
         UserGroup userGroup1 = userGroupRepository.findUserGroupByUserId(user.getId());
-        if (!userGroup1.getIsAvailable()){
+        if (!userGroup1.getIsAvailable()) {
             userGroup1.setIsAvailable(false);
             userGroupRepository.save(userGroup1);
         }
@@ -68,11 +68,24 @@ public class UserGroupServiceImpl implements UserGroupService {
         return userGroupRepository.save(userGroup);
     }
 
+    /**
+     * 根据用户id查询员工与组关系映射表
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public UserGroup findUserByUserId(Long userId) {
+        return userGroupRepository.findUserGroupByUserId(userId);
+    }
+
+
     @Override
     public Page<User> findUserByGroupNo(String groupNo) {
-	    //创建分页数据
-        Pageable pageable = PageRequest.of(0,10,Sort.by("level"));
-        Page<User> userPage = userRepository.findAllByGroupNoAndIsAvailable(groupNo,pageable,true);
+        //创建分页数据
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("level"));
+        Page<User> userPage = userRepository.findAllByGroupNoAndIsAvailable(groupNo, pageable, true);
         return userPage;
     }
+
 }

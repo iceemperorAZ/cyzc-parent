@@ -13,7 +13,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,7 +68,7 @@ public class OrderController {
                            ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService,
                            BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer,
                            ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService, UserService userService,
-                           BuyerAddressService buyerAddressService,RegionService regionService) {
+                           BuyerAddressService buyerAddressService, RegionService regionService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
@@ -110,6 +109,11 @@ public class OrderController {
         //是否有真实库存
         boolean hasSku = true;
         Map<Long, Long> productPriceMap = new HashMap<>(100);
+        //返币初始化为0
+        order.setReturnGold(0);
+        Long drinksPrice = 0L;
+        List<OrderDetail> drinksDetails = new ArrayList<>();
+
         //计算商品总价
         for (OrderDetail orderDetail : order.getOrderDetails()) {
             orderDetail.setId(null);
@@ -144,11 +148,18 @@ public class OrderController {
 
             //售价[商品价格*数量]
             long sellingPrice = product.getSellingPrice() * orderDetail.getProductNum();
-            order.setTotalPrice(order.getTotalPrice() + sellingPrice);
-            order.setPayableFee(order.getPayableFee() + sellingPrice);
             orderDetail.setSellingPrice(product.getSellingPrice());
             orderDetail.setCreateTime(date);
             orderDetail.setIsAvailable(true);
+            //TODO 临时使用商品分类Id进行区分
+            if (product.getProductTypeId().equals(2020030121L)) {
+                //饮料类的价格不进行累加，单独出来计算
+                drinksDetails.add(orderDetail);
+                orderDetail.setDifference(product.getSellingPrice() - product.getMarketPrice());
+                drinksPrice += sellingPrice;
+            }
+            order.setTotalPrice(order.getTotalPrice() + sellingPrice);
+            order.setPayableFee(order.getPayableFee() + sellingPrice);
             orderDetails.add(orderDetail);
             //查询已购买数量
             Long increment = redisService.increment("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", orderDetail.getProductNum());
@@ -158,6 +169,15 @@ public class OrderController {
                 //如果是第一次则进行倒计时（当天12点失效）
                 Duration duration = Duration.between(LocalDateTime.now(), LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)));
                 redisService.setExpire("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", duration.toMillis() / 1000);
+            }
+            //判断商品本次购买数量是否满足最底限度
+            if (orderDetail.getProductNum() < product.getMinNum()) {
+                for (OrderDetail detailReq : orderDetails) {
+                    //如果本次有已经售空的商品就把减掉的库存加回去，并返回库存商品已售空
+                    redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
+                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detailReq.getProductId() + "", detailReq.getProductNum());
+                }
+                return Result.build(Msg.ORDER_FAIL, product.getProductName() + "最少" + product.getMinNum() + product.getUnit() + "起购");
             }
             //判断商品本次是否超过购买限制
             if (orderDetail.getProductNum() > product.getLimitNum()) {
@@ -199,7 +219,7 @@ public class OrderController {
         order.setProductNum(productNum);
         //是否满足可以下单的订单额度
         Config config = configService.findByCode("300");
-        if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+        if (order.getTotalPrice() + drinksPrice < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             for (OrderDetail detail : orderDetails) {
                 //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                 redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
@@ -209,7 +229,7 @@ public class OrderController {
         }
         //是否满足可以下单的订单额度
         config = configService.findByCode("700");
-        if (order.getTotalPrice() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+        if (order.getTotalPrice() + drinksPrice > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             for (OrderDetail detail : orderDetails) {
                 //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                 redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
@@ -302,23 +322,25 @@ public class OrderController {
         order.setOrderStatus(100);
         order.setPayStartTime(date);
         order.setUpdateTime(date);
-        Map<String, String> resultMap = new HashMap<>();
+        Map<String, String> resultMap = new HashMap<>(156);
         if (order.getIsGold() != null && order.getIsGold()) {
             //选择使用金币后
             //扣除金币
             buyer = buyerService.findById(buyer.getId());
             Integer gold = buyer.getGold();
             //金币小于等于订单支付数
-            if (order.getPayableFee() / 100 >= gold / 10) {
-                order.setPayableFee((order.getPayableFee() / 10 - gold) * 10);
+            if ((order.getPayableFee()) / 100 >= gold / 10) {
+                order.setPayableFee(((order.getPayableFee()) / 10 - gold) * 10);
                 order.setGold(gold);
             } else {
                 //使用了对应钱数的金币
-                order.setGold(order.getPayableFee().intValue() / 10);
+                order.setGold((order.getPayableFee().intValue() / 10));
                 //金币大于订单支付数
                 order.setPayableFee(0L);
             }
         }
+
+
         //计算运费
         config = configService.findByCode("100");
         if (order.getTotalPrice() >= (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
@@ -385,15 +407,16 @@ public class OrderController {
         order.setDetailAddressCity(buyerAddress.getCityCode());
         order.setDetailAddressArea(buyerAddress.getAreaCode());
         order.setDetailAddressStreet(buyerAddress.getStreetCode());
-        String DetailAddress = regionService.findByCode(buyerAddress.getProvinceCode())
-                .concat("/")
-                .concat(buyerAddress.getCityCode())
-                .concat("/")
-                .concat(buyerAddress.getAreaCode())
-                .concat("/")
-                .concat(StringUtils.isNotBlank(buyerAddress.getStreetCode())?buyerAddress.getStreetCode():"");
-        order.setDetailAddress(DetailAddress);
-        order = orderService.save(order);
+//        String DetailAddress = regionService.findByCode(buyerAddress.getProvinceCode())
+//                .concat("/")
+//                .concat(buyerAddress.getCity().getName())
+//                .concat("/")
+//                .concat(buyerAddress.getArea().getName())
+//                .concat("/")
+//                .concat(StringUtils.isNotBlank(buyerAddress.getStreetCode())?buyerAddress.getStreetCode():"");
+//        order.setDetailAddress(DetailAddress);
+
+        order = orderService.save(order, drinksDetails, drinksPrice);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {
             return Result.build(Msg.PAY_GOLD_OK, "");
@@ -406,6 +429,7 @@ public class OrderController {
         log.debug("返回结果：{}", orderResp);
         return Result.buildSaveOk(resultMap);
     }
+
     /**
      * 取消订单
      */

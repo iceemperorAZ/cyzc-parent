@@ -176,6 +176,12 @@ public class Buyer implements Serializable {
     @Column(name = "member_level")
     private Integer memberLevel;
 
+    /**
+     * 商铺详细地址
+     */
+    @Column(name = "ship_addr")
+    private String shipAddress;
+
     @Transient
     private String token;
 

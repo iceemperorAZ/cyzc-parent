@@ -29,6 +29,10 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -170,7 +174,7 @@ public class WechatManageController {
         }
         //1.2.不是查询的是自己的商户，判断要查询的销售是否是自己分组下的人
         if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
-            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+            return Result.build(Msg.FAIL, "无查看此商户信息权限");
         }
         //1.3.查询指定销售在自己组下所有商户产生的总绩效
         Map<String, Object> achievement = wechatManageService.bossUserAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", saleUserId, startTime, endTime);
@@ -201,7 +205,7 @@ public class WechatManageController {
         }
         //1.2.不是查询的是自己的商户，判断要查询的销售是否是自己分组下的人
         if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
-            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+            return Result.build(Msg.FAIL, "无查看此商信息权限");
         }
         //1.3.查询指定销售在自己组下所有商户产生的绩效
         List<Map<String, Object>> achievements = wechatManageService.bossUserBuyerAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", saleUserId, startTime, endTime);
@@ -238,7 +242,7 @@ public class WechatManageController {
         }
         //1.2.不是查询自己的商户，判断要查询的销售是否是自己分组下的人
         if (!saleUser.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
-            return Result.build(Msg.FAIL, "无查看此销售信息权限");
+            return Result.build(Msg.FAIL, "无查看此商户信息权限");
         }
         //1.3.查询指定销售在自己组下的商户所有订单产生的绩效
         List<Map<String, Object>> achievements = wechatManageService.bossUserBuyerOrderAchievement(user.getGroupNo().replaceAll("0*$", "") + "%", buyer.getId(), startTime, endTime);
@@ -266,10 +270,10 @@ public class WechatManageController {
         //1.判断是否查询的是自己的或自己组下的商户订单详情
         if ((user.getId().equals(saleUserId)) || order.getGroupNo().startsWith(user.getGroupNo().replaceAll("0*$", ""))) {
             //1.1.查询订单详情产生的绩效
-            List<Map<String, Object>> achievements = wechatManageService.bossBuyerOrderDetailAchievement(orderId ,startTime, endTime);
+            List<Map<String, Object>> achievements = wechatManageService.bossBuyerOrderDetailAchievement(orderId, startTime, endTime);
             return Result.buildQueryOk(achievements);
         }
-        return Result.build(Msg.FAIL, "无查看此销售信息权限");
+        return Result.build(Msg.FAIL, "无查看此商户订单详情的权限");
     }
 
     /**
@@ -305,8 +309,8 @@ public class WechatManageController {
     @GetMapping("/boss/group/product/achievement")
     @ApiOperation(value = "查询分组统计各个组下的商品所产生的绩效")
     public Result<List<Map<String, Object>>> bossGroupProductAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                             String groupNo, HttpSession session) {
+                                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                         String groupNo, HttpSession session) {
         if (StringUtils.isBlank(groupNo)) {
             return Result.buildQueryOk(new ArrayList<>());
         }
@@ -326,7 +330,39 @@ public class WechatManageController {
         return Result.buildQueryOk(achievements);
     }
 
+    /**
+     * 查询分组统计各个组下的商品所产生的绩效
+     */
+    @GetMapping("/boss/x")
+    @ApiOperation(value = "查询分组统计各个组下的商品所产生的绩效")
+    public Result<List<Map<String, Object>>> x(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                               String groupNo, HttpSession session) {
+        wechatManageService.x();
+        return null;
+    }
 
+    public static void main(String[] args) throws IOException {
+        Random random = new Random();
+        Set<String> set = new HashSet<>();
+        for (int i = 0; i < 5000; i++) {
+            StringBuilder builder = new StringBuilder();
+            for (int j = 0; j < 12; j++) {
+                int i1 = random.nextInt(10);
+                if (j == 0) {
+                    i1 = random.nextInt(9) + 1;
+                }
+                builder.append(i1);
+            }
+            set.add(builder.toString());
+        }
+        Writer writer = new OutputStreamWriter(new FileOutputStream("D:\\Users\\CleanCode\\Desktop\\x.txt", true));
+        for (String s : set) {
+            writer.write(s + "\r\n");
+        }
+        writer.close();
+
+    }
 //    /**
 //     * 查询所有销售（领导身份）
 //     */

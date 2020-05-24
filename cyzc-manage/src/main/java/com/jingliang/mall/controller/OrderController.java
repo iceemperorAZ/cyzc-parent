@@ -1,14 +1,10 @@
 package com.jingliang.mall.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.resp.OrderResp;
-import com.jingliang.mall.service.BuyerService;
-import com.jingliang.mall.service.OfflinePaymentService;
-import com.jingliang.mall.service.OrderDetailService;
-import com.jingliang.mall.service.OrderService;
+import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -57,12 +53,14 @@ public class OrderController {
     private final OrderDetailService orderDetailService;
     private final BuyerService buyerService;
     private final OfflinePaymentService offlinePaymentService;
+    private final GroupService groupService;
 
-    public OrderController(OrderService orderService, OrderDetailService orderDetailService, BuyerService buyerService, OfflinePaymentService offlinePaymentService) {
+    public OrderController(OrderService orderService, OrderDetailService orderDetailService, BuyerService buyerService, OfflinePaymentService offlinePaymentService, GroupService groupService) {
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.buyerService = buyerService;
         this.offlinePaymentService = offlinePaymentService;
+        this.groupService = groupService;
     }
 
     /**
@@ -105,9 +103,9 @@ public class OrderController {
      */
     @ApiOperation(value = "批量发货")
     @PostMapping("/deliverAll")
-    public Result<List<OrderResp>> deliverAll(@RequestBody Map<String,Object> map, @ApiIgnore HttpSession session) {
+    public Result<List<OrderResp>> deliverAll(@RequestBody Map<String, Object> map, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", map);
-        List<Long> orderIds  = ((List<?>) map.get("orderIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
+        List<Long> orderIds = ((List<?>) map.get("orderIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
         //获取map集合中的配送员参数
         String house = (String) map.get("storehouseName");
         String deliveryName = (String) map.get("expressUser");
@@ -119,15 +117,15 @@ public class OrderController {
         //创建订单返回类，进行订单返回结果的存储
         List<OrderResp> orderResps = new ArrayList<>();
         //对订单类进行查询，并存储到list中
-        for (Long id : orderIds){
+        for (Long id : orderIds) {
             order2 = orderService.findById(id);
             order2.setStorehouse(house);
             order2.setDeliveryName(deliveryName);
             order2.setDeliveryPhone(deliveryPhone);
-            orderReqs.add(BeanMapper.map(order2,OrderReq.class));
+            orderReqs.add(BeanMapper.map(order2, OrderReq.class));
         }
         //开始对每个订单进行发货操作
-        for (OrderReq orderReq : orderReqs){
+        for (OrderReq orderReq : orderReqs) {
             if (Objects.isNull(orderReq.getId()) || StringUtils.isBlank(orderReq.getDeliveryName())
                     || StringUtils.isBlank(orderReq.getDeliveryPhone()) || StringUtils.isBlank(orderReq.getStorehouse())) {
                 return Result.buildParamFail();
@@ -159,6 +157,7 @@ public class OrderController {
         //此处返回一个订单返回类的list
         return Result.buildUpdateOk(orderResps);
     }
+
     /**
      * 退货(不扣绩效)
      */
@@ -218,7 +217,7 @@ public class OrderController {
      */
     @ApiOperation(value = "分页查询全部用户订单信息")
     @GetMapping("/page/all")
-    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, @RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) {
+    public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, String region, @RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) {
         log.debug("请求参数：{}", orderReq);
         PageRequest pageRequest = PageRequest.of(orderReq.getPage(), orderReq.getPageSize());
         if (StringUtils.isNotBlank(orderReq.getClause())) {
@@ -244,6 +243,10 @@ public class OrderController {
                     orOredicateList.add(cb.equal(root.get("orderStatus"), orderStatus));
                 }
             }
+
+            if (StringUtils.isNotBlank(region)) {
+                predicateList.add(cb.like(root.get("detailAddressArea"), region.replaceAll("0*$", "") + "%"));
+            }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             if (!CollectionUtils.isEmpty(orderStatuses)) {
                 query.where(cb.and(predicateList.toArray(new Predicate[0])), cb.or(orOredicateList.toArray(new Predicate[0])));
@@ -265,7 +268,7 @@ public class OrderController {
      */
     @ApiOperation(value = "导出订单excel")
     @GetMapping("/download/excel")
-    public ResponseEntity<byte[]> download(OrderReq orderReq,@RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) throws IOException {
+    public ResponseEntity<byte[]> download(OrderReq orderReq, @RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) throws IOException {
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
             List<Predicate> orOredicateList = new ArrayList<>();
@@ -305,9 +308,9 @@ public class OrderController {
         int rowNum = 1;
         for (Order order : orders) {
             XSSFRow row = sheet.createRow(rowNum);
-            //"单据日期", "单据编号", "客户编号", "客户名称", "销售人员"
-            //            , "优惠金额", "客户承担费用", "本次收款", "结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
-            //            "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库","收货地址", "收货人","电话","备注"
+            //"单据日期", "单据编号","大区", "客户编号", "客户名称", "销售人员"
+            //            , "优惠金额", "客户承担费用", "订单金额","本次收款","使用金币数","返金币数","结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
+            //            "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库","收货地址+收货人+电话","备注"
             //单据日期
             int celNum = 0;
             Date createTime = order.getCreateTime();
@@ -318,6 +321,9 @@ public class OrderController {
             String orderNo = order.getOrderNo();
             row.createCell(++celNum).setCellValue(orderNo);
             Buyer buyer = buyerService.findById(order.getBuyerId());
+            //大区
+            Group group = groupService.findByGroupNo(order.getGroupNo());
+            row.createCell(++celNum).setCellValue(group.getGroupName());
             //客户编号
             Long buyerId = buyer.getId();
             row.createCell(++celNum).setCellValue(buyerId);
@@ -332,9 +338,37 @@ public class OrderController {
             row.createCell(++celNum).setCellValue(preferentialFee);
             //客户承担费用
             ++celNum;
+            //订单金额
+            row.createCell(++celNum).setCellValue(order.getTotalPrice());
             //本次收款
-            Long payableFee = order.getPayableFee();
-            row.createCell(++celNum).setCellValue(payableFee * 1.00 / 100);
+            row.createCell(++celNum).setCellValue(order.getPayableFee());
+            //判断是否使用金币
+            if (order.getIsGold()) {
+                //使用金币数
+                row.createCell(++celNum).setCellValue(order.getGold());
+            } else {
+                ++celNum;
+            }
+            if (order.getOrderStatus() >= 300 && order.getOrderStatus() < 600) {
+                //待返金币数
+                if (order.getReturnGold() != null) {
+                    row.createCell(++celNum).setCellValue(order.getReturnGold());
+                } else {
+                    ++celNum;
+                }
+            } else {
+                ++celNum;
+            }
+            if (order.getOrderStatus() >= 600) {
+                //已返金币数
+                if (order.getReturnGold() != null) {
+                    row.createCell(++celNum).setCellValue(order.getReturnGold());
+                } else {
+                    ++celNum;
+                }
+            } else {
+                ++celNum;
+            }
             if (order.getPayWay() == 200) {
                 OfflinePayment offlinePayment = offlinePaymentService.findByOrderId(order.getId());
                 if (Objects.nonNull(offlinePayment)) {
@@ -390,15 +424,13 @@ public class OrderController {
                 row.createCell(++productCelNum).setCellValue(storehouse);
                 //重复地址只写入一次
                 if (!flag) {
-                    //备注（收货地址
+                    //收货地址
                     String detailAddress = order.getDetailAddress();
-                    row.createCell(++productCelNum).setCellValue(detailAddress);
                     //收货人
                     String receiverName = order.getReceiverName();
-                    row.createCell(++productCelNum).setCellValue(receiverName);
                     //电话
                     String receiverPhone = order.getReceiverPhone();
-                    row.createCell(++productCelNum).setCellValue(receiverPhone);
+                    row.createCell(++productCelNum).setCellValue(detailAddress.concat("   ").concat(receiverName).concat("   ").concat(receiverPhone));
                     flag = true;
                 }
                 //创建一行

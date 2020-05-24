@@ -159,4 +159,6 @@ public interface WechatManageService {
      * @return
      */
     List<Map<String, Object>> bossGroupProductAchievement(String groupNo, Date startTime, Date endTime);
+
+    void x();
 }

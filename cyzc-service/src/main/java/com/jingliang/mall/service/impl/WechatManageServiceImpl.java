@@ -253,6 +253,12 @@ public class WechatManageServiceImpl implements WechatManageService {
         return orderRepository.bossGroupProductAchievement(groupNo, startTime, endTime);
     }
 
+    @Override
+    public void x() {
+        List<Map<String, Object>> x = orderRepository.x();
+        System.out.println(x);
+    }
+
     public ConfluenceDetail doBuyerPerformanceSummary(Buyer buyer, User user, Date startTime, Date endTime) {
         ConfluenceDetail confluenceDetail = new ConfluenceDetail();
         confluenceDetail.setId(buyer.getId());

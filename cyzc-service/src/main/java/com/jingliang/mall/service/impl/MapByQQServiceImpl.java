@@ -24,10 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.jingliang.mall.utils.MultipartFileToFile.delteTempFile;
 import static com.jingliang.mall.utils.MultipartFileToFile.multipartFileToFile;
@@ -148,16 +145,6 @@ public class MapByQQServiceImpl implements MapService {
         return addressUserHistoryRepository.save(addressUserHistory);
     }
 
-    /**
-     * 通过商户id获取经纬度记录
-     *
-     * @param userId
-     * @return
-     */
-    @Override
-    public List<AddressUserHistory> readMap(Long userId) {
-        return addressUserHistoryRepository.findAllByUserIdAndIsAvailableOrderByCreateTimeAsc(userId, true);
-    }
 
     @Transactional
     @Override
@@ -206,9 +193,37 @@ public class MapByQQServiceImpl implements MapService {
      */
     @Override
     public List<Map<String, Object>> findAddressByGroupNo(String groupNo) {
+        //使用正则表达式将组编码后面的0移除 0100000000  0101000000  0101010000,如果不传值，则查询全部
+        groupNo = groupNo.replaceAll("0*$", "") + "%";
         return buyerAddressRepository.findAddressByGroupNo(groupNo);
     }
 
+    /**
+     * 查询销售员的最后一条记录
+     *
+     * @param
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> userAddressHistoryToEndTime() {
+        return addressUserHistoryRepository.userAddressHistoryToEndTime(new Date());
+    }
+
+    @Override
+    public List<Map<String, Object>> searchSaleByGroup(String groupNo) {
+        return addressUserHistoryRepository.searchSaleByGroup(groupNo);
+    }
+
+    /**
+     * 通过商户id获取经纬度记录
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<AddressUserHistory> readMap(Long userId) {
+        return addressUserHistoryRepository.findAllByUserIdAndIsAvailableOrderByCreateTimeAsc(userId, true);
+    }
 
     /**
      * 解析url地址

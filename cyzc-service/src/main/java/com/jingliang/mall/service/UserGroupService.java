@@ -1,18 +1,13 @@
 package com.jingliang.mall.service;
 
 
-import com.jingliang.mall.entity.Group;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.entity.UserGroup;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.domain.Specification;
-
-import java.util.List;
 
 /**
  * 员工与组关系映射表Service
- * 
+ *
  * @author XiaoBing Li
  * @version 1.0.0
  * @date 2020-04-23 10:14:57
@@ -39,4 +34,6 @@ public interface UserGroupService {
      * @return
      */
     public UserGroup saveU(User user);
+
+    UserGroup findUserByUserId(Long saleUserId);
 }
