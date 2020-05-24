@@ -120,7 +120,8 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " g.parent_group_id = :parentGroupId " +
             " AND g.is_available = 1   " +
             " GROUP BY " +
-            " g.id,g.group_name ", nativeQuery = true)
+            " g.id,g.group_name "+
+            " ORDER BY totalPrice DESC ", nativeQuery = true)
     List<Map<String, Object>> findGroupAchievement(Long parentGroupId, Date startTime, Date endTime);
 
     /*
@@ -608,6 +609,6 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             "AND DATE_FORMAT(:endTime, '%e')", nativeQuery = true)
     List<Map<String, Object>> daysByDateAndParentGroupIdAchievement(Date startTime, Date endTime, Long parentGroupId);
 
-    @Query(value = "SELECT ANY_VALUE(g.group_name) as groupName,ANY_VALUE(b.id) as id,ANY_VALUE(b.shop_name) as shopName,ANY_VALUE(b.register_source) as registerSource,ANY_VALUE(b.sale_user_id) as saleUserId,DATE_FORMAT(b.create_time,'%Y-%m-%d') as date FROM tb_buyer b JOIN tb_user u ON u.id = b.sale_user_id JOIN tb_group g on u.group_no = g.group_no ORDER BY b.create_time DESC LIMIT 30",nativeQuery = true)
+    @Query(value = "SELECT ANY_VALUE(g.group_name) as groupName,ANY_VALUE(b.id) as id,ANY_VALUE(b.shop_name) as shopName,ANY_VALUE(b.register_source) as registerSource,ANY_VALUE(b.sale_user_id) as saleUserId,DATE_FORMAT(b.create_time,'%Y-%m-%d') as date,ANY_VALUE(u.user_name) AS saleName FROM tb_buyer b JOIN tb_user u ON u.id = b.sale_user_id JOIN tb_group g on u.group_no = g.group_no ORDER BY b.create_time DESC LIMIT 30",nativeQuery = true)
     List<Map<String, Object>> getBuyerTop30();
 }
