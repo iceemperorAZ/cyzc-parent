@@ -42,9 +42,10 @@ public class BuyerServiceImpl implements BuyerService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Buyer save(Buyer buyer) {
+        Buyer save = buyerRepository.save(buyer);
         if (buyer.getId() == null) {
             GoldLog goldLog = new GoldLog();
-            goldLog.setBuyerId(buyer.getId());
+            goldLog.setBuyerId(save.getId());
             goldLog.setIsAvailable(true);
             goldLog.setGold(10);
             goldLog.setMsg("新用户注册，赠送10金币。");
@@ -53,7 +54,7 @@ public class BuyerServiceImpl implements BuyerService {
             goldLogRepository.save(goldLog);
             buyer.setGold(10);
         }
-        return buyerRepository.save(buyer);
+        return save;
     }
 
     @Override
