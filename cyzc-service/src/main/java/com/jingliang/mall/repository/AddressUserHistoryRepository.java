@@ -57,7 +57,7 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
             "             ANY_VALUE(auh.latitude) AS latitude,  " +
             "             ANY_VALUE(auh.create_time) AS createTime  " +
             "             FROM tb_group g  " +
-            "             LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level`=100  " +
+            "             LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level` BETWEEN 0 AND 199  " +
             "             INNER JOIN tb_address_user_history auh ON auh.user_id = u.id  " +
             "             WHERE u.group_no = :groupNo " +
             "             GROUP BY userId,auh.create_time  " +
