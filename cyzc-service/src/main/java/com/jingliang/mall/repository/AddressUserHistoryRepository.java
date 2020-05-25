@@ -43,7 +43,7 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
             "LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level` BETWEEN 0 AND 199 \n" +
             "JOIN tb_address_user_history auh ON auh.user_id = u.id \n" +
             "WHERE DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(:time,'%Y-%m-%d') \n" +
-            "GROUP BY u.id,auh.create_time \n" +
+            "GROUP BY u.id,auh.create_time and auh.create_time = DATE_FORMAT(now(),'%Y-%m-%d') \n" +
             "ORDER BY userName,auh.create_time DESC", nativeQuery = true)
     List<Map<String, Object>> userAddressHistoryToEndTime(Date time);
 
@@ -57,9 +57,9 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
             "             ANY_VALUE(auh.latitude) AS latitude,  " +
             "             ANY_VALUE(auh.create_time) AS createTime  " +
             "             FROM tb_group g  " +
-            "             LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level`=100  " +
+            "             LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level` BETWEEN 0 AND 199  " +
             "             INNER JOIN tb_address_user_history auh ON auh.user_id = u.id  " +
-            "             WHERE u.group_no = :groupNo " +
+            "             WHERE u.group_no = :groupNo and auh.create_time = DATE_FORMAT(now(),'%Y-%m-%d') " +
             "             GROUP BY userId,auh.create_time  " +
             "             ORDER BY auh.create_time DESC  ", nativeQuery = true)
     List<Map<String, Object>> searchSaleByGroup(String groupNo);
