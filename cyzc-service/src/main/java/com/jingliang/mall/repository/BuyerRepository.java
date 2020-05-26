@@ -160,4 +160,11 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
      */
     @Query(value = "SELECT count(b.id) AS counts FROM tb_buyer b WHERE b.is_available=1", nativeQuery = true)
     List<Map<String, Object>> searchAllBuyer();
+
+    /*
+    *
+    * 查询未绑定销售的商户
+    * * */
+    @Query(value = " SELECT count(*) AS counts FROM tb_buyer WHERE sale_user_id IS NULL AND is_available = 1 ",nativeQuery = true)
+    List<Map<String, Object>> searchBuyerDontHaveSale();
 }

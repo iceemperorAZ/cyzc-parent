@@ -116,4 +116,10 @@ public interface BuyerManageService {
      * @return
      */
     List<Map<String, Object>> searchAllBuyer();
+
+    /*
+    * *
+    * 查询所有未绑定销售的商户
+    * * */
+    List<Map<String, Object>> searchBuyerDontHaveSale();
 }

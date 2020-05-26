@@ -389,4 +389,15 @@ public class BuyerManageController {
                 .contentLength(arrayOutputStream.size())
                 .body(arrayOutputStream.toByteArray());
     }
+
+    /*
+    *
+    *  查询未绑定销售的商户数
+    * * */
+    @GetMapping("/searchBuyerDontHaveSale")
+    @ApiOperation(value = "查询未绑定销售的商户")
+    public Result<?> searchBuyerDontHaveSale() {
+        List<Map<String, Object>> buyers = buyerManageService.searchBuyerDontHaveSale();
+        log.debug("返回参数:{}",buyers);
+        return Result.buildQueryOk(buyers);}
 }

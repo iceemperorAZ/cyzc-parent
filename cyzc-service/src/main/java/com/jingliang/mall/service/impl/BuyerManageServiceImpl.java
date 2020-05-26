@@ -138,4 +138,8 @@ public class BuyerManageServiceImpl implements BuyerManageService {
         return buyerRepository.searchAllBuyer();
     }
 
+    @Override
+    public List<Map<String, Object>> searchBuyerDontHaveSale() {
+        return buyerRepository.searchBuyerDontHaveSale();
+    }
 }
