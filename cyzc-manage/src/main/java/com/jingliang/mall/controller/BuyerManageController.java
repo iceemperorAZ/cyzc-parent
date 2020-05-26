@@ -399,5 +399,18 @@ public class BuyerManageController {
     public Result<?> searchBuyerDontHaveSale() {
         List<Map<String, Object>> buyers = buyerManageService.searchBuyerDontHaveSale();
         log.debug("返回参数:{}",buyers);
-        return Result.buildQueryOk(buyers);}
+        return Result.buildQueryOk(buyers);
+    }
+
+    /*
+     *
+     *  查询绑定销售的商户数
+     * * */
+    @GetMapping("/searchBuyerHaveSale")
+    @ApiOperation(value = "查询未绑定销售的商户")
+    public Result<?> searchBuyerHaveSale() {
+        List<Map<String, Object>> buyers = buyerManageService.searchBuyerHaveSale();
+        log.debug("返回参数:{}",buyers);
+        return Result.buildQueryOk(buyers);
+    }
 }

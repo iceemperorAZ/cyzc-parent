@@ -142,4 +142,8 @@ public class BuyerManageServiceImpl implements BuyerManageService {
     public List<Map<String, Object>> searchBuyerDontHaveSale() {
         return buyerRepository.searchBuyerDontHaveSale();
     }
+    @Override
+    public List<Map<String, Object>> searchBuyerHaveSale(){
+        return buyerRepository.searchBuyerHaveSale();
+    }
 }
