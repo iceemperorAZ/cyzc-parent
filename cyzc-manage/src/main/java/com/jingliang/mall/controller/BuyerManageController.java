@@ -327,6 +327,19 @@ public class BuyerManageController {
     }
 
     /**
+     * 查询全部可用的销售
+     *
+     * @return
+     */
+    @GetMapping("/searchAllBuyer")
+    @ApiOperation(value = "查询全部可用的销售")
+    public Result<List<Map<String, Object>>> searchAllBuyer() {
+        List<Map<String, Object>> maps = buyerManageService.searchAllBuyer();
+        log.debug("返回参数:{}", maps);
+        return Result.buildOk(maps);
+    }
+
+    /**
      * 导出销售新增商户统计的excel
      *
      * @return

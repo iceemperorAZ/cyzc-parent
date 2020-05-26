@@ -152,4 +152,12 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
             "AND DATE_FORMAT(:endTime, '%m')  " +
             "ORDER BY counts DESC LIMIT :topNum ", nativeQuery = true)
     List<Map<String, Object>> monthtopOfProductCountsByOrder(Date startTime, Date endTime, Integer topNum);
+
+    /**
+     * 查询所有可用商户
+     *
+     * @return
+     */
+    @Query(value = "SELECT count(b.id) AS counts FROM tb_buyer b WHERE b.is_available=1", nativeQuery = true)
+    List<Map<String, Object>> searchAllBuyer();
 }
