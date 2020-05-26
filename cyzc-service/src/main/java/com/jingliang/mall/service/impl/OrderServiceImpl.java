@@ -58,40 +58,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Order save(Order order, List<OrderDetail> drinksDetails, Long drinksPrice) {
+    public Order save(Order order) {
         Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(order.getBuyerId(), true);
         if (order.getIsGold() != null && order.getIsGold()) {
             buyer.setGold(buyer.getGold() - order.getGold());
             buyerRepository.save(buyer);
-        }
-
-        if (order.getPayableFee() > 0 && buyer.getOrderSpecificNum() > 0) {
-            buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() - 1);
-            //计算返金币比例
-            Config config = configRepository.findFirstByCodeAndIsAvailable("800", true);
-            double percentage = Integer.parseInt(config.getConfigValues()) * 0.01;
-            //返的金币数
-            int gold = (int) (((order.getPayableFee() - drinksPrice) / 100.00) * percentage);
-            order.setReturnGold(gold);
-        }
-        //金币
-        final long[] gold = {buyer.getGold() == null ? 0 : drinksPrice * 10};
-        if (order.getIsGold() == null || !order.getIsGold()) {
-            for (OrderDetail orderDetail : drinksDetails.stream().sorted(Comparator.comparingLong(OrderDetail::getDifference).reversed()).collect(Collectors.toList())) {
-                for (int i = 0; i < orderDetail.getProductNum(); i++) {
-                    if (gold[0] - (orderDetail.getSellingPrice()) >= 0) { //这里在测试时进行了改动
-                        order.setReturnGold((int) (order.getReturnGold() + orderDetail.getDifference() / 10));
-                        //反对应数量的金币
-                        gold[0] -= (orderDetail.getSellingPrice());
-                        drinksPrice -= (orderDetail.getSellingPrice());
-                    }
-                    //金币不够支付，算出实际支付价格，以及扣减金币后的价格
-                    else {
-                        drinksPrice -= orderDetail.getSellingPrice() - gold[0];
-                        gold[0] = 0;
-                    }
-                }
-            }
         }
         order = orderRepository.save(order);
         //减库存
