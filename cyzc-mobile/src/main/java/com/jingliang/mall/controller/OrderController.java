@@ -109,11 +109,6 @@ public class OrderController {
         //是否有真实库存
         boolean hasSku = true;
         Map<Long, Long> productPriceMap = new HashMap<>(100);
-        //返币初始化为0
-        order.setReturnGold(0);
-        Long drinksPrice = 0L;
-        List<OrderDetail> drinksDetails = new ArrayList<>();
-
         //计算商品总价
         for (OrderDetail orderDetail : order.getOrderDetails()) {
             orderDetail.setId(null);
@@ -148,18 +143,11 @@ public class OrderController {
 
             //售价[商品价格*数量]
             long sellingPrice = product.getSellingPrice() * orderDetail.getProductNum();
+            order.setTotalPrice(order.getTotalPrice() + sellingPrice);
+            order.setPayableFee(order.getPayableFee() + sellingPrice);
             orderDetail.setSellingPrice(product.getSellingPrice());
             orderDetail.setCreateTime(date);
             orderDetail.setIsAvailable(true);
-            //TODO 临时使用商品分类Id进行区分
-            if (product.getProductTypeId().equals(2020030121L)) {
-                //饮料类的价格不进行累加，单独出来计算
-                drinksDetails.add(orderDetail);
-                orderDetail.setDifference(product.getSellingPrice() - product.getMarketPrice());
-                drinksPrice += sellingPrice;
-            }
-            order.setTotalPrice(order.getTotalPrice() + sellingPrice);
-            order.setPayableFee(order.getPayableFee() + sellingPrice);
             orderDetails.add(orderDetail);
             //查询已购买数量
             Long increment = redisService.increment("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", orderDetail.getProductNum());
@@ -169,15 +157,6 @@ public class OrderController {
                 //如果是第一次则进行倒计时（当天12点失效）
                 Duration duration = Duration.between(LocalDateTime.now(), LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)));
                 redisService.setExpire("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", duration.toMillis() / 1000);
-            }
-            //判断商品本次购买数量是否满足最底限度
-            if (orderDetail.getProductNum() < product.getMinNum()) {
-                for (OrderDetail detailReq : orderDetails) {
-                    //如果本次有已经售空的商品就把减掉的库存加回去，并返回库存商品已售空
-                    redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
-                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detailReq.getProductId() + "", detailReq.getProductNum());
-                }
-                return Result.build(Msg.ORDER_FAIL, product.getProductName() + "最少" + product.getMinNum() + product.getUnit() + "起购");
             }
             //判断商品本次是否超过购买限制
             if (orderDetail.getProductNum() > product.getLimitNum()) {
@@ -219,7 +198,7 @@ public class OrderController {
         order.setProductNum(productNum);
         //是否满足可以下单的订单额度
         Config config = configService.findByCode("300");
-        if (order.getTotalPrice() + drinksPrice < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+        if (order.getTotalPrice() < (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             for (OrderDetail detail : orderDetails) {
                 //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                 redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
@@ -229,7 +208,7 @@ public class OrderController {
         }
         //是否满足可以下单的订单额度
         config = configService.findByCode("700");
-        if (order.getTotalPrice() + drinksPrice > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
+        if (order.getTotalPrice() > (long) (Double.parseDouble(config.getConfigValues()) * 100)) {
             for (OrderDetail detail : orderDetails) {
                 //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
                 redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
@@ -416,7 +395,7 @@ public class OrderController {
 //                .concat(StringUtils.isNotBlank(buyerAddress.getStreetCode())?buyerAddress.getStreetCode():"");
 //        order.setDetailAddress(DetailAddress);
 
-        order = orderService.save(order, drinksDetails, drinksPrice);
+        order = orderService.save(order);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {
             return Result.build(Msg.PAY_GOLD_OK, "");

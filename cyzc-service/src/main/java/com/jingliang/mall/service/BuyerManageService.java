@@ -110,4 +110,21 @@ public interface BuyerManageService {
      */
     List<Map<String, Object>> monthtopOfProductCountsByOrder(Date startTime, Date endTime, Integer topNum);
 
+    /**
+     * 查询所有可用商户
+     *
+     * @return
+     */
+    List<Map<String, Object>> searchAllBuyer();
+
+    /*
+    * *
+    * 查询所有未绑定销售的商户
+    * * */
+    List<Map<String, Object>> searchBuyerDontHaveSale();
+    /*
+     * *
+     * 查询所有绑定销售的商户
+     * * */
+    List<Map<String, Object>> searchBuyerHaveSale();
 }

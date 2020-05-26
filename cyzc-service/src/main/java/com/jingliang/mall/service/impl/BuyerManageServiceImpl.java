@@ -133,4 +133,17 @@ public class BuyerManageServiceImpl implements BuyerManageService {
         return buyerRepository.monthtopOfProductCountsByOrder(startTime, endTime, topNum);
     }
 
+    @Override
+    public List<Map<String, Object>> searchAllBuyer() {
+        return buyerRepository.searchAllBuyer();
+    }
+
+    @Override
+    public List<Map<String, Object>> searchBuyerDontHaveSale() {
+        return buyerRepository.searchBuyerDontHaveSale();
+    }
+    @Override
+    public List<Map<String, Object>> searchBuyerHaveSale(){
+        return buyerRepository.searchBuyerHaveSale();
+    }
 }

@@ -327,6 +327,19 @@ public class BuyerManageController {
     }
 
     /**
+     * 查询全部可用的销售
+     *
+     * @return
+     */
+    @GetMapping("/searchAllBuyer")
+    @ApiOperation(value = "查询全部可用的销售")
+    public Result<List<Map<String, Object>>> searchAllBuyer() {
+        List<Map<String, Object>> maps = buyerManageService.searchAllBuyer();
+        log.debug("返回参数:{}", maps);
+        return Result.buildOk(maps);
+    }
+
+    /**
      * 导出销售新增商户统计的excel
      *
      * @return
@@ -375,5 +388,29 @@ public class BuyerManageController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .contentLength(arrayOutputStream.size())
                 .body(arrayOutputStream.toByteArray());
+    }
+
+    /*
+    *
+    *  查询未绑定销售的商户数
+    * * */
+    @GetMapping("/searchBuyerDontHaveSale")
+    @ApiOperation(value = "查询未绑定销售的商户")
+    public Result<?> searchBuyerDontHaveSale() {
+        List<Map<String, Object>> buyers = buyerManageService.searchBuyerDontHaveSale();
+        log.debug("返回参数:{}",buyers);
+        return Result.buildQueryOk(buyers);
+    }
+
+    /*
+     *
+     *  查询绑定销售的商户数
+     * * */
+    @GetMapping("/searchBuyerHaveSale")
+    @ApiOperation(value = "查询未绑定销售的商户")
+    public Result<?> searchBuyerHaveSale() {
+        List<Map<String, Object>> buyers = buyerManageService.searchBuyerHaveSale();
+        log.debug("返回参数:{}",buyers);
+        return Result.buildQueryOk(buyers);
     }
 }
