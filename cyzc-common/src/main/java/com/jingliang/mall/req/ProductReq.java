@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品表
@@ -331,6 +332,12 @@ public class ProductReq extends BaseReq implements Serializable {
      */
     @ApiModelProperty(value = "每日购买上限")
     private Integer limitNum;
+
+    /**
+     * 商品详情
+     */
+    @ApiModelProperty(value = "商品详情")
+    private String test;
 
     public Boolean getIsSoonShow() {
         return isSoonShow;

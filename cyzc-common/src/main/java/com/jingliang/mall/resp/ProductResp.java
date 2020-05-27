@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品表
@@ -271,6 +272,12 @@ public class ProductResp implements Serializable {
      */
     @ApiModelProperty(value = "每日购买上限")
     private Integer limitNum;
+
+    /**
+     * 商品详情
+     */
+    @ApiModelProperty(value = "商品详情")
+    private String test;
 
     /**
      * 商品图片字符串转集合

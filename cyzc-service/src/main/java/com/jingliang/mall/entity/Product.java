@@ -17,7 +17,7 @@ import java.util.Date;
 @Table(name = "tb_product")
 @Entity
 @Data
-public class Product implements Serializable {
+public class Product<List> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -256,4 +256,10 @@ public class Product implements Serializable {
      */
     @Column(name = "min_num")
     private Integer minNum;
+
+    /**
+     * 商品详情
+     */
+    @Column(name = "test")
+    private String test;
 }
