@@ -102,7 +102,7 @@ public class ProductController {
                 }
             }
         }
-        Product product = productService.findAllByProductTypeIdAndSort(productReq.getProductTypeId(), productReq.getProductSort());
+        Product product = productService.findAllById(productReq.getId());
         if (product != null && !product.getId().equals(productReq.getId())) {
             //序号重复
             return Result.build(Msg.FAIL, "序号重复");

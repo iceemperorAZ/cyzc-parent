@@ -332,12 +332,6 @@ public class ProductReq extends BaseReq implements Serializable {
     @ApiModelProperty(value = "每日购买上限")
     private Integer limitNum;
 
-    /**
-     * 商品详情
-     */
-    @ApiModelProperty(value = "商品详情")
-    private String productDetails;
-
     public Boolean getIsSoonShow() {
         return isSoonShow;
     }
@@ -351,6 +345,18 @@ public class ProductReq extends BaseReq implements Serializable {
      */
     @ApiModelProperty(value = "重量")
     private Integer weight;
+
+    /**
+     * 商品详情
+     */
+    @ApiModelProperty(value = "商品详情")
+    private String productDetails;
+
+    /**
+     * 商品详情图
+     */
+    @ApiModelProperty(value = "商品详情图")
+    private String productDetailsImg;
 
     public void setMarketPrice(Float marketPrice) {
         this.marketPrice = marketPrice * 100;
