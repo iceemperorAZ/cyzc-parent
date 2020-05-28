@@ -106,6 +106,9 @@ public class OrderController {
         int productNum = 0;
         List<OrderDetail> orderDetails = new ArrayList<>();
         Date date = new Date();
+        //返币
+        Long drinksPrice = 0L;
+        List<OrderDetail> drinksDetails = new ArrayList<>();
         //是否有真实库存
         boolean hasSku = true;
         Map<Long, Long> productPriceMap = new HashMap<>(100);
@@ -149,6 +152,13 @@ public class OrderController {
             orderDetail.setCreateTime(date);
             orderDetail.setIsAvailable(true);
             orderDetails.add(orderDetail);
+            //TODO 临时使用商品分类Id进行区分
+            if (product.getProductTypeId().equals(2020030121L)) {
+                //饮料类的价格不进行累加，单独出来计算
+                drinksDetails.add(orderDetail);
+                orderDetail.setDifference(product.getSellingPrice() - product.getMarketPrice());
+                drinksPrice += sellingPrice;
+            }
             //查询已购买数量
             Long increment = redisService.increment("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", orderDetail.getProductNum());
             //查询线上库存
@@ -395,7 +405,7 @@ public class OrderController {
 //                .concat(StringUtils.isNotBlank(buyerAddress.getStreetCode())?buyerAddress.getStreetCode():"");
 //        order.setDetailAddress(DetailAddress);
 
-        order = orderService.save(order);
+        order = orderService.save(order, drinksDetails, drinksPrice);
         rabbitProducer.sendOrderExpireMsg(order);
         if (order.getPayableFee().equals(0L)) {
             return Result.build(Msg.PAY_GOLD_OK, "");

@@ -23,7 +23,7 @@ public interface OrderService {
      * @param order 订单对象
      * @return 返回保存后的订单信息
      */
-    Order save(Order order);
+    Order save(Order order, List<OrderDetail> drinksDetails, Long drinksPrice);
 
     /**
      * 根据订单Id和会员Id查询订单信息

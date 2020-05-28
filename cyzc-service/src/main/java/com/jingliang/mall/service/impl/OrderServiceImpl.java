@@ -58,8 +58,39 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Order save(Order order) {
+    public Order save(Order order, List<OrderDetail> drinksDetails, Long drinksPrice) {
         Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(order.getBuyerId(), true);
+        //金币
+        final long[] gold = {order.getGold() == null ? 0 : (order.getGold() * 10)};
+        for (OrderDetail orderDetail : drinksDetails.stream().sorted(Comparator.comparingLong(OrderDetail::getDifference).reversed()).collect(Collectors.toList())) {
+            for (int i = 0; i < orderDetail.getProductNum(); i++) {
+                if (gold[0] > 0) {
+                    if (gold[0] - (orderDetail.getSellingPrice()) > 0) {
+                        //拿出使用的金币数，看能抵消多少件商品
+                        gold[0] -= (orderDetail.getSellingPrice());
+                        drinksPrice -= (orderDetail.getSellingPrice());
+                    }
+                    //金币不够支付，算出实际支付价格，以及扣减金币后的价格
+                    else {
+                        order.setReturnGold((int) ((order.getReturnGold() == null ? 0 : order.getReturnGold()) + orderDetail.getSellingPrice() - gold[0]) / 10);
+                        drinksPrice -= gold[0];
+                        gold[0] = 0;
+                    }
+                } else {
+                    order.setReturnGold((int) ((order.getReturnGold() == null ? 0 : order.getReturnGold()) + orderDetail.getDifference() / 10));
+                }
+            }
+        }
+        if ((order.getPayableFee() - drinksPrice) > 0 && buyer.getOrderSpecificNum().compareTo(0) > 0) {
+            buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() - 1);
+            //计算返金币比例
+            Config config = configRepository.findFirstByCodeAndIsAvailable("800", true);
+            double percentage = Integer.parseInt(config.getConfigValues()) * 0.01;
+            //返的金币数
+            int gold1 = (int) (((order.getPayableFee() - drinksPrice) / 100.00) * percentage);
+            order.setReturnGold((order.getReturnGold() == null ? 0 : order.getReturnGold()) + gold1);//这里测试时进行了改动，返币应该加上之前饮料的返币
+        }
+
         if (order.getIsGold() != null && order.getIsGold()) {
             buyer.setGold(buyer.getGold() - order.getGold());
             buyerRepository.save(buyer);
