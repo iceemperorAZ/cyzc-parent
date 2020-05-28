@@ -210,11 +210,26 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
             "FROM tb_order_detail AS o_d  JOIN tb_order o ON o_d.order_id = o.id JOIN tb_group g ON o.group_no LIKE :groupNo  JOIN tb_product p ON o_d.product_id = p.id  " +
             "WHERE o.order_status BETWEEN 300 AND 700 AND o.create_time BETWEEN :startTime AND :endTime AND  o.is_available = 1 AND o_d.is_available = 1 AND  p.is_available = 1 GROUP BY p.product_name ORDER BY SUM(o_d.product_num) DESC", nativeQuery = true)
     List<Map<String, Object>> bossGroupProductAchievement(String groupNo, Date startTime, Date endTime);
+
     @Query(value = "SELECT @cdate \\:= date_add(@cdate,interval -1 day) days from   \n" +
             "(SELECT @cdate \\:= CURDATE() from tb_order limit 10) t1  ", nativeQuery = true)
+    List<Map<String, Object>> x();
 
-    List<Map<String, Object>>  x();
-
-    @Query(value = "SELECT o.id as id ,o.order_no as orderNo,o.buyer_id as bid ,p.product_name FROM tb_order o JOIN tb_order_detail od ON o.order_no = od.order_no JOIN tb_product p ON p.id = od.product_id JOIN tb_product_type pt ON p.product_type_id = 2020030121 WHERE o.id = :id ",nativeQuery = true)
+    @Query(value = "SELECT o.id as id ,o.order_no as orderNo,o.buyer_id as bid ,p.product_name FROM tb_order o JOIN tb_order_detail od ON o.order_no = od.order_no JOIN tb_product p ON p.id = od.product_id JOIN tb_product_type pt ON p.product_type_id = 2020030121 WHERE o.id = :id ", nativeQuery = true)
     List<Map<String, Object>> orderHasDrunk(Integer id);
+
+    /**
+     * 导出订单优化
+     *
+     * @return
+     */
+    @Query(value = "SELECT o.create_time AS createTime,o.id AS orderId,o.order_no AS orderNo,g.group_name AS groupName,b.id AS buyerId,b.user_name AS buyerName,b.shop_name AS shopName,u.user_name AS userName,o.preferential_fee AS preferentialFee,o.total_price AS totalPrice,o.payable_fee AS payableFee,o.is_gold AS isGold,o.gold AS gold,o.order_status AS orderStatus,o.return_gold AS returnGold,o.pay_way AS payWay,p.product_no AS productNo,p.product_name AS productName,p.specs,pt.product_type_name AS productTypeName,od.product_num AS productNum,od.selling_price AS sellingPrice,o.storehouse,o.detail_address AS detailAddress,o.receiver_name AS receiverName,o.receiver_phone AS receiverPhone  \n" +
+            "FROM tb_order o INNER JOIN tb_order_detail od ON od.order_no=o.order_no INNER JOIN tb_group g ON g.group_no=o.group_no INNER JOIN tb_product p ON p.id=od.product_id INNER JOIN tb_buyer b ON b.id=o.buyer_id INNER JOIN tb_user u ON u.id=b.sale_user_id INNER JOIN tb_product_type pt ON pt.id=p.product_type_id WHERE o.order_status BETWEEN 300 AND 599  \n" +
+            "UNION ALL \n" +
+            "SELECT o.create_time AS createTime,o.id AS orderId,o.order_no AS orderNo,g.group_name AS groupName,b.id AS buyerId,b.user_name AS buyerName,b.shop_name AS shopName,u.user_name AS userName,o.preferential_fee AS preferentialFee,o.total_price AS totalPrice,o.payable_fee AS payableFee,o.is_gold AS isGold,o.gold AS gold,o.order_status AS orderStatus,o.return_gold AS returnGold,o.pay_way AS payWay,p.product_no AS productNo,p.product_name AS productName,p.specs,pt.product_type_name AS productTypeName,od.product_num AS productNum,od.selling_price AS sellingPrice,o.storehouse,o.detail_address AS detailAddress,o.receiver_name AS receiverName,o.receiver_phone AS receiverPhone  \n" +
+            "FROM tb_order o INNER JOIN tb_order_detail od ON od.order_no=o.order_no INNER JOIN tb_group g ON g.group_no=o.group_no INNER JOIN tb_product p ON p.id=od.product_id INNER JOIN tb_buyer b ON b.id=o.buyer_id INNER JOIN tb_user u ON u.id=b.sale_user_id INNER JOIN tb_product_type pt ON pt.id=p.product_type_id WHERE o.order_status BETWEEN 600 AND 999\n" +
+            "UNION ALL\n" +
+            "SELECT o.create_time AS createTime,o.id AS orderId,o.order_no AS orderNo,g.group_name AS groupName,b.id AS buyerId,b.user_name AS buyerName,b.shop_name AS shopName,u.user_name AS userName,o.preferential_fee AS preferentialFee,o.total_price AS totalPrice,o.payable_fee AS payableFee,o.is_gold AS isGold,o.gold AS gold,o.order_status AS orderStatus,o.return_gold AS returnGold,o.pay_way AS payWay,p.product_no AS productNo,p.product_name AS productName,p.specs,pt.product_type_name AS productTypeName,od.product_num AS productNum,od.selling_price AS sellingPrice,o.storehouse,o.detail_address AS detailAddress,o.receiver_name AS receiverName,o.receiver_phone AS receiverPhone  \n" +
+            "FROM tb_order o INNER JOIN tb_order_detail od ON od.order_no=o.order_no INNER JOIN tb_group g ON g.group_no=o.group_no INNER JOIN tb_product p ON p.id=od.product_id INNER JOIN tb_buyer b ON b.id=o.buyer_id INNER JOIN tb_user u ON u.id=b.sale_user_id INNER JOIN tb_product_type pt ON pt.id=p.product_type_id WHERE o.order_status BETWEEN 0 AND 299", nativeQuery = true)
+    List<Map<String, String>> orderExcel();
 }

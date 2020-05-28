@@ -260,6 +260,6 @@ public class Product<List> implements Serializable {
     /**
      * 商品详情
      */
-    @Column(name = "test")
-    private String test;
+    @Column(name = "product_details")
+    private String productDetails;
 }

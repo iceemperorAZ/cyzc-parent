@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 订单表Service
@@ -82,4 +83,10 @@ public interface OrderService {
      * @return 返回查询到的订单信息
      */
     List<Order> findAll(Specification<Order> orderSpecification);
+
+    /**
+     * 订单导出excel
+     * @return
+     */
+    List<Map<String,String>> orderExcel();
 }

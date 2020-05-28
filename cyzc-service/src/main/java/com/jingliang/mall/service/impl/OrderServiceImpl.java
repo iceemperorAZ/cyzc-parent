@@ -15,10 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -266,5 +263,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findAll(Specification<Order> orderSpecification) {
         return orderRepository.findAll(orderSpecification);
+    }
+
+    @Override
+    public List<Map<String, String>> orderExcel() {
+        return orderRepository.orderExcel();
     }
 }

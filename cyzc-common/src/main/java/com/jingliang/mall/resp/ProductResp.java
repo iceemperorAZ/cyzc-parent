@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 商品表
@@ -277,7 +276,7 @@ public class ProductResp implements Serializable {
      * 商品详情
      */
     @ApiModelProperty(value = "商品详情")
-    private String test;
+    private String productDetails;
 
     /**
      * 商品图片字符串转集合
