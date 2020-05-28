@@ -332,6 +332,12 @@ public class ProductReq extends BaseReq implements Serializable {
     @ApiModelProperty(value = "每日购买上限")
     private Integer limitNum;
 
+    /**
+     * 商品详情
+     */
+    @ApiModelProperty(value = "商品详情")
+    private String productDetails;
+
     public Boolean getIsSoonShow() {
         return isSoonShow;
     }

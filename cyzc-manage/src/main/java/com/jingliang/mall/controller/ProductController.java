@@ -73,7 +73,8 @@ public class ProductController {
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
                 || productReq.getProductImgs().isEmpty() || StringUtils.isBlank(productReq.getProductName())
                 || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs()) || productReq.getProductSort() == null
-                || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())) {
+                || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())
+                || StringUtils.isBlank(productReq.getProductDetails())) {
             log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
