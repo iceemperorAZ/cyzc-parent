@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //金币不够支付，算出实际支付价格，以及扣减金币后的价格
                     else {
-                        order.setReturnGold((int) ((order.getReturnGold() == null ? 0 : order.getReturnGold()) + orderDetail.getDifference() - gold[0]) / 100);
+                        order.setReturnGold((int) ((order.getReturnGold() == null ? 0 : order.getReturnGold()) + orderDetail.getDifference() - gold[0]) / 10);
                         drinksPrice -= gold[0];
                         gold[0] = 0;
                     }
