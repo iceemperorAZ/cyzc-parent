@@ -262,9 +262,9 @@ public class UserController {
     @ApiOperation(value = "移动/分配用户到组")
     public Result<Boolean> distribution(@RequestBody Map<String, Object> map) {
         String groupNo = (String) map.get("groupNo");
-        List<Long> userIds  = ((List<?>) map.get("userIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
-        userService.distribution(groupNo,userIds);
-        return Result.build(Msg.OK,"操作成功",true);
+        List<Long> userIds = ((List<?>) map.get("userIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
+        userService.distribution(groupNo, userIds);
+        return Result.build(Msg.OK, "操作成功", true);
     }
 
     /**
@@ -273,8 +273,36 @@ public class UserController {
     @PostMapping("/remove/ungrouped")
     @ApiOperation(value = "移除用户到未分配")
     public Result<Boolean> removeToUngrouped(@RequestBody Map<String, Object> map) {
-        List<Long> userIds  = ((List<?>) map.get("userIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
+        List<Long> userIds = ((List<?>) map.get("userIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
         userService.removeToUngrouped(userIds);
-        return Result.build(Msg.OK,"已成功从该分组移除",true);
+        return Result.build(Msg.OK, "已成功从该分组移除", true);
+    }
+
+    /**
+     * 根据id逻辑删除用户
+     */
+    @PostMapping("/delete")
+    @ApiOperation(value = "根据id逻辑删除用户")
+    public Result<?> deleteUser(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", userReq);
+        if (userReq.getId() <= 0 || userReq.getId() == null) {
+            return Result.build(Msg.FAIL, "该用户可能不存在，请联系管理员核实");
+        }
+        User oldUser = BeanMapper.map(userReq, User.class);
+        User user = (User) session.getAttribute(sessionUser);
+        //根据id查询该用户名下的商户
+        List<Buyer> buyers = buyerService.findAllBySaleUserId(userReq.getId());
+        //如果名下没有商户，则逻辑删除
+        if (Objects.isNull(buyers) || buyers.size() <= 0) {
+            oldUser.setIsAvailable(false);
+            oldUser.setUpdateTime(new Date());
+            oldUser.setUpdateUserId(user.getId());
+            oldUser.setUpdateUserName(user.getUserName());
+            userService.save(oldUser);
+            UserResp userResp = BeanMapper.map(oldUser, UserResp.class);
+            return Result.buildDeleteOk(userResp);
+        }
+        //名下有商户，返回失败结果和其名下所有商户信息
+        return Result.build(Msg.FAIL, "该用户名下有商户，无法删除", buyers);
     }
 }
