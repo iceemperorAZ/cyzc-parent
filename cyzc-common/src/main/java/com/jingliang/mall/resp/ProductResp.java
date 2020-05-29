@@ -279,6 +279,12 @@ public class ProductResp implements Serializable {
     private String productDetails;
 
     /**
+     * 商品详情图
+     */
+    @ApiModelProperty(value = "商品详情图")
+    private String productDetailsImg;
+
+    /**
      * 商品图片字符串转集合
      */
     public void setProductImgUris(String productImgUris) {
