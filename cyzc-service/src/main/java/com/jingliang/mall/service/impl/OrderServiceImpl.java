@@ -69,12 +69,14 @@ public class OrderServiceImpl implements OrderService {
                     }
                     //金币不够支付，算出实际支付价格，以及扣减金币后的价格
                     else {
-                        order.setReturnGold((int) ((order.getReturnGold() == null ? 0 : order.getReturnGold()) + orderDetail.getDifference() - gold[0]) / 10);
+                        //算出需要支付的钱，除以售价，就是应返金币的比例，用比例乘以应返金币数，就是应返的金币。每个商品的返币比例不同，所以这里的比例根据抵扣完金币后的应付价格和不同商品的售价进行计算。
+                        float proportion = ((float) (orderDetail.getSellingPrice() - gold[0]) / (float) orderDetail.getSellingPrice());
+                        order.setReturnGold((int) ((order.getReturnGold() == null ? 0 : order.getReturnGold()) + ((orderDetail.getDifference()) / 10 * proportion)));
                         drinksPrice -= gold[0];
                         gold[0] = 0;
                     }
                 } else {
-                    order.setReturnGold((int) ((order.getReturnGold() == null ? 0 : order.getReturnGold()) + orderDetail.getDifference() / 10));
+                    order.setReturnGold((int) ((order.getReturnGold() == null ? 0 : order.getReturnGold()) + (orderDetail.getDifference() / 10)));
                 }
             }
         }
