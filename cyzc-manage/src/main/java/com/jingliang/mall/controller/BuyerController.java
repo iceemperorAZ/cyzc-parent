@@ -160,11 +160,11 @@ public class BuyerController {
         }
         Specification<Buyer> buyerSpecification = (Specification<Buyer>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
-            if (buyerReq.getId() != null) {
-                predicateList.add(cb.equal(root.get("id"), buyerReq.getId()));
+            if (StringUtils.isNotBlank(buyerReq.getPhone())) {
+                predicateList.add(cb.or(cb.equal(root.get("id"), Long.parseLong(buyerReq.getPhone())), cb.like(root.get("phone"), buyerReq.getPhone() + "%")));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
-            return predicateList.isEmpty() ? null : cb.and(predicateList.toArray(new Predicate[0]));
+            return cb.and(predicateList.toArray(new Predicate[0]));
         };
         Page<Buyer> buyerPage = buyerService.findAll(buyerSpecification, pageRequest);
         MallPage<BuyerResp> buyerRespMallPage = BaseMallUtils.toMallPage(buyerPage, BuyerResp.class);

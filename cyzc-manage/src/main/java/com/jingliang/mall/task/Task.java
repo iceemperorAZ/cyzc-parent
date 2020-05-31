@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,7 +63,8 @@ public class Task {
             };
             List<Order> orders = orderService.findAll(orderSpecification);
             orders.forEach(order -> {
-                orderService.update(new Order().setId(order.getId()).setOrderStatus(600));
+                //修改为完成状态和设置完成时间
+                orderService.update(new Order().setId(order.getId()).setOrderStatus(600).setFinishTime(new Date()));
             });
         }
     }

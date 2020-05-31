@@ -85,8 +85,8 @@ public class ProductTypeController {
         //判断商品分类下是否有已经上架的商品
         //1.有则不允许删除
         //2.无则正常删除
-        Integer count = productService.countByProductTypeIdAnnShow(productTypeReq.getId(),true);
-        if(count>0){
+        Integer count = productService.countByProductTypeIdAnnShow(productTypeReq.getId(), true);
+        if (count > 0) {
             return Result.build(Msg.FAIL, Msg.TEXT_PRODUCT_DELETE_FAIL);
         }
         Long id = productTypeReq.getId();
@@ -127,5 +127,17 @@ public class ProductTypeController {
         MallPage<ProductTypeResp> productTypeRespPage = MallUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeRespPage);
         return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeRespPage);
+    }
+
+    /**
+     * 查询所有商品分类
+     */
+    @ApiOperation(value = "查询所有商品分类")
+    @GetMapping("/all")
+    public Result<List<ProductTypeResp>> pageAllProductTypeResp() {
+        List<ProductType> productTypes = productTypeService.findAll();
+        List<ProductTypeResp> productTypeResps = BeanMapper.mapList(productTypes, ProductTypeResp.class);
+        log.debug("返回结果：{}", productTypeResps);
+        return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeResps);
     }
 }

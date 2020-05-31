@@ -300,6 +300,11 @@ public class UserController {
             oldUser.setUpdateUserName(user.getUserName());
             userService.save(oldUser);
             UserResp userResp = BeanMapper.map(oldUser, UserResp.class);
+            //在删除用户的同时，同时拉黑用户绑定的小程序
+            User u = userService.findById(user.getId());
+            Buyer buyer = buyerService.findById(u.getBuyerId());
+            buyer.setIsSealUp(true);
+            buyerService.save(buyer);
             return Result.buildDeleteOk(userResp);
         }
         //名下有商户，返回失败结果和其名下所有商户信息
