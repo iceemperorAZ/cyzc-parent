@@ -64,6 +64,9 @@ public class SkuController {
         }
         Specification<Sku> skuSpecification = (Specification<Sku>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
+            if (Objects.nonNull(skuReq.getProductTypeId())) {
+                predicateList.add(cb.equal(root.get("productTypeId"), skuReq.getProductTypeId()));
+            }
             if (StringUtils.isNotBlank(skuReq.getProductName())) {
                 predicateList.add(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%"));
             }
