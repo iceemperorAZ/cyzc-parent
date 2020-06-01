@@ -179,4 +179,9 @@ public class ProductServiceImpl implements ProductService {
     public Product findAllByProductTypeIdAndSort(Long productTypeId, Integer productSort) {
         return productRepository.findFirstByProductTypeIdAndProductSortAndIsAvailable(productTypeId, productSort, true);
     }
+
+    @Override
+    public Product findByProductNameAndSpecs(String productName, String specs) {
+        return productRepository.findByProductNameAndSpecsAndIsAvailable(productName, specs, true);
+    }
 }

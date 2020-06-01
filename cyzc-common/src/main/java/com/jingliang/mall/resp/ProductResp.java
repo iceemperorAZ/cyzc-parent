@@ -273,16 +273,22 @@ public class ProductResp implements Serializable {
     private Integer limitNum;
 
     /**
+     * 每日购买下限
+     */
+    @ApiModelProperty(value = "每日购买下限")
+    private Integer minNum;
+
+    /**
      * 商品详情
      */
     @ApiModelProperty(value = "商品详情")
     private String productDetails;
 
     /**
-     * 商品详情图
+     * 商品详情图url
      */
-    @ApiModelProperty(value = "商品详情图")
-    private String productDetailsImg;
+    @ApiModelProperty(value = "商品详情图url")
+    private List<String>  productDetailsImgUrlList;
 
     /**
      * 商品图片字符串转集合
@@ -290,7 +296,12 @@ public class ProductResp implements Serializable {
     public void setProductImgUris(String productImgUris) {
         this.productImgUriList = StringUtils.isBlank(productImgUris) ? null : Arrays.asList(productImgUris.split(";"));
     }
-
+    /**
+     * 商品详情图片字符串转集合
+     */
+    public void setProductDetailsImgUrls(String productDetailsImgUrls) {
+        this.productDetailsImgUrlList = StringUtils.isBlank(productDetailsImgUrls) ? null : Arrays.asList(productDetailsImgUrls.split(";"));
+    }
     public Double getMarketPrice() {
         return marketPrice / 100;
     }

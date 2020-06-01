@@ -122,4 +122,13 @@ public interface ProductService {
      * @return
      */
     Product findAllByProductTypeIdAndSort(Long productTypeId, Integer productSort);
+
+    /**
+     * 根据商品名称，规格，查询可用的商品
+     *
+     * @param productName
+     * @param specs
+     * @return
+     */
+    Product findByProductNameAndSpecs(String productName, String specs);
 }

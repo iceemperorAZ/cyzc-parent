@@ -619,7 +619,7 @@ public class OrderController {
                 row.createCell(++celNum).setCellValue(productNo);
                 //商品名称
                 String productName = stringMap.get("productName");
-                row.createCell(++celNum).setCellValue(productName);
+                row.createCell(++celNum).setCellValue(productName.concat(" ").concat(stringMap.get("specs")));
                 //商品型号
                 String specs = stringMap.get("specs");
                 row.createCell(++celNum).setCellValue(specs);
