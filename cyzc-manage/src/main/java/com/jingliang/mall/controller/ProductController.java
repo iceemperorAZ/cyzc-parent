@@ -71,18 +71,32 @@ public class ProductController {
     public Result<ProductResp> save(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
-                || productReq.getProductImgs().isEmpty() || StringUtils.isBlank(productReq.getProductName())
+                || StringUtils.isBlank(productReq.getProductName())
                 || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs()) || productReq.getProductSort() == null
-                || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())
-                || StringUtils.isBlank(productReq.getProductDetails())) {
+                || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())) {
             log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
+        //判断图片是否为空
+        if ((Objects.isNull(productReq.getProductImgs()) || productReq.getProductImgs().isEmpty()) &&
+                ((Objects.isNull(productReq.getProductImgUris())) || productReq.getProductImgUris().isEmpty())) {
+            return Result.build(Msg.FAIL, "图片不能为空");
+        }
+        if ((Objects.isNull(productReq.getProductDetailsImgBase64s()) || productReq.getProductDetailsImgBase64s().isEmpty()) &&
+                ((Objects.isNull(productReq.getProductDetailsImgUrls())) || productReq.getProductDetailsImgUrls().isEmpty())) {
+            return Result.build(Msg.FAIL, "图片详情不能为空");
+        }
         //判断商品是否重复
+        Product oldProduct = productService.findByProductNameAndSpecs(productReq.getProductName(), productReq.getSpecs());
+        if (!Objects.isNull(oldProduct) && Objects.isNull(oldProduct.getId())) {
+            return Result.build(Msg.FAIL, "该商品已存在，不能重复添加");
+        }
 //        if (Objects.isNull(productReq.getId()) && Objects.nonNull(productService.findAllByProductName(productReq.getProductName()))) {
 //            log.debug("返回结果：{}", MallConstant.TEXT_PRODUCT_EXIST_FAIL);
 //            return MallResult.build(MallConstant.SAVE_FAIL, MallConstant.TEXT_PRODUCT_EXIST_FAIL);
 //        }
+        StringBuilder builder = new StringBuilder();
+        StringBuilder detailsBuilder = new StringBuilder();
         if (Objects.nonNull(productReq.getId())) {
             //商品名称不能被修改
 //            productReq.setProductName(null);
@@ -92,12 +106,60 @@ public class ProductController {
                 //上架中的商品不能修改
                 return Result.build(Msg.PRODUCT_FAIL, Msg.TEXT_PRODUCT_UPDATE_FAIL);
             }
-            String productImgUris = product.getProductImgUris();
-            if (StringUtils.isNotBlank(productImgUris)) {
-                String[] imgUris = productImgUris.split(";");
-                for (String imgUri : imgUris) {
-                    if (!fastdfsService.deleteFile(imgUri)) {
-                        log.error("图片删除失败：{}", imgUri);
+            //获取本地url
+            String oldProductImgUris = product.getProductImgUris();
+            //获取要保存的url
+            List<String> productImgUris = productReq.getProductImgUris();
+            //如果没有要保存的url
+            if (productImgUris.isEmpty() || Objects.isNull(productImgUris)) {
+                if (StringUtils.isNotBlank(oldProductImgUris)) {
+                    String[] imgUris = oldProductImgUris.split(";");
+                    for (String imgUri : imgUris) {
+                        if (!fastdfsService.deleteFile(imgUri)) {
+                            log.error("图片删除失败：{}", imgUri);
+                        }
+                    }
+                }
+            }
+            for (String newProductImgUris : productImgUris) {
+                builder.append(";").append(newProductImgUris);
+                //获取要删除的url
+                String delProductImgUrls;
+                delProductImgUrls = oldProductImgUris.replaceAll(newProductImgUris, "");
+                if (StringUtils.isNotBlank(delProductImgUrls)) {
+                    String[] imgUris = delProductImgUrls.split(";");
+                    for (String imgUri : imgUris) {
+                        if (!fastdfsService.deleteFile(imgUri)) {
+                            log.error("图片删除失败：{}", imgUri);
+                        }
+                    }
+                }
+            }
+            //获取本地商品详情url
+            String oldProductDetailsImgUrls = product.getProductDetailsImgUrls();
+            //获取要保存的url
+            List<String> productDetailsImgUrls = productReq.getProductDetailsImgUrls();
+            //如果没有要保存的url
+            if (productDetailsImgUrls.isEmpty() || Objects.isNull(productDetailsImgUrls)) {
+                if (StringUtils.isNotBlank(oldProductDetailsImgUrls)) {
+                    String[] imgUris = oldProductDetailsImgUrls.split(";");
+                    for (String imgUri : imgUris) {
+                        if (!fastdfsService.deleteFile(imgUri)) {
+                            log.error("图片删除失败：{}", imgUri);
+                        }
+                    }
+                }
+            }
+            for (String newProductDetailsImgUrls : productDetailsImgUrls) {
+                detailsBuilder.append(";").append(newProductDetailsImgUrls);
+                //获取要删除的url
+                String delProductDetailsImgUrls = oldProductDetailsImgUrls.replaceAll(newProductDetailsImgUrls, "");
+                if (StringUtils.isNotBlank(delProductDetailsImgUrls)) {
+                    String[] imgUris = delProductDetailsImgUrls.split(";");
+                    for (String imgUri : imgUris) {
+                        if (!fastdfsService.deleteFile(imgUri)) {
+                            log.error("图片删除失败：{}", imgUri);
+                        }
                     }
                 }
             }
@@ -108,6 +170,9 @@ public class ProductController {
             return Result.build(Msg.FAIL, "序号重复");
         }
         List<Base64Image> base64Images = new ArrayList<>();
+        if (Objects.isNull(productReq.getProductImgs())) {
+            return Result.build(Msg.FAIL, "商品图片不能为空");
+        }
         for (String productImg : productReq.getProductImgs()) {
             Base64Image base64Image = Base64Image.build(productImg);
             if (Objects.isNull(base64Image)) {
@@ -116,13 +181,27 @@ public class ProductController {
             }
             base64Images.add(base64Image);
         }
-        StringBuilder builder = new StringBuilder();
         for (Base64Image base64Image : base64Images) {
             builder.append(";").append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
         }
+        //详情页图片处理
+        List<Base64Image> detailsBase64Images = new ArrayList<>();
+        if (Objects.isNull(productReq.getProductDetailsImgBase64s())) {
+            return Result.build(Msg.FAIL, "商品详情图片不能为空");
+        }
+        for (String productDetailsImgUrl : productReq.getProductDetailsImgBase64s()) {
+            Base64Image base64Image = Base64Image.build(productDetailsImgUrl);
+            if (Objects.isNull(base64Image)) {
+                log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+                return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
+            }
+            detailsBase64Images.add(base64Image);
+        }
+        for (Base64Image base64Image : detailsBase64Images) {
+            detailsBuilder.append(";").append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
+        }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(productReq, user);
-        productReq.setProductImgUris(builder.substring(1));
         productReq.setProductNo(redisService.getProductNo());
         productReq.setIsShow(false);
         productReq.setIsSoonShow(productReq.getIsSoonShow() == null ? false : productReq.getIsSoonShow());
@@ -130,6 +209,10 @@ public class ProductController {
         productReq.setProductZoneId(-1L);
         productReq.setExamineStatus(ExamineStatus.NOT_SUBMITTED.getValue());
         product = BeanMapper.map(productReq, Product.class);
+        assert product != null;
+        product.setProductImgUris(builder.length() > 1 ? builder.substring(1) : "");
+        product.setProductDetailsImgUrls(detailsBuilder.length() > 1 ? detailsBuilder.substring(1) : "");
+        product.setMinNum(Objects.isNull(productReq.getMinNum()) || productReq.getMinNum() < 0 ? 0 : productReq.getMinNum());
         ProductResp productResp = new ProductResp();
         BeanMapper.map(productService.save(product), productResp);
         log.debug("返回结果：{}", productResp);

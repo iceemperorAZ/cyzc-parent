@@ -177,4 +177,9 @@ public class ProductServiceImpl implements ProductService {
     public Product findAllByProductTypeIdAndSort(Long productTypeId, Integer productSort) {
         return productRepository.findAllByProductTypeIdAndProductSortAndIsAvailable(productTypeId, productSort,true);
     }
+
+    @Override
+    public Product findByProductNameAndSpecs(String productName, String specs) {
+        return productRepository.findByProductNameAndSpecsAndIsAvailable(productName, specs, true);
+    }
 }

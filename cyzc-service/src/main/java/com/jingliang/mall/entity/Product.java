@@ -266,6 +266,6 @@ public class Product implements Serializable {
     /**
      * 商品详情图
      */
-    @Column(name = "product_details_img")
-    private String productDetailsImg;
+    @Column(name = "product_details_img_url")
+    private String productDetailsImgUrls;
 }

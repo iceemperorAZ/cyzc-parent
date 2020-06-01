@@ -79,7 +79,7 @@ public class ProductReq extends BaseReq implements Serializable {
      * 商品图片uri集合
      */
     @ApiModelProperty(hidden = true)
-    private String productImgUris;
+    private List<String> productImgUris;
     /**
      * 商品base64图片集合
      */
@@ -332,6 +332,12 @@ public class ProductReq extends BaseReq implements Serializable {
     @ApiModelProperty(value = "每日购买上限")
     private Integer limitNum;
 
+    /**
+     * 每日购买下限
+     */
+    @ApiModelProperty(value = "每日购买下限")
+    private Integer minNum;
+
     public Boolean getIsSoonShow() {
         return isSoonShow;
     }
@@ -353,10 +359,16 @@ public class ProductReq extends BaseReq implements Serializable {
     private String productDetails;
 
     /**
-     * 商品详情图
+     * 商品详情图base64
      */
-    @ApiModelProperty(value = "商品详情图")
-    private String productDetailsImg;
+    @ApiModelProperty(value = "商品详情图base64")
+    private List<String> productDetailsImgBase64s = new ArrayList<>();
+
+    /**
+     * 商品详情图url
+     */
+    @ApiModelProperty(value = "商品详情图url")
+    private List<String> productDetailsImgUrls;
 
     public void setMarketPrice(Float marketPrice) {
         this.marketPrice = marketPrice * 100;
