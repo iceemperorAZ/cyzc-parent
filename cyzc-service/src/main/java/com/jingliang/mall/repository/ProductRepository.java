@@ -78,7 +78,7 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
      * @return 返回查询到商品
      */
     Product findFirstByProductTypeIdAndProductSortAndIsAvailable(Long productTypeId, Integer productSort, Boolean isAvailable);
-
+  
     /**
      * 根据商品名称，规格，查询可用的商品
      *
