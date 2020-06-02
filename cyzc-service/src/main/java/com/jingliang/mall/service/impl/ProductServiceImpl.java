@@ -182,6 +182,6 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product findByProductNameAndSpecs(String productName, String specs) {
-        return productRepository.findByProductNameAndSpecsAndIsAvailable(productName, specs, true);
+        return productRepository.findFirstByProductNameAndSpecsAndIsAvailable(productName, specs, true);
     }
 }

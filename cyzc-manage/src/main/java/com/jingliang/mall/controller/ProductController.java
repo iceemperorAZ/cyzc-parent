@@ -140,7 +140,7 @@ public class ProductController {
             //获取要保存的url
             List<String> productDetailsImgUrls = productReq.getProductDetailsImgUrls();
             //如果没有要保存的url
-            if (productDetailsImgUrls.isEmpty() || Objects.isNull(productDetailsImgUrls)) {
+            if (productDetailsImgUrls.isEmpty()) {
                 if (StringUtils.isNotBlank(oldProductDetailsImgUrls)) {
                     String[] imgUris = oldProductDetailsImgUrls.split(";");
                     for (String imgUri : imgUris) {
@@ -202,10 +202,14 @@ public class ProductController {
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(productReq, user);
-        productReq.setProductNo(redisService.getProductNo());
+        if (StringUtils.isNotBlank(productReq.getProductNo())) {
+            productReq.setProductNo(redisService.getProductNo());
+        }
         productReq.setIsShow(false);
         productReq.setIsSoonShow(productReq.getIsSoonShow() == null ? false : productReq.getIsSoonShow());
-        productReq.setSalesVolume(0);
+        if (productReq.getSalesVolume() != null) {
+            productReq.setSalesVolume(0);
+        }
         productReq.setProductZoneId(-1L);
         productReq.setExamineStatus(ExamineStatus.NOT_SUBMITTED.getValue());
         product = BeanMapper.map(productReq, Product.class);
