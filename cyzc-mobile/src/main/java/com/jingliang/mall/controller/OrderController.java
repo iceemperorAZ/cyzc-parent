@@ -168,6 +168,15 @@ public class OrderController {
                 Duration duration = Duration.between(LocalDateTime.now(), LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)));
                 redisService.setExpire("PRODUCT-BUYER-LIMIT-" + buyer.getId() + product.getId() + "", duration.toMillis() / 1000);
             }
+            //判断商品本次是否满足购买限制
+            if (orderDetail.getProductNum() < product.getMinNum()) {
+                for (OrderDetail detailReq : orderDetails) {
+                    //如果本次有已经售空的商品就把减掉的库存加回去，并返回库存商品已售空
+                    redisService.skuLineIncrement(String.valueOf(detailReq.getProductId()), detailReq.getProductNum());
+                    redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detailReq.getProductId() + "", detailReq.getProductNum());
+                }
+                return Result.build(Msg.ORDER_FAIL, product.getProductName() + "商品最低" + product.getMinNum() + product.getUnit() + "起购");
+            }
             //判断商品本次是否超过购买限制
             if (orderDetail.getProductNum() > product.getLimitNum()) {
                 for (OrderDetail detailReq : orderDetails) {

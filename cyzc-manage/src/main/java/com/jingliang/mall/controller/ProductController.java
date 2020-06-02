@@ -73,7 +73,8 @@ public class ProductController {
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
                 || StringUtils.isBlank(productReq.getProductName())
                 || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs()) || productReq.getProductSort() == null
-                || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())) {
+                || StringUtils.isBlank(productReq.getUnit()) || Objects.isNull(productReq.getIsHot()) || Objects.isNull(productReq.getIsNew())
+                || Objects.isNull(productReq.getProductDetails())) {
             log.debug("返回结果：{}", Msg.TEXT_PARAM_FAIL);
             return Result.buildParamFail();
         }
@@ -123,9 +124,20 @@ public class ProductController {
             }
             for (String newProductImgUris : productImgUris) {
                 builder.append(";").append(newProductImgUris);
-                //获取要删除的url
-                String delProductImgUrls;
-                delProductImgUrls = oldProductImgUris.replaceAll(newProductImgUris, "");
+            }
+            //获取要删除的url
+            if (builder.length() <= 1) {
+                String delProductImgUrls = oldProductImgUris.replaceAll(builder.substring(0), "");
+                if (StringUtils.isNotBlank(delProductImgUrls)) {
+                    String[] imgUris = delProductImgUrls.split(";");
+                    for (String imgUri : imgUris) {
+                        if (!fastdfsService.deleteFile(imgUri)) {
+                            log.error("图片删除失败：{}", imgUri);
+                        }
+                    }
+                }
+            } else {
+                String delProductImgUrls = oldProductImgUris.replaceAll(builder.substring(1), "");
                 if (StringUtils.isNotBlank(delProductImgUrls)) {
                     String[] imgUris = delProductImgUrls.split(";");
                     for (String imgUri : imgUris) {
@@ -152,8 +164,20 @@ public class ProductController {
             }
             for (String newProductDetailsImgUrls : productDetailsImgUrls) {
                 detailsBuilder.append(";").append(newProductDetailsImgUrls);
-                //获取要删除的url
-                String delProductDetailsImgUrls = oldProductDetailsImgUrls.replaceAll(newProductDetailsImgUrls, "");
+            }
+            //获取要删除的url
+            if (detailsBuilder.length() <= 1) {
+                String delProductDetailsImgUrls = oldProductDetailsImgUrls.replaceAll(detailsBuilder.substring(0), "");
+                if (StringUtils.isNotBlank(delProductDetailsImgUrls)) {
+                    String[] imgUris = delProductDetailsImgUrls.split(";");
+                    for (String imgUri : imgUris) {
+                        if (!fastdfsService.deleteFile(imgUri)) {
+                            log.error("图片删除失败：{}", imgUri);
+                        }
+                    }
+                }
+            } else {
+                String delProductDetailsImgUrls = oldProductDetailsImgUrls.replaceAll(detailsBuilder.substring(1), "");
                 if (StringUtils.isNotBlank(delProductDetailsImgUrls)) {
                     String[] imgUris = delProductDetailsImgUrls.split(";");
                     for (String imgUri : imgUris) {
