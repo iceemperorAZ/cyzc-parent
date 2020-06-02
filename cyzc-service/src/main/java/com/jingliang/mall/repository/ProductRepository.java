@@ -87,7 +87,7 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
      * @param isAvailable
      * @return
      */
-    Product findByProductNameAndSpecsAndIsAvailable(String productName, String specs, Boolean isAvailable);
+    Product findFirstByProductNameAndSpecsAndIsAvailable(String productName, String specs, Boolean isAvailable);
 
     /**
      * 根据商品分类和序号查询
