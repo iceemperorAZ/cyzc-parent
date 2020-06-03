@@ -255,6 +255,14 @@ public class Order implements Serializable {
     @Column(name = "sale_user_id")
     private Long saleUserId;
 
+
+    /**
+     * 销售员
+     */
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "sale_user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private User sale;
+
     /**
      * 修改时间
      */
