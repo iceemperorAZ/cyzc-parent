@@ -333,7 +333,7 @@ public class OrderController {
             String shopName = buyer.getShopName();
             row.createCell(++celNum).setCellValue(shopName);
             //销售人员
-            String userName = buyer.getSale().getUserName();
+            String userName =order.getSale().getUserName();
             row.createCell(++celNum).setCellValue(userName);
             //优惠金额(元)
             double preferentialFee = (order.getPreferentialFee() * 1.00) / 100;
