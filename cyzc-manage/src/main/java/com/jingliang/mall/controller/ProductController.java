@@ -194,9 +194,6 @@ public class ProductController {
             return Result.build(Msg.FAIL, "序号重复");
         }
         List<Base64Image> base64Images = new ArrayList<>();
-        if (Objects.isNull(productReq.getProductImgs())) {
-            return Result.build(Msg.FAIL, "商品图片不能为空");
-        }
         for (String productImg : productReq.getProductImgs()) {
             Base64Image base64Image = Base64Image.build(productImg);
             if (Objects.isNull(base64Image)) {
@@ -210,9 +207,6 @@ public class ProductController {
         }
         //详情页图片处理
         List<Base64Image> detailsBase64Images = new ArrayList<>();
-        if (Objects.isNull(productReq.getProductDetailsImgBase64s())) {
-            return Result.build(Msg.FAIL, "商品详情图片不能为空");
-        }
         for (String productDetailsImgUrl : productReq.getProductDetailsImgBase64s()) {
             Base64Image base64Image = Base64Image.build(productDetailsImgUrl);
             if (Objects.isNull(base64Image)) {
