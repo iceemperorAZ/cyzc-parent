@@ -271,6 +271,12 @@ public class OrderResp implements Serializable {
     private Integer gold;
 
     /**
+     * 返金币数
+     */
+    @ApiModelProperty(value = "返金币数")
+    private Integer returnGold;
+
+    /**
      * 订单详情列表
      */
     @ApiModelProperty(value = "订单详情列表")
