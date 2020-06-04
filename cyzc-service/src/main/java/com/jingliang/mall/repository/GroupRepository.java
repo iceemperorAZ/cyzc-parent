@@ -107,6 +107,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " ANY_VALUE(g.id) AS id, " +
             " ANY_VALUE(g.parent_group_id) AS parentGroupId, " +
             " ANY_VALUE(g.group_name) AS groupName, " +
+            " ANY_VALUE(g.group_no) AS groupNo, " +
             " CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice   " +
             " FROM " +
             " tb_group g " +
