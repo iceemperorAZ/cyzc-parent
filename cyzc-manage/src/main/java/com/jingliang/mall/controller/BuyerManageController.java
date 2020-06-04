@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -297,9 +298,9 @@ public class BuyerManageController {
     @GetMapping("/month/groupNo/buyerCounts")
     @ApiOperation(value = "根据组编号查询该组在每月的用户量")
     public Result<?> monthByDateAndGroupNoAchievement(String groupNo,
-                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                            HttpSession session) {
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                      HttpSession session) {
         //获取用户
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -341,9 +342,9 @@ public class BuyerManageController {
     @GetMapping("/day/groupNo/buyerCounts")
     @ApiOperation(value = "根据组编号查询该组在每天的用户量")
     public Result<?> daysByDateAndGroupNoAchievement(String GroupNo,
-                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                           HttpSession session) {
+                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                     HttpSession session) {
         //获取用户
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -386,7 +387,7 @@ public class BuyerManageController {
     @GetMapping("/topOrderCounts")
     public Result<List<Map<String, Object>>> topOfOrderCountsByUser(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                    Integer topNum,
+                                                                    @RequestParam(defaultValue = "5") Integer topNum,
                                                                     HttpSession session) {
         //获取用户
         User user = (User) session.getAttribute(sessionUser);
@@ -394,7 +395,7 @@ public class BuyerManageController {
         if (user.getLevel() == null || user.getLevel() < 110) {
             return Result.build(Msg.FAIL, "无查看此分组的权限");
         }
-        List<Map<String, Object>> mapList = buyerManageService.topOfOrderCountsByUser(startTime, endTime, topNum == null ? 5 : topNum);
+        List<Map<String, Object>> mapList = buyerManageService.topOfOrderCountsByUser(startTime, endTime, topNum);
         return Result.buildQueryOk(mapList);
     }
 
@@ -523,14 +524,14 @@ public class BuyerManageController {
     }
 
     /*
-    *
-    *  查询未绑定销售的商户数
-    * * */
+     *
+     *  查询未绑定销售的商户数
+     * * */
     @GetMapping("/searchBuyerDontHaveSale")
     @ApiOperation(value = "查询未绑定销售的商户")
     public Result<?> searchBuyerDontHaveSale() {
         List<Map<String, Object>> buyers = buyerManageService.searchBuyerDontHaveSale();
-        log.debug("返回参数:{}",buyers);
+        log.debug("返回参数:{}", buyers);
         return Result.buildQueryOk(buyers);
     }
 
@@ -542,7 +543,7 @@ public class BuyerManageController {
     @ApiOperation(value = "查询未绑定销售的商户")
     public Result<?> searchBuyerHaveSale() {
         List<Map<String, Object>> buyers = buyerManageService.searchBuyerHaveSale();
-        log.debug("返回参数:{}",buyers);
+        log.debug("返回参数:{}", buyers);
         return Result.buildQueryOk(buyers);
     }
 }
