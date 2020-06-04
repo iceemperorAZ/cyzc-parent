@@ -394,7 +394,7 @@ public class BuyerManageController {
         if (user.getLevel() == null || user.getLevel() < 110) {
             return Result.build(Msg.FAIL, "无查看此分组的权限");
         }
-        List<Map<String, Object>> mapList = buyerManageService.topOfOrderCountsByUser(startTime, endTime, topNum);
+        List<Map<String, Object>> mapList = buyerManageService.topOfOrderCountsByUser(startTime, endTime, topNum == null ? 5 : topNum);
         return Result.buildQueryOk(mapList);
     }
 
