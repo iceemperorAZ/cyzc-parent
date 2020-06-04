@@ -167,7 +167,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             "AND o.create_time " +
             "BETWEEN :startTime AND :endTime " +
             "WHERE g.group_no = :groupNo " +
-            "GROUP BY u.user_name ORDER BY totalPrice DESC ", nativeQuery = true)
+            "GROUP BY u.user_name ORDER BY totalPrice DESC LIMIT 5 ", nativeQuery = true)
     List<Map<String, Object>> findUserAchievement(String groupNo, Date startTime, Date endTime);
 
 
@@ -550,6 +550,50 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
     List<Map<String, Object>> yearByDateAndParentGroupIdAchievement(Date startTime, Date endTime, Long parentGroupId);
 
     /**
+     * 根据组编号查询子区以年统计的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @Query(value = "SELECT    " +
+            "a.days AS days,  " +
+            "a.id AS id,  " +
+            "a.group_name AS groupName,  " +
+            "temp.counts AS counts  " +
+            "FROM (  " +
+            "SELECT dd.days,tg.id,tg.group_name,tg.parent_group_id,tg.group_no FROM    " +
+            "  (SELECT 2015 AS days UNION  " +
+            "  SELECT 2016 UNION  " +
+            "  SELECT 2017 UNION  " +
+            "  SELECT 2018 UNION  " +
+            "  SELECT 2019 UNION  " +
+            "  SELECT 2020   " +
+            ") dd ,tb_group tg) a LEFT JOIN (  " +
+            "  SELECT    " +
+            "  ANY_VALUE(g.group_name) AS groupName,  " +
+            "  ANY_VALUE(g.id) AS groupId,  " +
+            "  DATE_FORMAT(b.create_time,'%Y') AS createTime,  " +
+            "  count(b.id) AS counts  " +
+            "  FROM tb_group g   " +
+            "  LEFT JOIN tb_user u  " +
+            "  ON u.group_no LIKE CONCAT(regexp_replace(g.group_no ,'0*$',''), '%' )  " +
+            "  INNER JOIN tb_buyer b ON b.sale_user_id = u.id  " +
+            "  AND b.is_available = 1   " +
+            "  AND g.group_no = :groupNo  " +
+            "  AND b.create_time BETWEEN :startTime AND :endTime     " +
+            "  GROUP BY g.group_name,g.group_no,  " +
+            "  DATE_FORMAT(b.create_time, '%Y')  " +
+            ") as temp ON a.days = temp.createTime   " +
+            "AND a.id = temp.groupId  " +
+            "WHERE a.group_no =:groupNo  " +
+            "AND a.days BETWEEN DATE_FORMAT(:startTime, '%Y')    " +
+            "AND DATE_FORMAT(:endTime, '%Y') " +
+            "ORDER BY days ", nativeQuery = true)
+    List<Map<String, Object>> yearByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo);
+
+    /**
      * 根据父id查询子区以月统计的用户量
      *
      * @param startTime
@@ -589,6 +633,45 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             "AND DATE_FORMAT(:endTime, '%c')", nativeQuery = true)
     List<Map<String, Object>> monthByDateAndParentGroupIdAchievement(Date startTime, Date endTime, Long parentGroupId);
 
+    /**
+     * 根据组编号查询子区以月统计的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @Query(value = "SELECT    " +
+            "a.days AS days,  " +
+            "a.id AS id,  " +
+            "a.group_name AS groupName,  " +
+            "temp.counts AS counts  " +
+            "FROM (  " +
+            "SELECT dd.days,tg.id,tg.group_name,tg.parent_group_id,tg.group_no FROM    " +
+            "  (SELECT 1 AS days UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION    " +
+            "  SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION   " +
+            "  SELECT 11 UNION SELECT 12   " +
+            ") dd ,tb_group tg) a LEFT JOIN (  " +
+            "  SELECT    " +
+            "  ANY_VALUE(g.group_name) AS groupName,  " +
+            "  ANY_VALUE(g.id) AS groupId,  " +
+            "  DATE_FORMAT(b.create_time,'%c') AS createTime,  " +
+            "  count(b.id) AS counts  " +
+            "  FROM tb_group g   " +
+            "  LEFT JOIN tb_user u  " +
+            "  ON u.group_no LIKE CONCAT(regexp_replace(g.group_no ,'0*$',''), '%' )  " +
+            "  INNER JOIN tb_buyer b ON b.sale_user_id = u.id  " +
+            "  AND b.is_available = 1   " +
+            "  AND g.group_no = :groupNo  " +
+            "  AND b.create_time BETWEEN :startTime AND :endTime     " +
+            "  GROUP BY g.group_name,g.group_no,  " +
+            "  DATE_FORMAT(b.create_time, '%c')  " +
+            ") as temp ON a.days = temp.createTime   " +
+            "AND a.id = temp.groupId  " +
+            "WHERE a.group_no =:groupNo  " +
+            "AND a.days BETWEEN DATE_FORMAT(:startTime, '%c')    " +
+            "AND DATE_FORMAT(:endTime, '%c')", nativeQuery = true)
+    List<Map<String, Object>> monthByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo);
 
     /**
      * 根据父id查询子区以天统计的用户量
@@ -634,6 +717,50 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             "AND DATE_FORMAT(:endTime, '%e')", nativeQuery = true)
     List<Map<String, Object>> daysByDateAndParentGroupIdAchievement(Date startTime, Date endTime, Long parentGroupId);
 
-    @Query(value = "SELECT ANY_VALUE(g.group_name) as groupName,ANY_VALUE(b.id) as id,ANY_VALUE(b.shop_name) as shopName,ANY_VALUE(b.register_source) as registerSource,ANY_VALUE(b.sale_user_id) as saleUserId,DATE_FORMAT(b.create_time,'%Y-%m-%d') as date,ANY_VALUE(u.user_name) AS saleName FROM tb_buyer b JOIN tb_user u ON u.id = b.sale_user_id JOIN tb_group g on u.group_no = g.group_no ORDER BY b.create_time DESC LIMIT 30",nativeQuery = true)
+    /**
+     * 根据组编号查询子区以天统计的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @Query(value = "SELECT    " +
+            "a.days AS days,  " +
+            "a.id AS id,  " +
+            "a.group_name AS groupName,  " +
+            "temp.counts AS counts  " +
+            "FROM (  " +
+            "SELECT dd.days,tg.id,tg.group_name,tg.parent_group_id,tg.group_no FROM    " +
+            "  (SELECT 1 AS days UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION    " +
+            "  SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION   " +
+            "  SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION    " +
+            "  SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20 UNION    " +
+            "  SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION    " +
+            "  SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30 UNION    " +
+            "  SELECT 31  " +
+            ") dd ,tb_group tg) a LEFT JOIN (  " +
+            "  SELECT    " +
+            "  ANY_VALUE(g.group_name) AS groupName,  " +
+            "  ANY_VALUE(g.id) AS groupId,  " +
+            "  DATE_FORMAT(b.create_time,'%e') AS createTime,  " +
+            "  count(b.id) AS counts  " +
+            "  FROM tb_group g   " +
+            "  LEFT JOIN tb_user u  " +
+            "  ON u.group_no LIKE CONCAT(regexp_replace(g.group_no ,'0*$',''), '%' )  " +
+            "  INNER JOIN tb_buyer b ON b.sale_user_id = u.id  " +
+            "  AND b.is_available = 1   " +
+            "  AND g.group_no = :groupNo  " +
+            "  AND b.create_time BETWEEN :startTime AND :endTime     " +
+            "  GROUP BY g.group_name,g.group_no,  " +
+            "  DATE_FORMAT(b.create_time, '%e')  " +
+            ") as temp ON a.days = temp.createTime   " +
+            "AND a.id = temp.groupId  " +
+            "WHERE a.group_no =:groupNo  " +
+            "AND a.days BETWEEN DATE_FORMAT(:startTime, '%e')    " +
+            "AND DATE_FORMAT(:endTime, '%e')", nativeQuery = true)
+    List<Map<String, Object>> daysByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo);
+
+    @Query(value = "SELECT ANY_VALUE(g.group_name) as groupName,ANY_VALUE(b.id) as id,ANY_VALUE(b.shop_name) as shopName,ANY_VALUE(b.register_source) as registerSource,ANY_VALUE(b.sale_user_id) as saleUserId,DATE_FORMAT(b.create_time,'%Y-%m-%d') as date,ANY_VALUE(u.user_name) AS saleName FROM tb_buyer b JOIN tb_user u ON u.id = b.sale_user_id JOIN tb_group g on u.group_no = g.group_no ORDER BY b.create_time DESC LIMIT 30", nativeQuery = true)
     List<Map<String, Object>> getBuyerTop30();
 }

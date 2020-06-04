@@ -243,6 +243,138 @@ public class BuyerManageController {
     }
 
     /**
+     * 根据组编号查询该组在每年的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @GetMapping("/year/groupNo/buyerCounts")
+    @ApiOperation(value = "根据组编号查询该组在每年的用户量")
+    public Result<?> yearByDateAndParentGroupIdAchievement(String groupNo,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                           HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //查询自身组名下的新增商户数
+        if (!Objects.isNull(groupNo)) {
+            List<Map<String, Object>> counts = buyerManageService.yearByDateAndGroupNoAchievement(startTime, endTime, groupNo);
+            log.debug("返回参数:{}", counts);
+            Set<Object> date = counts.stream().map(stringObjectMap -> stringObjectMap.get("days")).collect(Collectors.toSet());
+            Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
+            counts.forEach(stringObjectMap -> {
+                if (map.get(((String) stringObjectMap.get("groupName"))) == null) {
+                    map.put(((String) stringObjectMap.get("groupName")), new ArrayList<>());
+                }
+                map.get(((String) stringObjectMap.get("groupName"))).add(stringObjectMap);
+            });
+            List<List<Map<String, Object>>> list = new ArrayList<>();
+            for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+                list.add(entry.getValue());
+            }
+            Map<String, Object> resultMap = new HashMap<>(156);
+            resultMap.put("x", date);
+            resultMap.put("data", list);
+            return Result.buildQueryOk(resultMap);
+        }
+        return Result.buildParamFail();
+    }
+
+    /**
+     * 根据组编号查询该组在每月的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @GetMapping("/month/groupNo/buyerCounts")
+    @ApiOperation(value = "根据组编号查询该组在每月的用户量")
+    public Result<?> monthByDateAndGroupNoAchievement(String groupNo,
+                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                            HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //查询自身组名下的新增商户数
+        if (!Objects.isNull(groupNo)) {
+            List<Map<String, Object>> counts = buyerManageService.monthByDateAndGroupNoAchievement(startTime, endTime, groupNo);
+            log.debug("返回参数:{}", counts);
+            Set<Object> date = counts.stream().map(stringObjectMap -> stringObjectMap.get("days")).collect(Collectors.toSet());
+            Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
+            counts.forEach(stringObjectMap -> {
+                if (map.get(((String) stringObjectMap.get("groupName"))) == null) {
+                    map.put(((String) stringObjectMap.get("groupName")), new ArrayList<>());
+                }
+                map.get(((String) stringObjectMap.get("groupName"))).add(stringObjectMap);
+            });
+            List<List<Map<String, Object>>> list = new ArrayList<>();
+            for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+                list.add(entry.getValue());
+            }
+            Map<String, Object> resultMap = new HashMap<>(156);
+            resultMap.put("x", date);
+            resultMap.put("data", list);
+            return Result.buildQueryOk(resultMap);
+        }
+        return Result.buildParamFail();
+    }
+
+    /**
+     * 根据组编号查询该组在每天的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @GetMapping("/day/groupNo/buyerCounts")
+    @ApiOperation(value = "根据组编号查询该组在每天的用户量")
+    public Result<?> daysByDateAndGroupNoAchievement(String GroupNo,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                           HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //查询自身组名下的新增商户数
+        if (!Objects.isNull(GroupNo)) {
+            List<Map<String, Object>> counts = buyerManageService.daysByDateAndGroupNoAchievement(startTime, endTime, GroupNo);
+            log.debug("返回参数:{}", counts);
+            Set<Object> date = counts.stream().map(stringObjectMap -> stringObjectMap.get("days")).collect(Collectors.toSet());
+            Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
+            counts.forEach(stringObjectMap -> {
+                if (map.get(((String) stringObjectMap.get("groupName"))) == null) {
+                    map.put(((String) stringObjectMap.get("groupName")), new ArrayList<>());
+                }
+                map.get(((String) stringObjectMap.get("groupName"))).add(stringObjectMap);
+            });
+            List<List<Map<String, Object>>> list = new ArrayList<>();
+            for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+                list.add(entry.getValue());
+            }
+            Map<String, Object> resultMap = new HashMap<>(156);
+            resultMap.put("x", date);
+            resultMap.put("data", list);
+            return Result.buildQueryOk(resultMap);
+        }
+        return Result.buildParamFail();
+    }
+
+    /**
      * 当前年销售下单量top
      *
      * @param startTime
