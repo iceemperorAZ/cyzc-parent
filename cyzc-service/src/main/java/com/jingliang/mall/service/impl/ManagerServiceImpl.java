@@ -1,7 +1,8 @@
 package com.jingliang.mall.service.impl;
 
-import com.jingliang.mall.entity.Group;
+import com.jingliang.mall.entity.User;
 import com.jingliang.mall.repository.GroupRepository;
+import com.jingliang.mall.repository.UserRepository;
 import com.jingliang.mall.service.ManagerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,11 @@ import java.util.*;
 public class ManagerServiceImpl implements ManagerService {
 
     private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
 
-    public ManagerServiceImpl(GroupRepository groupRepository){
+    public ManagerServiceImpl(GroupRepository groupRepository, UserRepository userRepository){
         this.groupRepository = groupRepository;
+        this.userRepository = userRepository;
     }
 
 
@@ -35,6 +38,15 @@ public class ManagerServiceImpl implements ManagerService {
     public List<Map<String, Object>> findGroupAchievement(Long parentGroupId, Date startTime, Date endTime) {
         //根据大区下的子分组查询绩效
         return groupRepository.findGroupAchievement(parentGroupId,startTime,endTime);
+    }
+
+    /*
+     * 根据大区下的子分组查询绩效
+     * */
+    @Override
+    public List<Map<String, Object>> findGroupAchievementByGroupNo(String groupNo, Date startTime, Date endTime) {
+        //根据大区下的子分组查询绩效
+        return groupRepository.findGroupAchievementByGroupNo(groupNo,startTime,endTime);
     }
 
     /*
@@ -105,5 +117,10 @@ public class ManagerServiceImpl implements ManagerService {
     @Override
     public List<Map<String, Object>> getBuyerTop30() {
         return groupRepository.getBuyerTop30();
+    }
+
+    @Override
+    public List<User> findSaleByGroup(String groupNo) {
+        return userRepository.findAllByIsAvailableAndGroupNo(true,groupNo);
     }
 }

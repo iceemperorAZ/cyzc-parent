@@ -74,6 +74,31 @@ public class ManagerController {
     }
 
     /**
+     * 通过parentid查询大区绩效绩效信息
+     */
+    @GetMapping("/searchAchievementsByGroupNo")
+    @ApiOperation(value = "查询各个分区时间段内的所有绩效")
+    public Result<List<Map<String, Object>>> searchAchievementsByGroupNo(String groupNo,
+                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                       HttpSession session) {
+        //1.判断是否是管理员
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //2.判断传参是查总绩效还是分区绩效
+        if (!Objects.isNull(groupNo)) {
+            //未传父组id，查询总绩效
+            List<Map<String, Object>> achievements = managerService.findGroupAchievementByGroupNo(groupNo,startTime, endTime);
+            log.debug("返回参数:{}", achievements);
+            return Result.buildQueryOk(achievements);
+        }
+        return Result.buildParamFail();
+    }
+
+    /**
      * 通过分区查询销售绩效信息
      */
     @GetMapping("/searchAchievementsWithUser")
@@ -363,5 +388,17 @@ public class ManagerController {
         }
         log.debug("返回结果:{}",getBuyer);
         return Result.buildQueryOk(getBuyer);
+    }
+
+    @GetMapping("/findSaleByGroup")
+    @ApiOperation(value = "查询组下的所有销售")
+    public Result<?> findSaleByGroup(String groupNo){
+        if (!Objects.isNull(groupNo)) {
+            //未传父组id，查询总绩效
+            List<User> salies = managerService.findSaleByGroup(groupNo);
+            log.debug("返回参数:{}", salies);
+            return Result.buildQueryOk(salies);
+        }
+        return Result.buildParamFail();
     }
 }

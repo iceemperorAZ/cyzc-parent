@@ -125,6 +125,30 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
     List<Map<String, Object>> findGroupAchievement(Long parentGroupId, Date startTime, Date endTime);
 
     /*
+     * 柱状图-查询每个大区下的子分组绩效
+     * */
+    @Query(value = " SELECT " +
+            " ANY_VALUE(g.id) AS id, " +
+            " ANY_VALUE(g.parent_group_id) AS parentGroupId, " +
+            " ANY_VALUE(g.group_name) AS groupName, " +
+            " CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice   " +
+            " FROM " +
+            " tb_group g " +
+            " LEFT JOIN tb_order o ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
+            " AND o.order_status BETWEEN 300  " +
+            " AND 700  " +
+            " AND o.is_available = 1  " +
+            " AND o.create_time BETWEEN :startTime " +
+            " AND :endTime " +
+            " WHERE " +
+            " g.groupNo = :groupNo " +
+            " AND g.is_available = 1   " +
+            " GROUP BY " +
+            " g.id,g.group_name "+
+            " ORDER BY totalPrice DESC ", nativeQuery = true)
+    List<Map<String, Object>> findGroupAchievementByGroupNo(String groupNo, Date startTime, Date endTime);
+
+    /*
      * 柱状图-查询子分组下各个销售的绩效
      *
      * */
@@ -142,7 +166,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             "AND o.create_time " +
             "BETWEEN :startTime AND :endTime " +
             "WHERE g.group_no = :groupNo " +
-            "GROUP BY u.user_name", nativeQuery = true)
+            "GROUP BY u.user_name ORDER BY totalPrice DESC ", nativeQuery = true)
     List<Map<String, Object>> findUserAchievement(String groupNo, Date startTime, Date endTime);
 
 

@@ -1,5 +1,7 @@
 package com.jingliang.mall.service;
 
+import com.jingliang.mall.entity.User;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +11,8 @@ public interface ManagerService {
     public List<Map<String, Object>> findAchievementsByMyself(Date startTime, Date endTime);
 
     public List<Map<String, Object>> findGroupAchievement(Long parentGroupId, Date startTime, Date endTime);
+
+    public List<Map<String, Object>> findGroupAchievementByGroupNo(String groupNo, Date startTime, Date endTime);
 
     public List<Map<String, Object>> findUserAchievement(String groupNo, Date startTime, Date endTime);
 
@@ -27,4 +31,6 @@ public interface ManagerService {
     public List<Map<String, Object>> findOrdersTotalByGroupAndDay(Long parentGroupId, Date startTime, Date endTime);
 
     public List<Map<String, Object>> getBuyerTop30();
+
+    List<User> findSaleByGroup(String groupNo);
 }
