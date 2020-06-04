@@ -411,7 +411,7 @@ public class BuyerManageController {
     @GetMapping("/year/topProductCounts")
     public Result<List<Map<String, Object>>> yeartopOfProductCountsByOrder(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                           Integer topNum,
+                                                                           @RequestParam(defaultValue = "5") Integer topNum,
                                                                            HttpSession session) {
         //获取用户
         User user = (User) session.getAttribute(sessionUser);
@@ -435,7 +435,7 @@ public class BuyerManageController {
     @GetMapping("/month/topProductCounts")
     public Result<List<Map<String, Object>>> monthtopOfProductCountsByOrder(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                            Integer topNum,
+                                                                            @RequestParam(defaultValue = "5") Integer topNum,
                                                                             HttpSession session) {
         //获取用户
         User user = (User) session.getAttribute(sessionUser);
