@@ -398,6 +398,9 @@ public class WechatManageController {
             hashMap.put(group.getGroupName(), list);
             //总新增
             List<Map<String, Object>> allIncrease = wechatManageService.allIncrease(user.getGroupNo().replaceAll("0*$", "") + "%");
+            if(allIncrease.size()>1){
+                return Result.build(Msg.AUTHORITY_FAIL, "权限不足");
+            }
             if (!allIncrease.isEmpty()) {
                 map = new HashMap<>();
                 map.put("name", allIncrease.get(0).get("groupName"));
