@@ -220,7 +220,7 @@ public class ProductController {
         }
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(productReq, user);
-        if (StringUtils.isNotBlank(productReq.getProductNo())) {
+        if (StringUtils.isBlank(productReq.getProductNo())) {
             productReq.setProductNo(redisService.getProductNo());
         }
         productReq.setIsShow(false);
