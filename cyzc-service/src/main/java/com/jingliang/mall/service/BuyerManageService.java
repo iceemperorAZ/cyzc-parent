@@ -74,6 +74,36 @@ public interface BuyerManageService {
     List<Map<String, Object>> daysByDateAndParentGroupIdAchievement(Date startTime, Date endTime, Long parentGroupId);
 
     /**
+     * 根据父id查询子区每年的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    List<Map<String, Object>> yearByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo);
+
+    /**
+     * 根据父id查询子区每月的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    List<Map<String, Object>> monthByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo);
+
+    /**
+     * 根据父id查询子区每天的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    List<Map<String, Object>> daysByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo);
+
+    /**
      * 销售新增商户统计
      *
      * @return
@@ -118,10 +148,11 @@ public interface BuyerManageService {
     List<Map<String, Object>> searchAllBuyer();
 
     /*
-    * *
-    * 查询所有未绑定销售的商户
-    * * */
+     * *
+     * 查询所有未绑定销售的商户
+     * * */
     List<Map<String, Object>> searchBuyerDontHaveSale();
+
     /*
      * *
      * 查询所有绑定销售的商户
