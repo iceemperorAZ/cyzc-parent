@@ -142,7 +142,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " AND o.create_time BETWEEN :startTime " +
             " AND :endTime " +
             " WHERE " +
-            " g.groupNo = :groupNo " +
+            " g.group_no = :groupNo " +
             " AND g.is_available = 1   " +
             " GROUP BY " +
             " g.id,g.group_name "+
