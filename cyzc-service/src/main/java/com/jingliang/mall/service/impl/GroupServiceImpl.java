@@ -114,7 +114,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<Group> getGroupWithFather(Long parentGroupId, Boolean isAvailable) {
-        return groupRepository.findGroupsByParentGroupIdAndIsAvailable(parentGroupId, true);
+        return groupRepository.findGroupsByParentGroupIdAndIsAvailableOrderByCreateTime(parentGroupId, true);
     }
 
     /**

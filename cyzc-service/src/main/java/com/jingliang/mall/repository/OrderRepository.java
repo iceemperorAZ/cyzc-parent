@@ -238,7 +238,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      *
      * @return
      */
-    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer",nativeQuery = true)
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer", nativeQuery = true)
     Integer countBuyerAll();
 
     /**
@@ -246,7 +246,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      *
      * @return
      */
-    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer WHERE sale_user_id IS NOT NULL",nativeQuery = true)
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer WHERE sale_user_id IS NOT NULL", nativeQuery = true)
     Integer countActiveBuyerAll();
 
     /**
@@ -254,7 +254,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      *
      * @return
      */
-    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer WHERE sale_user_id IS NULL",nativeQuery = true)
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer WHERE sale_user_id IS NULL", nativeQuery = true)
     Integer countInactiveBuyerAll();
 
     /**
@@ -264,7 +264,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      * @param date
      * @return
      */
-    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo AND DATE_FORMAT(b.create_time,'%Y-%m') = DATE_FORMAT(:date,'%Y-%m') GROUP BY g.group_no,g.group_name;\n",nativeQuery = true)
+    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo AND DATE_FORMAT(b.create_time,'%Y-%m') = DATE_FORMAT(:date,'%Y-%m') GROUP BY g.group_no,g.group_name;\n", nativeQuery = true)
     List<Map<String, Object>> monthIncrease(String groupNo, Date date);
 
     /**
@@ -274,7 +274,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      * @param date
      * @return
      */
-    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo AND DATE_FORMAT(b.create_time,'%Y-%m-%d') = DATE_FORMAT(:date,'%Y-%m-%d') GROUP BY g.group_no,g.group_name;",nativeQuery = true)
+    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo AND DATE_FORMAT(b.create_time,'%Y-%m-%d') = DATE_FORMAT(:date,'%Y-%m-%d') GROUP BY g.group_no,g.group_name;", nativeQuery = true)
     List<Map<String, Object>> dayIncrease(String groupNo, Date date);
 
     /**
@@ -283,6 +283,24 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      * @param groupNo
      * @return
      */
-    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo  GROUP BY g.group_no,g.group_name;",nativeQuery = true)
+    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo  GROUP BY g.group_no,g.group_name;", nativeQuery = true)
     List<Map<String, Object>> allIncrease(String groupNo);
+
+    /**
+     * 查询总的月新增商户
+     *
+     * @param date
+     * @return
+     */
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m') = DATE_FORMAT(:date,'%Y-%m')", nativeQuery = true)
+    Integer totalMonthBuyerAll(Date date);
+
+    /**
+     * 查询总的日新增商户
+     *
+     * @param date
+     * @return
+     */
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m-%d') = DATE_FORMAT(:date,'%Y-%m-%d')", nativeQuery = true)
+    Integer totalDayBuyerAll(Date date);
 }

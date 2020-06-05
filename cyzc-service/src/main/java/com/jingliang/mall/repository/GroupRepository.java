@@ -22,7 +22,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
 
     public Group findGroupByParentGroupIdAndIsAvailable(@Param("parentGroupId") Long parentGroupId, @Param("isAvailable") Boolean isAvailable);
 
-    public List<Group> findGroupsByParentGroupIdAndIsAvailable(Long parentGroupId, Boolean isAvailable);
+    public List<Group> findGroupsByParentGroupIdAndIsAvailableOrderByCreateTime(Long parentGroupId, Boolean isAvailable);
 
     /**
      * 统计子节点数量
