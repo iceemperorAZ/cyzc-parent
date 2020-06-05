@@ -153,7 +153,7 @@ public class OrderController {
             orderDetail.setIsAvailable(true);
             orderDetails.add(orderDetail);
             //TODO 临时使用商品分类Id进行区分
-            if (product.getProductTypeId().equals(2020030121L)) {
+            if (product.getProductTypeId().equals(2020030121L) || product.getProductTypeId().equals(202006053569L)) {
                 //饮料类的价格不进行累加，单独出来计算
                 drinksDetails.add(orderDetail);
                 orderDetail.setDifference(product.getSellingPrice() - product.getMarketPrice());
