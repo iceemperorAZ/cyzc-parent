@@ -123,4 +123,19 @@ public class ManagerServiceImpl implements ManagerService {
     public List<User> findSaleByGroup(String groupNo) {
         return userRepository.findAllByIsAvailableAndGroupNo(true,groupNo);
     }
+
+    @Override
+    public List<Map<String, Object>> findGroupAchievementWithTimeByYearAndGroupNo(String groupNo, Date startTime, Date endTime) {
+        return groupRepository.findGroupAchievementWithTimeByYearAndGroupNo(groupNo,startTime,endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> findGroupAchievementWithTimeByMonthAndGroupNo(String groupNo, Date startTime, Date endTime) {
+        return groupRepository.findGroupAchievementWithTimeByMonthAndGroupNo(groupNo,startTime,endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> findGroupAchievementWithTimeByDayAndGroupNo(String groupNo, Date startTime, Date endTime) {
+        return groupRepository.findGroupAchievementWithTimeByDayAndGroupNo(groupNo,startTime,endTime);
+    }
 }

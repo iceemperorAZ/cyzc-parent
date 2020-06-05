@@ -33,4 +33,10 @@ public interface ManagerService {
     public List<Map<String, Object>> getBuyerTop30();
 
     List<User> findSaleByGroup(String groupNo);
+
+    List<Map<String, Object>> findGroupAchievementWithTimeByYearAndGroupNo(String groupNo, Date startTime, Date endTime);
+
+    List<Map<String, Object>> findGroupAchievementWithTimeByMonthAndGroupNo(String groupNo, Date startTime, Date endTime);
+
+    List<Map<String, Object>> findGroupAchievementWithTimeByDayAndGroupNo(String groupNo, Date startTime, Date endTime);
 }

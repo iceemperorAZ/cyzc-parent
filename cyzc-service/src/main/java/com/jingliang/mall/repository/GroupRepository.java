@@ -296,6 +296,130 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
     List<Map<String, Object>> findGroupAchievementWithTimeByDay(Long parentGroupId, Date startTime, Date endTime);
 
     /*
+     * 根据年份进行查询-折线图（总绩效）
+     * */
+    @Query(value = " SELECT  " +
+            " a.eday AS date," +
+            " IF(a.id IS NULL, 0, a.id) AS id," +
+            " a.group_name AS groupName," +
+            " IF(temp.totalPrice IS NULL, 0, temp.totalPrice) AS totalPrice " +
+            " FROM ( SELECT dd.eday , tg.id , tg.group_name , tg.parent_group_id, tg.group_no FROM  " +
+            " ( SELECT 2018 AS eday UNION" +
+            " SELECT 2019 UNION" +
+            " SELECT 2020 UNION" +
+            " SELECT 2021 UNION" +
+            " SELECT 2022 UNION" +
+            " SELECT 2023 UNION" +
+            " SELECT 2024 UNION" +
+            " SELECT 2025 UNION" +
+            " SELECT 2026 UNION" +
+            " SELECT 2027 UNION" +
+            " SELECT 2028 UNION" +
+            " SELECT 2029) dd ,tb_group tg) a LEFT JOIN ( SELECT  " +
+            " ANY_VALUE(g.id) as id , ANY_VALUE(g.group_name) as group_name , DATE_FORMAT( o.create_time, '%Y' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice" +
+            " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' ) " +
+            " WHERE " +
+            " g.group_no = :groupNo " +
+            " AND o.create_time BETWEEN :startTime  AND :endTime " +
+            " AND o.order_status BETWEEN 300 AND 700   " +
+            " GROUP BY g.group_name,g.group_no," +
+            " DATE_FORMAT( o.create_time, '%Y' )) as temp ON a.eday = temp.create_time " +
+            " AND a.id = temp.id" +
+            " WHERE  a.group_no = :groupNo " +
+            " AND a.eday BETWEEN DATE_FORMAT( :startTime , '%Y' )  " +
+            " AND DATE_FORMAT( :endTime , '%Y' ) ", nativeQuery = true)
+    List<Map<String, Object>> findGroupAchievementWithTimeByYearAndGroupNo(String groupNo, Date startTime, Date endTime);
+
+    /*
+     * 根据月份进行查询-折线图（总绩效）
+     * */
+    @Query(value = " SELECT  " +
+            " a.eday AS date," +
+            " IF(a.id IS NULL, 0, a.id) AS id, " +
+            " a.group_name AS groupName, " +
+            " IF(temp.totalPrice IS NULL, 0, temp.totalPrice) AS totalPrice " +
+            " FROM ( SELECT dd.eday, tg.id , tg.group_name , tg.parent_group_id , tg.group_no " +
+            " FROM ( SELECT 1 AS eday UNION " +
+            " SELECT 2 UNION " +
+            " SELECT 3 UNION " +
+            " SELECT 4 UNION " +
+            " SELECT 5 UNION " +
+            " SELECT 6 UNION " +
+            " SELECT 7 UNION " +
+            " SELECT 8 UNION " +
+            " SELECT 9 UNION " +
+            " SELECT 10 UNION " +
+            " SELECT 11 UNION " +
+            " SELECT 12 ) dd ,tb_group tg ) a LEFT JOIN ( SELECT  " +
+            " ANY_VALUE(g.id) as id , ANY_VALUE(g.group_name) as group_name , DATE_FORMAT( o.create_time, '%c' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice" +
+            " FROM  tb_group g JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' ) " +
+            " WHERE " +
+            " g.group_no = :groupNo " +
+            " AND o.create_time BETWEEN :startTime AND :endTime " +
+            " AND o.order_status BETWEEN 300 AND 700   " +
+            " GROUP BY g.group_name,g.group_no," +
+            " DATE_FORMAT( o.create_time, '%c' )) as temp ON a.eday = temp.create_time " +
+            " AND a.id = temp.id" +
+            " WHERE  a.group_no = :groupNo " +
+            " AND a.eday BETWEEN DATE_FORMAT( :startTime , '%c' )  " +
+            " AND DATE_FORMAT( :endTime , '%c' ) ;", nativeQuery = true)
+    List<Map<String, Object>> findGroupAchievementWithTimeByMonthAndGroupNo(String groupNo, Date startTime, Date endTime);
+
+    /*
+     * 根据天数进行查询-折线图（总绩效）
+     * */
+    @Query(value = " SELECT  " +
+            " a.eday AS date , " +
+            " IF(a.id IS NULL, 0, a.id) AS id, " +
+            " a.group_name AS groupName , " +
+            " IF(temp.totalPrice IS NULL, 0, temp.totalPrice) AS totalPrice " +
+            " FROM ( SELECT dd.eday , tg.id , tg.group_name , tg.parent_group_id, tg.group_no FROM  " +
+            " ( SELECT 1 AS eday UNION " +
+            " SELECT 2 UNION  " +
+            " SELECT 3 UNION  " +
+            " SELECT 4 UNION  " +
+            " SELECT 5 UNION  " +
+            " SELECT 6 UNION  " +
+            " SELECT 7 UNION  " +
+            " SELECT 8 UNION  " +
+            " SELECT 9 UNION  " +
+            " SELECT 10 UNION  " +
+            " SELECT 11 UNION  " +
+            " SELECT 12 UNION  " +
+            " SELECT 13 UNION  " +
+            " SELECT 14 UNION  " +
+            " SELECT 15 UNION  " +
+            " SELECT 16 UNION  " +
+            " SELECT 17 UNION  " +
+            " SELECT 18 UNION  " +
+            " SELECT 19 UNION  " +
+            " SELECT 20 UNION  " +
+            " SELECT 21 UNION  " +
+            " SELECT 22 UNION  " +
+            " SELECT 23 UNION  " +
+            " SELECT 24 UNION  " +
+            " SELECT 25 UNION  " +
+            " SELECT 26 UNION  " +
+            " SELECT 27 UNION  " +
+            " SELECT 28 UNION  " +
+            " SELECT 29 UNION  " +
+            " SELECT 30 UNION  " +
+            " SELECT 31 ) dd ,tb_group tg) a LEFT JOIN ( SELECT  " +
+            " ANY_VALUE(g.id) as id , ANY_VALUE(g.group_name) as group_name , DATE_FORMAT( o.create_time, '%e' ) as create_time , SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice " +
+            " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' ) " +
+            " WHERE " +
+            " g.group_no = :groupNo " +
+            " AND o.create_time BETWEEN :startTime AND :endTime " +
+            " AND o.order_status BETWEEN 300 AND 700   " +
+            " GROUP BY g.group_name,g.group_no," +
+            " DATE_FORMAT( o.create_time, '%e' )) as temp ON a.eday = temp.create_time " +
+            " AND a.id = temp.id" +
+            " WHERE  a.group_no = :groupNo " +
+            " AND a.eday BETWEEN DATE_FORMAT( :startTime , '%e' )  " +
+            " AND DATE_FORMAT( :endTime, '%e' ) ;", nativeQuery = true)
+    List<Map<String, Object>> findGroupAchievementWithTimeByDayAndGroupNo(String groupNo, Date startTime, Date endTime);
+
+    /*
      * 查询总销售量-柱-饼
      * */
     @Query(value = "SELECT    " +
