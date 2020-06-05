@@ -341,7 +341,7 @@ public class BuyerManageController {
      */
     @GetMapping("/day/groupNo/buyerCounts")
     @ApiOperation(value = "根据组编号查询该组在每天的用户量")
-    public Result<?> daysByDateAndGroupNoAchievement(String GroupNo,
+    public Result<?> daysByDateAndGroupNoAchievement(String groupNo,
                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                      HttpSession session) {
@@ -352,8 +352,8 @@ public class BuyerManageController {
             return Result.build(Msg.FAIL, "无查看此分组的权限");
         }
         //查询自身组名下的新增商户数
-        if (!Objects.isNull(GroupNo)) {
-            List<Map<String, Object>> counts = buyerManageService.daysByDateAndGroupNoAchievement(startTime, endTime, GroupNo);
+        if (!Objects.isNull(groupNo)) {
+            List<Map<String, Object>> counts = buyerManageService.daysByDateAndGroupNoAchievement(startTime, endTime, groupNo);
             log.debug("返回参数:{}", counts);
             Set<Object> date = counts.stream().map(stringObjectMap -> stringObjectMap.get("days")).collect(Collectors.toSet());
             Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
