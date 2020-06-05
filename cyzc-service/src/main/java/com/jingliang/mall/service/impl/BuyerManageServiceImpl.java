@@ -108,6 +108,21 @@ public class BuyerManageServiceImpl implements BuyerManageService {
         return groupRepository.daysByDateAndParentGroupIdAchievement(startTime, endTime, parentGroupId);
     }
 
+    @Override
+    public List<Map<String, Object>> yearByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo) {
+        return groupRepository.yearByDateAndGroupNoAchievement(startTime, endTime, groupNo);
+    }
+
+    @Override
+    public List<Map<String, Object>> monthByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo) {
+        return groupRepository.monthByDateAndGroupNoAchievement(startTime, endTime, groupNo);
+    }
+
+    @Override
+    public List<Map<String, Object>> daysByDateAndGroupNoAchievement(Date startTime, Date endTime, String groupNo) {
+        return groupRepository.daysByDateAndGroupNoAchievement(startTime, endTime, groupNo);
+    }
+
     /**
      * 销售新增商户统计
      *

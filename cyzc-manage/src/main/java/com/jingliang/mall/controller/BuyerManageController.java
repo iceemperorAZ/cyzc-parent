@@ -21,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -243,6 +244,138 @@ public class BuyerManageController {
     }
 
     /**
+     * 根据组编号查询该组在每年的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @GetMapping("/year/groupNo/buyerCounts")
+    @ApiOperation(value = "根据组编号查询该组在每年的用户量")
+    public Result<?> yearByDateAndParentGroupIdAchievement(String groupNo,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                           HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //查询自身组名下的新增商户数
+        if (!Objects.isNull(groupNo)) {
+            List<Map<String, Object>> counts = buyerManageService.yearByDateAndGroupNoAchievement(startTime, endTime, groupNo);
+            log.debug("返回参数:{}", counts);
+            Set<Object> date = counts.stream().map(stringObjectMap -> stringObjectMap.get("days")).collect(Collectors.toSet());
+            Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
+            counts.forEach(stringObjectMap -> {
+                if (map.get(((String) stringObjectMap.get("groupName"))) == null) {
+                    map.put(((String) stringObjectMap.get("groupName")), new ArrayList<>());
+                }
+                map.get(((String) stringObjectMap.get("groupName"))).add(stringObjectMap);
+            });
+            List<List<Map<String, Object>>> list = new ArrayList<>();
+            for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+                list.add(entry.getValue());
+            }
+            Map<String, Object> resultMap = new HashMap<>(156);
+            resultMap.put("x", date);
+            resultMap.put("data", list);
+            return Result.buildQueryOk(resultMap);
+        }
+        return Result.buildParamFail();
+    }
+
+    /**
+     * 根据组编号查询该组在每月的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @GetMapping("/month/groupNo/buyerCounts")
+    @ApiOperation(value = "根据组编号查询该组在每月的用户量")
+    public Result<?> monthByDateAndGroupNoAchievement(String groupNo,
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                      HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //查询自身组名下的新增商户数
+        if (!Objects.isNull(groupNo)) {
+            List<Map<String, Object>> counts = buyerManageService.monthByDateAndGroupNoAchievement(startTime, endTime, groupNo);
+            log.debug("返回参数:{}", counts);
+            Set<Object> date = counts.stream().map(stringObjectMap -> stringObjectMap.get("days")).collect(Collectors.toSet());
+            Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
+            counts.forEach(stringObjectMap -> {
+                if (map.get(((String) stringObjectMap.get("groupName"))) == null) {
+                    map.put(((String) stringObjectMap.get("groupName")), new ArrayList<>());
+                }
+                map.get(((String) stringObjectMap.get("groupName"))).add(stringObjectMap);
+            });
+            List<List<Map<String, Object>>> list = new ArrayList<>();
+            for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+                list.add(entry.getValue());
+            }
+            Map<String, Object> resultMap = new HashMap<>(156);
+            resultMap.put("x", date);
+            resultMap.put("data", list);
+            return Result.buildQueryOk(resultMap);
+        }
+        return Result.buildParamFail();
+    }
+
+    /**
+     * 根据组编号查询该组在每天的用户量
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @return
+     */
+    @GetMapping("/day/groupNo/buyerCounts")
+    @ApiOperation(value = "根据组编号查询该组在每天的用户量")
+    public Result<?> daysByDateAndGroupNoAchievement(String groupNo,
+                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                     HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        //查询自身组名下的新增商户数
+        if (!Objects.isNull(groupNo)) {
+            List<Map<String, Object>> counts = buyerManageService.daysByDateAndGroupNoAchievement(startTime, endTime, groupNo);
+            log.debug("返回参数:{}", counts);
+            Set<Object> date = counts.stream().map(stringObjectMap -> stringObjectMap.get("days")).collect(Collectors.toSet());
+            Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
+            counts.forEach(stringObjectMap -> {
+                if (map.get(((String) stringObjectMap.get("groupName"))) == null) {
+                    map.put(((String) stringObjectMap.get("groupName")), new ArrayList<>());
+                }
+                map.get(((String) stringObjectMap.get("groupName"))).add(stringObjectMap);
+            });
+            List<List<Map<String, Object>>> list = new ArrayList<>();
+            for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+                list.add(entry.getValue());
+            }
+            Map<String, Object> resultMap = new HashMap<>(156);
+            resultMap.put("x", date);
+            resultMap.put("data", list);
+            return Result.buildQueryOk(resultMap);
+        }
+        return Result.buildParamFail();
+    }
+
+    /**
      * 当前年销售下单量top
      *
      * @param startTime
@@ -254,7 +387,7 @@ public class BuyerManageController {
     @GetMapping("/topOrderCounts")
     public Result<List<Map<String, Object>>> topOfOrderCountsByUser(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                    Integer topNum,
+                                                                    @RequestParam(defaultValue = "5") Integer topNum,
                                                                     HttpSession session) {
         //获取用户
         User user = (User) session.getAttribute(sessionUser);
@@ -278,7 +411,7 @@ public class BuyerManageController {
     @GetMapping("/year/topProductCounts")
     public Result<List<Map<String, Object>>> yeartopOfProductCountsByOrder(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                           Integer topNum,
+                                                                           @RequestParam(defaultValue = "5") Integer topNum,
                                                                            HttpSession session) {
         //获取用户
         User user = (User) session.getAttribute(sessionUser);
@@ -302,7 +435,7 @@ public class BuyerManageController {
     @GetMapping("/month/topProductCounts")
     public Result<List<Map<String, Object>>> monthtopOfProductCountsByOrder(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                            Integer topNum,
+                                                                            @RequestParam(defaultValue = "5") Integer topNum,
                                                                             HttpSession session) {
         //获取用户
         User user = (User) session.getAttribute(sessionUser);
@@ -391,14 +524,14 @@ public class BuyerManageController {
     }
 
     /*
-    *
-    *  查询未绑定销售的商户数
-    * * */
+     *
+     *  查询未绑定销售的商户数
+     * * */
     @GetMapping("/searchBuyerDontHaveSale")
     @ApiOperation(value = "查询未绑定销售的商户")
     public Result<?> searchBuyerDontHaveSale() {
         List<Map<String, Object>> buyers = buyerManageService.searchBuyerDontHaveSale();
-        log.debug("返回参数:{}",buyers);
+        log.debug("返回参数:{}", buyers);
         return Result.buildQueryOk(buyers);
     }
 
@@ -410,7 +543,7 @@ public class BuyerManageController {
     @ApiOperation(value = "查询未绑定销售的商户")
     public Result<?> searchBuyerHaveSale() {
         List<Map<String, Object>> buyers = buyerManageService.searchBuyerHaveSale();
-        log.debug("返回参数:{}",buyers);
+        log.debug("返回参数:{}", buyers);
         return Result.buildQueryOk(buyers);
     }
 }
