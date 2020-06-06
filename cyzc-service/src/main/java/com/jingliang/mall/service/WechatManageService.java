@@ -181,4 +181,18 @@ public interface WechatManageService {
      * @return
      */
     List<Map<String, Object>> allIncrease(String groupNo);
+
+    /**
+     * 查询总的月新增商户
+     * @param date
+     * @return
+     */
+    Integer totalMonthBuyerAll(Date date);
+
+    /**
+     * 查询总的日新增商户
+     * @param date
+     * @return
+     */
+    Integer totalDayBuyerAll(Date date);
 }

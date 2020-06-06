@@ -115,4 +115,14 @@ public class WechatManageServiceImpl implements WechatManageService {
     public List<Map<String, Object>> allIncrease(String groupNo) {
         return orderRepository.allIncrease(groupNo);
     }
+
+    @Override
+    public Integer totalMonthBuyerAll(Date date) {
+        return orderRepository.totalMonthBuyerAll(date);
+    }
+
+    @Override
+    public Integer totalDayBuyerAll(Date date) {
+        return orderRepository.totalDayBuyerAll(date);
+    }
 }

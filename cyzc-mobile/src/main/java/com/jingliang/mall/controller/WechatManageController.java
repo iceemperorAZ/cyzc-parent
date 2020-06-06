@@ -323,9 +323,9 @@ public class WechatManageController {
         //当前操作人
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
-        Map<String, Object> resultMap = new HashMap<>(10);
+        Map<String, Object> resultMap = new TreeMap<>();
         //判断是否是管理员
-        Map<String, List<Map<String, Object>>> hashMap = new HashMap<>();
+        Map<String, List<Map<String, Object>>> hashMap = new LinkedHashMap<>();
         if (user.getLevel() == 200) {
             List<Group> groups = groupService.getGroupWithFather(1L, true);
             for (Group group : groups) {
@@ -353,35 +353,48 @@ public class WechatManageController {
             //查询总待激活商户
             Integer countInactiveBuyerAll = wechatManageService.countInactiveBuyerAll();
             resultMap.put("countInactiveBuyerAll", countInactiveBuyerAll);
-            //总新增
+            //查询总的月新增商户
+            Integer totalMonthBuyerAll = wechatManageService.totalMonthBuyerAll(new Date());
+            resultMap.put("totalMonthBuyerAll", totalMonthBuyerAll);
+            //查询总的日新增商户
+            Integer totalDayBuyerAll = wechatManageService.totalDayBuyerAll(new Date());
+            resultMap.put("totalDayBuyerAll", totalDayBuyerAll);
+
+            //各个区总新增
             List<Map<String, Object>> allIncrease = wechatManageService.allIncrease(user.getGroupNo().replaceAll("0*$", "") + "%");
             for (Map<String, Object> objectMap : allIncrease) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", objectMap.get("groupName"));
                 map.put("value", ((BigInteger) objectMap.get("count")).longValue());
-                hashMap.get(objectMap.get("groupName")).set(0, map);
+                if (hashMap.containsKey(objectMap.get("groupName"))) {
+                    hashMap.get(objectMap.get("groupName")).set(0, map);
+                }
             }
-            //总月新增
+            //各个区总月新增
             List<Map<String, Object>> monthIncrease = wechatManageService.monthIncrease(user.getGroupNo().replaceAll("0*$", "") + "%", new Date());
             for (Map<String, Object> objectMap : monthIncrease) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", objectMap.get("groupName"));
                 map.put("value", ((BigInteger) objectMap.get("count")).longValue());
-                hashMap.get(objectMap.get("groupName")).set(0, map);
+                if (hashMap.containsKey(objectMap.get("groupName"))) {
+                    hashMap.get(objectMap.get("groupName")).set(1, map);
+                }
             }
-            //总日新增
+            //各个区总日新增
             List<Map<String, Object>> dayIncrease = wechatManageService.dayIncrease(user.getGroupNo().replaceAll("0*$", "") + "%", new Date());
             for (Map<String, Object> objectMap : dayIncrease) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("name", objectMap.get("groupName"));
                 map.put("value", ((BigInteger) objectMap.get("count")).longValue());
-                hashMap.get(objectMap.get("groupName")).set(0, map);
+                if (hashMap.containsKey(objectMap.get("groupName"))) {
+                    hashMap.get(objectMap.get("groupName")).set(2, map);
+                }
             }
             resultMap.put("regionList", new ArrayList<>(hashMap.values()));
             return Result.build(Msg.OK, "", resultMap);
         } else if (user.getLevel() == 110) {
             Group group = groupService.findByGroupNo(user.getGroupNo());
-            hashMap = new HashMap<>();
+            hashMap = new LinkedHashMap<>();
             List<Map<String, Object>> list = new ArrayList<>();
             Map<String, Object> map = new HashMap<>();
             map.put("name", group.getGroupName());
@@ -398,11 +411,16 @@ public class WechatManageController {
             hashMap.put(group.getGroupName(), list);
             //总新增
             List<Map<String, Object>> allIncrease = wechatManageService.allIncrease(user.getGroupNo().replaceAll("0*$", "") + "%");
+            if (allIncrease.size() > 1) {
+                return Result.build(Msg.AUTHORITY_FAIL, "权限不足");
+            }
             if (!allIncrease.isEmpty()) {
                 map = new HashMap<>();
                 map.put("name", allIncrease.get(0).get("groupName"));
                 map.put("value", ((BigInteger) allIncrease.get(0).get("count")).longValue());
-                hashMap.get(allIncrease.get(0).get("groupName")).set(0, map);
+                if (hashMap.containsKey(allIncrease.get(0).get("groupName"))) {
+                    hashMap.get(allIncrease.get(0).get("groupName")).set(0, map);
+                }
             }
             //总月新增
             List<Map<String, Object>> monthIncrease = wechatManageService.monthIncrease(user.getGroupNo().replaceAll("0*$", "") + "%", new Date());
@@ -410,7 +428,9 @@ public class WechatManageController {
                 map = new HashMap<>();
                 map.put("name", monthIncrease.get(0).get("groupName"));
                 map.put("value", ((BigInteger) monthIncrease.get(0).get("count")).longValue());
-                hashMap.get(monthIncrease.get(0).get("groupName")).set(0, map);
+                if (hashMap.containsKey(monthIncrease.get(0).get("groupName"))) {
+                    hashMap.get(monthIncrease.get(0).get("groupName")).set(1, map);
+                }
             }
             //总日新增
             List<Map<String, Object>> dayIncrease = wechatManageService.dayIncrease(user.getGroupNo().replaceAll("0*$", "") + "%", new Date());
@@ -418,7 +438,9 @@ public class WechatManageController {
                 map = new HashMap<>();
                 map.put("name", (String) dayIncrease.get(0).get("groupName"));
                 map.put("value", ((BigInteger) dayIncrease.get(0).get("count")).longValue());
-                hashMap.get(dayIncrease.get(0).get("groupName")).set(0, map);
+                if (hashMap.containsKey(dayIncrease.get(0).get("groupName"))) {
+                    hashMap.get(dayIncrease.get(0).get("groupName")).set(2, map);
+                }
             }
             resultMap.put("regionList", new ArrayList<>(hashMap.values()));
             return Result.build(Msg.OK, "", resultMap);
