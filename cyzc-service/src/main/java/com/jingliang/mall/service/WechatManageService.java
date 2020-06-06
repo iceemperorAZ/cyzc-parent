@@ -1,9 +1,5 @@
 package com.jingliang.mall.service;
 
-import com.jingliang.mall.bean.ConfluenceDetail;
-import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.entity.User;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -15,27 +11,6 @@ import java.util.Map;
  * @date 2019-12-12 14:21:29
  */
 public interface WechatManageService {
-    /**
-     * 查询销售员在指定时间内的绩效总汇
-     *
-     * @param user      指定员工
-     * @param startTime 开始时间
-     * @param endTime   结束时间
-     * @return
-     */
-    public ConfluenceDetail userPerformanceSummary(User user, Date startTime, Date endTime);
-
-    /**
-     * 查询商户在指定时间内的绩效
-     *
-     * @param buyer     商户
-     * @param user      销售
-     * @param startTime 开始时间
-     * @param endTime   结束时间
-     * @return
-     */
-    public ConfluenceDetail buyerPerformanceSummary(Buyer buyer, User user, Date startTime, Date endTime);
-
     /**
      * 根据组编号统计组下的业绩
      *
@@ -160,5 +135,64 @@ public interface WechatManageService {
      */
     List<Map<String, Object>> bossGroupProductAchievement(String groupNo, Date startTime, Date endTime);
 
-    void x();
+    /**
+     * 查询总商户
+     *
+     * @return
+     */
+    Integer countBuyerAll();
+
+    /**
+     * 查询总活跃商户
+     *
+     * @return
+     */
+    Integer countActiveBuyerAll();
+
+    /**
+     * 查询总待激活商户
+     *
+     * @return
+     */
+    Integer countInactiveBuyerAll();
+
+    /**
+     * 总月新增
+     *
+     * @param groupNo
+     * @param date
+     * @return
+     */
+    List<Map<String, Object>> monthIncrease(String groupNo, Date date);
+
+    /**
+     * 总日新增
+     *
+     * @param groupNo
+     * @param date
+     * @return
+     */
+    List<Map<String, Object>> dayIncrease(String groupNo, Date date);
+
+    /**
+     * 总新增
+     *
+     * @param groupNo
+     * @return
+     */
+    List<Map<String, Object>> allIncrease(String groupNo);
+
+    /**
+     * 查询总的月新增商户
+     * @param date
+     * @return
+     */
+    Integer totalMonthBuyerAll(Date date);
+
+    /**
+     * 查询总的日新增商户
+     * @param date
+     * @return
+     */
+    Integer totalDayBuyerAll(Date date);
 }

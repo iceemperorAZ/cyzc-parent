@@ -6,6 +6,7 @@ import javax.persistence.*;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 组
@@ -60,5 +61,11 @@ public class Group implements Serializable {
 	 */
 	@Column(name = "child")
 	private Boolean child;
+
+	/**
+	 * 创建时间
+	 */
+	@Column(name = "create_time")
+	private Date createTime;
 
 }

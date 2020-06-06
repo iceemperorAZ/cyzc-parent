@@ -22,7 +22,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
 
     public Group findGroupByParentGroupIdAndIsAvailable(@Param("parentGroupId") Long parentGroupId, @Param("isAvailable") Boolean isAvailable);
 
-    public List<Group> findGroupsByParentGroupIdAndIsAvailable(Long parentGroupId, Boolean isAvailable);
+    public List<Group> findGroupsByParentGroupIdAndIsAvailableOrderByCreateTime(Long parentGroupId, Boolean isAvailable);
 
     /**
      * 统计子节点数量
@@ -142,7 +142,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " AND o.create_time BETWEEN :startTime " +
             " AND :endTime " +
             " WHERE " +
-            " g.groupNo = :groupNo " +
+            " g.group_no = :groupNo " +
             " AND g.is_available = 1   " +
             " GROUP BY " +
             " g.id,g.group_name "+

@@ -232,4 +232,75 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
             "SELECT o.create_time AS createTime,o.id AS orderId,o.order_no AS orderNo,g.group_name AS groupName,b.id AS buyerId,b.user_name AS buyerName,b.shop_name AS shopName,u.user_name AS userName,o.preferential_fee AS preferentialFee,o.total_price AS totalPrice,o.payable_fee AS payableFee,o.is_gold AS isGold,o.gold AS gold,o.order_status AS orderStatus,o.return_gold AS returnGold,o.pay_way AS payWay,p.product_no AS productNo,p.product_name AS productName,p.specs,pt.product_type_name AS productTypeName,od.product_num AS productNum,od.selling_price AS sellingPrice,o.storehouse,o.detail_address AS detailAddress,o.receiver_name AS receiverName,o.receiver_phone AS receiverPhone  \n" +
             "FROM tb_order o INNER JOIN tb_order_detail od ON od.order_no=o.order_no INNER JOIN tb_group g ON g.group_no=o.group_no INNER JOIN tb_product p ON p.id=od.product_id INNER JOIN tb_buyer b ON b.id=o.buyer_id INNER JOIN tb_user u ON u.id=b.sale_user_id INNER JOIN tb_product_type pt ON pt.id=p.product_type_id WHERE o.order_status BETWEEN 0 AND 299", nativeQuery = true)
     List<Map<String, String>> orderExcel();
+
+    /**
+     * 查询总商户
+     *
+     * @return
+     */
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer", nativeQuery = true)
+    Integer countBuyerAll();
+
+    /**
+     * 查询总活跃商户
+     *
+     * @return
+     */
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer WHERE sale_user_id IS NOT NULL", nativeQuery = true)
+    Integer countActiveBuyerAll();
+
+    /**
+     * 查询总待激活商户
+     *
+     * @return
+     */
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer WHERE sale_user_id IS NULL", nativeQuery = true)
+    Integer countInactiveBuyerAll();
+
+    /**
+     * 总月新增
+     *
+     * @param groupNo
+     * @param date
+     * @return
+     */
+    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo AND DATE_FORMAT(b.create_time,'%Y-%m') = DATE_FORMAT(:date,'%Y-%m') GROUP BY g.group_no,g.group_name;\n", nativeQuery = true)
+    List<Map<String, Object>> monthIncrease(String groupNo, Date date);
+
+    /**
+     * 总日新增
+     *
+     * @param groupNo
+     * @param date
+     * @return
+     */
+    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo AND DATE_FORMAT(b.create_time,'%Y-%m-%d') = DATE_FORMAT(:date,'%Y-%m-%d') GROUP BY g.group_no,g.group_name;", nativeQuery = true)
+    List<Map<String, Object>> dayIncrease(String groupNo, Date date);
+
+    /**
+     * 总新增
+     *
+     * @param groupNo
+     * @return
+     */
+    @Query(value = "SELECT g.group_no as groupNo,g.group_name as groupName,COUNT(1) as count FROM tb_buyer b JOIN tb_user u ON b.sale_user_id = u.id JOIN tb_group g ON g.group_no LIKE CONCAT(regexp_replace(u.group_no ,'0*$',''), '%' ) WHERE g.group_no like :groupNo  GROUP BY g.group_no,g.group_name;", nativeQuery = true)
+    List<Map<String, Object>> allIncrease(String groupNo);
+
+    /**
+     * 查询总的月新增商户
+     *
+     * @param date
+     * @return
+     */
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m') = DATE_FORMAT(:date,'%Y-%m')", nativeQuery = true)
+    Integer totalMonthBuyerAll(Date date);
+
+    /**
+     * 查询总的日新增商户
+     *
+     * @param date
+     * @return
+     */
+    @Query(value = "SELECT COUNT(1) as count FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m-%d') = DATE_FORMAT(:date,'%Y-%m-%d')", nativeQuery = true)
+    Integer totalDayBuyerAll(Date date);
 }
