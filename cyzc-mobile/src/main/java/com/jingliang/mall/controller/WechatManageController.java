@@ -1,11 +1,10 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
-import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.entity.Group;
-import com.jingliang.mall.entity.Order;
-import com.jingliang.mall.entity.User;
+import com.jingliang.mall.entity.*;
+import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.service.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -318,6 +317,12 @@ public class WechatManageController {
         return Result.buildQueryOk(achievements);
     }
 
+    /**
+     * 统计商户新增
+     *
+     * @param session
+     * @return
+     */
     @GetMapping("/boss/group/buyer/count")
     public Result<Map<String, Object>> groupBuyerCount(HttpSession session) {
         //当前操作人
@@ -446,5 +451,68 @@ public class WechatManageController {
             return Result.build(Msg.OK, "", resultMap);
         }
         return Result.build(Msg.AUTHORITY_FAIL, "权限不足");
+    }
+
+    /**
+     * 查询销售信息
+     */
+    @GetMapping("/boss/group/users")
+    public Result<List<Map<String, Object>>> groupUsers(HttpSession session) {
+        //当前操作人
+        User user = (User) session.getAttribute(sessionUser);
+        List<Map<String, Object>> lists = new ArrayList<>();
+        if (user.getLevel() == 200) {
+            List<Group> groups = groupService.getGroupWithFather(1L, true);
+            for (Group group : groups) {
+                List<User> userList = userService.likeAllByGroupNo(group.getGroupNo().replaceAll("0*$", ""));
+                Map<String, Object> map = new LinkedHashMap<>();
+                map.put("name", group.getGroupName());
+                map.put("value", userList);
+                lists.add(map);
+            }
+        } else if (user.getLevel() == 110) {
+            Group group = groupService.findByGroupNo(user.getGroupNo());
+            List<User> userList = userService.likeAllByGroupNo(user.getGroupNo().replaceAll("0*$", ""));
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("name", group.getGroupName());
+            map.put("value", userList);
+            lists.add(map);
+        }
+        return Result.build(Msg.OK, "", lists);
+    }
+
+    /**
+     * 查询商户信息
+     */
+    @GetMapping("/boss/group/buyers")
+    public Result<List<BuyerResp>> groupBuyers(Long userId, HttpSession session) {
+        //当前操作人
+        User user = (User) session.getAttribute(sessionUser);
+        List<Buyer> buyers;
+        if (user.getLevel() == 200 || user.getLevel() == 110) {
+            //如果是管理员或区域经理则可以直接用传过来的用户Id查询商户
+            buyers = buyerService.findAllBySaleUserId(userId);
+        } else {
+            //否则只能查询自己下面的商户
+            buyers = buyerService.findAllBySaleUserId(user.getId());
+        }
+        return Result.build(Msg.OK, "", BeanMapper.mapList(buyers, BuyerResp.class));
+    }
+
+    /**
+     * 根据商户信息查询收货地址信息
+     */
+    @GetMapping("/boss/buyer/addresses")
+    public Result<List<BuyerAddress>> buyerAddresses(Long buyerId, HttpSession session) {
+        //当前操作人
+        User user = (User) session.getAttribute(sessionUser);
+        if (user.getLevel() == 200 || user.getLevel() == 110 || user.getLevel() == 100) {
+            //如果是管理员或区域经理则可以直接用传过来的用户Id查询商户
+            List<BuyerAddress> buyerAddresses = buyerAddressService.findByBuyerId(buyerId);
+            return Result.build(Msg.OK, "", buyerAddresses);
+        } else {
+            return Result.build(Msg.AUTHORITY_FAIL, "权限不足");
+        }
+
     }
 }

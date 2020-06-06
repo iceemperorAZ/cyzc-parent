@@ -89,7 +89,7 @@ public class GroupServiceImpl implements GroupService {
         for (String mergeGroupNo : mergeGroupNos) {
             List<Order> orders = orderRepository.findAllByIsAvailableAndGroupNoLike(true, mergeGroupNo.replaceAll("0*$", "") + "%");
             List<Group> groups = groupRepository.findAllByGroupNoLikeAndIsAvailable(mergeGroupNo.replaceAll("0*$", "") + "%", true);
-            List<User> users = userRepository.findAllByIsAvailableAndGroupNoLikeOrderByGroupNoAsc(true, mergeGroupNo.replaceAll("0*$", "") + "%");
+            List<User> users = userRepository.findAllByIsAvailableAndGroupNoLikeOrderByGroupNoAscLevelDesc(true, mergeGroupNo.replaceAll("0*$", "") + "%");
             mergeOrders.addAll(orders);
             mergeGroups.addAll(groups);
             mergeUsers.addAll(users);
