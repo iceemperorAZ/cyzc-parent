@@ -35,7 +35,7 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
      * @param isAvailable 是否可用
      * @return 返回查询到的会员列表
      */
-    List<Buyer> findAllBySaleUserIdAndIsAvailable(Long saleUserId, Boolean isAvailable);
+    List<Buyer> findAllBySaleUserIdAndIsAvailableAndIsSealUp(Long saleUserId, Boolean isAvailable, Boolean isSealUp);
 
     /**
      * 分页查询商户信息
@@ -45,7 +45,7 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
      * @param pageable    分页条件
      * @return 返回查询到的商户列表
      */
-    Page<Buyer> findAllBySaleUserIdAndIsAvailable(Long saleUserId, Boolean isAvailable, Pageable pageable);
+    Page<Buyer> findAllBySaleUserIdAndIsAvailableAndIsSealUp(Long saleUserId, Boolean isAvailable, Boolean isSealUp, Pageable pageable);
 
     /**
      * 根据销售Id分页查询
@@ -162,15 +162,15 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
     List<Map<String, Object>> searchAllBuyer();
 
     /*
-    *
-    * 查询未绑定销售的商户
-    * * */
-    @Query(value = " SELECT count(*) AS counts FROM tb_buyer WHERE sale_user_id IS NULL AND is_available = 1 ",nativeQuery = true)
+     *
+     * 查询未绑定销售的商户
+     * * */
+    @Query(value = " SELECT count(*) AS counts FROM tb_buyer WHERE sale_user_id IS NULL AND is_available = 1 ", nativeQuery = true)
     List<Map<String, Object>> searchBuyerDontHaveSale();
 
     /*
-    * 查询绑定销售的全部商户
-    * */
-    @Query(value = " SELECT COUNT(*) AS counts FROM tb_buyer WHERE sale_user_id IS NOT NULL AND is_available = 1 ",nativeQuery = true)
+     * 查询绑定销售的全部商户
+     * */
+    @Query(value = " SELECT COUNT(*) AS counts FROM tb_buyer WHERE sale_user_id IS NOT NULL AND is_available = 1 ", nativeQuery = true)
     List<Map<String, Object>> searchBuyerHaveSale();
 }

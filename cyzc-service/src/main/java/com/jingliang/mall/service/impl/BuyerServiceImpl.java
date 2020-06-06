@@ -69,12 +69,12 @@ public class BuyerServiceImpl implements BuyerService {
 
     @Override
     public List<Buyer> findAllBySaleUserId(Long saleUserId) {
-        return buyerRepository.findAllBySaleUserIdAndIsAvailable(saleUserId, true);
+        return buyerRepository.findAllBySaleUserIdAndIsAvailableAndIsSealUp(saleUserId, true, false);
     }
 
     @Override
     public Page<Buyer> findAllBySaleUserId(Long saleUserId, PageRequest pageRequest) {
-        return buyerRepository.findAllBySaleUserIdAndIsAvailable(saleUserId, true, pageRequest);
+        return buyerRepository.findAllBySaleUserIdAndIsAvailableAndIsSealUp(saleUserId, true, false, pageRequest);
     }
 
     @Override
