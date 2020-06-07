@@ -221,8 +221,18 @@ public class MapByQQServiceImpl implements MapService {
      * @return
      */
     @Override
-    public List<AddressUserHistory> readMap(Long userId) {
-        return addressUserHistoryRepository.findAllByUserIdAndIsAvailableOrderByCreateTimeAsc(userId, true);
+    public List<Map<String, Object>> readMap(Long userId) {
+        //获取当前系统时间的前一天
+        Date date = new Date();
+        //获取日历类
+        Calendar calendar = Calendar.getInstance();
+        //将当期日期设置进去
+        calendar.setTime(date);
+        //对天进行减1天
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        //获取昨天的Date对象
+        Date yesterdayDate = calendar.getTime();
+        return addressUserHistoryRepository.findAllTimeAndUserId(yesterdayDate, userId);
     }
 
     /**
