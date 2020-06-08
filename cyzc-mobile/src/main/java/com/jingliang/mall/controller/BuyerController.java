@@ -196,6 +196,7 @@ public class BuyerController {
             return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
+        buyer = buyerService.findById(buyer.getId());
         String sessionKey = buyer.getSessionKey();
         //解密用户手机号
         String decrypt = MUtils.decrypt(sessionKey, phoneDataReq.getIv(), phoneDataReq.getEncryptedData());
