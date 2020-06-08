@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> likeAllByGroupNo(String groupNo) {
-        return userRepository.findAllByIsAvailableAndGroupNoLikeOrderByGroupNoAsc(true, groupNo + "%");
+        return userRepository.findAllByIsAvailableAndGroupNoLikeOrderByGroupNoAscLevelDesc(true, groupNo + "%");
     }
 
     @Override

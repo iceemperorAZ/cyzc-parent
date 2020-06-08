@@ -1,7 +1,6 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.Result;
-import com.jingliang.mall.entity.AddressUserHistory;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.service.MapService;
@@ -17,6 +16,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.jingliang.mall.utils.StaticField.LATITUDE;
+import static com.jingliang.mall.utils.StaticField.LONGITUDE;
 
 
 /**
@@ -96,11 +98,17 @@ public class MapController {
      * @return
      */
     @GetMapping("/readMapToUserId")
-    public Result<List<AddressUserHistory>> readMap(@RequestParam("userId") Long userId) {
+    public Result<List<List<Double>>> readMap(@RequestParam("userId") Long userId) {
         log.debug("请求参数：{}", userId);
-        List<AddressUserHistory> addressUserHistories = mapService.readMap(userId);
-        log.debug("返回参数：{}", addressUserHistories);
-        return Result.buildQueryOk(addressUserHistories);
+        List<List<Double>> lists = new ArrayList<>();
+        for (Map<String, Object> map : mapService.readMap(userId)) {
+            List<Double> list = new ArrayList<>();
+            list.add((Double) map.get(LATITUDE));
+            list.add((Double) map.get(LONGITUDE));
+            lists.add(list);
+        }
+        log.debug("返回参数：{}", lists);
+        return Result.buildQueryOk(lists);
     }
 
     /**
@@ -129,8 +137,8 @@ public class MapController {
     }
 
     /*
-    * 根据分区查询销售员定位的最后一条记录
-    * */
+     * 根据分区查询销售员定位的最后一条记录
+     * */
     @GetMapping("/searchSaleByGroup")
     @ApiOperation("根据分区查询销售员定位的最后一条记录")
     public Result<?> searchSaleByGroup(String groupNo) {

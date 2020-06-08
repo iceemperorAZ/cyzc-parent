@@ -47,12 +47,11 @@ public class BuyerServiceImpl implements BuyerService {
             GoldLog goldLog = new GoldLog();
             goldLog.setBuyerId(save.getId());
             goldLog.setIsAvailable(true);
-            goldLog.setGold(10);
-            goldLog.setMsg("新用户注册，赠送10金币。");
+            goldLog.setGold(30);
+            goldLog.setMsg("新用户注册，赠送30金币。");
             goldLog.setCreateTime(new Date());
             goldLog.setType(300);
             goldLogRepository.save(goldLog);
-            buyer.setGold(10);
         }
         return save;
     }
@@ -69,12 +68,12 @@ public class BuyerServiceImpl implements BuyerService {
 
     @Override
     public List<Buyer> findAllBySaleUserId(Long saleUserId) {
-        return buyerRepository.findAllBySaleUserIdAndIsAvailable(saleUserId, true);
+        return buyerRepository.findAllBySaleUserIdAndIsAvailableAndIsSealUp(saleUserId, true, false);
     }
 
     @Override
     public Page<Buyer> findAllBySaleUserId(Long saleUserId, PageRequest pageRequest) {
-        return buyerRepository.findAllBySaleUserIdAndIsAvailable(saleUserId, true, pageRequest);
+        return buyerRepository.findAllBySaleUserIdAndIsAvailableAndIsSealUp(saleUserId, true, false, pageRequest);
     }
 
     @Override

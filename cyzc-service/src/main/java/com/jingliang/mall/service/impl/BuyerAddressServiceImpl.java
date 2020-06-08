@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -60,6 +61,11 @@ public class BuyerAddressServiceImpl implements BuyerAddressService {
 
     @Override
     public BuyerAddress findDefaultAddrByBuyerId(Long id) {
-        return buyerAddressRepository.findFirstByBuyerIdAndIsDefaultAndIsAvailable(id,true,true);
+        return buyerAddressRepository.findFirstByBuyerIdAndIsDefaultAndIsAvailable(id, true, true);
+    }
+
+    @Override
+    public List<BuyerAddress> findByBuyerId(Long buyerId) {
+        return buyerAddressRepository.findAllByBuyerIdAndIsAvailableOrderByIsDefaultDesc(buyerId,true);
     }
 }

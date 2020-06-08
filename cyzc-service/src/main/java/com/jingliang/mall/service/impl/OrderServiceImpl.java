@@ -170,11 +170,11 @@ public class OrderServiceImpl implements OrderService {
             Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
             if (oldOrder.getIsGold() != null && oldOrder.getIsGold()) {
                 buyer.setGold(buyer.getGold() + oldOrder.getGold());
-                buyerRepository.save(buyer);
             }
             if (order.getPayableFee() > 0 && order.getReturnGold() != null && order.getReturnGold() > 0) {
                 buyer.setOrderSpecificNum(buyer.getOrderSpecificNum() + 1);
             }
+            buyerRepository.saveAndFlush(buyer);
         } else if (order.getOrderStatus() == 400) {
             //如果为发货状态，则减去实际库存
             //查询订单详情
@@ -223,7 +223,7 @@ public class OrderServiceImpl implements OrderService {
                 int gold = oldOrder.getGold();
                 Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
                 buyer.setGold(buyer.getGold() + gold);
-                buyerRepository.save(buyer);
+                buyerRepository.saveAndFlush(buyer);
                 GoldLog goldLog = new GoldLog();
                 goldLog.setGold(gold);
                 goldLog.setIsAvailable(true);
@@ -243,7 +243,7 @@ public class OrderServiceImpl implements OrderService {
                 int gold = oldOrder.getReturnGold();
                 Buyer buyer = buyerRepository.findAllByIdAndIsAvailable(oldOrder.getBuyerId(), true);
                 buyer.setGold(buyer.getGold() + gold);
-                buyerRepository.save(buyer);
+                buyerRepository.saveAndFlush(buyer);
                 GoldLog goldLog = new GoldLog();
                 goldLog.setGold(gold);
                 goldLog.setIsAvailable(true);
@@ -258,6 +258,8 @@ public class OrderServiceImpl implements OrderService {
             //留着退货会用到
 //            order.setReturnGold(0);
         }
+        order.setSale(null);
+        order.setBuyer(null);
         order = orderRepository.save(order);
         return order;
     }

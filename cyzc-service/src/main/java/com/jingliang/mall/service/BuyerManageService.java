@@ -158,4 +158,12 @@ public interface BuyerManageService {
      * 查询所有绑定销售的商户
      * * */
     List<Map<String, Object>> searchBuyerHaveSale();
+
+    /**
+     * 查询销售下的商户定位
+     *
+     * @param userId
+     * @return
+     */
+    List<Map<String, Object>> findBuyerAddressByUserId(Long userId);
 }

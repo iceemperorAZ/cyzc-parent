@@ -21,10 +21,11 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
      * 根据buyerId查询经纬度记录
      *
      * @param userId
-     * @param isAvailable
      * @return
      */
-    List<AddressUserHistory> findAllByUserIdAndIsAvailableOrderByCreateTimeAsc(Long userId, Boolean isAvailable);
+    @Query(value = "SELECT auh.user_id,auh.longitude,auh.latitude,DATE_FORMAT(auh.create_time,'%Y-%m-%d') AS createTime FROM tb_address_user_history auh WHERE DATE_FORMAT(auh.create_time,'%Y-%m-%d')\n" +
+            " = DATE_FORMAT(:dateTime,'%Y-%m-%d') AND auh.user_id = :userId ORDER BY createTime DESC", nativeQuery = true)
+    List<Map<String, Object>> findAllTimeAndUserId(Date dateTime, Long userId);
 
     /**
      * 查询销售员的最后一条记录

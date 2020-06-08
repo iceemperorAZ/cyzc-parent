@@ -73,16 +73,16 @@ public interface UserRepository extends BaseRepository<User, Long> {
     /**
      * 根据分组编号查询
      *
-     * @param b
+     * @param isAvailable
      * @param groupNo
      * @return
      */
-    List<User> findAllByIsAvailableAndGroupNoLikeOrderByGroupNoAsc(boolean isAvailable, String groupNo);
+    List<User> findAllByIsAvailableAndGroupNoLikeOrderByGroupNoAscLevelDesc(boolean isAvailable, String groupNo);
 
     /**
      * 查询所有未分组的用户
      *
-     * @param b
+     * @param isAvailable
      * @param groupNo
      * @return
      */

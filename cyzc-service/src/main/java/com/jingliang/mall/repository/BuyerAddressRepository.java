@@ -1,7 +1,7 @@
 package com.jingliang.mall.repository;
 
-import com.jingliang.mall.repository.base.BaseRepository;
 import com.jingliang.mall.entity.BuyerAddress;
+import com.jingliang.mall.repository.base.BaseRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
@@ -55,7 +55,7 @@ public interface BuyerAddressRepository extends BaseRepository<BuyerAddress, Lon
      */
     @Query(value = "SELECT g.group_no AS groupNo,  " +
             " b.user_name AS buyerName,  " +
-            " b.shop_name AS shopName," + 
+            " b.shop_name AS shopName," +
             " b.phone AS phone,  " +
             " CONCAT_WS('/',r1.`name`,r2.`name`,r3.`name`,baddr.detailed_address) AS address,  " +
             " baddr.longitude AS longitude,  " +
@@ -69,4 +69,13 @@ public interface BuyerAddressRepository extends BaseRepository<BuyerAddress, Lon
             " WHERE g.group_no like :groupNo AND baddr.is_available = 1 AND baddr.is_default = 1  " +
             " ORDER BY groupNo", nativeQuery = true)
     List<Map<String, Object>> findAddressByGroupNo(String groupNo);
+
+    /**
+     * '根据商户Id查询地址列表
+     *
+     * @param buyerId
+     * @param isAvailable
+     * @return
+     */
+    List<BuyerAddress> findAllByBuyerIdAndIsAvailableOrderByIsDefaultDesc(Long buyerId, Boolean isAvailable);
 }

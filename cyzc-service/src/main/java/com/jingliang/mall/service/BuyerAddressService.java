@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
+
 /**
  * 会员收货地址表Service
  *
@@ -42,8 +44,17 @@ public interface BuyerAddressService {
 
     /**
      * 根据主键Id查询默认收货地址
+     *
      * @param id
      * @return
      */
     BuyerAddress findDefaultAddrByBuyerId(Long id);
+
+    /**
+     * 根据商户Id查询所有地址
+     *
+     * @param buyerId
+     * @return
+     */
+    List<BuyerAddress> findByBuyerId(Long buyerId);
 }

@@ -282,6 +282,12 @@ public class OrderResp implements Serializable {
     private UserResp sale;
 
     /**
+     * 商户信息
+     */
+    @ApiModelProperty(value = "商户信息")
+    private BuyerResp buyer;
+
+    /**
      * 订单详情列表
      */
     @ApiModelProperty(value = "订单详情列表")

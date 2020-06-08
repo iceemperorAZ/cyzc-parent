@@ -221,8 +221,18 @@ public class MapByQQServiceImpl implements MapService {
      * @return
      */
     @Override
-    public List<AddressUserHistory> readMap(Long userId) {
-        return addressUserHistoryRepository.findAllByUserIdAndIsAvailableOrderByCreateTimeAsc(userId, true);
+    public List<Map<String, Object>> readMap(Long userId) {
+//        //获取当前系统时间
+//        Date date = new Date();
+//        //获取日历类
+//        Calendar calendar = Calendar.getInstance();
+//        //将当期日期设置进去
+//        calendar.setTime(date);
+//        //对天进行减1天
+//        calendar.add(Calendar.DAY_OF_MONTH, -1);
+//        //获取昨天的Date对象
+//        Date yesterdayDate = calendar.getTime();
+        return addressUserHistoryRepository.findAllTimeAndUserId(new Date(), userId);
     }
 
     /**
@@ -241,7 +251,9 @@ public class MapByQQServiceImpl implements MapService {
             //TODO 因为腾讯地图api调用的key是个人的，并发上限5，所以在此让线程睡眠来保证可以获取到数据
             // 这个睡眠值是根据excel中地址数测试得到的，不具有通用性
 //            Thread.sleep(1000);
-            URL url1 = new URL(url);
+            //这一步解决url拆行的问题
+            String newUrl = url.replaceAll("\r|\n", "");
+            URL url1 = new URL(newUrl);
             URLConnection yc = url1.openConnection();
             BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
             String inputLine = null;
