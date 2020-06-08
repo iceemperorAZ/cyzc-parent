@@ -546,4 +546,15 @@ public class BuyerManageController {
         log.debug("返回参数:{}", buyers);
         return Result.buildQueryOk(buyers);
     }
+
+    /**
+     * 查询销售下的商户定位
+     */
+    @GetMapping("/findBuyerAddressByUserId")
+    @ApiOperation(value = "查询销售下的商户定位")
+    public Result<List<Map<String, Object>>> findBuyerAddressByUserId(Long userId,HttpSession session){
+        log.debug("请求参数:{}", userId);
+        List<Map<String, Object>> mapList = buyerManageService.findBuyerAddressByUserId(userId);
+        return Result.buildQueryOk(mapList);
+    }
 }

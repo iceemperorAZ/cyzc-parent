@@ -303,4 +303,15 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      */
     @Query(value = "SELECT COUNT(1) as count FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m-%d') = DATE_FORMAT(:date,'%Y-%m-%d')", nativeQuery = true)
     Integer totalDayBuyerAll(Date date);
+
+    /**
+     * 查询规定时间内的已支付订单
+     *
+     * @param createTime
+     * @param IsAvailable
+     * @param orderStatus
+     * @return
+     */
+    List<Order> findAllByCreateTimeAfterAndIsAvailableAndOrderStatusGreaterThanEqual(Date createTime, Boolean IsAvailable, Integer orderStatus);
+
 }

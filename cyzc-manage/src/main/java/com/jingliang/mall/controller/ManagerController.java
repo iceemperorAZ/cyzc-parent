@@ -2,6 +2,7 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
+import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.GroupService;
 import com.jingliang.mall.service.ManagerService;
@@ -66,7 +67,7 @@ public class ManagerController {
         //2.判断传参是查总绩效还是分区绩效
         if (!Objects.isNull(parentGroupId)) {
             //未传父组id，查询总绩效
-            List<Map<String, Object>> achievements = managerService.findGroupAchievement(parentGroupId,startTime, endTime);
+            List<Map<String, Object>> achievements = managerService.findGroupAchievement(parentGroupId, startTime, endTime);
             log.debug("返回参数:{}", achievements);
             return Result.buildQueryOk(achievements);
         }
@@ -79,9 +80,9 @@ public class ManagerController {
     @GetMapping("/searchAchievementsByGroupNo")
     @ApiOperation(value = "查询各个分区时间段内的所有绩效")
     public Result<List<Map<String, Object>>> searchAchievementsByGroupNo(String groupNo,
-                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                       HttpSession session) {
+                                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                                         HttpSession session) {
         //1.判断是否是管理员
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -91,7 +92,7 @@ public class ManagerController {
         //2.判断传参是查总绩效还是分区绩效
         if (!Objects.isNull(groupNo)) {
             //未传父组id，查询总绩效
-            List<Map<String, Object>> achievements = managerService.findGroupAchievementByGroupNo(groupNo,startTime, endTime);
+            List<Map<String, Object>> achievements = managerService.findGroupAchievementByGroupNo(groupNo, startTime, endTime);
             log.debug("返回参数:{}", achievements);
             return Result.buildQueryOk(achievements);
         }
@@ -240,9 +241,9 @@ public class ManagerController {
     @GetMapping("/searchAchievementsByYearAndGroupNo")
     @ApiOperation(value = "根据年份查询绩效")
     public Result<?> searchAchievementsByYearAndGroupNo(String groupNo,
-                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                              HttpSession session) {
+                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                        HttpSession session) {
         //1.判断是否是管理员
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -278,9 +279,9 @@ public class ManagerController {
     @GetMapping("/searchAchievementsByMonthAndGroupNo")
     @ApiOperation(value = "根据月份查询绩效")
     public Result<?> searchAchievementsByMonthAndGroupNo(String groupNo,
-                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                               HttpSession session) {
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                         HttpSession session) {
         //1.判断是否是管理员
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -317,9 +318,9 @@ public class ManagerController {
      */
     @GetMapping("/searchAchievementsByDayAndGroupNo")
     public Result<?> searchAchievementsByDayAndGroupNo(String groupNo,
-                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                             HttpSession session) {
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                       HttpSession session) {
         //1.判断是否是管理员
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -495,19 +496,19 @@ public class ManagerController {
 
     @GetMapping("/getBuyerTop30")
     @ApiOperation(value = "查询最新增加的商户数量的前三十")
-    public Result<List<Map<String,Object>>> getBuyerTop30(){
-        List<Map<String,Object>> getBuyer = managerService.getBuyerTop30();
-        if (Objects.isNull(getBuyer)){
-            log.debug("返回结果:{}",getBuyer);
+    public Result<List<Map<String, Object>>> getBuyerTop30() {
+        List<Map<String, Object>> getBuyer = managerService.getBuyerTop30();
+        if (Objects.isNull(getBuyer)) {
+            log.debug("返回结果:{}", getBuyer);
             return Result.buildParamFail();
         }
-        log.debug("返回结果:{}",getBuyer);
+        log.debug("返回结果:{}", getBuyer);
         return Result.buildQueryOk(getBuyer);
     }
 
     @GetMapping("/findSaleByGroup")
     @ApiOperation(value = "查询组下的所有销售")
-    public Result<?> findSaleByGroup(String groupNo){
+    public Result<?> findSaleByGroup(String groupNo) {
         if (!Objects.isNull(groupNo)) {
             //未传父组id，查询总绩效
             List<User> salies = managerService.findSaleByGroup(groupNo);
@@ -515,5 +516,12 @@ public class ManagerController {
             return Result.buildQueryOk(salies);
         }
         return Result.buildParamFail();
+    }
+
+    @GetMapping("/findGoldDontReturn")
+    @ApiOperation(value = "查询未返金币的用户并返回金币")
+    public Result<?> findGoldDontReturn(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date createTime) {
+        Map<String, Integer> goldDontReturn = managerService.findGoldDontReturn(createTime);
+        return Result.buildSaveOk(goldDontReturn);
     }
 }

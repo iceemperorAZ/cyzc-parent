@@ -5,6 +5,8 @@ import com.jingliang.mall.repository.base.BaseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * 签到日志Repository
  *
@@ -30,4 +32,12 @@ public interface GoldLogRepository extends BaseRepository<GoldLog, Long> {
      */
     GoldLog findFirstByPayNo(String payNo);
 
+    /**
+     * 根据用户返币记录查询订单有无返币记录
+     *
+     * @param payNo
+     * @param isAvailable
+     * @return
+     */
+    List<GoldLog> findAllByPayNoAndIsAvailable(String payNo,Boolean isAvailable);
 }

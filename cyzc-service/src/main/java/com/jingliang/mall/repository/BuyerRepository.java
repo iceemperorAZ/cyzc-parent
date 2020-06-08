@@ -79,11 +79,11 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
             "  INNER JOIN tb_group g ON u.group_no = g.group_no AND g.parent_group_id=1  " +
             "  INNER JOIN tb_buyer_address bad ON bad.buyer_id=b.id  " +
             "  INNER JOIN tb_region r ON bad.area_code=r.`code`  " +
-            "  WHERE b.create_time BETWEEN '2020-05-01 00:00:00' AND '2020-05-24 00:00:00'  " +
+            "  WHERE DATE_FORMAT(ANY_VALUE(b.create_time),'%Y-%m-%d') = DATE_FORMAT(:dateTime,'%Y-%m-%d')  " +
             "  GROUP BY u.id,createTime  " +
             ") res JOIN tb_user tu ON tu.id = res.managerId  " +
             "ORDER BY res.createTime DESC", nativeQuery = true)
-    List<Map<String, String>> countsByUserId();
+    List<Map<String, String>> countsByUserId(Date dateTime);
 
     /**
      * 当前年销售下单量top
@@ -173,4 +173,16 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
      * */
     @Query(value = " SELECT COUNT(*) AS counts FROM tb_buyer WHERE sale_user_id IS NOT NULL AND is_available = 1 ", nativeQuery = true)
     List<Map<String, Object>> searchBuyerHaveSale();
+
+    @Query(value="SELECT ANY_VALUE(u.user_name) AS userName,  " +
+            "  ANY_VALUE(b.user_name) AS buyerName,  " +
+            "  ANY_VALUE(b.phone) AS phone,  " +
+            "  ANY_VALUE(bad.longitude) AS longitude,  " +
+            "  ANY_VALUE(bad.latitude) AS latitude  " +
+            "  FROM tb_buyer b LEFT JOIN tb_user u ON b.sale_user_id = u.id    " +
+            "  INNER JOIN tb_group g ON u.group_no = g.group_no    " +
+            "  INNER JOIN tb_buyer_address bad ON bad.buyer_id=b.id  " +
+            "  WHERE u.id = :userId  " +
+            "  GROUP BY b.id ",nativeQuery = true)
+    List<Map<String,Object>> findBuyerAddressByUserId(Long userId);
 }
