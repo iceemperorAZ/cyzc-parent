@@ -1,5 +1,6 @@
 package com.jingliang.mall.service;
 
+import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.entity.User;
 
 import java.util.Date;
@@ -39,4 +40,7 @@ public interface ManagerService {
     List<Map<String, Object>> findGroupAchievementWithTimeByMonthAndGroupNo(String groupNo, Date startTime, Date endTime);
 
     List<Map<String, Object>> findGroupAchievementWithTimeByDayAndGroupNo(String groupNo, Date startTime, Date endTime);
+
+    Map<String, Integer> findGoldDontReturn(Date createTime);
+
 }
