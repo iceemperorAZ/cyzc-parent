@@ -130,7 +130,7 @@ public class BuyerManageServiceImpl implements BuyerManageService {
      */
     @Override
     public List<Map<String, String>> countsByUserId() {
-        return buyerRepository.countsByUserId();
+        return buyerRepository.countsByUserId(new Date());
     }
 
     @Override
@@ -160,5 +160,10 @@ public class BuyerManageServiceImpl implements BuyerManageService {
     @Override
     public List<Map<String, Object>> searchBuyerHaveSale(){
         return buyerRepository.searchBuyerHaveSale();
+    }
+
+    @Override
+    public List<Map<String, Object>> findBuyerAddressByUserId(Long userId) {
+        return buyerRepository.findBuyerAddressByUserId(userId);
     }
 }
