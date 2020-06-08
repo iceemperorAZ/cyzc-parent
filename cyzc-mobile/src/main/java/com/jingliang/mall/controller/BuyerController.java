@@ -196,13 +196,13 @@ public class BuyerController {
             return Result.buildParamFail();
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
-        buyer = buyerService.findById(buyer.getId());
         String sessionKey = buyer.getSessionKey();
         //解密用户手机号
         String decrypt = MUtils.decrypt(sessionKey, phoneDataReq.getIv(), phoneDataReq.getEncryptedData());
         if (StringUtils.isNotBlank(decrypt) && StringUtils.isNotBlank(JSONObject.parseObject(decrypt).getString("purePhoneNumber"))) {
             String purePhoneNumber = JSONObject.parseObject(decrypt).getString("purePhoneNumber");
             log.debug("返回解析后的手机号：{}", purePhoneNumber);
+            buyer = buyerService.findById(buyer.getId());
             buyer.setPhone(purePhoneNumber);
             buyerService.save(buyer);
             return Result.build(Msg.OK, Msg.TEXT_OK, purePhoneNumber);
