@@ -47,7 +47,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * @param isAvailable
      * @return
      */
-    List<Group> findGroupsByIsAvailable(boolean isAvailable);
+    List<Group> findGroupsByIsAvailableOrderByCreateTimeAsc(boolean isAvailable);
 
     /**
      * 根据组名和父组Id查询

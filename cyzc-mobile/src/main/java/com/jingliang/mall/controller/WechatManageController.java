@@ -149,8 +149,13 @@ public class WechatManageController {
         //当前操作人
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
-        //要查询的销售员
-        User saleUser = userService.findById(saleUserId);
+        //要查询的销售员，没传就查自己的
+        User saleUser = user;
+        if (saleUserId != null) {
+            saleUser = userService.findById(saleUserId);
+        } else {
+            saleUserId = user.getId();
+        }
         //1.判断是否查询的是自己的商户
         if (user.getId().equals(saleUserId)) {
             //1.1.查询销售自己所有商户产生的总绩效
@@ -182,8 +187,13 @@ public class WechatManageController {
         //当前操作人
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
-        //要查询的销售员
-        User saleUser = userService.findById(saleUserId);
+        //要查询的销售员，没传就查自己的
+        User saleUser = user;
+        if (saleUserId != null) {
+            saleUser = userService.findById(saleUserId);
+        } else {
+            saleUserId = user.getId();
+        }
         //1.判断是否查询的是自己的商户
         if (user.getId().equals(saleUserId)) {
             //1.1.查询销售自己所有商户产生的绩效
@@ -332,7 +342,7 @@ public class WechatManageController {
         //判断是否是管理员
         Map<String, List<Map<String, Object>>> hashMap = new LinkedHashMap<>();
         if (user.getLevel() == 200) {
-            List<Group> groups = groupService.getGroupWithFather(1L, true);
+            List<Group> groups = groupService.findGroupAll();
             for (Group group : groups) {
                 List<Map<String, Object>> list = new ArrayList<>();
                 Map<String, Object> map = new HashMap<>();
@@ -462,9 +472,9 @@ public class WechatManageController {
         User user = (User) session.getAttribute(sessionUser);
         List<Map<String, Object>> lists = new ArrayList<>();
         if (user.getLevel() == 200) {
-            List<Group> groups = groupService.getGroupWithFather(1L, true);
+            List<Group> groups = groupService.findGroupAll();
             for (Group group : groups) {
-                List<User> userList = userService.likeAllByGroupNo(group.getGroupNo().replaceAll("0*$", ""));
+                List<User> userList = userService.likeAllByGroupNo(group.getGroupNo());
                 Map<String, Object> map = new LinkedHashMap<>();
                 map.put("name", group.getGroupName());
                 map.put("value", userList);
@@ -472,8 +482,9 @@ public class WechatManageController {
             }
         } else if (user.getLevel() == 110) {
             Group group = groupService.findByGroupNo(user.getGroupNo());
-            List<User> userList = userService.likeAllByGroupNo(user.getGroupNo().replaceAll("0*$", ""));
+            List<User> userList = userService.likeAllByGroupNo(user.getGroupNo());
             Map<String, Object> map = new LinkedHashMap<>();
+
             map.put("name", group.getGroupName());
             map.put("value", userList);
             lists.add(map);

@@ -42,7 +42,7 @@ public interface MapService {
      * @param userId
      * @return
      */
-    List<AddressUserHistory> readMap(Long userId);
+    List<Map<String, Object>> readMap(Long userId);
 
     /**
      * 获取所有商户地址，解析成经纬度并存入数据库
