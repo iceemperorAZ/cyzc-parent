@@ -1,5 +1,4 @@
 package com.jingliang.mall.controller;
-import java.util.Date;
 
 import com.alibaba.fastjson.JSONObject;
 import com.jingliang.mall.common.*;
@@ -113,6 +112,8 @@ public class BuyerController {
             buyer.setMemberLevel(100);
             buyer.setOrderSpecificNum(1);
             buyer.setIsNew(true);
+            //新用户注册，赠送30金币。
+            buyer.setGold(30);
             buyer.setRegisterSource("WX");
             buyer = buyerService.save(buyer);
         }
@@ -285,7 +286,7 @@ public class BuyerController {
         buyerAddress.setConsigneeName(buyerReq.getUserName());
         buyerAddress.setPhone(buyerReq.getPhone());
         buyerAddress.setPostCode("0000");
-        BuyerResp buyerResp = BeanMapper.map(buyerSaleService.bindingSale(buyerSale,BeanMapper.map(buyerReq, Buyer.class),buyerAddress), BuyerResp.class);
+        BuyerResp buyerResp = BeanMapper.map(buyerSaleService.bindingSale(buyerSale, BeanMapper.map(buyerReq, Buyer.class), buyerAddress), BuyerResp.class);
         assert buyerResp != null;
         buyerResp.setSale(BeanMapper.map(user, UserResp.class));
         log.debug("返回结果：{}", buyerResp);

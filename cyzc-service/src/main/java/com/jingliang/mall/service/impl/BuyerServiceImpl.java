@@ -52,7 +52,6 @@ public class BuyerServiceImpl implements BuyerService {
             goldLog.setCreateTime(new Date());
             goldLog.setType(300);
             goldLogRepository.save(goldLog);
-            buyer.setGold(30);
         }
         return save;
     }
