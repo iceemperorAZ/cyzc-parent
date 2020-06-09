@@ -174,7 +174,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      * @param endTime
      * @return
      */
-    @Query(value = "SELECT  p.product_name AS productName, FORMAT( IFNULL(  o_d.selling_price * o_d.product_num, 0 ) * 0.01 ,2) AS totalPrice, FORMAT( IFNULL(  o_d.selling_price * o_d.product_num, 0 ) * 0.01 ,2) AS payableFee, 0 AS preferentialFee, FORMAT( IFNULL(  o_d.selling_price * o_d.product_num * o.ratio * 0.001 , 0 ) * 0.01  ,2)  AS royaltyPrice \n" +
+    @Query(value = "SELECT  p.product_name AS productName, FORMAT( IFNULL(  o_d.selling_price * o_d.product_num, 0 ) * 0.01 ,2) AS totalPrice, FORMAT( IFNULL(  o_d.selling_price * o_d.product_num, 0 ) * 0.01 ,2) AS payableFee, 0 AS preferentialFee, FORMAT( IFNULL(  o_d.selling_price * o_d.product_num * o.ratio * 0.001 , 0 ) * 0.01  ,2)  AS royaltyPrice ,ANY_VALUE(o.return_gold) as returnGold ,ANY_VALUE(o.gold) as gold \n" +
             "FROM tb_order_detail o_d LEFT JOIN tb_order o ON o_d.order_id = o.id LEFT JOIN tb_product p ON o_d.product_id= p.id " +
             "WHERE o.order_status BETWEEN 300  AND 700  AND o.is_available = 1  AND o.create_time BETWEEN :startTime AND :endTime  AND o.id = :orderId", nativeQuery = true)
     List<Map<String, Object>> bossBuyerOrderDetailAchievement(Long orderId, Date startTime, Date endTime);
