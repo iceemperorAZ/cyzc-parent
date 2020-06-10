@@ -18,13 +18,13 @@ import java.util.Map;
 public interface AddressUserHistoryRepository extends BaseRepository<AddressUserHistory, Long> {
 
     /**
-     * 根据buyerId查询经纬度记录
+     * 根据userId查询经纬度记录
      *
      * @param userId
      * @return
      */
-    @Query(value = "SELECT auh.user_id,auh.longitude,auh.latitude,DATE_FORMAT(auh.create_time,'%Y-%m-%d') AS createTime FROM tb_address_user_history auh WHERE DATE_FORMAT(auh.create_time,'%Y-%m-%d')\n" +
-            " = DATE_FORMAT(:dateTime,'%Y-%m-%d') AND auh.user_id = :userId ORDER BY createTime DESC", nativeQuery = true)
+    @Query(value = "SELECT DISTINCT auh.user_id,auh.longitude,auh.latitude,DATE_FORMAT(auh.create_time,'%Y-%m-%d') AS createTime FROM tb_address_user_history auh WHERE DATE_FORMAT(auh.create_time,'%Y-%m-%d') " +
+            " = DATE_FORMAT(:dateTime,'%Y-%m-%d') AND auh.user_id = :userId ORDER BY createTime DESC LIMIT 500 ", nativeQuery = true)
     List<Map<String, Object>> findAllTimeAndUserId(Date dateTime, Long userId);
 
     /**
@@ -32,20 +32,20 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
      *
      * @return
      */
-    @Query(value = "SELECT \n" +
-            "ANY_VALUE(g.group_no) AS groupNo, \n" +
-            "ANY_VALUE(u.id) AS userId, \n" +
-            "ANY_VALUE(u.user_name) AS userName, \n" +
-            "ANY_VALUE(u.phone) AS phone, \n" +
-            "ANY_VALUE(auh.longitude) AS longitude, \n" +
-            "ANY_VALUE(auh.latitude) AS latitude, \n" +
-            "DATE_FORMAT(auh.create_time,'%Y-%m-%d %H:%i:%s') AS createTime \n" +
-            "FROM tb_group g \n" +
-            "LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level` BETWEEN 0 AND 199 \n" +
-            "JOIN tb_address_user_history auh ON auh.user_id = u.id \n" +
-            "WHERE DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(:time,'%Y-%m-%d') \n" +
-            "GROUP BY u.id,auh.create_time AND DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d') \n" +
-            "ORDER BY userName,auh.create_time DESC", nativeQuery = true)
+    @Query(value = "SELECT   " +
+            " ANY_VALUE(g.group_no) AS groupNo,   " +
+            " ANY_VALUE(u.id) AS userId,   " +
+            " ANY_VALUE(u.user_name) AS userName,   " +
+            " ANY_VALUE(u.phone) AS phone,   " +
+            " ANY_VALUE(auh.longitude) AS longitude,   " +
+            " ANY_VALUE(auh.latitude) AS latitude,   " +
+            " DATE_FORMAT(auh.create_time,'%Y-%m-%d %H:%i:%s') AS createTime   " +
+            " FROM tb_group g   " +
+            " LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level` BETWEEN 0 AND 199   " +
+            " JOIN tb_address_user_history auh ON auh.user_id = u.id   " +
+            " WHERE DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(:time,'%Y-%m-%d')   " +
+            " GROUP BY u.id,auh.create_time AND DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')   " +
+            " ORDER BY userName,auh.create_time DESC", nativeQuery = true)
     List<Map<String, Object>> userAddressHistoryToEndTime(Date time);
 
     @Query(value = "SELECT  " +
