@@ -153,21 +153,22 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * 柱状图-查询子分组下各个销售的绩效
      *
      * */
-    @Query(value = "SELECT " +
-            "ANY_VALUE(u.user_name) AS userName, " +
-            "CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice " +
-            "FROM tb_order o " +
-            "JOIN tb_user u " +
-            "ON o.sale_user_id = u.id " +
-            "JOIN tb_group g " +
-            "ON o.group_no = g.group_no " +
-            "AND o.order_status " +
-            "BETWEEN 300 AND 700 " +
-            "AND o.is_available = 1 " +
-            "AND o.create_time " +
-            "BETWEEN :startTime AND :endTime " +
-            "WHERE g.group_no = :groupNo " +
-            "GROUP BY u.user_name ORDER BY totalPrice DESC LIMIT 5 ", nativeQuery = true)
+    @Query(value = "SELECT * FROM (  " +
+            "  SELECT ANY_VALUE(u.user_name) AS userName,  " +
+            "  CONVERT( IFNULL( SUM( o.total_price ), 0 ) * 0.01 ,decimal(12,2)) AS totalPrice  " +
+            "  FROM tb_order o  " +
+            "  JOIN tb_user u  " +
+            "  ON o.sale_user_id = u.id  " +
+            "  JOIN tb_group g  " +
+            "  ON o.group_no = g.group_no  " +
+            "  AND o.order_status  " +
+            "  BETWEEN 300 AND 700  " +
+            "  AND o.is_available = 1  " +
+            "  AND o.create_time  " +
+            "  BETWEEN '2020-05-01 00:00:00' AND '2020-06-01 00:00:00'  " +
+            "  WHERE g.group_no = 0101000000  " +
+            "  GROUP BY u.user_name ORDER BY totalPrice DESC LIMIT 5  " +
+            ") a ORDER BY totalPrice ASC ", nativeQuery = true)
     List<Map<String, Object>> findUserAchievement(String groupNo, Date startTime, Date endTime);
 
 

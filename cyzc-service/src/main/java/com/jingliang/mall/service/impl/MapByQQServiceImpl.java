@@ -215,7 +215,7 @@ public class MapByQQServiceImpl implements MapService {
     }
 
     /**
-     * 通过商户id获取经纬度记录
+     * 通过销售id获取经纬度记录
      *
      * @param userId
      * @return
