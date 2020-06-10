@@ -147,7 +147,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      * @param endTime
      * @return
      */
-    @Query(value = "SELECT  o.id, o.order_no AS orderNo, FORMAT( IFNULL(  o.total_price, 0 ) * 0.01 ,2) AS totalPrice, FORMAT( IFNULL(  o.payable_fee , 0 ) * 0.01 ,2) AS payableFee, FORMAT( IFNULL( o.preferential_fee , 0 ) * 0.01 ,2) AS preferentialFee, FORMAT( IFNULL(  o.total_price * o.ratio * 0.001 , 0 ) * 0.01  ,2)  AS royaltyPrice \n" +
+    @Query(value = "SELECT  o.id, o.order_no AS orderNo, FORMAT( IFNULL(  o.total_price, 0 ) * 0.01 ,2) AS totalPrice, FORMAT( IFNULL(  o.payable_fee , 0 ) * 0.01 ,2) AS payableFee, FORMAT( IFNULL( o.preferential_fee , 0 ) * 0.01 ,2) AS preferentialFee, FORMAT( IFNULL(  o.total_price * o.ratio * 0.001 , 0 ) * 0.01  ,2)  AS royaltyPrice ,ANY_VALUE(o.return_gold) as returnGold ,ANY_VALUE(o.gold) as gold \n" +
             "FROM tb_order o\n" +
             "WHERE o.order_status BETWEEN 300  AND 700  AND o.is_available = 1  AND o.create_time BETWEEN :startTime AND :endTime  AND o.sale_user_id=:saleUserId AND o.buyer_id= :buyerId ", nativeQuery = true)
     List<Map<String, Object>> bossSelfBuyerOrderAchievement(Long saleUserId, Long buyerId, Date startTime, Date endTime);
@@ -161,7 +161,7 @@ public interface OrderRepository extends BaseRepository<Order, Long> {
      * @param endTime
      * @return
      */
-    @Query(value = "SELECT  o.id, o.order_no AS orderNo, FORMAT( IFNULL(  o.total_price, 0 ) * 0.01 ,2) AS totalPrice, FORMAT( IFNULL(  o.payable_fee , 0 ) * 0.01 ,2) AS payableFee, FORMAT( IFNULL( o.preferential_fee , 0 ) * 0.01 ,2) AS preferentialFee, FORMAT( IFNULL(  o.total_price * o.ratio * 0.001 , 0 ) * 0.01  ,2)  AS royaltyPrice \n" +
+    @Query(value = "SELECT  o.id, o.order_no AS orderNo, FORMAT( IFNULL(  o.total_price, 0 ) * 0.01 ,2) AS totalPrice, FORMAT( IFNULL(  o.payable_fee , 0 ) * 0.01 ,2) AS payableFee, FORMAT( IFNULL( o.preferential_fee , 0 ) * 0.01 ,2) AS preferentialFee, FORMAT( IFNULL(  o.total_price * o.ratio * 0.001 , 0 ) * 0.01  ,2)  AS royaltyPrice ,ANY_VALUE(o.return_gold) as returnGold ,ANY_VALUE(o.gold) as gold \n" +
             "FROM tb_order o\n" +
             "WHERE o.order_status BETWEEN 300  AND 700  AND o.is_available = 1  AND o.create_time BETWEEN :startTime AND :endTime  AND o.buyer_id = :buyerId AND o.group_no LIKE :groupNo ", nativeQuery = true)
     List<Map<String, Object>> bossUserBuyerOrderAchievement(String groupNo, Long buyerId, Date startTime, Date endTime);
