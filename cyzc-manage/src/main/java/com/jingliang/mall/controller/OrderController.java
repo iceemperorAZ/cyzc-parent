@@ -325,7 +325,7 @@ public class OrderController {
             Buyer buyer = buyerService.findById(order.getBuyerId());
             //大区
             Group group = groupService.findByGroupNo(order.getGroupNo());
-            row.createCell(++celNum).setCellValue(group.getGroupName());
+            row.createCell(++celNum).setCellValue(group == null ? "未分区" : group.getGroupName());
             //客户编号
             Long buyerId = buyer.getId();
             row.createCell(++celNum).setCellValue(buyerId);
@@ -397,7 +397,7 @@ public class OrderController {
                 row.createCell(++productCelNum).setCellValue(productNo);
                 //商品名称
                 String productName = orderDetail.getProduct().getProductName();
-                row.createCell(++productCelNum).setCellValue(productName.concat("   ").concat(orderDetail.getProduct().getSpecs()));
+                row.createCell(++productCelNum).setCellValue(productName.concat(" ").concat(orderDetail.getProduct().getSpecs()));
                 //商品型号
                 String specs = orderDetail.getProduct().getSpecs();
                 row.createCell(++productCelNum).setCellValue(specs);
@@ -432,7 +432,7 @@ public class OrderController {
                     String receiverName = order.getReceiverName();
                     //电话
                     String receiverPhone = order.getReceiverPhone();
-                    row.createCell(++productCelNum).setCellValue(detailAddress.concat("   ").concat(receiverName).concat("   ").concat(receiverPhone));
+                    row.createCell(++productCelNum).setCellValue(detailAddress.concat(" ").concat(receiverName).concat(" ").concat(receiverPhone));
                     flag = true;
                 }
                 //创建一行
