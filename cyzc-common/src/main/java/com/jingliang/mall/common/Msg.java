@@ -42,6 +42,7 @@ public interface Msg {
     String TEXT_COUPON_RELEASE_FAIL = "发布失败，优惠券已过期或不可领取";
     String TEXT_COUPON_SAVE_FAIL = "保存失败，优惠券时间段选择不符合逻辑";
     String TEXT_IS_AVAILABLE_FAIL = "组不可用";
+    String TEXT_SHOP_NAME_FAIL = "店铺名已被占用，请尝试在店铺名前加入您所在的街道";
 
     Integer PARAM_FAIL = 310;
     String TEXT_PARAM_FAIL = "参数不全";
