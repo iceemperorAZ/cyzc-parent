@@ -174,7 +174,7 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
     @Query(value = " SELECT COUNT(*) AS counts FROM tb_buyer WHERE sale_user_id IS NOT NULL AND is_available = 1 ", nativeQuery = true)
     List<Map<String, Object>> searchBuyerHaveSale();
 
-    @Query(value="SELECT ANY_VALUE(u.user_name) AS userName,  " +
+    @Query(value = "SELECT ANY_VALUE(u.user_name) AS userName,  " +
             "  ANY_VALUE(b.user_name) AS buyerName,  " +
             "  ANY_VALUE(b.phone) AS phone,  " +
             "  ANY_VALUE(bad.longitude) AS longitude,  " +
@@ -183,6 +183,9 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
             "  INNER JOIN tb_group g ON u.group_no = g.group_no    " +
             "  INNER JOIN tb_buyer_address bad ON bad.buyer_id=b.id  " +
             "  WHERE u.id = :userId  " +
-            "  GROUP BY b.id ",nativeQuery = true)
-    List<Map<String,Object>> findBuyerAddressByUserId(Long userId);
+            "  GROUP BY b.id ", nativeQuery = true)
+    List<Map<String, Object>> findBuyerAddressByUserId(Long userId);
+
+    @Query(value = " SELECT count(1) FROM tb_buyer WHERE shop_name = :name ", nativeQuery = true)
+    Integer findBuyerNameCount(String name);
 }

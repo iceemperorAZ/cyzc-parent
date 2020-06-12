@@ -62,8 +62,9 @@ public class BuyerController {
     private final SignInService signInService;
     private final GoldLogService goldLogService;
     private final TechargeService techargeService;
+    private final UnavailableNameService unavailableNameService;
 
-    public BuyerController(BuyerService buyerService, FastdfsService fastdfsService, WechatService wechatService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService, SignInService signInService, GoldLogService goldLogService, TechargeService techargeService) {
+    public BuyerController(BuyerService buyerService, FastdfsService fastdfsService, WechatService wechatService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService, SignInService signInService, GoldLogService goldLogService, TechargeService techargeService, UnavailableNameService unavailableNameService) {
         this.buyerService = buyerService;
         this.fastdfsService = fastdfsService;
         this.wechatService = wechatService;
@@ -73,6 +74,7 @@ public class BuyerController {
         this.signInService = signInService;
         this.goldLogService = goldLogService;
         this.techargeService = techargeService;
+        this.unavailableNameService = unavailableNameService;
     }
 
     /**
@@ -252,6 +254,9 @@ public class BuyerController {
         if (Objects.isNull(buyerReq.getSaleUserId()) || StringUtils.isBlank(buyerReq.getPhone()) || StringUtils.isBlank(buyerReq.getShopName())
                 || StringUtils.isBlank(buyerReq.getUserName())) {
             return Result.buildParamFail();
+        }
+        if (!unavailableNameService.findNameCount(buyerReq.getShopName())) {
+            return Result.build(Msg.FAIL, Msg.TEXT_SHOP_NAME_FAIL);
         }
         User user = userService.findById(buyerReq.getSaleUserId());
         if (Objects.isNull(user)) {
