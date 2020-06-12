@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 员工表Repository
@@ -115,4 +116,25 @@ public interface UserRepository extends BaseRepository<User, Long> {
      * @return
      */
     Integer countByGroupNoAndIsAvailable(String groupNo, boolean isAvailable);
+
+    /**
+     * 查询组下的所有销售和其名下商户数
+     *
+     * @param groupNo
+     * @return
+     */
+    @Query(value = "select  " +
+            " ANY_VALUE(u.id) AS id,  " +
+            " ANY_VALUE(u.user_name) AS userName,  " +
+            " ANY_VALUE(u.group_no) AS groupNo,  " +
+            " ANY_VALUE(u.`level`) AS `level`,  " +
+            " count(*) AS counts  " +
+            " from tb_group g  " +
+            " left join tb_user u on  " +
+            " u.group_no LIKE CONCAT(regexp_replace(g.group_no ,'0*$',''), '%' )  " +
+            " and u.group_no = g.group_no  " +
+            " inner join tb_buyer b on b.sale_user_id = u.id  " +
+            " WHERE g.group_no = :groupNo AND u.is_available=1  " +
+            " GROUP BY u.user_name", nativeQuery = true)
+    List<Map<String, Object>> findAllBySaleIdAndGroupNo(String groupNo);
 }
