@@ -190,4 +190,13 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
 
     @Query(value = " SELECT count(1) FROM tb_buyer WHERE shop_name = :name ", nativeQuery = true)
     Integer findBuyerNameCount(String name);
+
+    /**
+     * 根据电话+密码查询商户
+     *
+     * @param phone
+     * @param isAvailable
+     * @return
+     */
+    Buyer findFirstByPhoneAndIsAvailable(String phone, Boolean isAvailable);
 }
