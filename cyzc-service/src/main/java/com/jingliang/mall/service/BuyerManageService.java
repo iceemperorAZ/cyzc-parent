@@ -166,4 +166,19 @@ public interface BuyerManageService {
      * @return
      */
     List<Map<String, Object>> findBuyerAddressByUserId(Long userId);
+
+    /**
+     * 月新增商户数
+     *
+     * @return
+     */
+    List<Map<String, Object>> findBuyerCountsToMonth();
+
+    /**
+     * 日新增商户数
+     *
+     * @return
+     */
+    List<Map<String, Object>> findBuyerCountsToDay();
+
 }

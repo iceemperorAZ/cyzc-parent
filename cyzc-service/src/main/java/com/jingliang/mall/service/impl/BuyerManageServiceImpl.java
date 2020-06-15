@@ -157,13 +157,24 @@ public class BuyerManageServiceImpl implements BuyerManageService {
     public List<Map<String, Object>> searchBuyerDontHaveSale() {
         return buyerRepository.searchBuyerDontHaveSale();
     }
+
     @Override
-    public List<Map<String, Object>> searchBuyerHaveSale(){
+    public List<Map<String, Object>> searchBuyerHaveSale() {
         return buyerRepository.searchBuyerHaveSale();
     }
 
     @Override
     public List<Map<String, Object>> findBuyerAddressByUserId(Long userId) {
         return buyerRepository.findBuyerAddressByUserId(userId);
+    }
+
+    @Override
+    public List<Map<String, Object>> findBuyerCountsToMonth() {
+        return groupRepository.findBuyerCountsToMonth(new Date(), new Date());
+    }
+
+    @Override
+    public List<Map<String, Object>> findBuyerCountsToDay() {
+        return groupRepository.findBuyerCountsToDay(new Date(), new Date());
     }
 }
