@@ -214,7 +214,6 @@ public class ManagerServiceImpl implements ManagerService {
      * LocalDate: 表示没有时区的日期, LocalDate是不可变并且线程安全的
      * LocalTime: 表示没有时区的时间, LocalTime是不可变并且线程安全的
      * LocalDateTime: 表示没有时区的日期时间, LocalDateTime是不可变并且线程安全的
-     *
      */
     @Override
     public List<Map<String, Object>> findGroupAchievementWithTimeBy10DayLate() {
@@ -256,5 +255,15 @@ public class ManagerServiceImpl implements ManagerService {
         //获取结束时间
         Date endTime = Date.from(instantMax);
         return groupRepository.findGroupAchievementWithTimeByGroupNo10DayLate(groupNo, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> findProductTypeSalePrice(String groupNo) {
+        return groupRepository.findProductTypeSalePrice(groupNo);
+    }
+
+    @Override
+    public List<Map<String, Object>> findProductTypeSalePrice() {
+        return groupRepository.findProductTypeSalePrice();
     }
 }

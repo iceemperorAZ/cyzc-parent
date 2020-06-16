@@ -2,6 +2,7 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
+import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.GroupService;
 import com.jingliang.mall.service.ManagerService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -549,7 +551,7 @@ public class ManagerController {
         }
         Map<String, Object> resultMap = new HashMap<>(156);
         List<String> days = new ArrayList<>();
-        for (Object o:date) {
+        for (Object o : date) {
             days.add(o.toString());
         }
         //Collections.sort()方法默认正序，String或Integer这些已经实现Comparable接口的类来说，可以直接使用Collections.sort方法传入list参数来实现默认方式（正序）排序，
@@ -587,5 +589,17 @@ public class ManagerController {
         resultMap.put("x", date);
         resultMap.put("data", list);
         return Result.buildQueryOk(resultMap);
+    }
+
+    @GetMapping("/findProductTypeSalePrice")
+    @ApiOperation(value = "查询各个商品种类的销售情况")
+    public Result<?> findProductTypeSalePrice(String groupNo) {
+        List<Map<String, Object>> typePrice = new ArrayList<>();
+        if (Objects.isNull(groupNo)) {
+            typePrice = managerService.findProductTypeSalePrice();
+        } else {
+            typePrice = managerService.findProductTypeSalePrice(groupNo);
+        }
+        return Result.buildQueryOk(typePrice);
     }
 }
