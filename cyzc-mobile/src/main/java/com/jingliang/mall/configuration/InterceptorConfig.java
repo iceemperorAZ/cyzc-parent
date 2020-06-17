@@ -67,7 +67,7 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
                 //需要跳过的uri
 
                 .excludePathPatterns("/front/buyer/wechat/login", "/front/buyer/exemption", "/front/buyer/logout", "/front/pay/wechat/recharge","/front/pay/wechat/notify", "/front/config/minimum"
-                        , "/front/region/**","/front/carousel/**","/front/buyer//login/phone")
+                        , "/front/region/**","/front/carousel/**","/front/buyer/login/phone")
                 //拦截器的执行顺序 设置高一点方便后期扩展
                 .order(1);
         //前台拦截器
