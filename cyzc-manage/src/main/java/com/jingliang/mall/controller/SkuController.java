@@ -60,7 +60,7 @@ public class SkuController {
             pageRequest = PageRequest.of(skuReq.getPage(), skuReq.getPageSize(), Sort.by(MallUtils.separateOrder(skuReq.getClause())));
         }
         if (StringUtils.isNotBlank(skuReq.getProductName())) {
-            skuReq.setProductName(URLDecoder.decode(skuReq.getProductName(),"UTF-8"));
+            skuReq.setProductName(URLDecoder.decode(skuReq.getProductName(), "UTF-8"));
         }
         Specification<Sku> skuSpecification = (Specification<Sku>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
@@ -68,7 +68,7 @@ public class SkuController {
                 predicateList.add(cb.equal(root.get("productTypeId"), skuReq.getProductTypeId()));
             }
             if (StringUtils.isNotBlank(skuReq.getProductName())) {
-                predicateList.add(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%"));
+                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%"),cb.equal(root.get("id"),Long.parseLong(skuReq.getProductName()))));
             }
             if (Objects.nonNull(skuReq.getProductId())) {
                 predicateList.add(cb.equal(root.get("productId"), skuReq.getProductId()));
@@ -78,7 +78,7 @@ public class SkuController {
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.asc(root.get("skuLineNum")),cb.asc(root.get("updateTime")));
+            query.orderBy(cb.asc(root.get("skuLineNum")), cb.asc(root.get("updateTime")));
             return query.getRestriction();
         };
         Page<Sku> skuPage = skuService.findAll(skuSpecification, pageRequest);
