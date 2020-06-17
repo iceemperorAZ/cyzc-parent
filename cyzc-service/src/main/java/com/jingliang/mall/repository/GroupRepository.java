@@ -937,13 +937,8 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " ANY_VALUE(g.group_no) AS groupNo,  " +
             " ANY_VALUE(g.id) AS groupId,  " +
             " count(b.id) AS counts  " +
-            " FROM tb_group g   " +
-            " LEFT JOIN tb_user u  " +
-            " ON u.group_no LIKE CONCAT(regexp_replace(g.group_no ,'0*$',''), '%' )  " +
-            " INNER JOIN tb_buyer b ON b.sale_user_id = u.id  " +
-            " WHERE DATE_FORMAT(b.create_time,'%Y-%m') BETWEEN DATE_FORMAT(:startTime,'%Y-%m') AND DATE_FORMAT(:endTime,'%Y-%m')  " +
-            " AND g.parent_group_id=-1  " +
-            " GROUP BY g.group_no ", nativeQuery = true)
+            " FROM  tb_buyer b " +
+            " WHERE DATE_FORMAT(b.create_time,'%Y-%m') BETWEEN DATE_FORMAT(:startTime,'%Y-%m') AND DATE_FORMAT(:endTime,'%Y-%m')", nativeQuery = true)
     List<Map<String, Object>> findBuyerCountsToMonth(Date startTime, Date endTime);
 
     /**
@@ -958,12 +953,31 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " ANY_VALUE(g.group_no) AS groupNo,  " +
             " ANY_VALUE(g.id) AS groupId,  " +
             " count(b.id) AS counts  " +
-            " FROM tb_group g   " +
-            " LEFT JOIN tb_user u  " +
-            " ON u.group_no LIKE CONCAT(regexp_replace(g.group_no ,'0*$',''), '%' )  " +
-            " INNER JOIN tb_buyer b ON b.sale_user_id = u.id  " +
-            " WHERE DATE_FORMAT(b.create_time,'%Y-%m-%d') BETWEEN DATE_FORMAT(:startTime,'%Y-%m-%d') AND DATE_FORMAT(:endTime,'%Y-%m-%d')  " +
-            " AND g.parent_group_id=-1  " +
-            " GROUP BY g.group_no ", nativeQuery = true)
+            " FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m-%d') BETWEEN DATE_FORMAT(:startTime,'%Y-%m-%d') AND DATE_FORMAT(:endTime,'%Y-%m-%d')", nativeQuery = true)
     List<Map<String, Object>> findBuyerCountsToDay(Date startTime, Date endTime);
+
+    /**
+     * 查询各类商品的销售情况（分组）
+     *
+     * @param groupNo
+     * @return
+     */
+    @Query(value = " SELECT ANY_VALUE(IFNULL(SUM(od.selling_price * od.product_num),0)) AS maxprice,ANY_VALUE(prot.product_type_name) AS name FROM tb_order_detail od " +
+            " JOIN tb_product p ON od.product_id = p.id " +
+            " RIGHT JOIN (SELECT o.order_no,o.group_no FROM tb_order o WHERE o.group_no = :groupNo ) as ord ON ord.order_no = od.order_no " +
+            " RIGHT JOIN (SELECT pt.id,pt.product_type_order,pt.product_type_name FROM tb_product_type pt WHERE pt.is_available = 1) as prot " +
+            " ON p.product_type_id = prot.id GROUP BY prot.product_type_name ORDER BY maxprice DESC LIMIT 6;", nativeQuery = true)
+    List<Map<String, Object>> findProductTypeSalePrice(String groupNo);
+
+    /**
+     * 查询各类商品的销售情况
+     *
+     * @return
+     */
+    @Query(value = " SELECT ANY_VALUE(IFNULL(SUM(od.selling_price * od.product_num),0)) AS maxprice,ANY_VALUE(prot.product_type_name) AS name FROM tb_order_detail od " +
+            " JOIN tb_product p ON od.product_id = p.id " +
+            " RIGHT JOIN (SELECT o.order_no,o.group_no FROM tb_order o ) as ord ON ord.order_no = od.order_no " +
+            " RIGHT JOIN (SELECT pt.id,pt.product_type_order,pt.product_type_name FROM tb_product_type pt WHERE pt.is_available = 1) as prot " +
+            " ON p.product_type_id = prot.id GROUP BY prot.product_type_name ORDER BY maxprice DESC LIMIT 6;", nativeQuery = true)
+    List<Map<String, Object>> findProductTypeSalePrice();
 }

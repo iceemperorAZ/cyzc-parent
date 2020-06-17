@@ -1,5 +1,6 @@
 package com.jingliang.mall.service;
 
+import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.entity.User;
 
 import java.util.Date;
@@ -52,10 +53,26 @@ public interface ManagerService {
     List<Map<String, Object>> findGroupAchievementWithTimeBy10DayLate();
 
     /**
+     * 查询各类商品的销售情况
+     *
+     * @param groupNo
+     * @return
+     */
+    List<Map<String, Object>> findProductTypeSalePrice(String groupNo);
+
+    /**
+     * 查询各类商品的销售情况
+     *
+     * @return
+     */
+    List<Map<String, Object>> findProductTypeSalePrice();
+
+    /**
      * 查询前十天-折线图（总绩效）
      *
      * @param groupNo
      * @return
      */
     List<Map<String, Object>> findGroupAchievementWithTimeByGroupNo10DayLate(String groupNo);
+
 }

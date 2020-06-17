@@ -565,7 +565,7 @@ public class OrderController {
                 row.createCell(++celNum).setCellValue(productNo);
                 //商品名称
                 String productName = stringMap.get("productName");
-                row.createCell(++celNum).setCellValue(productName.concat(" ").concat(stringMap.get("specs")));
+                row.createCell(++celNum).setCellValue(productName.concat("%20").concat(stringMap.get("specs")));
                 //商品型号
                 String specs = stringMap.get("specs");
                 row.createCell(++celNum).setCellValue(specs);
@@ -598,7 +598,7 @@ public class OrderController {
                 String receiverName = nullString(stringMap.get("receiverName"));
                 //电话
                 String receiverPhone = nullString(stringMap.get("receiverPhone"));
-                row.createCell(++celNum).setCellValue(detailAddress.concat(" ").concat(receiverName).concat(" ").concat(receiverPhone));
+                row.createCell(++celNum).setCellValue(detailAddress.concat("%20").concat(receiverName).concat("%20").concat(receiverPhone));
             } else {
                 ++celNum;
                 ++celNum;
