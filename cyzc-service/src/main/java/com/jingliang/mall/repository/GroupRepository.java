@@ -962,11 +962,11 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * @param groupNo
      * @return
      */
-    @Query(value = " SELECT ANY_VALUE(IFNULL(SUM(od.selling_price * od.product_num),0)) AS price,ANY_VALUE(prot.product_type_name) AS name FROM tb_order_detail od " +
+    @Query(value = " SELECT ANY_VALUE(IFNULL(SUM(od.selling_price * od.product_num),0)) AS maxprice,ANY_VALUE(prot.product_type_name) AS name FROM tb_order_detail od " +
             " JOIN tb_product p ON od.product_id = p.id " +
             " RIGHT JOIN (SELECT o.order_no,o.group_no FROM tb_order o WHERE o.group_no = :groupNo ) as ord ON ord.order_no = od.order_no " +
             " RIGHT JOIN (SELECT pt.id,pt.product_type_order,pt.product_type_name FROM tb_product_type pt WHERE pt.is_available = 1) as prot " +
-            " ON p.product_type_id = prot.id GROUP BY prot.product_type_name ORDER BY price DESC LIMIT 6;", nativeQuery = true)
+            " ON p.product_type_id = prot.id GROUP BY prot.product_type_name ORDER BY maxprice DESC LIMIT 6;", nativeQuery = true)
     List<Map<String, Object>> findProductTypeSalePrice(String groupNo);
 
     /**
@@ -974,10 +974,10 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      *
      * @return
      */
-    @Query(value = " SELECT ANY_VALUE(IFNULL(SUM(od.selling_price * od.product_num),0)) AS price,ANY_VALUE(prot.product_type_name) AS name FROM tb_order_detail od " +
+    @Query(value = " SELECT ANY_VALUE(IFNULL(SUM(od.selling_price * od.product_num),0)) AS maxprice,ANY_VALUE(prot.product_type_name) AS name FROM tb_order_detail od " +
             " JOIN tb_product p ON od.product_id = p.id " +
             " RIGHT JOIN (SELECT o.order_no,o.group_no FROM tb_order o ) as ord ON ord.order_no = od.order_no " +
             " RIGHT JOIN (SELECT pt.id,pt.product_type_order,pt.product_type_name FROM tb_product_type pt WHERE pt.is_available = 1) as prot " +
-            " ON p.product_type_id = prot.id GROUP BY prot.product_type_name ORDER BY price DESC LIMIT 6;", nativeQuery = true)
+            " ON p.product_type_id = prot.id GROUP BY prot.product_type_name ORDER BY maxprice DESC LIMIT 6;", nativeQuery = true)
     List<Map<String, Object>> findProductTypeSalePrice();
 }
