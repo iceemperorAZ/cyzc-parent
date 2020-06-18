@@ -1,6 +1,5 @@
 package com.jingliang.mall.entity;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -182,11 +181,58 @@ public class Buyer implements Serializable {
     @Column(name = "ship_addr")
     private String shipAddress;
 
+    /**
+     * 是否可以货到付款 0：否，1：是
+     */
+    @Column(name = "is_cash_on_delivery")
+    private Boolean isCashOnDelivery;
+
+    /**
+     * 后台用户修改时间
+     */
+    @Column(name = "back_update_time")
+    private Date backUpdateTime;
+
+    /**
+     * 后台修改人id
+     */
+    @Column(name = "back_update_user_id")
+    private Long backUpdateUserId;
+
+    /**
+     * 商铺图片url集合
+     */
+    @Column(name = "buyer_img_urls")
+    private String buyerImdUrls;
+
+    /**
+     * 审核人id
+     */
+    @Column(name = "review_user_id")
+    private Long reviewUserId;
+
+    /**
+     * 审核时间
+     */
+    @Column(name = "review_time")
+    private Date reviewTime;
+
+    /**
+     * 审核意见
+     */
+    @Column(name = "review_msg")
+    private String reviewMsg;
+
+    /**
+     * 商户状态：100待审核，300审核通过
+     */
+    @Column(name = "buyer_status")
+    private Integer buyerStatus;
+
     @Transient
     private String token;
 
     @Transient
     private String sessionKey;
-
 
 }
