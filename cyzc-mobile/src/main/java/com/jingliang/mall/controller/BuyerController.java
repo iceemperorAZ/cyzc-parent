@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -63,8 +64,9 @@ public class BuyerController {
     private final GoldLogService goldLogService;
     private final TechargeService techargeService;
     private final UnavailableNameService unavailableNameService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public BuyerController(BuyerService buyerService, FastdfsService fastdfsService, WechatService wechatService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService, SignInService signInService, GoldLogService goldLogService, TechargeService techargeService, UnavailableNameService unavailableNameService) {
+    public BuyerController(BuyerService buyerService, FastdfsService fastdfsService, WechatService wechatService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService, SignInService signInService, GoldLogService goldLogService, TechargeService techargeService, UnavailableNameService unavailableNameService, RedisTemplate<String, Object> redisTemplate) {
         this.buyerService = buyerService;
         this.fastdfsService = fastdfsService;
         this.wechatService = wechatService;
@@ -75,6 +77,7 @@ public class BuyerController {
         this.goldLogService = goldLogService;
         this.techargeService = techargeService;
         this.unavailableNameService = unavailableNameService;
+        this.redisTemplate = redisTemplate;
     }
 
     /**
@@ -423,4 +426,75 @@ public class BuyerController {
         log.debug("返回结果：{}", buyerResp);
         return Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, buyerResp);
     }
+    /**
+     * 注册：手机号 + 短信验证码 + 昵称 + 密码 【注册完成后直接登录】
+     */
+    @PostMapping("/register")
+    public Result<Buyer> register(@RequestBody BuyerReq buyerReq, HttpServletResponse response) {
+        String redisCode = (String) redisTemplate.opsForValue().get(Constant.CODE_PREFIX + buyerReq.getPhone());
+        //校验验证码
+        if (buyerReq.getCode() == null || !StringUtils.equals(redisCode, buyerReq.getCode())) {
+            return Result.build(Msg.FAIL, "验证码错误");
+        }
+//        if (StringUtils.isBlank(buyerReq.getNickName())) {
+//            return Result.build(Msg.FAIL, "昵称不能为空");
+//        }
+//        if (StringUtils.isBlank(buyerReq.getUsername())) {
+//            return Result.build(Msg.FAIL, "账号不能为空");
+//        }
+//        if (StringUtils.isBlank(buyerReq.getPhone())) {
+//            return Result.build(Msg.FAIL, "手机号不能为空");
+//        } else {
+//            if (!MUtils.phoneCheck(buyerReq.getPhone())) {
+//                return Result.build(Msg.FAIL, "手机号格式错误");
+//            }
+//        }
+//        //校验手机号是否已经注册
+//        User checkUser = userService.getOne(Wrappers.<User>lambdaQuery().eq(User::getPhone, buyerReq.getPhone()));
+//        if (checkUser != null) {
+//            return Result.build(Msg.FAIL, "该手机号已经注册");
+//        }
+//        //校验账号是否已经注册
+//        checkUser = userService.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, buyerReq.getUsername()));
+//        if (checkUser != null) {
+//            return Result.build(Msg.FAIL, "该手机号已经注册");
+//        }
+//        //校验昵称是否已经注册
+//        checkUser = userService.getOne(Wrappers.<User>lambdaQuery().eq(User::getNickName, buyerReq.getNickName()));
+//        if (checkUser != null) {
+//            return Result.build(Msg.FAIL, "该昵称已经注册");
+//        }
+//        if (StringUtils.isNotBlank(buyerReq.getMail())) {
+//            if (!Utils.mailCheck(buyerReq.getMail())) {
+//                return Result.build(Msg.FAIL, "邮箱格式错误");
+//            }
+//            //校验邮箱是否已经注册
+//            checkUser = userService.getOne(Wrappers.<User>lambdaQuery().eq(User::getMail, buyerReq.getMail()));
+//            if (checkUser != null) {
+//                return Result.build(Msg.FAIL, "该邮箱已经注册");
+//            }
+//        }
+//        LocalDateTime localDateTime = LocalDateTime.now();
+//        buyerReq.setCreateTime(localDateTime);
+//        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+//        buyerReq.setPassword(bCryptPasswordEncoder.encode(buyerReq.getPassword()));
+//        buyerReq.setUpdateTime(localDateTime);
+//        buyerReq.setActivation(true);
+//        //注册
+//        if (!userService.register(buyerReq)) {
+//            return Result.build(Msg.FAIL, "注册失败");
+//        }
+//        //登录
+//        //生成token
+//        String token = JwtUtil.genToken(buyerReq.getId());
+//        //在redis中进行无操作自动离线倒计时
+//        response.setHeader(JwtUtil.AUTH_HEADER_KEY, token);
+//        //清除注册次数
+//        redisTemplate.delete(Constant.LIMIT_PREFIX + buyerReq.getPhone());
+//        redisTemplate.opsForValue().set(Constant.ON_LINE_USER_PREFIX + buyerReq.getId(), token, Constant.ON_LINE_TIME_USER, TimeUnit.SECONDS);
+//        response.setHeader(JwtUtil.AUTH_HEADER_KEY, token);
+//        return Result.build(Msg.OK, "注册成功", buyerReq);
+        return null;
+    }
+
 }

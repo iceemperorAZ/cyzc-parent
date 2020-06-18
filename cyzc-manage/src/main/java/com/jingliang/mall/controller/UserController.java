@@ -310,4 +310,17 @@ public class UserController {
         //名下有商户，返回失败结果和其名下所有商户信息
         return Result.build(Msg.FAIL, "该用户名下有商户，无法删除", buyers);
     }
+
+    /**
+     * 查询当前区域经理下的所有销售
+     */
+    @GetMapping("/all/region/groupNo")
+    @ApiOperation(value = "根据分组编号查询用户")
+    public Result<List<UserResp>> allRegionGroupNo(@ApiIgnore HttpSession session) {
+        User user = (User) session.getAttribute(sessionUser);
+        if (user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "权限不足");
+        }
+        return Result.buildQueryOk(BeanMapper.mapList(userService.likeAllByGroupNo(user.getGroupNo().replaceAll("0*$", "")), UserResp.class));
+    }
 }
