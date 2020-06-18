@@ -31,34 +31,10 @@ public class BuyerAddressReq extends BaseReq implements Serializable {
 	private Long id;
 
 	/**
-	 * 主键-开始
-	 */
-	@ApiModelProperty(value = "主键-开始")
-	private Long idStart;
-
-	/**
-	 * 主键-结束
-	 */
-	@ApiModelProperty(value = "主键-结束")
-	private Long idEnd;
-
-	/**
 	 * 会员Id
 	 */
 	@ApiModelProperty(value = "会员Id")
 	private Long buyerId;
-
-	/**
-	 * 会员Id-开始
-	 */
-	@ApiModelProperty(value = "会员Id-开始")
-	private Long buyerIdStart;
-
-	/**
-	 * 会员Id-结束
-	 */
-	@ApiModelProperty(value = "会员Id-结束")
-	private Long buyerIdEnd;
 
 	/**
 	 * 省编码
@@ -116,44 +92,12 @@ public class BuyerAddressReq extends BaseReq implements Serializable {
 	private Date createTime;
 
 	/**
-	 * 创建时间-开始
-	 */
-	@ApiModelProperty(value = "创建时间-开始")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date createTimeStart;
-
-	/**
-	 * 创建时间-结束
-	 */
-	@ApiModelProperty(value = "创建时间-结束")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date createTimeEnd;
-
-	/**
 	 * 修改时间
 	 */
 	@ApiModelProperty(value = "修改时间")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date updateTime;
-
-	/**
-	 * 修改时间-开始
-	 */
-	@ApiModelProperty(value = "修改时间-开始")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date updateTimeStart;
-
-	/**
-	 * 修改时间-结束
-	 */
-	@ApiModelProperty(value = "修改时间-结束")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-	private Date updateTimeEnd;
 
 	/**
 	 * 收货人名称
@@ -185,5 +129,11 @@ public class BuyerAddressReq extends BaseReq implements Serializable {
 	 */
 	@ApiModelProperty(value = "纬度")
 	private String longitude;
+
+	/**
+	 * 地图地址
+	 */
+	@ApiModelProperty(value = "地图地址")
+	private String mapAddress;
 
 }

@@ -152,4 +152,10 @@ public class BuyerAddressResp implements Serializable {
     @ApiModelProperty(value = "纬度")
     private String longitude;
 
+    /**
+     * 地图地址
+     */
+    @ApiModelProperty(value = "地图地址")
+    private String mapAddress;
+
 }

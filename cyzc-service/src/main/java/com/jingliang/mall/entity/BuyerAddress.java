@@ -147,4 +147,10 @@ public class BuyerAddress implements Serializable {
      */
     @Column(name = "latitude")
     private Double latitude;
+
+    /**
+     * 地图地址
+     */
+    @Column(name = "map_address")
+    private String mapAddress;
 }
