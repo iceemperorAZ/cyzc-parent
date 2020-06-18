@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
@@ -507,13 +508,14 @@ public class ManagerController {
     }
 
     @GetMapping("/findSaleByGroup")
-    @ApiOperation(value = "查询组下的所有销售")
+    @ApiOperation(value = "查询组下的所有销售和其名下商户数")
     public Result<?> findSaleByGroup(String groupNo) {
         if (!Objects.isNull(groupNo)) {
-            //未传父组id，查询总绩效
-            List<User> salies = managerService.findSaleByGroup(groupNo);
-            log.debug("返回参数:{}", salies);
-            return Result.buildQueryOk(salies);
+//            //未传父组id，查询总绩效
+//            List<User> salies = managerService.findSaleByGroup(groupNo);
+            List<Map<String, Object>> mapList = managerService.findAllBySaleIdAndGroupNo(groupNo);
+            log.debug("返回参数:{}", mapList);
+            return Result.buildQueryOk(mapList);
         }
         return Result.buildParamFail();
     }
@@ -523,5 +525,81 @@ public class ManagerController {
     public Result<?> findGoldDontReturn(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date createTime) {
         Map<String, Integer> goldDontReturn = managerService.findGoldDontReturn(createTime);
         return Result.buildSaveOk(goldDontReturn);
+    }
+
+    /**
+     * 根据父组id查询前10天的绩效
+     *
+     * @return
+     */
+    @GetMapping("/findParentGroupIdTo10DayLate")
+    @ApiOperation(value = "根据父组id查询前10天的绩效")
+    public Result<?> findGoldDontReturn() {
+        List<Map<String, Object>> achievements = managerService.findGroupAchievementWithTimeBy10DayLate();
+        log.debug("返回参数:{}", achievements);
+        Set<Object> date = achievements.stream().map(stringObjectMap -> stringObjectMap.get("Days")).collect(Collectors.toSet());
+        Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
+        achievements.forEach(stringObjectMap -> {
+            if (map.get(((String) stringObjectMap.get("groupName"))) == null) {
+                map.put(((String) stringObjectMap.get("groupName")), new ArrayList<>());
+            }
+            map.get(((String) stringObjectMap.get("groupName"))).add(stringObjectMap);
+        });
+        List<List<Map<String, Object>>> list = new ArrayList<>();
+        for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+            list.add(entry.getValue());
+        }
+        Map<String, Object> resultMap = new HashMap<>(156);
+        List<String> days = new ArrayList<>();
+        for (Object o : date) {
+            days.add(o.toString());
+        }
+        //Collections.sort()方法默认正序，String或Integer这些已经实现Comparable接口的类来说，可以直接使用Collections.sort方法传入list参数来实现默认方式（正序）排序，
+        //如果不想使用默认方式（正序）排序，可以通过Collections.sort传入第二个参数类型为Comparator来自定义排序规则
+        Collections.sort(days);
+        resultMap.put("x", days);
+        resultMap.put("data", list);
+        return Result.buildQueryOk(resultMap);
+    }
+
+    /**
+     * 按组查询前10天的绩效
+     *
+     * @param groupNo
+     * @return
+     */
+    @GetMapping("/findGroupNoTo10DayLate")
+    @ApiOperation(value = "按组查询前10天的绩效")
+    public Result<?> findGroupNoTo10DayLate(String groupNo) {
+        List<Map<String, Object>> achievements = managerService.findGroupAchievementWithTimeByGroupNo10DayLate(groupNo.replaceAll("0*$", "") + "%");
+        log.debug("返回参数:{}", achievements);
+        List<Object> date = achievements.stream().map(stringObjectMap -> stringObjectMap.get("Days")).collect(Collectors.toList());
+        Map<String, List<Map<String, Object>>> map = new HashMap<>(156);
+        achievements.forEach(stringObjectMap -> {
+            if (map.get(((String) stringObjectMap.get("groupName"))) == null) {
+                map.put(((String) stringObjectMap.get("groupName")), new ArrayList<>());
+            }
+            map.get(((String) stringObjectMap.get("groupName"))).add(stringObjectMap);
+        });
+        List<List<Map<String, Object>>> list = new ArrayList<>();
+        for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+            list.add(entry.getValue());
+        }
+        Map<String, Object> resultMap = new HashMap<>(156);
+        resultMap.put("x", date);
+        resultMap.put("data", list);
+        return Result.buildQueryOk(resultMap);
+    }
+
+    @GetMapping("/findProductTypeSalePrice")
+    @ApiOperation(value = "查询各个商品种类的销售情况")
+    public Result<?> findProductTypeSalePrice(String groupNo) {
+        List<Map<String, Object>> typePrice = new ArrayList<>();
+        if (Objects.isNull(groupNo)) {
+            typePrice = managerService.findProductTypeSalePrice();
+        } else {
+            typePrice = managerService.findProductTypeSalePrice(groupNo);
+        }
+        return Result.buildQueryOk(typePrice);
     }
 }

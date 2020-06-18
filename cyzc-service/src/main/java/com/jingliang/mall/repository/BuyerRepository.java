@@ -109,48 +109,50 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
     List<Map<String, Object>> topOfOrderCountsByUser(Date startTime, Date endTime, Integer topNum);
 
     /**
-     * 当前年商品销售量top
+     * 当前年商品销售额top
      *
      * @param startTime
      * @param endTime
      * @param topNum
      * @return
      */
-    @Query(value = "SELECT a.days,temp.orderNo,temp.productName,temp.counts  " +
-            "FROM (  " +
-            "  SELECT 2020 AS days UNION SELECT 2021 UNION SELECT 2022 UNION SELECT 2023 UNION SELECT 2024 UNION  " +
-            "  SELECT 2025) a LEFT JOIN (  " +
-            "    SELECT ANY_VALUE(o.order_no) AS orderNo,ANY_VALUE(p.product_name) AS productName,count(p.id) AS counts,  " +
-            "    DATE_FORMAT(ANY_VALUE(od.create_time),'%Y') AS createTime  " +
-            "    FROM tb_order o INNER JOIN tb_order_detail od ON od.order_no=o.order_no AND  " +
-            "    od.create_time BETWEEN :startTime AND :endTime AND o.order_status BETWEEN 300 AND 700  " +
-            "    INNER JOIN tb_product p ON p.id=od.product_id GROUP BY productName,createTime ORDER BY counts DESC    " +
-            "  ) AS temp ON a.days=temp.createTime AND a.days BETWEEN DATE_FORMAT(:startTime, '%Y')    " +
-            "AND DATE_FORMAT(:endTime, '%Y')  " +
-            "ORDER BY counts DESC LIMIT :topNum ", nativeQuery = true)
+    @Query(value = "SELECT a.days,temp.orderNo,temp.productName,CONVERT(temp.counts,decimal(12,2)) AS counts  " +
+            " FROM (   " +
+            "  SELECT 2019 AS days UNION SELECT 2020 UNION SELECT 2021 UNION SELECT 2022 UNION SELECT 2023 UNION SELECT 2024 UNION   " +
+            "  SELECT 2025) a LEFT JOIN (   " +
+            "    SELECT ANY_VALUE(o.order_no) AS orderNo,ANY_VALUE(p.product_name) AS productName,  " +
+            "    SUM(od.product_num*od.selling_price)/100 AS counts,   " +
+            "    DATE_FORMAT(ANY_VALUE(od.create_time),'%Y') AS createTime   " +
+            "    FROM tb_order o INNER JOIN tb_order_detail od ON od.order_no=o.order_no   " +
+            "    AND o.order_status BETWEEN 300 AND 700   " +
+            "    INNER JOIN tb_product p ON p.id=od.product_id GROUP BY productName,createTime ORDER BY counts DESC     " +
+            "  ) AS temp ON a.days=temp.createTime AND a.days BETWEEN DATE_FORMAT(:startTime, '%Y')     " +
+            " AND DATE_FORMAT(:endTime, '%Y')   " +
+            " ORDER BY temp.counts DESC LIMIT :topNum", nativeQuery = true)
     List<Map<String, Object>> yeartopOfProductCountsByOrder(Date startTime, Date endTime, Integer topNum);
 
     /**
-     * 当前月商品销售量top
+     * 当前月商品销售额top
      *
      * @param startTime
      * @param endTime
      * @param topNum
      * @return
      */
-    @Query(value = "SELECT a.days,temp.orderNo,temp.productName,temp.counts  " +
-            "FROM (  " +
+    @Query(value = "SELECT a.days,temp.orderNo,temp.productName,CONVERT(temp.counts,decimal(12,2)) AS counts  " +
+            " FROM (  " +
             "  SELECT 1 AS days UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION  " +
             "  SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION   " +
             "  SELECT 11 UNION SELECT 12) a LEFT JOIN (  " +
-            "    SELECT ANY_VALUE(o.order_no) AS orderNo,ANY_VALUE(p.product_name) AS productName,count(p.id) AS counts,  " +
+            "    SELECT ANY_VALUE(o.order_no) AS orderNo,ANY_VALUE(p.product_name) AS productName," +
+            "    SUM(od.product_num*od.selling_price)/100 AS counts,  " +
             "    DATE_FORMAT(ANY_VALUE(od.create_time),'%m') AS createTime  " +
-            "    FROM tb_order o INNER JOIN tb_order_detail od ON od.order_no=o.order_no AND  " +
-            "    od.create_time BETWEEN :startTime AND :endTime AND o.order_status BETWEEN 300 AND 700  " +
+            "    FROM tb_order o INNER JOIN tb_order_detail od ON od.order_no=o.order_no   " +
+            "    AND o.order_status BETWEEN 300 AND 700  " +
             "    INNER JOIN tb_product p ON p.id=od.product_id GROUP BY productName,createTime ORDER BY counts DESC    " +
             "  ) AS temp ON a.days=temp.createTime AND a.days BETWEEN DATE_FORMAT(:startTime, '%m')    " +
-            "AND DATE_FORMAT(:endTime, '%m')  " +
-            "ORDER BY counts DESC LIMIT :topNum ", nativeQuery = true)
+            " AND DATE_FORMAT(:endTime, '%m')  " +
+            " ORDER BY temp.counts DESC LIMIT :topNum ", nativeQuery = true)
     List<Map<String, Object>> monthtopOfProductCountsByOrder(Date startTime, Date endTime, Integer topNum);
 
     /**
@@ -174,7 +176,7 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
     @Query(value = " SELECT COUNT(*) AS counts FROM tb_buyer WHERE sale_user_id IS NOT NULL AND is_available = 1 ", nativeQuery = true)
     List<Map<String, Object>> searchBuyerHaveSale();
 
-    @Query(value="SELECT ANY_VALUE(u.user_name) AS userName,  " +
+    @Query(value = "SELECT ANY_VALUE(u.user_name) AS userName,  " +
             "  ANY_VALUE(b.user_name) AS buyerName,  " +
             "  ANY_VALUE(b.phone) AS phone,  " +
             "  ANY_VALUE(bad.longitude) AS longitude,  " +
@@ -183,6 +185,18 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
             "  INNER JOIN tb_group g ON u.group_no = g.group_no    " +
             "  INNER JOIN tb_buyer_address bad ON bad.buyer_id=b.id  " +
             "  WHERE u.id = :userId  " +
-            "  GROUP BY b.id ",nativeQuery = true)
-    List<Map<String,Object>> findBuyerAddressByUserId(Long userId);
+            "  GROUP BY b.id ", nativeQuery = true)
+    List<Map<String, Object>> findBuyerAddressByUserId(Long userId);
+
+    @Query(value = " SELECT count(1) FROM tb_buyer WHERE shop_name = :name ", nativeQuery = true)
+    Integer findBuyerNameCount(String name);
+
+    /**
+     * 根据电话+密码查询商户
+     *
+     * @param phone
+     * @param isAvailable
+     * @return
+     */
+    Buyer findFirstByPhoneAndIsAvailable(String phone, Boolean isAvailable);
 }

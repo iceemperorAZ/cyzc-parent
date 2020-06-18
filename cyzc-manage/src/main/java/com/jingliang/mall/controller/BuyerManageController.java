@@ -473,6 +473,32 @@ public class BuyerManageController {
     }
 
     /**
+     * 通过组编号查询商户总数
+     *
+     * @param startTime
+     * @param endTime
+     * @param groupNo
+     * @param session
+     * @return
+     */
+    @GetMapping("/date/groupNo/achievement")
+    @ApiOperation(value = "通过组编号查询商户总数")
+    public Result<List<Map<String, Object>>> dateAndGroupNoAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
+                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+                                                            String groupNo,
+                                                            HttpSession session) {
+        //获取用户
+        User user = (User) session.getAttribute(sessionUser);
+        user = userService.findById(user.getId());
+        if (user.getLevel() == null || user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "无查看此分组的权限");
+        }
+        List<Map<String, Object>> maps = buyerManageService.dateAndGroupNoAchievement(startTime, endTime, groupNo);
+        log.debug("返回参数:{}", maps);
+        return Result.buildOk(maps);
+    }
+
+    /**
      * 导出销售新增商户统计的excel
      *
      * @return
@@ -552,9 +578,29 @@ public class BuyerManageController {
      */
     @GetMapping("/findBuyerAddressByUserId")
     @ApiOperation(value = "查询销售下的商户定位")
-    public Result<List<Map<String, Object>>> findBuyerAddressByUserId(Long userId,HttpSession session){
+    public Result<List<Map<String, Object>>> findBuyerAddressByUserId(Long userId, HttpSession session) {
         log.debug("请求参数:{}", userId);
         List<Map<String, Object>> mapList = buyerManageService.findBuyerAddressByUserId(userId);
+        return Result.buildQueryOk(mapList);
+    }
+
+    /**
+     * 月新增商户数
+     */
+    @GetMapping("/month/buyerCounts")
+    @ApiOperation(value = "月新增商户数")
+    public Result<List<Map<String,Object>>> findBuyerCountsToMonth(){
+        List<Map<String, Object>> mapList = buyerManageService.findBuyerCountsToMonth();
+        return Result.buildQueryOk(mapList);
+    }
+
+    /**
+     * 日新增商户数
+     */
+    @GetMapping("/day/buyerCounts")
+    @ApiOperation(value = "日新增商户数")
+    public Result<List<Map<String,Object>>> findBuyerCountsToDay(){
+        List<Map<String, Object>> mapList = buyerManageService.findBuyerCountsToDay();
         return Result.buildQueryOk(mapList);
     }
 }

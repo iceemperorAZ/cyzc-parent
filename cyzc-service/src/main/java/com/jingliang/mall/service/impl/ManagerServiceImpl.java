@@ -10,8 +10,8 @@ import com.jingliang.mall.service.ManagerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import springfox.documentation.spring.web.json.Json;
 
+import java.time.*;
 import java.util.*;
 
 @Service
@@ -137,6 +137,11 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
+    public List<Map<String, Object>> findAllBySaleIdAndGroupNo(String groupNo) {
+        return userRepository.findAllBySaleIdAndGroupNo(groupNo);
+    }
+
+    @Override
     public List<Map<String, Object>> findGroupAchievementWithTimeByYearAndGroupNo(String groupNo, Date startTime, Date endTime) {
         return groupRepository.findGroupAchievementWithTimeByYearAndGroupNo(groupNo, startTime, endTime);
     }
@@ -200,5 +205,65 @@ public class ManagerServiceImpl implements ManagerService {
         resultOrder.put("未返币订单重新返币订单数：", returnGoldNull);
         resultOrder.put("订单完成用户金币未到账订单数：", goldLogNull);
         return resultOrder;
+    }
+
+
+    /**
+     * ZoneId: 时区ID，用来确定Instant和LocalDateTime互相转换的规则
+     * Instant: 用来表示时间线上的一个点（瞬时）
+     * LocalDate: 表示没有时区的日期, LocalDate是不可变并且线程安全的
+     * LocalTime: 表示没有时区的时间, LocalTime是不可变并且线程安全的
+     * LocalDateTime: 表示没有时区的日期时间, LocalDateTime是不可变并且线程安全的
+     */
+    @Override
+    public List<Map<String, Object>> findGroupAchievementWithTimeBy10DayLate() {
+        //获取LocalDateTime类，LocalDate.now()当前年月日，LocalTime.MIN获取时间的最小值
+        LocalDateTime localDateTimeMin = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        //往前推11天
+        localDateTimeMin = localDateTimeMin.plusDays(-16);
+        //LocalDateTime转Date
+        ZoneId zoneMin = ZoneId.systemDefault();
+        Instant instantMin = localDateTimeMin.atZone(zoneMin).toInstant();
+        //获取开始时间
+        Date startTime = Date.from(instantMin);
+        //获取LocalDateTime类，LocalDate.now()当前年月日，LocalTime.MIN获取时间的最大值
+        LocalDateTime localDateTimeMax = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        localDateTimeMax = localDateTimeMax.plusDays(-1);
+        ZoneId zoneMax = ZoneId.systemDefault();
+        Instant instantMax = localDateTimeMax.atZone(zoneMax).toInstant();
+        //获取结束时间
+        Date endTime = Date.from(instantMax);
+        return groupRepository.findGroupAchievementWithTimeBy10DayLate(startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> findGroupAchievementWithTimeByGroupNo10DayLate(String groupNo) {
+        //获取LocalDateTime类，LocalDate.now()当前年月日，LocalTime.MIN获取时间的最小值
+        LocalDateTime localDateTimeMin = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        //往前推11天
+        localDateTimeMin = localDateTimeMin.plusDays(-16);
+        //LocalDateTime转Date
+        ZoneId zoneMin = ZoneId.systemDefault();
+        Instant instantMin = localDateTimeMin.atZone(zoneMin).toInstant();
+        //获取开始时间
+        Date startTime = Date.from(instantMin);
+        //获取LocalDateTime类，LocalDate.now()当前年月日，LocalTime.MIN获取时间的最大值
+        LocalDateTime localDateTimeMax = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        localDateTimeMax = localDateTimeMax.plusDays(-1);
+        ZoneId zoneMax = ZoneId.systemDefault();
+        Instant instantMax = localDateTimeMax.atZone(zoneMax).toInstant();
+        //获取结束时间
+        Date endTime = Date.from(instantMax);
+        return groupRepository.findGroupAchievementWithTimeByGroupNo10DayLate(groupNo, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> findProductTypeSalePrice(String groupNo) {
+        return groupRepository.findProductTypeSalePrice(groupNo);
+    }
+
+    @Override
+    public List<Map<String, Object>> findProductTypeSalePrice() {
+        return groupRepository.findProductTypeSalePrice();
     }
 }

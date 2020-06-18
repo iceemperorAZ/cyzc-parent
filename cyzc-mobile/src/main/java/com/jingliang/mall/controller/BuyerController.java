@@ -62,8 +62,9 @@ public class BuyerController {
     private final SignInService signInService;
     private final GoldLogService goldLogService;
     private final TechargeService techargeService;
+    private final UnavailableNameService unavailableNameService;
 
-    public BuyerController(BuyerService buyerService, FastdfsService fastdfsService, WechatService wechatService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService, SignInService signInService, GoldLogService goldLogService, TechargeService techargeService) {
+    public BuyerController(BuyerService buyerService, FastdfsService fastdfsService, WechatService wechatService, RedisService redisService, UserService userService, BuyerSaleService buyerSaleService, SignInService signInService, GoldLogService goldLogService, TechargeService techargeService, UnavailableNameService unavailableNameService) {
         this.buyerService = buyerService;
         this.fastdfsService = fastdfsService;
         this.wechatService = wechatService;
@@ -73,6 +74,7 @@ public class BuyerController {
         this.signInService = signInService;
         this.goldLogService = goldLogService;
         this.techargeService = techargeService;
+        this.unavailableNameService = unavailableNameService;
     }
 
     /**
@@ -253,6 +255,9 @@ public class BuyerController {
                 || StringUtils.isBlank(buyerReq.getUserName())) {
             return Result.buildParamFail();
         }
+        if (!unavailableNameService.findNameCount(buyerReq.getShopName())) {
+            return Result.build(Msg.FAIL, Msg.TEXT_SHOP_NAME_FAIL);
+        }
         User user = userService.findById(buyerReq.getSaleUserId());
         if (Objects.isNull(user)) {
             return Result.build(Msg.FAIL, Msg.TEXT_BUYER_FAIL);
@@ -372,5 +377,50 @@ public class BuyerController {
         return Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, BeanMapper.map(buyerService.findById(buyer.getId()), BuyerResp.class));
     }
 
-
+    /**
+     * 登录(手机号+密码)
+     */
+    @ApiOperation(value = "登录(手机号+密码)")
+    @PostMapping("/login/phone")
+    public Result<BuyerResp> loginByPhone(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpServletResponse response) {
+        log.debug("请求参数：{}", buyerReq);
+        if (StringUtils.isBlank(buyerReq.getPhone()) || StringUtils.isBlank(buyerReq.getPassword())) {
+            return Result.buildParamFail();
+        }
+        Buyer buyer = buyerService.findFirstByPhone(buyerReq.getPhone());
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        //判断用户密码是否匹配
+        if (!passwordEncoder.matches(buyerReq.getPassword(), buyer.getPassword())) {
+            return Result.build(Msg.FAIL, "密码不正确");
+        }
+        //是否封停
+        if (buyer.getIsSealUp()) {
+            return Result.build(Msg.LOGIN_FAIL, Msg.TEXT_IS_SEAL_UP_FAIL);
+        }
+        Map<String, String> tokenMap = new HashMap<>();
+        tokenMap.put("id", buyer.getId() + "");
+        BuyerResp buyerResp = BeanMapper.map(buyer, BuyerResp.class);
+        User user = userService.findByBuyerId(buyer.getId());
+        log.debug("WX登录信息{}", user);
+        assert buyerResp != null;
+        if (Objects.nonNull(user)) {
+            tokenMap.put("userId", user.getId() + "");
+            log.debug("WX登录绑定的员工{}", user);
+            //存入redis   有效时长为1800秒（半小时）
+            redisService.setExpire(tokenUserPrefix + "FRONT-" + user.getId(), user, tokenTimeOut);
+            Integer level = user.getLevel();
+            buyerResp.setLevel(level);
+            buyerResp.setUser(BeanMapper.map(user, UserResp.class));
+        }
+        //生成token
+        String token = JwtUtil.genToken(tokenMap);
+        buyer.setToken(token);
+        buyer.setSessionKey("phone="+buyer.getPhone()+"pwd="+buyer.getPassword());
+        //存入redis  有效时长为1800秒（半小时）
+        redisService.setExpire(tokenBuyerPrefix + buyer.getId(), buyer, tokenTimeOut);
+        response.setHeader("Authorization", token);
+        log.debug("微信登录Token= {}", token);
+        log.debug("返回结果：{}", buyerResp);
+        return Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, buyerResp);
+    }
 }

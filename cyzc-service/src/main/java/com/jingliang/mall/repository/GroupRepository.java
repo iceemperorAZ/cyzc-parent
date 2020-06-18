@@ -121,7 +121,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " g.parent_group_id = :parentGroupId " +
             " AND g.is_available = 1   " +
             " GROUP BY " +
-            " g.id,g.group_name "+
+            " g.id,g.group_name " +
             " ORDER BY totalPrice DESC ", nativeQuery = true)
     List<Map<String, Object>> findGroupAchievement(Long parentGroupId, Date startTime, Date endTime);
 
@@ -145,7 +145,7 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
             " g.group_no = :groupNo " +
             " AND g.is_available = 1   " +
             " GROUP BY " +
-            " g.id,g.group_name "+
+            " g.id,g.group_name " +
             " ORDER BY totalPrice DESC ", nativeQuery = true)
     List<Map<String, Object>> findGroupAchievementByGroupNo(String groupNo, Date startTime, Date endTime);
 
@@ -888,4 +888,96 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
 
     @Query(value = "SELECT ANY_VALUE(g.group_name) as groupName,ANY_VALUE(b.id) as id,ANY_VALUE(b.shop_name) as shopName,ANY_VALUE(b.register_source) as registerSource,ANY_VALUE(b.sale_user_id) as saleUserId,DATE_FORMAT(b.create_time,'%Y-%m-%d') as date,ANY_VALUE(u.user_name) AS saleName FROM tb_buyer b JOIN tb_user u ON u.id = b.sale_user_id JOIN tb_group g on u.group_no = g.group_no ORDER BY b.create_time DESC LIMIT 30", nativeQuery = true)
     List<Map<String, Object>> getBuyerTop30();
+
+    /**
+     * 查询前十天-折线图（总绩效）
+     *
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @Query(value = "SELECT DATE_FORMAT( ANY_VALUE(o.create_time), '%m.%d' ) as Days ,   " +
+            " SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice  " +
+            " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
+            " WHERE  " +
+            " o.create_time BETWEEN :startTime AND :endTime  " +
+            " AND o.order_status BETWEEN 300 AND 700    " +
+            " GROUP BY DATE_FORMAT( o.create_time, '%m.%d' )  " +
+            " ORDER BY ANY_VALUE(o.create_time)", nativeQuery = true)
+    List<Map<String, Object>> findGroupAchievementWithTimeBy10DayLate(Date startTime, Date endTime);
+
+    /**
+     * 根据组编号查询前十天-折线图（总绩效）
+     *
+     * @param groupNo
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @Query(value = "SELECT DATE_FORMAT( ANY_VALUE(o.create_time), '%m.%d' ) as Days ," +
+            " SUM(CONVERT( IFNULL( o.total_price , 0 ) * 0.01 ,decimal(12,2))) AS totalPrice  " +
+            " FROM  tb_group g  JOIN  tb_order o  ON o.group_no LIKE CONCAT( regexp_replace ( g.group_no, '0*$', '' ), '%' )  " +
+            " WHERE  " +
+            " g.group_no like :groupNo  " +
+            " AND o.create_time BETWEEN :startTime AND :endTime  " +
+            " AND o.order_status BETWEEN 300 AND 700    " +
+            " GROUP BY DATE_FORMAT( o.create_time, '%m.%d' )  " +
+            " ORDER BY ANY_VALUE(o.create_time)", nativeQuery = true)
+    List<Map<String, Object>> findGroupAchievementWithTimeByGroupNo10DayLate(String groupNo, Date startTime, Date endTime);
+
+    /**
+     * 月新增商户数
+     *
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @Query(value = "SELECT  " +
+            " ANY_VALUE(g.group_name) AS groupName,  " +
+            " ANY_VALUE(g.group_no) AS groupNo,  " +
+            " ANY_VALUE(g.id) AS groupId,  " +
+            " count(b.id) AS counts  " +
+            " FROM  tb_buyer b " +
+            " WHERE DATE_FORMAT(b.create_time,'%Y-%m') BETWEEN DATE_FORMAT(:startTime,'%Y-%m') AND DATE_FORMAT(:endTime,'%Y-%m')", nativeQuery = true)
+    List<Map<String, Object>> findBuyerCountsToMonth(Date startTime, Date endTime);
+
+    /**
+     * 日新增商户数
+     *
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    @Query(value = "SELECT  " +
+            " ANY_VALUE(g.group_name) AS groupName,  " +
+            " ANY_VALUE(g.group_no) AS groupNo,  " +
+            " ANY_VALUE(g.id) AS groupId,  " +
+            " count(b.id) AS counts  " +
+            " FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m-%d') BETWEEN DATE_FORMAT(:startTime,'%Y-%m-%d') AND DATE_FORMAT(:endTime,'%Y-%m-%d')", nativeQuery = true)
+    List<Map<String, Object>> findBuyerCountsToDay(Date startTime, Date endTime);
+
+    /**
+     * 查询各类商品的销售情况（分组）
+     *
+     * @param groupNo
+     * @return
+     */
+    @Query(value = " SELECT ANY_VALUE(IFNULL(SUM(od.selling_price * od.product_num),0)) AS maxprice,ANY_VALUE(prot.product_type_name) AS name FROM tb_order_detail od " +
+            " JOIN tb_product p ON od.product_id = p.id " +
+            " RIGHT JOIN (SELECT o.order_no,o.group_no FROM tb_order o WHERE o.group_no = :groupNo ) as ord ON ord.order_no = od.order_no " +
+            " RIGHT JOIN (SELECT pt.id,pt.product_type_order,pt.product_type_name FROM tb_product_type pt WHERE pt.is_available = 1) as prot " +
+            " ON p.product_type_id = prot.id GROUP BY prot.product_type_name ORDER BY maxprice DESC LIMIT 6;", nativeQuery = true)
+    List<Map<String, Object>> findProductTypeSalePrice(String groupNo);
+
+    /**
+     * 查询各类商品的销售情况
+     *
+     * @return
+     */
+    @Query(value = " SELECT ANY_VALUE(IFNULL(SUM(od.selling_price * od.product_num),0)) AS maxprice,ANY_VALUE(prot.product_type_name) AS name FROM tb_order_detail od " +
+            " JOIN tb_product p ON od.product_id = p.id " +
+            " RIGHT JOIN (SELECT o.order_no,o.group_no FROM tb_order o ) as ord ON ord.order_no = od.order_no " +
+            " RIGHT JOIN (SELECT pt.id,pt.product_type_order,pt.product_type_name FROM tb_product_type pt WHERE pt.is_available = 1) as prot " +
+            " ON p.product_type_id = prot.id GROUP BY prot.product_type_name ORDER BY maxprice DESC LIMIT 6;", nativeQuery = true)
+    List<Map<String, Object>> findProductTypeSalePrice();
 }

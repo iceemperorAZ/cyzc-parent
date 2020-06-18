@@ -86,4 +86,9 @@ public class BuyerServiceImpl implements BuyerService {
         return buyerRepository.findAll(buyerSpecification);
     }
 
+    @Override
+    public Buyer findFirstByPhone(String phone) {
+        return buyerRepository.findFirstByPhoneAndIsAvailable(phone, true);
+    }
+
 }

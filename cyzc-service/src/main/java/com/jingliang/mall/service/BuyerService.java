@@ -1,7 +1,6 @@
 package com.jingliang.mall.service;
 
 import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.entity.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -78,8 +77,17 @@ public interface BuyerService {
 
     /**
      * 根据条件查询
+     *
      * @param buyerSpecification
      * @return
      */
     List<Buyer> findAll(Specification<Buyer> buyerSpecification);
+
+    /**
+     * 根据电话查询商户
+     *
+     * @param phone
+     * @return
+     */
+    Buyer findFirstByPhone(String phone);
 }
