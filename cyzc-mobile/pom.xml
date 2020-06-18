@@ -49,6 +49,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
                 <includes>
+                    <include>img/*</include>
                     <include>*/*.xlsx</include>
                     <include>*/*.json</include>
                     <include>banner.txt</include>
