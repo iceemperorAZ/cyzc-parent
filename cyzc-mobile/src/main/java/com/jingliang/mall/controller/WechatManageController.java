@@ -17,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
@@ -525,5 +526,35 @@ public class WechatManageController {
             return Result.build(Msg.AUTHORITY_FAIL, "权限不足");
         }
 
+    }
+
+    /**
+     * 根据手机号查询用户
+     *
+     * @param phone
+     * @return
+     */
+    @GetMapping("/boss/phone/users")
+    public Result<List<Map<String, Object>>> phoneUsers(String phone, @ApiIgnore HttpSession session) {
+        log.debug("请求参数:{}", phone);
+        List<Map<String, Object>> lists = new ArrayList<>();
+        List<Group> groups = groupService.findGroupAll();
+        for (Group group : groups) {
+            List<Map<String, Object>> mapList = userService.findPhoneLike(phone);
+            Map<String, Object> map1 = new LinkedHashMap<>();
+            List<User> users = new ArrayList<>();
+            for (Map<String, Object> map : mapList) {
+                if(!(Objects.equals(map.get("groupNo"),"-1")) && Objects.equals(group.getGroupNo(),map.get("groupNo"))){
+                    User user = userService.findById(Long.valueOf(map.get("id").toString()));
+                    users.add(user);
+                }else {
+                    continue;
+                }
+            }
+            map1.put("name", group.getGroupName());
+            map1.put("value", users);
+            lists.add(map1);
+        }
+        return Result.build(Msg.OK, "", lists);
     }
 }

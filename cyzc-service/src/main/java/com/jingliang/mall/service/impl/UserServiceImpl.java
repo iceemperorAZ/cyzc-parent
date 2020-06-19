@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 员工表ServiceImpl
@@ -146,6 +147,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Integer countByGroupNo(String groupNo) {
-        return userRepository.countByGroupNoAndIsAvailable(groupNo,true);
+        return userRepository.countByGroupNoAndIsAvailable(groupNo, true);
+    }
+
+    @Override
+    public List<Map<String, Object>> findPhoneLike(String phone) {
+        return userRepository.findAllByPhoneLike(phone);
     }
 }
