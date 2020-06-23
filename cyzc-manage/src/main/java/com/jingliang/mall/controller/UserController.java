@@ -323,4 +323,88 @@ public class UserController {
         }
         return Result.buildQueryOk(BeanMapper.mapList(userService.likeAllByGroupNo(user.getGroupNo().replaceAll("0*$", "")), UserResp.class));
     }
+
+    /**
+     * 根据用户id查询名下所有可用的商户
+     *
+     * @param userReq
+     * @param session
+     * @return
+     */
+    @ApiOperation(value = "根据用户id查询名下所有可用的商户")
+    @GetMapping("/findAllBuyer")
+    public Result<List<BuyerResp>> findAllByUserId(UserReq userReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", userReq);
+        List<Buyer> buyerList = buyerService.findAllBySaleUserId(userReq.getId());
+        List<BuyerResp> res = new ArrayList<>();
+        for (Buyer buyer : buyerList) {
+            res.add(BeanMapper.map(buyer, BuyerResp.class));
+        }
+        return Result.buildQueryOk(res);
+    }
+
+    /**
+     * 批量操作商户重新绑定销售
+     *
+     * @param session
+     * @return
+     */
+    @ApiOperation(value = "批量操作商户重新绑定销售")
+    @PostMapping("/update/allSaleUser")
+    public Result<Boolean> updateSaleUserToAll(@RequestBody Map<String, Object> map, @ApiIgnore HttpSession session) {
+        //TODO 订单功能新增了销售帮客户下单，这时候，如果订单未完成，销售歇逼了，这个订单就歇了，这部分需要修改，代订，提出时间：time：2020/6/2
+        log.debug("请求参数：{}", map);
+        //获取操作者
+        User user = (User) session.getAttribute(sessionUser);
+        //判断操作者是否有修改权限
+        if (user.getLevel() < 110) {
+            return Result.build(Msg.FAIL, "你没有修改权限");
+        }
+        //获取要更改的用户
+        User newUser = userService.findById(Long.valueOf((String) map.get("userId")));
+        //获取要操作的商户id集合
+        List<Long> buyerIds = ((List<?>) map.get("buyerIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
+        for (Long buyerId : buyerIds) {
+            //获取要操作的商户`
+            Buyer buyer = buyerService.findById(buyerId);
+            //修改商户绑定的销售
+            buyer.setSaleUserId(newUser.getId());
+            buyer.setUpdateTime(new Date());
+            buyerService.save(buyer);
+        }
+        newUser.setUpdateUserName(user.getUserName());
+        newUser.setUpdateUserId(user.getId());
+        newUser.setUpdateTime(new Date());
+        userService.save(newUser);
+        return Result.buildUpdateOk(true);
+    }
+
+    /**
+     * 查询所有用户
+     */
+    @GetMapping("/list/all")
+    @ApiOperation(value = "查询所有用户")
+    public Result<List<UserResp>> listAllUser(UserReq userReq) {
+        log.debug("请求参数：{}", userReq);
+        Specification<User> userSpecification = (Specification<User>) (root, query, cb) -> {
+            List<Predicate> predicateList = new ArrayList<>();
+            //TODO 这个地方使用名字模糊查，工号和名字一起使用实现不太行，等回头有好点子再来搞，这个地方前端也不太好搞
+//            if (StringUtils.isNotBlank(userReq.getUserNo())) {
+//                predicateList.add(cb.like(root.get("userNo"), "%" + userReq.getUserNo() + "%"));
+//            }
+            if (StringUtils.isNotBlank(userReq.getSearchName())) {
+                predicateList.add(cb.like(root.get("userName"), "%" + userReq.getSearchName() + "%"));
+            }
+            predicateList.add(cb.equal(root.get("isAvailable"), true));
+            query.where(cb.and(predicateList.toArray(new Predicate[0])));
+            query.orderBy(cb.asc(root.get("createTime")));
+            return query.getRestriction();
+        };
+        List<UserResp> userRespList = new ArrayList<>();
+        for (User user : userService.findAll(userSpecification)) {
+            userRespList.add(BeanMapper.map(user, UserResp.class));
+        }
+        log.debug("返回结果：{}", userRespList);
+        return Result.buildQueryOk(userRespList);
+    }
 }

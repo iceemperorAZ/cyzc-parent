@@ -335,10 +335,22 @@ public class BuyerReq extends BaseReq implements Serializable {
     private List<String> buyerImdUrlsList;
 
     /**
+     * 营业执照url集合
+     */
+    @ApiModelProperty(value = "营业执照url集合")
+    private List<String> businessLicenseUrlsList;
+
+    /**
      * 商铺base64图片集合
      */
     @ApiModelProperty(value = "商铺base64图片集合")
     private List<String> buyerImgBase64s = new ArrayList<>();
+
+    /**
+     * 营业执照base64图片集合
+     */
+    @ApiModelProperty(value = "营业执照base64图片集合")
+    private List<String> businessLicenseBase64s = new ArrayList<>();
 
     /**
      * 审核人id
@@ -363,4 +375,10 @@ public class BuyerReq extends BaseReq implements Serializable {
      */
     @ApiModelProperty(value = "商户状态：100待审核，300审核通过")
     private Integer buyerStatus;
+
+    /**
+     * 商户类别标签
+     */
+    @ApiModelProperty(value = "商户类别标签")
+    private List<String> buyerTypeLabelList;
 }

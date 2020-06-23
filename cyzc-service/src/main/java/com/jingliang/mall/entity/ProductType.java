@@ -84,4 +84,9 @@ public class ProductType implements Serializable {
     @Column(name = "update_time")
     private Date updateTime;
 
+    /**
+     * 商品分类图(1张)
+     */
+    @Column(name = "product_type_img_url")
+    private String productTypeImgUrl;
 }

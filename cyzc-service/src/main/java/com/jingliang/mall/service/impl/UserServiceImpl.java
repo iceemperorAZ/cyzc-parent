@@ -154,4 +154,9 @@ public class UserServiceImpl implements UserService {
     public List<Map<String, Object>> findPhoneLike(String phone) {
         return userRepository.findAllByPhoneLike(phone);
     }
+
+    @Override
+    public List<User> findAll(Specification<User> userSpecification) {
+        return userRepository.findAll(userSpecification);
+    }
 }

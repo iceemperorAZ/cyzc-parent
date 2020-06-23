@@ -47,4 +47,11 @@ public interface ProductTypeService {
      * @return
      */
     List<ProductType> findAll(List<Long> ids);
+
+    /**
+     * 查询分类集合的第一个
+     *
+     * @return
+     */
+    ProductType findFirst();
 }

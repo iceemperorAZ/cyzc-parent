@@ -137,4 +137,13 @@ public interface UserService {
      * @return
      */
     List<Map<String, Object>> findPhoneLike(String phone);
+
+    /**
+     * 查询全部用户
+     *
+     * @param userSpecification 查询条件
+     * @return 返回差存到的用户列表
+     */
+
+    List<User> findAll(Specification<User> userSpecification);
 }
