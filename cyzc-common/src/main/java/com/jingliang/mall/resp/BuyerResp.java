@@ -288,29 +288,29 @@ public class BuyerResp implements Serializable {
     @ApiModelProperty(value = "商户状态：100待审核，300审核通过")
     private Integer buyerStatus;
 
-    @ApiModelProperty(value = "商户状态文字描述")
-    public String getBuyerStatusView() {
-        switch (buyerStatus) {
-            case 100:
-                return "待审核";
-            case 300:
-                return "审核通过";
-            default:
-                return "未知";
-        }
-    }
-
-    @ApiModelProperty(value = "商户状态文字描述")
-    public String getStatusView() {
-        switch (buyerStatus) {
-            case 100:
-                return "待审核";
-            case 300:
-                return "审核通过";
-            default:
-                return "未知";
-        }
-    }
+//    @ApiModelProperty(value = "商户状态文字描述")
+//    public String getBuyerStatusView() {
+//        switch (buyerStatus) {
+//            case 100:
+//                return "待审核";
+//            case 300:
+//                return "审核通过";
+//            default:
+//                return "未知";
+//        }
+//    }
+//
+//    @ApiModelProperty(value = "商户状态文字描述")
+//    public String getStatusView() {
+//        switch (buyerStatus) {
+//            case 100:
+//                return "待审核";
+//            case 300:
+//                return "审核通过";
+//            default:
+//                return "未知";
+//        }
+//    }
 
     /**
      * 商铺图片字符串转集合

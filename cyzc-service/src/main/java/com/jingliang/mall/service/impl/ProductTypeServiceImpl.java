@@ -52,4 +52,9 @@ public class ProductTypeServiceImpl implements ProductTypeService {
     public ProductType findFirst() {
         return productTypeRepository.findFirstByIsAvailable(true);
     }
+
+    @Override
+    public ProductType findById(Long id) {
+        return productTypeRepository.findByIdAndIsAvailable(id, true);
+    }
 }

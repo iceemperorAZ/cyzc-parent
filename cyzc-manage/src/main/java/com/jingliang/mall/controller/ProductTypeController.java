@@ -90,7 +90,7 @@ public class ProductTypeController {
             return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
         }
         builder.append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
-        productType.setProductTypeImgUrl(builder.substring(1));
+        productType.setProductTypeImgUrl(builder.substring(0));
         productType = productTypeService.save(productType);
         ProductTypeResp productTypeResp = BeanMapper.map(productType, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeResp);

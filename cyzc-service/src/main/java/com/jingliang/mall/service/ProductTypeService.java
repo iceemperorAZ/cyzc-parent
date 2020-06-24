@@ -54,4 +54,12 @@ public interface ProductTypeService {
      * @return
      */
     ProductType findFirst();
+
+    /**
+     * 根据id查询商品分类
+     *
+     * @param id
+     * @return
+     */
+    ProductType findById(Long id);
 }

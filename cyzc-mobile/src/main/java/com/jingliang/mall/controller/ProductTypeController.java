@@ -68,6 +68,21 @@ public class ProductTypeController {
     }
 
     /**
+     * 分页查询所有商品分类
+     */
+    @ApiOperation(value = "分页查询所有商品分类")
+    @GetMapping("/list/all")
+    public Result<List<ProductTypeResp>> listAllProductTypeResp() {
+        List<ProductTypeResp> productTypeResps = new ArrayList<>();
+        List<ProductType> productTypes = productTypeService.findAll();
+        for (ProductType productType : productTypes) {
+            productTypeResps.add(BeanMapper.map(productType,ProductTypeResp.class));
+        }
+        log.debug("返回结果：{}", productTypeResps);
+        return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeResps);
+    }
+
+    /**
      * 查询分类集合的第一个
      *
      * @return
