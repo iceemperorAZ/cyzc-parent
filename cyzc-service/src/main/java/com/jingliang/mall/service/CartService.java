@@ -47,4 +47,12 @@ public interface CartService {
      * @param productIds 商品Id集合
      */
     void emptyCartItem(Long buyerId, List<Long> productIds);
+
+    /**
+     * 根据商户id查询购物车数量
+     *
+     * @param buyerId
+     * @return
+     */
+    Integer countAllByBuyerId(Long buyerId);
 }

@@ -156,4 +156,15 @@ public class ProductTypeReq extends BaseReq implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTimeEnd;
 
+    /**
+     * 商品分类base64图片
+     */
+    @ApiModelProperty(value = "商品分类base64图片")
+    private String productTypeImgBase64;
+
+    /**
+     * 商品分类图片url
+     */
+    @ApiModelProperty(value = "商品分类图片url")
+    private String productTypeImgUrl;
 }

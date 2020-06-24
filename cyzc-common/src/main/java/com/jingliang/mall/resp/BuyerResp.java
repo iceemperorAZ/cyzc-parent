@@ -7,11 +7,13 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Column;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 会员表
@@ -224,4 +226,107 @@ public class BuyerResp implements Serializable {
      */
     @ApiModelProperty(value = "会员等级")
     private Integer memberLevel;
+
+    /**
+     * 后台用户修改时间
+     */
+    @ApiModelProperty(value = "后台用户修改时间")
+    private Date backUpdateTime;
+
+    /**
+     * 后台修改人id
+     */
+    @ApiModelProperty(value = "后台修改人id")
+    private Long backUpdateUserId;
+
+    /**
+     * 商铺图片url集合
+     */
+    @ApiModelProperty(value = "商铺图片url集合")
+    private List<String> buyerImdUrlsList;
+
+    /**
+     * 营业执照url集合
+     */
+    @ApiModelProperty(value = "business_license_urls")
+    private List<String> businessLicenseUrlsList;
+
+    /**
+     * 审核人id
+     */
+    @ApiModelProperty(value = "审核人id")
+    private Long reviewUserId;
+
+    /**
+     * 审核时间
+     */
+    @ApiModelProperty(value = "审核时间")
+    private Date reviewTime;
+
+    /**
+     * 审核意见
+     */
+    @ApiModelProperty(value = "审核意见")
+    private String reviewMsg;
+
+    /**
+     * 商户类别标签
+     */
+    @ApiModelProperty(value = "商户类别标签")
+    private String buyerTypeLabel;
+
+
+    /**
+     * 商户类别标签集合
+     */
+    @ApiModelProperty(value = "商户类别标签集合")
+    private List<String> buyerTypeLabelList;
+
+    /**
+     * 商户状态：100待审核，300审核通过
+     */
+    @ApiModelProperty(value = "商户状态：100待审核，300审核通过")
+    private Integer buyerStatus;
+
+//    @ApiModelProperty(value = "商户状态文字描述")
+//    public String getBuyerStatusView() {
+//        switch (buyerStatus) {
+//            case 100:
+//                return "待审核";
+//            case 300:
+//                return "审核通过";
+//            default:
+//                return "未知";
+//        }
+//    }
+//
+//    @ApiModelProperty(value = "商户状态文字描述")
+//    public String getStatusView() {
+//        switch (buyerStatus) {
+//            case 100:
+//                return "待审核";
+//            case 300:
+//                return "审核通过";
+//            default:
+//                return "未知";
+//        }
+//    }
+
+    /**
+     * 商铺图片字符串转集合
+     */
+    public void setBuyerImdUrlsList(String buyerImdUrlsList) {
+        this.buyerImdUrlsList = StringUtils.isBlank(buyerImdUrlsList) ? null : Arrays.asList(buyerImdUrlsList.split(";"));
+    }
+
+    /**
+     * 营业执照图片字符串转集合
+     */
+    public void setBusinessLicenseList(String businessLicenseUrlsList) {
+        this.businessLicenseUrlsList = StringUtils.isBlank(businessLicenseUrlsList) ? null : Arrays.asList(businessLicenseUrlsList.split(";"));
+    }
+
+    public void setBuyerTypeLabelList(String buyerTypeLabelList) {
+        this.buyerTypeLabelList = StringUtils.isBlank(buyerTypeLabelList) ? null : Arrays.asList(buyerTypeLabelList.split(";"));
+    }
 }

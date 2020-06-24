@@ -5,6 +5,7 @@ import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.ProductTypeReq;
 import com.jingliang.mall.resp.ProductTypeResp;
+import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.ProductTypeService;
 import io.swagger.annotations.Api;
@@ -45,10 +46,12 @@ public class ProductTypeController {
 
     private final ProductTypeService productTypeService;
     private final ProductService productService;
+    private final FastdfsService fastdfsService;
 
-    public ProductTypeController(ProductTypeService productTypeService, ProductService productService) {
+    public ProductTypeController(ProductTypeService productTypeService, ProductService productService, FastdfsService fastdfsService) {
         this.productTypeService = productTypeService;
         this.productService = productService;
+        this.fastdfsService = fastdfsService;
     }
 
     /**
@@ -65,6 +68,29 @@ public class ProductTypeController {
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(productTypeReq, user);
         ProductType productType = BeanMapper.map(productTypeReq, ProductType.class);
+        //判断图片是否为空
+        if (StringUtils.isBlank(productTypeReq.getProductTypeImgBase64())) {
+            return Result.build(Msg.FAIL, "图片不能为空");
+        }
+        StringBuilder builder = new StringBuilder();
+        assert productType != null;
+        if (Objects.nonNull(productTypeReq.getId())) {
+            //将之前所有的图片删除重新上传一份新的
+            String productTypeImgUrl = productType.getProductTypeImgUrl();
+            if (StringUtils.isNotBlank(productTypeImgUrl)) {
+                if (!fastdfsService.deleteFile(productTypeImgUrl)) {
+                    log.error("图片删除失败：{}", productTypeImgUrl);
+                }
+            }
+        }
+        String imgBase = productTypeReq.getProductTypeImgBase64();
+        Base64Image base64Image = Base64Image.build(imgBase);
+        if (Objects.isNull(base64Image)) {
+            log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+            return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
+        }
+        builder.append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
+        productType.setProductTypeImgUrl(builder.substring(0));
         productType = productTypeService.save(productType);
         ProductTypeResp productTypeResp = BeanMapper.map(productType, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeResp);

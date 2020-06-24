@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品表Service
@@ -131,4 +132,12 @@ public interface ProductService {
      * @return
      */
     Product findByProductNameAndSpecs(String productName, String specs);
+
+    /**
+     * 查询商户所在的大区
+     * @param id
+     */
+    String getBuyerProduct(Long id);
+
+    List<Map<String, Object>> getAllProduct();
 }

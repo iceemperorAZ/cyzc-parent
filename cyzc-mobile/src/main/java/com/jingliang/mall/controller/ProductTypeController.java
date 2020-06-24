@@ -2,9 +2,9 @@ package com.jingliang.mall.controller;
 
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.ProductType;
-import com.jingliang.mall.service.ProductTypeService;
 import com.jingliang.mall.req.ProductTypeReq;
 import com.jingliang.mall.resp.ProductTypeResp;
+import com.jingliang.mall.service.ProductTypeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -65,5 +65,35 @@ public class ProductTypeController {
         MallPage<ProductTypeResp> productTypeRespPage = MUtils.toMallPage(productTypeByPage, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeRespPage);
         return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeRespPage);
+    }
+
+    /**
+     * 分页查询所有商品分类
+     */
+    @ApiOperation(value = "分页查询所有商品分类")
+    @GetMapping("/list/all")
+    public Result<List<ProductTypeResp>> listAllProductTypeResp() {
+        List<ProductTypeResp> productTypeResps = new ArrayList<>();
+        List<ProductType> productTypes = productTypeService.findAll();
+        for (ProductType productType : productTypes) {
+            productTypeResps.add(BeanMapper.map(productType,ProductTypeResp.class));
+        }
+        log.debug("返回结果：{}", productTypeResps);
+        return Result.build(Msg.OK, Msg.TEXT_QUERY_OK, productTypeResps);
+    }
+
+    /**
+     * 查询分类集合的第一个
+     *
+     * @return
+     */
+    //TODO 这个接口手机宝哥提出来，暂时顶替秒杀页面的策略
+    @GetMapping("/findFirst")
+    @ApiOperation(value = "查询分类集合的第一个")
+    public Result<ProductTypeResp> findFirst() {
+        ProductType productType = productTypeService.findFirst();
+        ProductTypeResp productTypeResp = BeanMapper.map(productType, ProductTypeResp.class);
+        log.debug("返回结果：{}", productTypeResp);
+        return Result.buildQueryOk(productTypeResp);
     }
 }

@@ -14,22 +14,25 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * 商品表Controller
@@ -261,7 +264,7 @@ public class ProductController {
                 predicateList.add(cb.equal(root.get("productTypeId"), productReq.getProductTypeId()));
             }
             if (StringUtils.isNotBlank(productReq.getProductName())) {
-                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"), cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%")));
+                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"), cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%"),cb.equal(root.get("id"),Long.parseLong(productReq.getProductName()))));
             }
             if (Objects.nonNull(productReq.getProductZoneId())) {
                 predicateList.add(cb.equal(root.get("productZoneId"), productReq.getProductZoneId()));
@@ -395,5 +398,71 @@ public class ProductController {
         List<ProductResp> productRespList = BeanMapper.mapList(productList, ProductResp.class);
         log.debug("返回结果：{}", productRespList);
         return Result.buildDeleteOk(productRespList);
+    }
+
+    /**
+     * 导出商品表
+     */
+    @GetMapping("/download/excel")
+    @ApiOperation(value = "导出商品表")
+    public ResponseEntity<byte[]> getAllBuyerAndSaleByTimeToExcel() throws IOException {
+        List<Map<String, Object>> product = productService.getAllProduct();
+        // 定义一个新的工作簿
+        XSSFWorkbook productWorkbook = new XSSFWorkbook();
+        // 创建一个Sheet页
+        XSSFSheet sheet = productWorkbook.createSheet("First sheet");
+        //设置行高
+        sheet.setDefaultRowHeight((short) (2 * 256));
+        //设置列宽
+        sheet.setColumnWidth(0, 4000);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 4000);
+        XSSFFont font = productWorkbook.createFont();
+        font.setFontName("宋体");
+        font.setFontHeightInPoints((short) 16);
+        //获得表格第一行
+        XSSFRow row = sheet.createRow(0);
+        //根据需要给第一行每一列设置标题
+        XSSFCell cell = row.createCell(0);
+        cell.setCellValue("商品编号");
+        cell = row.createCell(1);
+        cell.setCellValue("商户名称");
+        cell = row.createCell(2);
+        cell.setCellValue("商户规格");
+        cell = row.createCell(3);
+        XSSFRow rows;
+        XSSFCell cells;
+        //循环拿到的数据给所有行每一列设置对应的值
+        for (int i = 0; i < product.size(); i++) {
+
+            // 在这个sheet页里创建一行
+            rows = sheet.createRow(i + 1);
+            // 该行创建一个单元格,在该单元格里设置值
+            String no = product.get(i).get("商品编号").toString();
+            String name = product.get(i).get("商品名称").toString();
+            String specs = product.get(i).get("商品规格").toString();
+            cells = rows.createCell(0);
+            cells.setCellValue(no);
+            cells = rows.createCell(1);
+            cells.setCellValue(name);
+            cells = rows.createCell(2);
+            cells.setCellValue(specs);
+        }
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        productWorkbook.write(arrayOutputStream);
+        String newName = URLEncoder.encode("商品明细表-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ".xlsx", "utf-8")
+                .replaceAll("\\+", "%20").replaceAll("%28", "\\(")
+                .replaceAll("%29", "\\)").replaceAll("%3B", ";")
+                .replaceAll("%40", "@").replaceAll("%23", "\\#")
+                .replaceAll("%26", "\\&").replaceAll("%2C", "\\,");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", newName));
+        headers.add("Expires", "0");
+        headers.add("Pragma", "no-cache");
+        return ResponseEntity.ok().headers(headers)
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentLength(arrayOutputStream.size())
+                .body(arrayOutputStream.toByteArray());
     }
 }

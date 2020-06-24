@@ -91,4 +91,10 @@ public class CartResp implements Serializable {
         }
         return sellingPrice;
     }
+
+    /**
+     * 购物车数量
+     */
+    @ApiModelProperty(value = "购物车数量")
+    private Integer counts;
 }

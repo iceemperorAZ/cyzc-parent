@@ -55,6 +55,12 @@ public class UserReq extends BaseReq implements Serializable {
     private String userName;
 
     /**
+     * 查询用户名
+     */
+    @ApiModelProperty(value = "查询用户名")
+    private String searchName;
+
+    /**
      * 员工编号
      */
     @ApiModelProperty(value = "员工编号")

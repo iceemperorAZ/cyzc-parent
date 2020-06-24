@@ -3,8 +3,10 @@ package com.jingliang.mall.repository;
 
 import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.repository.base.BaseRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 商品表Repository
@@ -97,4 +99,7 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
      * @return
      */
     Product findAllByProductTypeIdAndProductSortAndIsAvailable(Long productTypeId, Integer productSort, Boolean isAvailable);
+
+    @Query(value = " SELECT p.product_no as '商品编号',p.product_name as '商品名称',p.specs as '商品规格' from tb_product p WHERE p.is_available = 1; " ,nativeQuery=true)
+    List<Map<String, Object>> getAllProduct();
 }

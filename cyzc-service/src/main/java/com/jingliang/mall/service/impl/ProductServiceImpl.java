@@ -4,13 +4,19 @@ package com.jingliang.mall.service.impl;
 //import com.jingliang.mall.dao.EsKeywordRepository;
 //import com.jingliang.mall.dao.EsProductRepository;
 
+import com.jingliang.mall.entity.BuyerAddress;
 import com.jingliang.mall.entity.Product;
 import com.jingliang.mall.entity.Sku;
+//import com.jingliang.mall.esdocument.EsKeyword;
+//import com.jingliang.mall.esdocument.EsProduct;
 import com.jingliang.mall.repository.ProductRepository;
 import com.jingliang.mall.repository.SkuRepository;
 import com.jingliang.mall.server.RedisService;
+import com.jingliang.mall.service.BuyerAddressService;
 import com.jingliang.mall.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,13 +24,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
-//import com.jingliang.mall.esdocument.EsKeyword;
-//import com.jingliang.mall.esdocument.EsProduct;
 
 /**
  * 商品表ServiceImpl
@@ -45,14 +52,16 @@ public class ProductServiceImpl implements ProductService {
     //    private final EsProductRepository esProductRepository;
 //    private final EsKeywordRepository esKeywordRepository;
     private final RedisService redisService;
+    private final BuyerAddressService buyerAddressService;
 
     public ProductServiceImpl(ProductRepository productRepository,
-                              SkuRepository skuRepository,/* EsProductRepository esProductRepository, EsKeywordRepository esKeywordRepository,*/ RedisService redisService) {
+                              SkuRepository skuRepository,/* EsProductRepository esProductRepository, EsKeywordRepository esKeywordRepository,*/ RedisService redisService, BuyerAddressService buyerAddressService) {
         this.productRepository = productRepository;
         this.skuRepository = skuRepository;
 //        this.esProductRepository = esProductRepository;
 //        this.esKeywordRepository = esKeywordRepository;
         this.redisService = redisService;
+        this.buyerAddressService = buyerAddressService;
     }
 
     @Override
@@ -183,5 +192,20 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product findByProductNameAndSpecs(String productName, String specs) {
         return productRepository.findFirstByProductNameAndSpecsAndIsAvailable(productName, specs, true);
+    }
+
+    @Override
+    public String getBuyerProduct(Long id) {
+        if (Objects.isNull(buyerAddressService.findDefaultAddrByBuyerId(id))) {
+            return "";
+        }
+        BuyerAddress buyerAddress = buyerAddressService.findDefaultAddrByBuyerId(id);
+        return buyerAddress.getAreaCode();
+    }
+
+    @Override
+    public List<Map<String, Object>> getAllProduct() {
+        List<Map<String, Object>> product = productRepository.getAllProduct();
+        return product;
     }
 }

@@ -8,7 +8,9 @@ import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 会员表
@@ -308,4 +310,75 @@ public class BuyerReq extends BaseReq implements Serializable {
     @ApiModelProperty(value = "纬度")
     private String longitude;
 
+    /**
+     * 是否可以货到付款 0：否，1：是
+     */
+    @ApiModelProperty(name = "是否可以货到付款")
+    private Boolean cashOnDelivery;
+
+    /**
+     * 后台用户修改时间
+     */
+    @ApiModelProperty(value = "后台用户修改时间")
+    private Date backUpdateTime;
+
+    /**
+     * 后台修改人id
+     */
+    @ApiModelProperty(value = "后台修改人id")
+    private Long backUpdateUserId;
+
+    /**
+     * 商铺图片url集合
+     */
+    @ApiModelProperty(value = "商铺图片url集合")
+    private List<String> buyerImdUrlsList;
+
+    /**
+     * 营业执照url集合
+     */
+    @ApiModelProperty(value = "营业执照url集合")
+    private List<String> businessLicenseUrlsList;
+
+    /**
+     * 商铺base64图片集合
+     */
+    @ApiModelProperty(value = "商铺base64图片集合")
+    private List<String> buyerImgBase64s = new ArrayList<>();
+
+    /**
+     * 营业执照base64图片集合
+     */
+    @ApiModelProperty(value = "营业执照base64图片集合")
+    private List<String> businessLicenseBase64s = new ArrayList<>();
+
+    /**
+     * 审核人id
+     */
+    @ApiModelProperty(value = "审核人id")
+    private Long reviewUserId;
+
+    /**
+     * 审核时间
+     */
+    @ApiModelProperty(value = "审核时间")
+    private Date reviewTime;
+
+    /**
+     * 审核意见
+     */
+    @ApiModelProperty(value = "审核意见")
+    private String reviewMsg;
+
+    /**
+     * 商户状态：100待审核，300审核通过
+     */
+    @ApiModelProperty(value = "商户状态：100待审核，300审核通过")
+    private Integer buyerStatus;
+
+    /**
+     * 商户类别标签
+     */
+    @ApiModelProperty(value = "商户类别标签")
+    private List<String> buyerTypeLabelList;
 }
