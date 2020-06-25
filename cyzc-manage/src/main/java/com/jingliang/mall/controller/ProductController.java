@@ -28,7 +28,9 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
@@ -264,9 +266,9 @@ public class ProductController {
                 predicateList.add(cb.equal(root.get("productTypeId"), productReq.getProductTypeId()));
             }
             if (StringUtils.isNotBlank(productReq.getProductName())) {
-                try{
-                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"), cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%"),cb.equal(root.get("id"),Long.parseLong(productReq.getProductName()))));
-                }catch (Exception e){
+                try {
+                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"), cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%"), cb.equal(root.get("id"), Long.parseLong(productReq.getProductName()))));
+                } catch (Exception e) {
                     predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"), cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%")));
                 }
             }
