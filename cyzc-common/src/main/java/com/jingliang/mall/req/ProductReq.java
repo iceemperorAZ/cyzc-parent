@@ -370,6 +370,12 @@ public class ProductReq extends BaseReq implements Serializable {
     @ApiModelProperty(value = "商品详情图url")
     private List<String> productDetailsImgUrls = new ArrayList<>();
 
+    /**
+     * 商品不展示的区编号
+     */
+    @ApiModelProperty(value = "商品不展示的区编号")
+    private String productArea;
+
     public void setMarketPrice(Float marketPrice) {
         this.marketPrice = marketPrice * 100;
     }

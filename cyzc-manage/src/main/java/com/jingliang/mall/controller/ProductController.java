@@ -10,6 +10,7 @@ import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.SkuService;
+import com.jingliang.mall.utils.PageMapperUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +74,15 @@ public class ProductController {
     @ApiOperation(value = "保存商品")
     public Result<ProductResp> save(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
+        if (StringUtils.isNotBlank(productReq.getProductArea())) {
+            String areas = productReq.getProductArea();
+            String[] area = areas.split(",");
+            String productArea = "";
+            for (String pa : area) {
+                productArea = productArea.concat(pa);
+            }
+            productReq.setProductArea(productArea);
+        }
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
                 || StringUtils.isBlank(productReq.getProductName())
                 || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs()) || productReq.getProductSort() == null
@@ -264,7 +274,14 @@ public class ProductController {
                 predicateList.add(cb.equal(root.get("productTypeId"), productReq.getProductTypeId()));
             }
             if (StringUtils.isNotBlank(productReq.getProductName())) {
-                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"), cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%"),cb.equal(root.get("id"),Long.parseLong(productReq.getProductName()))));
+                try {
+                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"),
+                            cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%"),
+                            cb.equal(root.get("id"), Long.parseLong(productReq.getProductName()))));
+                } catch (Exception e) {
+                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"),
+                            cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%")));
+                }
             }
             if (Objects.nonNull(productReq.getProductZoneId())) {
                 predicateList.add(cb.equal(root.get("productZoneId"), productReq.getProductZoneId()));
@@ -277,7 +294,7 @@ public class ProductController {
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.desc(root.get("createTime")));
+            query.orderBy(cb.asc(root.get("productSort")));
             return query.getRestriction();
         };
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
