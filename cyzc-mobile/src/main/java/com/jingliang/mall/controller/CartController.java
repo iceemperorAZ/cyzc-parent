@@ -25,6 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,7 +64,13 @@ public class CartController {
         }
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         MUtils.addDateAndBuyer(cartReq, buyer);
-        CartResp cartResp = BeanMapper.map(cartService.save(BeanMapper.map(cartReq, Cart.class)), CartResp.class);
+        Cart cart = BeanMapper.map(cartReq, Cart.class);
+        assert cart != null;
+        cart.setIsAvailable(true);
+        cart.setCreateTime(new Date());
+        CartResp cartResp = BeanMapper.map(cartService.save(cart), CartResp.class);
+        assert cartResp != null;
+        cartResp.setCounts(cartService.countAllByBuyerId(buyer.getId()));
         log.debug("返回结果：{}", cartResp);
         return Result.buildSaveOk(cartResp);
     }

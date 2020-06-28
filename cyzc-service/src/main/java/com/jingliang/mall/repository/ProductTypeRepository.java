@@ -23,4 +23,21 @@ public interface ProductTypeRepository extends BaseRepository<ProductType, Long>
      * @return
      */
     List<ProductType> findAllByIdInAndIsAvailable(List<Long> ids, boolean isAvailable);
+
+    /**
+     * 查询分类集合的第一个
+     *
+     * @param isAvailable
+     * @return
+     */
+    ProductType findFirstByIsAvailable(boolean isAvailable);
+
+    /**
+     * 根据id查询商品分类
+     *
+     * @param id
+     * @param isAvailable
+     * @return
+     */
+    ProductType findByIdAndIsAvailable(Long id, boolean isAvailable);
 }

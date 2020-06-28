@@ -41,7 +41,7 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
             " ANY_VALUE(auh.latitude) AS latitude,   " +
             " DATE_FORMAT(auh.create_time,'%Y-%m-%d %H:%i:%s') AS createTime   " +
             " FROM tb_group g   " +
-            " LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level` BETWEEN 0 AND 199   " +
+            " LEFT JOIN tb_user u ON u.group_no = g.group_no   " +
             " JOIN tb_address_user_history auh ON auh.user_id = u.id   " +
             " WHERE DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(:time,'%Y-%m-%d')   " +
             " GROUP BY u.id,auh.create_time AND DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')   " +
@@ -58,7 +58,7 @@ public interface AddressUserHistoryRepository extends BaseRepository<AddressUser
             "             ANY_VALUE(auh.latitude) AS latitude,  " +
             "             ANY_VALUE(auh.create_time) AS createTime  " +
             "             FROM tb_group g  " +
-            "             LEFT JOIN tb_user u ON u.group_no = g.group_no AND u.`level` BETWEEN 0 AND 199  " +
+            "             LEFT JOIN tb_user u ON u.group_no = g.group_no   " +
             "             INNER JOIN tb_address_user_history auh ON auh.user_id = u.id  " +
             "             WHERE u.group_no = :groupNo AND DATE_FORMAT(auh.create_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d') " +
             "             GROUP BY userId,auh.create_time  " +

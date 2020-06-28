@@ -45,6 +45,16 @@ public class ProductTypeServiceImpl implements ProductTypeService {
 
     @Override
     public List<ProductType> findAll(List<Long> productTypeIds) {
-        return productTypeRepository.findAllByIdInAndIsAvailable(productTypeIds,true);
+        return productTypeRepository.findAllByIdInAndIsAvailable(productTypeIds, true);
+    }
+
+    @Override
+    public ProductType findFirst() {
+        return productTypeRepository.findFirstByIsAvailable(true);
+    }
+
+    @Override
+    public ProductType findById(Long id) {
+        return productTypeRepository.findByIdAndIsAvailable(id, true);
     }
 }

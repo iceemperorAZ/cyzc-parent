@@ -93,4 +93,9 @@ public class ProductTypeResp implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date updateTime;
 
+	/**
+	 * 商品分类图片url
+	 */
+	@ApiModelProperty(value = "商品分类图片url")
+	private String productTypeImgUrl;
 }

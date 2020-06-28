@@ -137,4 +137,13 @@ public interface UserRepository extends BaseRepository<User, Long> {
             " WHERE g.group_no = :groupNo AND u.is_available=1  " +
             " GROUP BY u.user_name", nativeQuery = true)
     List<Map<String, Object>> findAllBySaleIdAndGroupNo(String groupNo);
+
+    /**
+     * 根据手机号查询
+     *
+     * @param phone
+     * @return
+     */
+    @Query(value = "SELECT group_no AS groupNo,user_name AS userName,phone,id FROM tb_user WHERE phone LIKE :phone% AND is_available=1", nativeQuery = true)
+    List<Map<String, Object>> findAllByPhoneLike(String phone);
 }

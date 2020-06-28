@@ -1,7 +1,7 @@
 package com.jingliang.mall.repository;
 
-import com.jingliang.mall.repository.base.BaseRepository;
 import com.jingliang.mall.entity.Cart;
+import com.jingliang.mall.repository.base.BaseRepository;
 
 import java.util.List;
 
@@ -31,13 +31,23 @@ public interface CartRepository extends BaseRepository<Cart, Long> {
      * @return 返回查询到的购物项
      */
     List<Cart> findAllByBuyerIdAndIsAvailableAndProductIdIsIn(Long buyerId, Boolean isAvailable, List<Long> productIds);
+
     /**
      * 查询用户下的
      *
      * @param buyerId     用户Id
      * @param isAvailable 是否可用（删除）
-     * @param productId  商品Id
+     * @param productId   商品Id
      * @return 返回查询到的购物项
      */
     Cart findFirstByBuyerIdAndIsAvailableAndProductId(Long buyerId, Boolean isAvailable, Long productId);
+
+    /**
+     * 根据商户id查询购物车数量
+     *
+     * @param buyerId
+     * @param isAvailable
+     * @return
+     */
+    Integer countAllByBuyerIdAndIsAvailable(Long buyerId, Boolean isAvailable);
 }

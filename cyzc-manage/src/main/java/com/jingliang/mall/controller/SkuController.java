@@ -1,13 +1,13 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.MallUtils;
-import com.jingliang.mall.entity.Sku;
-import com.jingliang.mall.service.ProductService;
-import com.jingliang.mall.service.SkuService;
 import com.jingliang.mall.common.MallPage;
+import com.jingliang.mall.common.MallUtils;
 import com.jingliang.mall.common.Result;
+import com.jingliang.mall.entity.Sku;
 import com.jingliang.mall.req.SkuReq;
 import com.jingliang.mall.resp.SkuResp;
+import com.jingliang.mall.service.ProductService;
+import com.jingliang.mall.service.SkuService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +68,11 @@ public class SkuController {
                 predicateList.add(cb.equal(root.get("productTypeId"), skuReq.getProductTypeId()));
             }
             if (StringUtils.isNotBlank(skuReq.getProductName())) {
-                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%"),cb.equal(root.get("id"),Long.parseLong(skuReq.getProductName()))));
+                try {
+                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%"), cb.equal(root.get("id"), Long.parseLong(skuReq.getProductName()))));
+                } catch (Exception e) {
+                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%")));
+                }
             }
             if (Objects.nonNull(skuReq.getProductId())) {
                 predicateList.add(cb.equal(root.get("productId"), skuReq.getProductId()));

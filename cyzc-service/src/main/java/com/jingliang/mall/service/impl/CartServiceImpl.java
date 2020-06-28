@@ -68,4 +68,9 @@ public class CartServiceImpl implements CartService {
         });
         cartRepository.saveAll(carts);
     }
+
+    @Override
+    public Integer countAllByBuyerId(Long buyerId) {
+        return cartRepository.countAllByBuyerIdAndIsAvailable(buyerId, true);
+    }
 }

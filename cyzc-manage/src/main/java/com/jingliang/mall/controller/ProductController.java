@@ -10,7 +10,6 @@ import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.SkuService;
-import com.jingliang.mall.utils.PageMapperUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -74,15 +73,6 @@ public class ProductController {
     @ApiOperation(value = "保存商品")
     public Result<ProductResp> save(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
-        if (StringUtils.isNotBlank(productReq.getProductArea())) {
-            String areas = productReq.getProductArea();
-            String[] area = areas.split(",");
-            String productArea = "";
-            for (String pa : area) {
-                productArea = productArea.concat(pa);
-            }
-            productReq.setProductArea(productArea);
-        }
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
                 || StringUtils.isBlank(productReq.getProductName())
                 || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs()) || productReq.getProductSort() == null

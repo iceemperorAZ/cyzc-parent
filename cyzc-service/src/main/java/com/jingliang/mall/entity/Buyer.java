@@ -206,6 +206,12 @@ public class Buyer implements Serializable {
     private String buyerImdUrls;
 
     /**
+     * 营业执照url集合
+     */
+    @Column(name = "business_license_urls")
+    private String businessLicenseUrls;
+
+    /**
      * 审核人id
      */
     @Column(name = "review_user_id")
@@ -228,6 +234,12 @@ public class Buyer implements Serializable {
      */
     @Column(name = "buyer_status")
     private Integer buyerStatus;
+
+    /**
+     * 商户类别标签
+     */
+    @Column(name = "buyer_type_label")
+    private String buyerTypeLabel;
 
     @Transient
     private String token;
