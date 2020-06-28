@@ -268,4 +268,10 @@ public class Product implements Serializable {
      */
     @Column(name = "product_details_img_url")
     private String productDetailsImgUrls;
+
+    /**
+     * 商品不展示的区编号
+     */
+    @Column(name = "product_area")
+    private String productArea;
 }

@@ -309,4 +309,10 @@ public class ProductResp implements Serializable {
     public Double getSellingPrice() {
         return sellingPrice / 100;
     }
+
+    /**
+     * 商品详情图
+     */
+    @ApiModelProperty(value = "商品不展示的区编号")
+    private String productArea;
 }

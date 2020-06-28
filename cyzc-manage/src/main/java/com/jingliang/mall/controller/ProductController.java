@@ -264,7 +264,14 @@ public class ProductController {
                 predicateList.add(cb.equal(root.get("productTypeId"), productReq.getProductTypeId()));
             }
             if (StringUtils.isNotBlank(productReq.getProductName())) {
-                predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"), cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%"),cb.equal(root.get("id"),Long.parseLong(productReq.getProductName()))));
+                try {
+                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"),
+                            cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%"),
+                            cb.equal(root.get("id"), Long.parseLong(productReq.getProductName()))));
+                } catch (Exception e) {
+                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + productReq.getProductName() + "%"),
+                            cb.like(root.get("productTypeName"), "%" + productReq.getProductName() + "%")));
+                }
             }
             if (Objects.nonNull(productReq.getProductZoneId())) {
                 predicateList.add(cb.equal(root.get("productZoneId"), productReq.getProductZoneId()));
@@ -277,7 +284,7 @@ public class ProductController {
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
-            query.orderBy(cb.desc(root.get("createTime")));
+            query.orderBy(cb.asc(root.get("productSort")));
             return query.getRestriction();
         };
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
