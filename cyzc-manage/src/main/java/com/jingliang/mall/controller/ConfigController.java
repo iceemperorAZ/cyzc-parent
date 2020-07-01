@@ -9,8 +9,8 @@ import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.ConfigReq;
 import com.jingliang.mall.resp.ConfigResp;
 import com.jingliang.mall.service.ConfigService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -33,7 +33,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2019-12-03 15:59:18
  */
-@Api(tags = "配置文件")
+@Api(description = "配置文件")
 @RequestMapping(value = "/back/config")
 @RestController
 @Slf4j
@@ -53,7 +53,7 @@ public class ConfigController {
     /**
      * 修改配置信息
      */
-    @ApiOperation(value = "修改配置信息")
+    @ApiOperation(description = "修改配置信息")
     @PostMapping("/update")
     public Result<ConfigResp> update(@RequestBody ConfigReq configReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", configReq);
@@ -71,7 +71,7 @@ public class ConfigController {
      * 分页查询全部配置
      */
     @GetMapping("/page/all")
-    @ApiOperation(value = "分页查询全部配置")
+    @ApiOperation(description = "分页查询全部配置")
     public Result<MallPage<ConfigResp>> pageAllProduct(ConfigReq configReq) {
         log.debug("请求参数：{}", configReq);
         PageRequest pageRequest = PageRequest.of(configReq.getPage(), configReq.getPageSize());

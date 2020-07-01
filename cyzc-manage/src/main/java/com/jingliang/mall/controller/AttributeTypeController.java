@@ -10,8 +10,8 @@ import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.AttributeTypeReq;
 import com.jingliang.mall.resp.AttributeTypeResp;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -38,7 +38,7 @@ import java.util.Objects;
 @RequestMapping("/back/attributeType")
 @RestController
 @Slf4j
-@Api(tags = "属性分类")
+@Api(description = "属性分类")
 public class AttributeTypeController {
     /**
      * session用户Key
@@ -55,7 +55,7 @@ public class AttributeTypeController {
      * 保存属性分类
      */
     @PostMapping("/save")
-    @ApiOperation(value = "保存属性分类")
+    @ApiOperation(description = "保存属性分类")
     public Result<AttributeTypeResp> save(@RequestBody AttributeTypeReq attributeTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", attributeTypeReq);
         if (Objects.isNull(attributeTypeReq.getProductTypeId()) || StringUtils.isBlank(attributeTypeReq.getAttributeTypeName())) {
@@ -73,7 +73,7 @@ public class AttributeTypeController {
     /**
      * 分页查询全部属性分类
      */
-    @ApiOperation(value = "分页查询全部属性分类")
+    @ApiOperation(description = "分页查询全部属性分类")
     @GetMapping("/page/all")
     public Result<MallPage<AttributeTypeResp>> pageAllAttributeType(AttributeTypeReq attributeTypeReq) {
         log.debug("请求参数：{}", attributeTypeReq);
@@ -100,7 +100,7 @@ public class AttributeTypeController {
     /**
      * 分页查询全部属性分类及属性值
      */
-    @ApiOperation(value = "分页查询全部属性分类及属性值")
+    @ApiOperation(description = "分页查询全部属性分类及属性值")
     @GetMapping("/page/sub/all")
     public Result<MallPage<AttributeTypeResp>> pageSubAllAttributeType(AttributeTypeReq attributeTypeReq) {
         log.debug("请求参数：{}", attributeTypeReq);

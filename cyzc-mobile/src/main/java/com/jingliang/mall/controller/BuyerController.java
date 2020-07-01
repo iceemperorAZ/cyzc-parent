@@ -1,6 +1,8 @@
 package com.jingliang.mall.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiParam;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.BuyerReq;
@@ -12,15 +14,13 @@ import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.*;
 import com.jingliang.mall.wx.service.WechatService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -35,7 +35,7 @@ import java.util.*;
  * @version 1.0.0
  * @date 2019-09-26 09:12:45
  */
-@Api(tags = "会员")
+@Api(description = "会员")
 @RequestMapping("/front/buyer")
 @RestController
 @Slf4j
@@ -83,7 +83,7 @@ public class BuyerController {
     /**
      * 微信登录
      */
-    @ApiOperation(value = "微信登录")
+    @ApiOperation(description = "微信登录")
     @PostMapping("/wechat/login")
     public Result<BuyerResp> login(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpServletResponse response) {
         log.debug("请求参数：{}", buyerReq);
@@ -157,7 +157,7 @@ public class BuyerController {
     /**
      * 登出
      */
-    @ApiOperation(value = "登出")
+    @ApiOperation(description = "登出")
     @PostMapping("/logout")
     public Result<Boolean> logout() {
         //暂未涉及
@@ -167,10 +167,10 @@ public class BuyerController {
     /**
      * 解析微信手机号
      */
-    @ApiOperation(value = "解析微信手机号")
+    @ApiOperation(description = "解析微信手机号")
     @GetMapping("/analysis/phone")
-    public Result<String> analysisPhone(@RequestParam @ApiParam("手机号加密算法的初始向量") String iv,
-                                        @RequestParam @ApiParam("手机号包括敏感数据在内的完整用户信息的加密数据") String encryptedData,
+    public Result<String> analysisPhone(@RequestParam @ApiParam(description = "手机号加密算法的初始向量") String iv,
+                                        @RequestParam @ApiParam(description = "手机号包括敏感数据在内的完整用户信息的加密数据") String encryptedData,
                                         @ApiIgnore HttpSession session) {
         log.debug("请求参数：iv={},encryptedData={}", iv, encryptedData);
         if (StringUtils.isBlank(iv) || StringUtils.isBlank(encryptedData)) {
@@ -192,7 +192,7 @@ public class BuyerController {
     /**
      * 修改当前用户的微信手机号
      */
-    @ApiOperation(value = "修改当前用户的微信手机号")
+    @ApiOperation(description = "修改当前用户的微信手机号")
     @PostMapping("/analysis/phone")
     public Result<String> analysisPhone(@RequestBody PhoneDataReq phoneDataReq,
                                         @ApiIgnore HttpSession session) {
@@ -219,7 +219,7 @@ public class BuyerController {
     /**
      * 修改会员信息
      */
-    @ApiOperation(value = "修改会员信息")
+    @ApiOperation(description = "修改会员信息")
     @PostMapping("/update")
     public Result<BuyerResp> update(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
@@ -250,7 +250,7 @@ public class BuyerController {
     /**
      * 绑定销售
      */
-    @ApiOperation(value = "绑定销售")
+    @ApiOperation(description = "绑定销售")
     @PostMapping("/binding/sale")
     public Result<BuyerResp> bindingSale(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
@@ -444,7 +444,7 @@ public class BuyerController {
      * 免责通知
      */
     @GetMapping("/exemption")
-    @ApiOperation(value = "免责通知")
+    @ApiOperation(description = "免责通知")
     public Result<String> analysisPhone() {
         return Result.buildQueryOk(Msg.EXEMPTION);
     }
@@ -453,7 +453,7 @@ public class BuyerController {
      * 签到
      */
     @PostMapping("/signIn")
-    @ApiOperation(value = "签到")
+    @ApiOperation(description = "签到")
     public Result<SignInResp> signIn(HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         LocalDate localDate = LocalDate.now();
@@ -471,7 +471,7 @@ public class BuyerController {
      * 查询签到
      */
     @GetMapping("/signIn")
-    @ApiOperation(value = "查询签到")
+    @ApiOperation(description = "查询签到")
     public Result<SignInResp> querySignIn(HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         SignIn signIn = signInService.querySignIn(buyer.getId());
@@ -483,7 +483,7 @@ public class BuyerController {
      * 充金币
      */
     @PostMapping("/recharge")
-    @ApiOperation(value = "充金币")
+    @ApiOperation(description = "充金币")
     public Result<Map<String, String>> recharge(@RequestBody Map<String, Long> map, HttpSession session) {
         Long id = map.get("id");
         Techarge techarge = techargeService.findById(id);
@@ -510,7 +510,7 @@ public class BuyerController {
     /**
      * 获取用户最新信息
      */
-    @ApiOperation(value = "获取用户最新信息")
+    @ApiOperation(description = "获取用户最新信息")
     @GetMapping("/buyer")
     public Result<BuyerResp> buyer(HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
@@ -521,7 +521,7 @@ public class BuyerController {
     /**
      * 登录(手机号+密码)
      */
-    @ApiOperation(value = "登录(手机号+密码)")
+    @ApiOperation(description = "登录(手机号+密码)")
     @PostMapping("/login/phone")
     public Result<BuyerResp> loginByPhone(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpServletResponse response) {
         log.debug("请求参数：{}", buyerReq);

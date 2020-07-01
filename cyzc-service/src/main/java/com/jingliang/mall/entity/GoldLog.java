@@ -1,6 +1,6 @@
 package com.jingliang.mall.entity;
 
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 

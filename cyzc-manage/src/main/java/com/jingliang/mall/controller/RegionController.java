@@ -5,8 +5,8 @@ import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Region;
 import com.jingliang.mall.resp.RegionResp;
 import com.jingliang.mall.service.RegionService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +21,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2019-09-25 19:09:47
  */
-@Api(tags = "区域")
+@Api(description = "区域")
 @RestController
 @RequestMapping("/back/region")
 @Slf4j
@@ -33,7 +33,7 @@ public class RegionController {
         this.regionService = regionService;
     }
 
-    @ApiOperation(value = "查询行政区域")
+    @ApiOperation(description = "查询行政区域")
     @GetMapping("/find")
     public Result<List<RegionResp>> findByParentCode(String parentCode) {
         log.debug("请求参数：{}", parentCode);

@@ -35,11 +35,9 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        //新版API
+        registry.addResourceHandler("/smart/**").addResourceLocations("classpath:/api/");
+        registry.addResourceHandler("/smart/api/**").addResourceLocations("classpath:/api/");
         super.addResourceHandlers(registry);
     }
 

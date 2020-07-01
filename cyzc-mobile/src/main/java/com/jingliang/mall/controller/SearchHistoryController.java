@@ -6,8 +6,8 @@ import com.jingliang.mall.entity.SearchHistory;
 import com.jingliang.mall.req.SearchHistoryReq;
 import com.jingliang.mall.resp.SearchHistoryResp;
 import com.jingliang.mall.service.SearchHistoryService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -33,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/front/searchHistory")
 @Slf4j
-@Api(tags = "历史搜索")
+@Api(description = "历史搜索")
 public class SearchHistoryController {
     /**
      * session用户Key
@@ -49,7 +49,7 @@ public class SearchHistoryController {
     /**
      * 保存搜索词到历史记录
      */
-    @ApiOperation(value = "保存搜索词到历史记录")
+    @ApiOperation(description = "保存搜索词到历史记录")
     @PostMapping("/save")
     public Result<SearchHistoryResp> save(@RequestBody SearchHistoryReq searchHistoryReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", searchHistoryReq);
@@ -63,7 +63,7 @@ public class SearchHistoryController {
     /**
      * 分页查询所有历史搜索
      */
-    @ApiOperation(value = "分页查询所有历史搜索")
+    @ApiOperation(description = "分页查询所有历史搜索")
     @GetMapping("/page/all")
     public Result<MallPage<SearchHistoryResp>> pageAll(SearchHistoryReq searchHistoryReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", searchHistoryReq);

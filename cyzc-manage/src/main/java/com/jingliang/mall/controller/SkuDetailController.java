@@ -11,8 +11,8 @@ import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.SkuDetailReq;
 import com.jingliang.mall.resp.SkuDetailResp;
 import com.jingliang.mall.server.RedisService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -36,7 +36,7 @@ import java.util.Objects;
  * @version 1.0.0
  * @date 2019-09-24 19:00:48
  */
-@Api(tags = "库存详情")
+@Api(description = "库存详情")
 @RequestMapping("/back/skuDetail")
 @RestController
 @Slf4j
@@ -57,7 +57,7 @@ public class SkuDetailController {
     /**
      * 追加库存
      */
-    @ApiOperation("追加库存")
+    @ApiOperation(description = "追加库存")
     @PostMapping("/save")
     public Result<SkuDetailResp> save(@RequestBody SkuDetailReq skuDetailReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", skuDetailReq);
@@ -82,7 +82,7 @@ public class SkuDetailController {
      * 分页查询全部库存详情列表
      */
     @GetMapping("/page/all")
-    @ApiOperation(value = "分页查询全部库存详情列表")
+    @ApiOperation(description = "分页查询全部库存详情列表")
     public Result<MallPage<SkuDetailResp>> pageAllProduct(SkuDetailReq skuDetailReq) {
         log.debug("请求参数：{}", skuDetailReq);
         PageRequest pageRequest = PageRequest.of(skuDetailReq.getPage(), skuDetailReq.getPageSize());

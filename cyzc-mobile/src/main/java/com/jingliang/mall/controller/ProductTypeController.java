@@ -5,8 +5,8 @@ import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.req.ProductTypeReq;
 import com.jingliang.mall.resp.ProductTypeResp;
 import com.jingliang.mall.service.ProductTypeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -31,7 +31,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping("/front/productType")
-@Api(tags = "商品分类")
+@Api(description = "商品分类")
 public class ProductTypeController {
 
     private final ProductTypeService productTypeService;
@@ -43,7 +43,7 @@ public class ProductTypeController {
     /**
      * 分页查询所有商品分类
      */
-    @ApiOperation(value = "分页查询所有商品分类")
+    @ApiOperation(description = "分页查询所有商品分类")
     @GetMapping("/page/all")
     public Result<MallPage<ProductTypeResp>> pageAllProductTypeResp(ProductTypeReq productTypeReq) {
         log.debug("请求参数：{}", productTypeReq);
@@ -70,7 +70,7 @@ public class ProductTypeController {
     /**
      * 分页查询所有商品分类
      */
-    @ApiOperation(value = "分页查询所有商品分类")
+    @ApiOperation(description = "分页查询所有商品分类")
     @GetMapping("/list/all")
     public Result<List<ProductTypeResp>> listAllProductTypeResp() {
         List<ProductTypeResp> productTypeResps = new ArrayList<>();
@@ -89,7 +89,7 @@ public class ProductTypeController {
      */
     //TODO 这个接口手机宝哥提出来，暂时顶替秒杀页面的策略
     @GetMapping("/findFirst")
-    @ApiOperation(value = "查询分类集合的第一个")
+    @ApiOperation(description = "查询分类集合的第一个")
     public Result<ProductTypeResp> findFirst() {
         ProductType productType = productTypeService.findFirst();
         ProductTypeResp productTypeResp = BeanMapper.map(productType, ProductTypeResp.class);

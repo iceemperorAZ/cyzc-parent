@@ -11,8 +11,8 @@ import com.jingliang.mall.req.RoleReq;
 import com.jingliang.mall.resp.RoleResp;
 import com.jingliang.mall.service.RoleService;
 import com.jingliang.mall.service.UserRoleService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 @RequestMapping(value = "/back/role")
-@Api(tags = "角色表")
+@Api(description = "角色表")
 public class RoleController {
     /**
      * session用户Key
@@ -59,7 +59,7 @@ public class RoleController {
      * 分页查询全部角色
      */
     @GetMapping("/page/all")
-    @ApiOperation(value = "分页查询全部角色")
+    @ApiOperation(description = "分页查询全部角色")
     public Result<MallPage<RoleResp>> pageAllProduct(RoleReq roleReq) {
         log.debug("请求参数：{}", roleReq);
         PageRequest pageRequest = PageRequest.of(roleReq.getPage(), roleReq.getPageSize());
@@ -91,7 +91,7 @@ public class RoleController {
         return Result.buildQueryOk(roleRespMallPage);
     }
     @PostMapping("/save")
-    @ApiOperation(value = "保存/更新角色")
+    @ApiOperation(description = "保存/更新角色")
     public Result<RoleResp> save(@RequestBody RoleReq roleReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", roleReq);
         if (StringUtils.isBlank(roleReq.getRoleName()) || StringUtils.isBlank(roleReq.getRoleNameZh())|| StringUtils.isBlank(roleReq.getRemark())) {
@@ -104,7 +104,7 @@ public class RoleController {
         return Result.buildSaveOk(roleResp);
     }
     @PostMapping("/delete")
-    @ApiOperation(value = "删除角色")
+    @ApiOperation(description = "删除角色")
     public Result<RoleResp> delete(@RequestBody RoleReq roleReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", roleReq);
         if (Objects.isNull(roleReq.getId())) {

@@ -8,14 +8,14 @@ import com.jingliang.mall.entity.GiveGold;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.resp.GiveGoldResp;
 import com.jingliang.mall.service.GiveGoldService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @RestController
 @Slf4j
-@Api(tags = "赠送金币")
+@Api(description = "赠送金币")
 @RequestMapping(value = "/back/giveGold")
 public class GiveGoldController {
 
@@ -50,7 +50,7 @@ public class GiveGoldController {
      * 赠送金币
      */
     @PostMapping("/save")
-    @ApiOperation("赠送金币")
+    @ApiOperation(description = "赠送金币")
     public Result<GiveGoldResp> give(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Long buyerId = Long.parseLong(map.get("buyerId"));
@@ -64,7 +64,7 @@ public class GiveGoldController {
      * 审批赠送金币
      */
     @PostMapping("/approval")
-    @ApiOperation("审批赠送金币")
+    @ApiOperation(description = "审批赠送金币")
     public Result<Boolean> approval(@RequestBody Map<String, String> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Long id = Long.parseLong(map.get("id"));
@@ -77,7 +77,7 @@ public class GiveGoldController {
      * 分页查询所有赠送金币记录
      */
     @GetMapping("/page/all")
-    @ApiOperation("分页查询所有赠送金币记录")
+    @ApiOperation(description = "分页查询所有赠送金币记录")
     public Result<MallPage<GiveGoldResp>> pageAll(Long buyerId, @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize, @ApiIgnore HttpSession session) {
         PageRequest pageRequest = PageRequest.of(page, pageSize);
         Page<GiveGold> giveGoldPage = giveGoldService.pageAll(buyerId, pageRequest);

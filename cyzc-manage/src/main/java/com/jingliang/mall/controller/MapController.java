@@ -4,7 +4,7 @@ import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.service.MapService;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
@@ -140,7 +140,7 @@ public class MapController {
      * 根据分区查询销售员定位的最后一条记录
      * */
     @GetMapping("/searchSaleByGroup")
-    @ApiOperation("根据分区查询销售员定位的最后一条记录")
+    @ApiOperation(description = "根据分区查询销售员定位的最后一条记录")
     public Result<?> searchSaleByGroup(String groupNo) {
         List<Map<String, Object>> mapList = mapService.searchSaleByGroup(groupNo);
         Map<String, Map<String, Object>> map = new HashMap<>(156);

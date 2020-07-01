@@ -11,8 +11,8 @@ import com.jingliang.mall.service.BuyerSaleService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.GoldLogService;
 import com.jingliang.mall.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.CreationHelper;
@@ -26,7 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -43,7 +43,7 @@ import java.util.*;
  * @version 1.0.0
  * @date 2019-09-26 09:12:45
  */
-@Api(tags = "会员")
+@Api(description = "会员")
 @RequestMapping("/back/buyer")
 @RestController("backBuyerController")
 @Slf4j
@@ -74,7 +74,7 @@ public class BuyerController {
     /**
      * 修改会员信息
      */
-    @ApiOperation(value = "修改会员信息")
+    @ApiOperation(description = "修改会员信息")
     @PostMapping("/save")
     public Result<BuyerResp> save(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
@@ -102,7 +102,7 @@ public class BuyerController {
     /**
      * 重新绑定销售
      */
-    @ApiOperation(value = "重新绑定销售")
+    @ApiOperation(description = "重新绑定销售")
     @PostMapping("/update/saleUser")
     public Result<BuyerResp> updateSaleUser(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
@@ -151,7 +151,7 @@ public class BuyerController {
      * 分页查询全部会员
      */
     @GetMapping("/page/all")
-    @ApiOperation(value = "分页查询全部会员")
+    @ApiOperation(description = "分页查询全部会员")
     public Result<MallPage<BuyerResp>> pageAllProduct(BuyerReq buyerReq) {
         log.debug("请求参数：{}", buyerReq);
         PageRequest pageRequest = PageRequest.of(buyerReq.getPage(), buyerReq.getPageSize());
@@ -175,7 +175,7 @@ public class BuyerController {
     /**
      * 导出excel
      */
-    @ApiOperation(value = "导出商户信息excel")
+    @ApiOperation(description = "导出商户信息excel")
     @GetMapping("/download/excel")
     public ResponseEntity<byte[]> download(BuyerReq buyerReq) throws IOException {
         Specification<Buyer> buyerSpecification = (Specification<Buyer>) (root, query, cb) -> {
@@ -237,7 +237,7 @@ public class BuyerController {
      *
      * @return
      */
-    @ApiOperation(value = "拉黑/解封商户")
+    @ApiOperation(description = "拉黑/解封商户")
     @PostMapping("/sealUpBuyer")
     public Result<?> sealUpBuyer(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
@@ -262,7 +262,7 @@ public class BuyerController {
     /**
      * 分页查询黑名单商户
      */
-    @ApiOperation(value = "分页查询黑名单商户")
+    @ApiOperation(description = "分页查询黑名单商户")
     @GetMapping("/findBlackBuyer")
     public Result<MallPage<BuyerResp>> findBlackBuyer(BuyerReq buyerReq){
         log.debug("请求参数：{}", buyerReq);

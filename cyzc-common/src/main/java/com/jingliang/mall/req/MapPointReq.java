@@ -1,9 +1,9 @@
 package com.jingliang.mall.req;
 
 import lombok.Data;
-import io.swagger.annotations.ApiModel;
+import com.citrsw.annatation.ApiModel;
 import lombok.EqualsAndHashCode;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiProperty;
 
 import javax.persistence.Column;
 import java.io.Serializable;
@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @version 1.0.0
  * @date 2020-05-29 09:19:03
  */
-@ApiModel(value = "MapPointReq", description = "保存地图信息")
+@ApiModel(name = "MapPointReq", description = "保存地图信息")
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class MapPointReq extends BaseReq implements Serializable {
@@ -25,19 +25,19 @@ public class MapPointReq extends BaseReq implements Serializable {
 	/**
 	 * 主键
 	 */
-	@ApiModelProperty(value = "主键")
+	@ApiProperty(description = "主键")
 	private Long id;
 
 	/**
 	 * 编号
 	 */
-	@ApiModelProperty(value = "编号")
+	@ApiProperty(description = "编号")
 	private String mapNo;
 
 	/**
 	 * 地图名称
 	 */
-	@ApiModelProperty(value = "地图名称")
+	@ApiProperty(description = "地图名称")
 	private String mapName;
 
 	/**

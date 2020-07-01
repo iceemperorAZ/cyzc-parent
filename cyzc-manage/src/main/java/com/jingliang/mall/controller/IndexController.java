@@ -3,8 +3,8 @@ package com.jingliang.mall.controller;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Order;
 import com.jingliang.mall.service.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +22,7 @@ import java.util.List;
  * @date 2020-01-02 14:36:40
  */
 @RestController
-@Api(tags = "首页数据")
+@Api(description = "首页数据")
 public class IndexController {
     private final UserService userService;
     private final BuyerService buyerService;
@@ -42,7 +42,7 @@ public class IndexController {
      * 查询近[type]天的成交额 -1:全部，几天就传几 ,0:表示当天
      */
     @GetMapping("/turnover")
-    @ApiOperation(value = "查询近[type]天的成交额 -1:全部，几天就传几")
+    @ApiOperation(description = "查询近[type]天的成交额 -1:全部，几天就传几")
     public Result<Double> turnover(Integer type) {
         if (type == null) {
             return Result.buildParamFail();

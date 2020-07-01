@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiModel;
+import com.citrsw.annatation.ApiProperty;
 
 import javax.persistence.Column;
 import java.io.Serializable;
@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @date 2020-05-29 09:19:03
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(value = "MapPointResp", description = "保存地图信息")
+@ApiModel(name = "MapPointResp", description = "保存地图信息")
 @Data
 public class MapPointResp implements Serializable {
 
@@ -27,20 +27,20 @@ public class MapPointResp implements Serializable {
 	/**
 	 * 主键
 	 */
-	@ApiModelProperty(value = "主键")
+	@ApiProperty(description = "主键")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 
 	/**
 	 * 编号
 	 */
-	@ApiModelProperty(value = "编号")
+	@ApiProperty(description = "编号")
 	private String mapNo;
 
 	/**
 	 * 地图名称
 	 */
-	@ApiModelProperty(value = "地图名称")
+	@ApiProperty(description = "地图名称")
 	private String mapName;
 
 	/**

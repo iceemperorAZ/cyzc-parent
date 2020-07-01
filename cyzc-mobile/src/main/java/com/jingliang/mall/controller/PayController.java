@@ -8,8 +8,8 @@ import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.service.*;
 import com.jingliang.mall.wx.service.WechatService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @date 2019-10-18 14:08
  */
-@Api(tags = "支付")
+@Api(description = "支付")
 @RestController
 @Slf4j
 @RequestMapping("/front/pay")
@@ -130,7 +130,7 @@ public class PayController {
     /**
      * 订单继续微信支付
      */
-    @ApiOperation("订单继续微信支付")
+    @ApiOperation(description = "订单继续微信支付")
     @PostMapping("/wechat/pay")
     public Result<Map<String, String>> wechatPay(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq.getId());

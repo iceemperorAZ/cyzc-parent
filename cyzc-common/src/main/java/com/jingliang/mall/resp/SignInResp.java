@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiModel;
+import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -23,7 +23,7 @@ import java.util.Date;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@ApiModel(value = "SignInResp", description = "签到日志")
+@ApiModel(name = "SignInResp", description = "签到日志")
 public class SignInResp implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -31,27 +31,27 @@ public class SignInResp implements Serializable {
     /**
      * 主键Id
      */
-    @ApiModelProperty(value = "主键Id")
+    @ApiProperty(description = "主键Id")
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
      * 商户Id
      */
-    @ApiModelProperty(value = "商户Id")
+    @ApiProperty(description = "商户Id")
     @JsonSerialize(using = ToStringSerializer.class)
     private Long buyerId;
 
     /**
      * 连续签到天数
      */
-    @ApiModelProperty(value = "连续签到天数")
+    @ApiProperty(description = "连续签到天数")
     private Integer dayNum;
 
     /**
      * 最后一次签到日期
      */
-    @ApiModelProperty(value = "最后一次签到日期")
+    @ApiProperty(description = "最后一次签到日期")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastDate;
@@ -63,7 +63,7 @@ public class SignInResp implements Serializable {
     /**
      * 是否可用 0：否，1：是
      */
-    @ApiModelProperty(value = "是否可用 0：否，1：是")
+    @ApiProperty(description = "是否可用 0：否，1：是")
     private Boolean isAvailable;
 
 

@@ -5,8 +5,8 @@ import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Techarge;
 import com.jingliang.mall.resp.TechargeResp;
 import com.jingliang.mall.service.TechargeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping(value = "/front/techarge")
-@Api(tags = "充值配置")
+@Api(description = "充值配置")
 public class TechargeController {
 
     private final TechargeService techargeService;
@@ -38,7 +38,7 @@ public class TechargeController {
      * 查询全部
      */
     @GetMapping("/all")
-    @ApiOperation("查询全部")
+    @ApiOperation(description = "查询全部")
     public Result<List<TechargeResp>> findAll() {
         List<Techarge> techarges = techargeService.findAllShow();
         return Result.buildQueryOk(BeanMapper.mapList(techarges, TechargeResp.class));

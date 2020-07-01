@@ -1,6 +1,6 @@
 package com.jingliang.mall.req;
 
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 
 /**
@@ -11,8 +11,8 @@ import lombok.Data;
  */
 @Data
 public class PhoneDataReq {
-    @ApiModelProperty("手机号加密算法的初始向量")
+    @ApiProperty(description = "手机号加密算法的初始向量")
     private String iv;
-    @ApiModelProperty("手机号包括敏感数据在内的完整用户信息的加密数据")
+    @ApiProperty(description = "手机号包括敏感数据在内的完整用户信息的加密数据")
     private String encryptedData;
 }

@@ -5,8 +5,8 @@ import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.resp.OrderResp;
 import com.jingliang.mall.service.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -42,7 +42,7 @@ import static com.jingliang.mall.common.NullToString.nullString;
  * @date 2019-09-26 11:25:09
  */
 @RequestMapping("/back/order")
-@Api(tags = "订单")
+@Api(description = "订单")
 @Slf4j
 @RestController("backOrderController")
 public class OrderController {
@@ -68,7 +68,7 @@ public class OrderController {
     /**
      * 发货
      */
-    @ApiOperation(value = "发货")
+    @ApiOperation(description = "发货")
     @PostMapping("/deliver")
     public Result<OrderResp> deliver(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
@@ -103,7 +103,7 @@ public class OrderController {
     /**
      * 发货
      */
-    @ApiOperation(value = "批量发货")
+    @ApiOperation(description = "批量发货")
     @PostMapping("/deliverAll")
     public Result<List<OrderResp>> deliverAll(@RequestBody Map<String, Object> map, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", map);
@@ -163,7 +163,7 @@ public class OrderController {
     /**
      * 退货(不扣绩效)
      */
-    @ApiOperation(value = "退货(不扣绩效)")
+    @ApiOperation(description = "退货(不扣绩效)")
     @PostMapping("/refunds")
     public Result<OrderResp> refunds(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
@@ -190,7 +190,7 @@ public class OrderController {
     /**
      * 退货(扣绩效)
      */
-    @ApiOperation(value = "退货(扣绩效)")
+    @ApiOperation(description = "退货(扣绩效)")
     @PostMapping("/refunds/money")
     public Result<OrderResp> refundsMoney(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
@@ -217,7 +217,7 @@ public class OrderController {
     /**
      * 分页查询全部用户订单信息
      */
-    @ApiOperation(value = "分页查询全部用户订单信息")
+    @ApiOperation(description = "分页查询全部用户订单信息")
     @GetMapping("/page/all")
     public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, String region, @RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) {
         log.debug("请求参数：{}", orderReq);
@@ -268,7 +268,7 @@ public class OrderController {
     /**
      * 导出excel
      */
-    @ApiOperation(value = "导出订单excel")
+    @ApiOperation(description = "导出订单excel")
     @GetMapping("/download/excel")
     public ResponseEntity<byte[]> download(OrderReq orderReq, @RequestParam(value = "orderStatuses", required = false) List<Integer> orderStatuses) throws IOException {
         Specification<Order> orderSpecification = (Specification<Order>) (root, query, cb) -> {
@@ -460,7 +460,7 @@ public class OrderController {
     /**
      * 导出excel优化第二版
      */
-    @ApiOperation(value = "导出订单excel")
+    @ApiOperation(description = "导出订单excel")
     @GetMapping("/fast/excel")
     public ResponseEntity<byte[]> download() throws IOException {
         XSSFWorkbook orderWorkbook = ExcelUtils.createExcelXlsx("销货单", Msg.orderExcelTitle);

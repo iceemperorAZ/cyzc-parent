@@ -8,14 +8,14 @@ import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.TurntableLog;
 import com.jingliang.mall.resp.TurntableLogResp;
 import com.jingliang.mall.service.TurntableLogService;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/front/turntableLog")
 @Slf4j
-@Api(tags = "转盘日志")
+@Api(description = "转盘日志")
 public class TurntableLogController {
 
     @Value("${session.buyer.key}")

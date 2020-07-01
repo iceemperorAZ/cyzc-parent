@@ -7,13 +7,13 @@ import com.jingliang.mall.req.OfflinePaymentReq;
 import com.jingliang.mall.resp.OfflinePaymentResp;
 import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.service.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(value = "/back/offlinePayment")
 @Slf4j
-@Api(tags = "线下支付")
+@Api(description = "线下支付")
 public class OfflinePaymentController {
     /**
      * session用户Key
@@ -64,7 +64,7 @@ public class OfflinePaymentController {
      * 保存/更新支付凭证
      */
     @PostMapping("/save")
-    @ApiOperation(value = "保存/更新支付凭证")
+    @ApiOperation(description = "保存/更新支付凭证")
     public Result<OfflinePaymentResp> save(@RequestBody OfflinePaymentReq offlinePaymentReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", offlinePaymentReq);
         if (Objects.isNull(offlinePaymentReq.getOrderId()) || StringUtils.isBlank(offlinePaymentReq.getRemark()) || Objects.isNull(offlinePaymentReq.getImgBase64s())) {
@@ -127,7 +127,7 @@ public class OfflinePaymentController {
      * 根据订单Id查询支付凭证
      */
     @GetMapping("/findByOrderId")
-    @ApiOperation(value = "根据订单Id查询支付凭证")
+    @ApiOperation(description = "根据订单Id查询支付凭证")
     public Result<OfflinePaymentResp> save(Long orderId) {
         log.debug("请求参数：orderId= {}", orderId);
         if (Objects.isNull(orderId)) {

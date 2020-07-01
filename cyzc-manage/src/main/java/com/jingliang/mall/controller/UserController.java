@@ -9,8 +9,8 @@ import com.jingliang.mall.resp.UserResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * @version 1.0.0
  * @date 2019-09-22 14:40:54
  */
-@Api(tags = "员工")
+@Api(description = "员工")
 @RestController("backUserController")
 @Slf4j
 @RequestMapping("/back/user")
@@ -64,7 +64,7 @@ public class UserController {
     /**
      * 登录
      */
-    @ApiOperation(value = "登录")
+    @ApiOperation(description = "登录")
     @PostMapping("login")
     public Result<UserResp> login() {
         return Result.buildOk();
@@ -73,7 +73,7 @@ public class UserController {
     /**
      * 修改用户密码
      */
-    @ApiOperation(value = "修改用户密码")
+    @ApiOperation(description = "修改用户密码")
     @PostMapping("/modify/password")
     public Result<UserResp> changePassword(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
@@ -109,7 +109,7 @@ public class UserController {
     /**
      * 重置其他用户密码
      */
-    @ApiOperation(value = "重置其他用户密码")
+    @ApiOperation(description = "重置其他用户密码")
     @PostMapping("/modify/other/password")
     public Result<UserResp> changeOtherPassword(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
@@ -141,7 +141,7 @@ public class UserController {
     /**
      * 登出
      */
-    @ApiOperation(value = "登出")
+    @ApiOperation(description = "登出")
     @PostMapping("/logout")
     public Result<Boolean> logout() {
         return Result.buildOk(true);
@@ -151,7 +151,7 @@ public class UserController {
      * 新增用户
      */
     @PostMapping("/save")
-    @ApiOperation(value = "新增用户")
+    @ApiOperation(description = "新增用户")
     public Result<UserResp> save(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
         if (Objects.nonNull(userReq.getBuyerId())) {
@@ -194,7 +194,7 @@ public class UserController {
      * 根据商户Id查询绑定销售信息
      */
     @GetMapping("/findUserByBuyerId")
-    @ApiOperation(value = "根据商户Id查询绑定销售信息")
+    @ApiOperation(description = "根据商户Id查询绑定销售信息")
     public Result<BuyerResp> findUserByBuyerId(Long buyerId) {
         Buyer buyer = buyerService.findById(buyerId);
         if (Objects.isNull(buyer) || Objects.isNull(buyer.getSaleUserId())) {
@@ -211,7 +211,7 @@ public class UserController {
      * 查询所有用户
      */
     @GetMapping("/page/all")
-    @ApiOperation(value = "分页查询所有用户")
+    @ApiOperation(description = "分页查询所有用户")
     public Result<MallPage<UserResp>> pageAllUser(UserReq userReq) {
         log.debug("请求参数：{}", userReq);
         PageRequest pageRequest = PageRequest.of(userReq.getPage(), userReq.getPageSize());
@@ -241,7 +241,7 @@ public class UserController {
      * 根据分组编号查询用户
      */
     @GetMapping("/all/groupNo")
-    @ApiOperation(value = "根据分组编号查询用户")
+    @ApiOperation(description = "根据分组编号查询用户")
     public Result<List<UserResp>> allGroupNo(String groupNo) {
         return Result.buildQueryOk(BeanMapper.mapList(userService.likeAllByGroupNo(groupNo.replaceAll("0*$", "")), UserResp.class));
     }
@@ -250,7 +250,7 @@ public class UserController {
      * 查询所有未分配的用户
      */
     @GetMapping("/all/ungrouped")
-    @ApiOperation(value = "查询所有未分配的用户")
+    @ApiOperation(description = "查询所有未分配的用户")
     public Result<List<UserResp>> allUngrouped() {
         return Result.buildQueryOk(BeanMapper.mapList(userService.allUngrouped(), UserResp.class));
     }
@@ -259,7 +259,7 @@ public class UserController {
      * 移动/分配用户到组
      */
     @PostMapping("/distribution")
-    @ApiOperation(value = "移动/分配用户到组")
+    @ApiOperation(description = "移动/分配用户到组")
     public Result<Boolean> distribution(@RequestBody Map<String, Object> map) {
         String groupNo = (String) map.get("groupNo");
         List<Long> userIds = ((List<?>) map.get("userIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
@@ -271,7 +271,7 @@ public class UserController {
      * 移除用户到未分配
      */
     @PostMapping("/remove/ungrouped")
-    @ApiOperation(value = "移除用户到未分配")
+    @ApiOperation(description = "移除用户到未分配")
     public Result<Boolean> removeToUngrouped(@RequestBody Map<String, Object> map) {
         List<Long> userIds = ((List<?>) map.get("userIds")).stream().map(p -> Long.valueOf(p.toString())).collect(Collectors.toList());
         userService.removeToUngrouped(userIds);
@@ -282,7 +282,7 @@ public class UserController {
      * 根据id逻辑删除用户
      */
     @PostMapping("/delete")
-    @ApiOperation(value = "根据id逻辑删除用户")
+    @ApiOperation(description = "根据id逻辑删除用户")
     public Result<?> deleteUser(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
         if (userReq.getId() <= 0 || userReq.getId() == null) {
@@ -315,7 +315,7 @@ public class UserController {
      * 查询当前区域经理下的所有销售
      */
     @GetMapping("/all/region/groupNo")
-    @ApiOperation(value = "根据分组编号查询用户")
+    @ApiOperation(description = "根据分组编号查询用户")
     public Result<List<UserResp>> allRegionGroupNo(@ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         if (user.getLevel() < 110) {
@@ -331,7 +331,7 @@ public class UserController {
      * @param session
      * @return
      */
-    @ApiOperation(value = "根据用户id查询名下所有可用的商户")
+    @ApiOperation(description = "根据用户id查询名下所有可用的商户")
     @GetMapping("/findAllBuyer")
     public Result<List<BuyerResp>> findAllByUserId(UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
@@ -349,7 +349,7 @@ public class UserController {
      * @param session
      * @return
      */
-    @ApiOperation(value = "批量操作商户重新绑定销售")
+    @ApiOperation(description = "批量操作商户重新绑定销售")
     @PostMapping("/update/allSaleUser")
     public Result<Boolean> updateSaleUserToAll(@RequestBody Map<String, Object> map, @ApiIgnore HttpSession session) {
         //TODO 订单功能新增了销售帮客户下单，这时候，如果订单未完成，销售歇逼了，这个订单就歇了，这部分需要修改，代订，提出时间：time：2020/6/2
@@ -380,10 +380,10 @@ public class UserController {
     }
 
     /**
-     * 查询所有用户(通过名字/工号)
+     * 查询所有用户
      */
     @GetMapping("/list/all")
-    @ApiOperation(value = "查询所有用户(通过名字/工号)")
+    @ApiOperation(description = "查询所有用户")
     public Result<List<UserResp>> listAllUser(UserReq userReq) {
         log.debug("请求参数：{}", userReq);
         Specification<User> userSpecification = (Specification<User>) (root, query, cb) -> {

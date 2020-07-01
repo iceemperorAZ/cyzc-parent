@@ -11,13 +11,12 @@ import com.jingliang.mall.req.BuyerCouponLimitReq;
 import com.jingliang.mall.resp.BuyerCouponLimitResp;
 import com.jingliang.mall.service.BuyerCouponLimitService;
 import com.jingliang.mall.service.ProductTypeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
  */
 @RequestMapping(value = "/back/buyerCouponLimit")
 @RestController
-@Api(tags = "用户优惠券使用限制")
+@Api(description = "用户优惠券使用限制")
 @Slf4j
 public class BuyerCouponLimitController {
     /**
@@ -55,7 +54,7 @@ public class BuyerCouponLimitController {
     /**
      * 保存/修改用户优惠券使用限制
      */
-    @ApiOperation(value = "保存/修改用户优惠券使用限制")
+   @ApiOperation(description = "保存/修改用户优惠券使用限制")
     @PostMapping("/save")
     public Result<BuyerCouponLimitResp> save(@RequestBody BuyerCouponLimitReq buyerCouponLimitReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponLimitReq);
@@ -78,9 +77,9 @@ public class BuyerCouponLimitController {
     /**
      * 根据商户Id查询全部用户优惠券使用限制
      */
-    @ApiOperation(value = "根据商户Id查询全部用户优惠券使用限制")
+   @ApiOperation(description = "根据商户Id查询全部用户优惠券使用限制")
     @GetMapping("/all")
-    @ApiImplicitParam(name = "商户Id", value = "buyerId", required = true, paramType = "Long")
+//    @ApiImplicitParam(name = "商户Id", value = "buyerId", required = true, paramType = "Long")
     public Result<List<BuyerCouponLimitResp>> findAll(@ApiIgnore BuyerCouponLimitReq buyerCouponLimitReq) {
         log.debug("请求参数：{}", buyerCouponLimitReq.getBuyerId());
         if (Objects.isNull(buyerCouponLimitReq.getBuyerId())) {

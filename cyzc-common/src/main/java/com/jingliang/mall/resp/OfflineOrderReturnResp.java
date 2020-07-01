@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Date;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 
@@ -18,7 +18,7 @@ import java.io.Serializable;
  * @version 1.0.0
  * @date 2020-04-20 17:57:20
  */
-@Api(value = "退货表")
+@Api(description = "退货表")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 public class OfflineOrderReturnResp implements Serializable {
@@ -28,70 +28,70 @@ public class OfflineOrderReturnResp implements Serializable {
 	/**
 	 * 主键Id
 	 */
-	@ApiModelProperty(value = "主键Id")
+	@ApiProperty(description = "主键Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 
 	/**
 	 * 原订单Id
 	 */
-	@ApiModelProperty(value = "原订单Id")
+	@ApiProperty(description = "原订单Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long orderId;
 
 	/**
 	 * 商品名称
 	 */
-	@ApiModelProperty(value = "商品名称")
+	@ApiProperty(description = "商品名称")
 	private String productName;
 
 	/**
 	 * 商品规格
 	 */
-	@ApiModelProperty(value = "商品规格")
+	@ApiProperty(description = "商品规格")
 	private String productSpecification;
 
 	/**
 	 * 单位
 	 */
-	@ApiModelProperty(value = "单位")
+	@ApiProperty(description = "单位")
 	private String company;
 
 	/**
 	 * 数量
 	 */
-	@ApiModelProperty(value = "数量")
+	@ApiProperty(description = "数量")
 	private Integer num;
 
 	/**
 	 * 单价(单位：分)
 	 */
-	@ApiModelProperty(value = "单价(单位：分)")
+	@ApiProperty(description = "单价(单位：分)")
 	private Integer unitPrice;
 
 	/**
 	 * 总价(单位：分)
 	 */
-	@ApiModelProperty(value = "总价(单位：分)")
+	@ApiProperty(description = "总价(单位：分)")
 	private Integer totalPrice;
 
 	/**
 	 * 状态(退货中，退货完成/退款中，退款完成/结束)
 	 */
-	@ApiModelProperty(value = "状态(退货中，退货完成/退款中，退款完成/结束)")
+	@ApiProperty(description = "状态(退货中，退货完成/退款中，退款完成/结束)")
 	private Integer orderStatus;
 
 	/**
 	 * 操作人Id
 	 */
-	@ApiModelProperty(value = "操作人Id")
+	@ApiProperty(description = "操作人Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long createUserId;
 
 	/**
 	 * 操作时间
 	 */
-	@ApiModelProperty(value = "操作时间")
+	@ApiProperty(description = "操作时间")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date createTime;
@@ -99,14 +99,14 @@ public class OfflineOrderReturnResp implements Serializable {
 	/**
 	 * 退款人Id
 	 */
-	@ApiModelProperty(value = "退款人Id")
+	@ApiProperty(description = "退款人Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long refundUserId;
 
 	/**
 	 * 退款时间
 	 */
-	@ApiModelProperty(value = "退款时间")
+	@ApiProperty(description = "退款时间")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date refundTime;

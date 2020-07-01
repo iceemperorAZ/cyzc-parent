@@ -11,7 +11,7 @@ import com.jingliang.mall.req.TurntableReq;
 import com.jingliang.mall.resp.TurntableResp;
 import com.jingliang.mall.service.BuyerAddressService;
 import com.jingliang.mall.service.TurntableService;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2020-03-12 17:34:10
  */
-@Api(tags = "转盘")
+@Api(description = "转盘")
 @RestController
 @RequestMapping(value = "/front/turntable")
 @Slf4j

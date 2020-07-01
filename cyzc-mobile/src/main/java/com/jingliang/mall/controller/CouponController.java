@@ -9,8 +9,8 @@ import com.jingliang.mall.req.CouponReq;
 import com.jingliang.mall.resp.CouponResp;
 import com.jingliang.mall.service.BuyerCouponService;
 import com.jingliang.mall.service.CouponService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * @date 2019-09-25 19:09:02
  */
 @RestController
-@Api(tags = "优惠券")
+@Api(description = "优惠券")
 @Slf4j
 @RequestMapping("/front/coupon")
 public class CouponController {
@@ -53,7 +53,7 @@ public class CouponController {
     /**
      * 查询全部优惠券
      */
-    @ApiOperation(value = "查询全部优惠券")
+    @ApiOperation(description = "查询全部优惠券")
     @GetMapping("/all")
     public Result<List<CouponResp>> pageAllCoupon(CouponReq couponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", couponReq);

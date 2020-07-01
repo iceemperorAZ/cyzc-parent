@@ -8,8 +8,8 @@ import com.jingliang.mall.req.SkuReq;
 import com.jingliang.mall.resp.SkuResp;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.SkuService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
@@ -35,7 +35,7 @@ import java.util.Objects;
  * @date 2019-09-22 14:40:54
  */
 @RequestMapping("/back/sku")
-@Api(tags = "商品库存")
+@Api(description = "商品库存")
 @RestController
 @Slf4j
 public class SkuController {
@@ -51,7 +51,7 @@ public class SkuController {
     /**
      * 分页查询所有库存
      */
-    @ApiOperation(value = "分页查询所有库存")
+    @ApiOperation(description = "分页查询所有库存")
     @GetMapping("/page/all")
     public Result<MallPage<SkuResp>> pageAll(SkuReq skuReq) throws UnsupportedEncodingException {
         log.debug("请求参数:{}", skuReq);

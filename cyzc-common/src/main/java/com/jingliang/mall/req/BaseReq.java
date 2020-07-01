@@ -1,6 +1,6 @@
 package com.jingliang.mall.req;
 
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -70,7 +70,7 @@ public class BaseReq implements Serializable {
     /**
      * 当前页
      */
-    @ApiModelProperty(value = "当前页")
+    @ApiProperty(description = "当前页")
     private Integer page = 1;
 
     public Integer getPage() {
@@ -80,12 +80,12 @@ public class BaseReq implements Serializable {
     /**
      * 每页条数
      */
-    @ApiModelProperty(value = "每页条数")
+    @ApiProperty(description = "每页条数")
     private Integer pageSize = 10;
 
     /**
      * 排序条件
      */
-    @ApiModelProperty(value = "排序条件")
+    @ApiProperty(description = "排序条件")
     private String clause;
 }

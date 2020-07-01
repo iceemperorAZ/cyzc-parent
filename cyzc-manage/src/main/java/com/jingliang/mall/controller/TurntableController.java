@@ -10,13 +10,13 @@ import com.jingliang.mall.req.TurntableReq;
 import com.jingliang.mall.resp.TurntableResp;
 import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.service.TurntableService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.Map;
  * @version 1.0.0
  * @date 2020-03-12 17:34:10
  */
-@Api(tags = "转盘")
+@Api(description = "转盘")
 @RestController
 @RequestMapping(value = "/back/turntable")
 @Slf4j
@@ -52,7 +52,7 @@ public class TurntableController {
      * 保存/修改
      */
     @PostMapping("/save")
-    @ApiOperation("保存/修改")
+    @ApiOperation(description = "保存/修改")
     public Result<TurntableResp> save(@RequestBody TurntableReq turntableReq, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         MallUtils.addDateAndUser(turntableReq, user);
@@ -77,7 +77,7 @@ public class TurntableController {
      * 全部转盘信息
      */
     @GetMapping("/all")
-    @ApiOperation("全部转盘信息")
+    @ApiOperation(description = "全部转盘信息")
     public Result<List<TurntableResp>> all() {
         return Result.buildQueryOk(BeanMapper.mapList(turntableService.findAll(), TurntableResp.class));
     }
@@ -86,7 +86,7 @@ public class TurntableController {
      * '删除
      */
     @PostMapping("/id")
-    @ApiOperation("删除")
+    @ApiOperation(description = "删除")
     public Result<Boolean> delete(@RequestBody Map<String, Long> map, @ApiIgnore HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         turntableService.delete(map.get("id"), user.getId());

@@ -10,7 +10,7 @@ import com.jingliang.mall.entity.User;
 import com.jingliang.mall.resp.OfflineOrderReturnResp;
 import com.jingliang.mall.service.OfflineOrderReturnService;
 import com.jingliang.mall.service.OfflineOrderService;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @date 2020-04-20 17:57:20
  */
 @RestController
-@Api(tags = "退货表")
+@Api(description = "退货表")
 @Slf4j
 public class OfflineOrderReturnController {
     /**

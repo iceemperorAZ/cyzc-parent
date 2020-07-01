@@ -10,8 +10,8 @@ import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.SkuService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.usermodel.*;
@@ -24,7 +24,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -41,7 +41,7 @@ import java.util.*;
  * @version 1.0.0
  * @date 2019-09-22 14:40:54
  */
-@Api(tags = "商品")
+@Api(description = "商品")
 @RestController("backProductController")
 @Slf4j
 @RequestMapping("/back/product")
@@ -70,7 +70,7 @@ public class ProductController {
      * 保存商品
      */
     @PostMapping("/save")
-    @ApiOperation(value = "保存商品")
+    @ApiOperation(description = "保存商品")
     public Result<ProductResp> save(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
@@ -248,7 +248,7 @@ public class ProductController {
      * 分页查询全部商品
      */
     @GetMapping("/page/all")
-    @ApiOperation(value = "分页查询全部商品")
+    @ApiOperation(description = "分页查询全部商品")
     public Result<MallPage<ProductResp>> pageAllProduct(ProductReq productReq) throws UnsupportedEncodingException {
         log.debug("请求参数：{}", productReq);
         PageRequest pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize());
@@ -296,7 +296,7 @@ public class ProductController {
     /**
      * 根据Id查询商品信息
      */
-    @ApiOperation(value = "根据Id查询商品信息")
+    @ApiOperation(description = "根据Id查询商品信息")
     @GetMapping("/id")
     public Result<ProductResp> findById(Long id) {
         log.debug("请求参数：{}", id);
@@ -308,7 +308,7 @@ public class ProductController {
     /**
      * 批量上架商品
      */
-    @ApiOperation(value = "批量上架商品")
+    @ApiOperation(description = "批量上架商品")
     @PostMapping("/batch/show")
     public Result<List<ProductResp>> batchShow(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq.getProductIds());
@@ -344,7 +344,7 @@ public class ProductController {
     /**
      * 批量下架商品
      */
-    @ApiOperation(value = "批量下架商品")
+    @ApiOperation(description = "批量下架商品")
     @PostMapping("/batch/hide")
     public Result<List<ProductResp>> batchHide(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq.getProductIds());
@@ -369,7 +369,7 @@ public class ProductController {
     /**
      * 批量删除商品
      */
-    @ApiOperation(value = "批量删除商品")
+    @ApiOperation(description = "批量删除商品")
     @PostMapping("/batch/delete")
     public Result<List<ProductResp>> batchDelete(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq.getProductIds());
@@ -411,7 +411,7 @@ public class ProductController {
      * 导出商品表
      */
     @GetMapping("/download/excel")
-    @ApiOperation(value = "导出商品表")
+    @ApiOperation(description = "导出商品表")
     public ResponseEntity<byte[]> getAllBuyerAndSaleByTimeToExcel() throws IOException {
         List<Map<String, Object>> product = productService.getAllProduct();
         // 定义一个新的工作簿

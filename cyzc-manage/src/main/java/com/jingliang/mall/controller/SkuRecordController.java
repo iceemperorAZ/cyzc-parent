@@ -8,8 +8,8 @@ import com.jingliang.mall.req.SkuRecordReq;
 import com.jingliang.mall.resp.SkuRecordResp;
 import com.jingliang.mall.service.SkuDetailService;
 import com.jingliang.mall.service.SkuRecordService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -34,7 +34,7 @@ import java.util.Objects;
  * @date 2019-10-11 11:56:20
  */
 @RestController
-@Api(tags = "库存记录单")
+@Api(description = "库存记录单")
 @Slf4j
 @RequestMapping(value = "/back/skuRecord")
 public class SkuRecordController {
@@ -54,7 +54,7 @@ public class SkuRecordController {
     /**
      * 新建库存出入记录单
      */
-    @ApiOperation(value = "新建库存出入记录单")
+    @ApiOperation(description = "新建库存出入记录单")
     @PostMapping("/save")
     public Result<SkuRecordResp> save(@RequestBody SkuRecordReq skuRecordReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", skuRecordReq);
@@ -85,7 +85,7 @@ public class SkuRecordController {
     /**
      * 更新库存出入记录单状态
      */
-    @ApiOperation(value = "更新库存出入记录单状态")
+    @ApiOperation(description = "更新库存出入记录单状态")
     @PostMapping("/update")
     public Result<SkuRecordResp> update(@RequestBody SkuRecordReq skuRecordReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", skuRecordReq);
@@ -117,7 +117,7 @@ public class SkuRecordController {
     /**
      * 分页查询库存出入记录列表
      */
-    @ApiOperation(value = "分页查询库存出入记录列表")
+    @ApiOperation(description = "分页查询库存出入记录列表")
     @GetMapping("/page/all")
     public Result<MallPage<SkuRecordResp>> pageAllProduct(SkuRecordReq skuRecordReq) {
         log.debug("请求参数：{}", skuRecordReq);
