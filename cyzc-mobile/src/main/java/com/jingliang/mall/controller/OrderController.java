@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.ali.service.AliPayService;
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
@@ -63,12 +64,13 @@ public class OrderController {
     private final UserService userService;
     private final BuyerAddressService buyerAddressService;
     private final RegionService regionService;
+    private final AliPayService aliPayService;
 
     public OrderController(RedisTemplate<String, Object> redisTemplate, OrderService orderService,
                            ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService,
                            BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer,
                            ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService, UserService userService,
-                           BuyerAddressService buyerAddressService, RegionService regionService) {
+                           BuyerAddressService buyerAddressService, RegionService regionService, AliPayService aliPayService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
@@ -82,6 +84,7 @@ public class OrderController {
         this.userService = userService;
         this.buyerAddressService = buyerAddressService;
         this.regionService = regionService;
+        this.aliPayService = aliPayService;
     }
 
 
@@ -364,6 +367,26 @@ public class OrderController {
                 }
             }
         }
+/*        if (Objects.equals(order.getPayWay(), 400)) {
+            if (!order.getPayableFee().equals(0L)) {
+                //支付宝支付
+                try {
+                    // 1、验证订单是否存在
+                    if (StringUtils.isBlank(order.getOrderNo())){
+                        return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_FAIL);
+                    }
+                    // 2、创建支付宝订单
+                    for (OrderDetail detail:orderDetails){
+                        Product product = productService.findAllById(detail.getProductId());
+
+                    }
+                    String orderStr = aliPayService.createOrder(order.getOrderNo(), Double.longBitsToDouble(order.getPayableFee()/100));
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_FAIL);
+                }
+            }
+        }*/
         if (order.getPayableFee().equals(0L)) {
             order.setOrderStatus(300);
         }

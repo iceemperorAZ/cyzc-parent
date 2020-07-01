@@ -1,8 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.citrsw.annatation.ApiIgnore;
-import com.citrsw.annatation.ApiParam;
+import com.citrsw.annatation.*;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.BuyerReq;
@@ -14,8 +13,6 @@ import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.*;
 import com.jingliang.mall.wx.service.WechatService;
-import com.citrsw.annatation.Api;
-import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -523,6 +520,7 @@ public class BuyerController {
      */
     @ApiOperation(description = "登录(手机号+密码)")
     @PostMapping("/login/phone")
+    @ApiModelProperty(require = {"phone", "password"})
     public Result<BuyerResp> loginByPhone(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpServletResponse response) {
         log.debug("请求参数：{}", buyerReq);
         if (StringUtils.isBlank(buyerReq.getPhone()) || StringUtils.isBlank(buyerReq.getPassword())) {
@@ -566,74 +564,87 @@ public class BuyerController {
     }
 
     /**
-     * 注册：手机号 + 短信验证码 + 昵称 + 密码 【注册完成后直接登录】
+     * 注册：手机号 + 短信验证码 + 密码 【注册完成后直接登录】
      */
     @PostMapping("/register")
-    public Result<Buyer> register(@RequestBody BuyerReq buyerReq, HttpServletResponse response) {
+    @ApiOperation(description = "注册：手机号 + 短信验证码 + 密码 【注册完成后直接登录】")
+    @ApiModelProperty(require = {"code", "phone", "password"})
+    public Result<BuyerResp> register(@RequestBody BuyerReq buyerReq, HttpServletResponse response) {
         String redisCode = (String) redisTemplate.opsForValue().get(Constant.CODE_PREFIX + buyerReq.getPhone());
         //校验验证码
         if (buyerReq.getCode() == null || !StringUtils.equals(redisCode, buyerReq.getCode())) {
             return Result.build(Msg.FAIL, "验证码错误");
         }
-//        if (StringUtils.isBlank(buyerReq.getNickName())) {
-//            return Result.build(Msg.FAIL, "昵称不能为空");
-//        }
-//        if (StringUtils.isBlank(buyerReq.getUsername())) {
-//            return Result.build(Msg.FAIL, "账号不能为空");
-//        }
-//        if (StringUtils.isBlank(buyerReq.getPhone())) {
-//            return Result.build(Msg.FAIL, "手机号不能为空");
-//        } else {
-//            if (!MUtils.phoneCheck(buyerReq.getPhone())) {
-//                return Result.build(Msg.FAIL, "手机号格式错误");
-//            }
-//        }
-//        //校验手机号是否已经注册
-//        User checkUser = userService.getOne(Wrappers.<User>lambdaQuery().eq(User::getPhone, buyerReq.getPhone()));
-//        if (checkUser != null) {
-//            return Result.build(Msg.FAIL, "该手机号已经注册");
-//        }
-//        //校验账号是否已经注册
-//        checkUser = userService.getOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, buyerReq.getUsername()));
-//        if (checkUser != null) {
-//            return Result.build(Msg.FAIL, "该手机号已经注册");
-//        }
-//        //校验昵称是否已经注册
-//        checkUser = userService.getOne(Wrappers.<User>lambdaQuery().eq(User::getNickName, buyerReq.getNickName()));
-//        if (checkUser != null) {
-//            return Result.build(Msg.FAIL, "该昵称已经注册");
-//        }
-//        if (StringUtils.isNotBlank(buyerReq.getMail())) {
-//            if (!Utils.mailCheck(buyerReq.getMail())) {
-//                return Result.build(Msg.FAIL, "邮箱格式错误");
-//            }
-//            //校验邮箱是否已经注册
-//            checkUser = userService.getOne(Wrappers.<User>lambdaQuery().eq(User::getMail, buyerReq.getMail()));
-//            if (checkUser != null) {
-//                return Result.build(Msg.FAIL, "该邮箱已经注册");
-//            }
-//        }
-//        LocalDateTime localDateTime = LocalDateTime.now();
-//        buyerReq.setCreateTime(localDateTime);
-//        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-//        buyerReq.setPassword(bCryptPasswordEncoder.encode(buyerReq.getPassword()));
-//        buyerReq.setUpdateTime(localDateTime);
-//        buyerReq.setActivation(true);
-//        //注册
-//        if (!userService.register(buyerReq)) {
-//            return Result.build(Msg.FAIL, "注册失败");
-//        }
-//        //登录
-//        //生成token
-//        String token = JwtUtil.genToken(buyerReq.getId());
-//        //在redis中进行无操作自动离线倒计时
-//        response.setHeader(JwtUtil.AUTH_HEADER_KEY, token);
-//        //清除注册次数
-//        redisTemplate.delete(Constant.LIMIT_PREFIX + buyerReq.getPhone());
-//        redisTemplate.opsForValue().set(Constant.ON_LINE_USER_PREFIX + buyerReq.getId(), token, Constant.ON_LINE_TIME_USER, TimeUnit.SECONDS);
-//        response.setHeader(JwtUtil.AUTH_HEADER_KEY, token);
-//        return Result.build(Msg.OK, "注册成功", buyerReq);
-        return null;
+        if (StringUtils.isBlank(buyerReq.getPhone())) {
+            return Result.build(Msg.FAIL, "手机号不能为空");
+        } else {
+            if (!MUtils.phoneCheck(buyerReq.getPhone())) {
+                return Result.build(Msg.FAIL, "手机号格式错误");
+            }
+        }
+        if (StringUtils.isBlank(buyerReq.getPassword())) {
+            return Result.build(Msg.FAIL, "密码不能为空");
+        }
+        //校验手机号是否已经注册
+        User checkUser = userService.findByPhone(buyerReq.getPhone());
+        if (checkUser != null) {
+            return Result.build(Msg.FAIL, "该手机号已经注册");
+        }
+        Date date = new Date();
+        buyerReq.setCreateTime(date);
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        buyerReq.setPassword(bCryptPasswordEncoder.encode(buyerReq.getPassword()));
+        buyerReq.setUpdateTime(date);
+        buyerReq.setIsAvailable(true);
+        //注册
+        Map<String, String> tokenMap = new HashMap<>(2);
+        Buyer buyer = buyerService.save(BeanMapper.map(buyerReq, Buyer.class));
+        //生成token
+        tokenMap.put("id", buyer.getId() + "");
+        String token = JwtUtil.genToken(tokenMap);
+        buyer.setToken(token);
+        //存入redis  有效时长为1800秒（半小时）
+        redisService.setExpire(tokenBuyerPrefix + buyer.getId(), buyer, tokenTimeOut);
+        response.setHeader("Authorization", token);
+        log.debug("微信登录Token= {}", token);
+        return Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, BeanMapper.map(buyer, BuyerResp.class));
+    }
+
+    /**
+     * 短信验证码登录：手机号 + 短信验证码
+     */
+    @PostMapping("/phone/login")
+    @ApiOperation(description = "短信验证码登录")
+    @ApiModelProperty(require = {"code", "phone"})
+    public Result<BuyerResp> phoneLogin(@RequestBody BuyerReq buyerReq, HttpServletResponse response) {
+        String redisCode = (String) redisTemplate.opsForValue().get(Constant.CODE_PREFIX + buyerReq.getPhone());
+        //校验验证码
+        if (buyerReq.getCode() == null || !StringUtils.equals(redisCode, buyerReq.getCode())) {
+            return Result.build(Msg.FAIL, "验证码错误");
+        }
+        if (StringUtils.isBlank(buyerReq.getPhone())) {
+            return Result.build(Msg.FAIL, "手机号不能为空");
+        } else {
+            if (!MUtils.phoneCheck(buyerReq.getPhone())) {
+                return Result.build(Msg.FAIL, "手机号格式错误");
+            }
+        }
+        //校验手机号是否已经注册
+        User buyer = userService.findByPhone(buyerReq.getPhone());
+        if (buyer == null) {
+            return Result.build(Msg.FAIL, "该手机号尚未注册");
+        }
+        //注册
+        Map<String, String> tokenMap = new HashMap<>(2);
+        //生成token
+        tokenMap.put("id", buyer.getId() + "");
+        String token = JwtUtil.genToken(tokenMap);
+        buyer.setToken(token);
+        //存入redis  有效时长为1800秒（半小时）
+        redisService.setExpire(tokenBuyerPrefix + buyer.getId(), buyer, tokenTimeOut);
+        response.setHeader("Authorization", token);
+        log.debug("微信登录Token= {}", token);
+        return Result.build(Msg.OK, Msg.TEXT_LOGIN_OK, BeanMapper.map(buyer, BuyerResp.class));
     }
 
 }

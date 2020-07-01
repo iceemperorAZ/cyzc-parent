@@ -155,6 +155,11 @@
             <version>2.1.0</version>
         </dependency>
         <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.10.38.ALL</version>
+        </dependency>
+        <dependency>
             <groupId>com.citrsw</groupId>
             <artifactId>java-smart-api</artifactId>
             <version>0.0.3-RELEASE</version>
