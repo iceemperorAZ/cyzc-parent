@@ -1,5 +1,8 @@
 package com.jingliang.mall.controller;
 
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiOperation;
+import com.citrsw.annatation.ApiParam;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.service.MessageService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +38,8 @@ public class VerificationController {
      * 发送短信
      */
     @GetMapping("/verification/msg")
-    public Result<Boolean> verification(String phone, String key, HttpServletRequest request) {
+    @ApiOperation(description = "发送短信")
+    public Result<Boolean> verification(@ApiParam(description = "手机号") String phone, @ApiParam(description = "图片验证token") String key, @ApiIgnore HttpServletRequest request) {
         String address = MUtils.getIpAddress(request);
         log.info("短信验证码请求ip:{}", address);
         log.info("获取到手机号" + phone);
@@ -84,10 +88,11 @@ public class VerificationController {
     }
 
     /**
-     * 图片验证码
+     * 获取图片验证码
      */
     @GetMapping("/verification/img")
-    public Result<Map<String, String>> verificationImage(String phone) {
+    @ApiOperation(description = "获取图片验证码")
+    public Result<Map<String, String>> verificationImage(@ApiParam(description = "手机号") String phone) {
         if (StringUtils.isBlank(phone)) {
             return Result.build(Msg.FAIL, "手机号为空");
         }
@@ -108,7 +113,8 @@ public class VerificationController {
      * 校验图片验证码
      */
     @GetMapping("/verification/img/check")
-    public Result<String> verificationImageChicken(String phone, Integer x) {
+    @ApiOperation(description = "校验图片验证码")
+    public Result<String> verificationImageChicken(@ApiParam(description = "手机号") String phone, @ApiParam(description = "x轴移动像素") Integer x) {
         log.debug("获取到手机号" + phone);
         if (!MUtils.phoneCheck(phone)) {
             return Result.build(Msg.FAIL, "手机号格式错误");

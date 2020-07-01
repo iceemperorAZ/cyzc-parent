@@ -146,4 +146,11 @@ public interface UserService {
      */
 
     List<User> findAll(Specification<User> userSpecification);
+
+    /**
+     * 根据手机号匹配
+     * @param phone
+     * @return
+     */
+    User findByPhone(String phone);
 }

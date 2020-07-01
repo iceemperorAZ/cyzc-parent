@@ -6,8 +6,8 @@ import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.BuyerReq;
 import com.jingliang.mall.service.BuyerService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +25,7 @@ import java.util.Date;
  * @date 2020/6/14
  * @Company 晶粮
  */
-@Api(tags = "商户审核")
+@Api(description = "商户审核")
 @RequestMapping("/wx/buyer/review")
 @RestController("buyerReviewController")
 @Slf4j
@@ -46,7 +46,7 @@ public class BuyerReviewController {
      * 商户审核通过
      */
     @PostMapping("/success")
-    @ApiOperation(value = "商户审核通过")
+    @ApiOperation(description = "商户审核通过")
     public Result<Boolean> success(@RequestBody BuyerReq buyerReq, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Buyer buyer = buyerService.findById(buyerReq.getId());
@@ -71,7 +71,7 @@ public class BuyerReviewController {
      * 商户审核驳回
      */
     @PostMapping("/overrule")
-    @ApiOperation(value = "商户审核驳回")
+    @ApiOperation(description = "商户审核驳回")
     public Result<Boolean> overrule(@RequestBody BuyerReq buyerReq, HttpSession session) {
         User user = (User) session.getAttribute(sessionUser);
         Buyer buyer = buyerService.findById(buyerReq.getId());

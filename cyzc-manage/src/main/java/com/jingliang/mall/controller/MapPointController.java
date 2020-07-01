@@ -5,12 +5,12 @@ import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.MapDetail;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.MapDetailReq;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import com.jingliang.mall.service.MapPointService;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 @RestController
 @Slf4j
-@Api(tags = "保存地图信息")
+@Api(description = "保存地图信息")
 @RequestMapping(value = "/front/mapPoint")
 public class MapPointController {
 
@@ -41,8 +41,8 @@ public class MapPointController {
     }
 
     @PostMapping("/saveMap")
-    @ApiOperation("保存地图信息到数据库")
-    public Result<?> saveMap(@RequestParam("mapNo") String mapNo, @RequestParam("excel") MultipartFile multipartFile, HttpSession session) {
+    @ApiOperation(description = "保存地图信息到数据库")
+    public Result<List<Map<String, Object>>> saveMap(@RequestParam("mapNo") String mapNo, @RequestParam("excel") MultipartFile multipartFile, HttpSession session) {
         log.debug("请求参数:{}", mapNo);
         User user = (User) session.getAttribute(sessionUser);
         if (Objects.isNull(multipartFile)) {
@@ -54,8 +54,8 @@ public class MapPointController {
     }
 
     @GetMapping("/updateMap")
-    @ApiOperation("更新地图点位信息")
-    public Result<?> updateMap(@RequestBody MapDetailReq mapDetailReq) {
+    @ApiOperation(description = "更新地图点位信息")
+    public Result<Object> updateMap(@RequestBody MapDetailReq mapDetailReq) {
         log.debug("请求参数:{}", mapDetailReq);
         MapDetail mapDetail = BeanMapper.map(mapDetailReq, MapDetail.class);
         Boolean flg = mapPointService.updateMap(mapDetail.getId(), mapDetail.getAddressDetail());
@@ -67,8 +67,8 @@ public class MapPointController {
     }
 
     @GetMapping("/deleteMap")
-    @ApiOperation("清空点位信息")
-    public Result<?> deleteMap(@RequestParam("mapNo") String mapNo) {
+    @ApiOperation(description = "清空点位信息")
+    public Result<List<MapDetail>> deleteMap(@RequestParam("mapNo") String mapNo) {
         log.debug("请求参数:{}", mapNo);
         List<MapDetail> mapDetails = mapPointService.deleteMap(mapNo);
         log.debug("返回参数:{}", mapDetails);
@@ -76,8 +76,8 @@ public class MapPointController {
     }
 
     @GetMapping("/searchPointByMapNo")
-    @ApiOperation("根据地图编号查询点位")
-    public Result<?> searchPoint(Long id) {
+    @ApiOperation(description = "根据地图编号查询点位")
+    public Result<MapDetail> searchPoint(Long id) {
         log.debug("请求参数:{}", id);
         MapDetail mapDetail = mapPointService.searchPointByMapNo(id);
         log.debug("返回参数:{}", mapDetail);

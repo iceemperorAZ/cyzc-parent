@@ -1,32 +1,29 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.ali.service.AliPayService;
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.common.Result;
+import com.jingliang.mall.common.ResultMap;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.OrderReq;
 import com.jingliang.mall.service.*;
 import com.jingliang.mall.wx.service.WechatService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import org.springframework.web.bind.annotation.*;
+import com.citrsw.annatation.ApiIgnore;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,9 +33,9 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @date 2019-10-18 14:08
  */
-@Api(tags = "支付")
-@RestController
 @Slf4j
+@Api(description = "支付")
+@RestController
 @RequestMapping("/front/pay")
 public class PayController {
     @Value("${session.buyer.key}")
@@ -51,10 +48,11 @@ public class PayController {
     private final BuyerService buyerService;
     private final GoldLogService goldLogService;
     private final TechargeService techargeService;
+    private final AliPayService aliPayService;
 
     public PayController(OrderService orderService, OrderDetailService orderDetailService, WechatService wechatService,
                          CartService cartService, RabbitProducer rabbitProducer, BuyerService buyerService, GoldLogService goldLogService,
-                         TechargeService techargeService) {
+                         TechargeService techargeService, AliPayService aliPayService) {
         this.orderService = orderService;
         this.orderDetailService = orderDetailService;
         this.wechatService = wechatService;
@@ -63,12 +61,13 @@ public class PayController {
         this.buyerService = buyerService;
         this.goldLogService = goldLogService;
         this.techargeService = techargeService;
+        this.aliPayService = aliPayService;
     }
 
     /**
      * 微信支付回调接口
      */
-    @ApiIgnore
+    @ApiOperation(description = "微信支付回调接口")
     @RequestMapping(value = "/wechat/notify", produces = MediaType.TEXT_XML_VALUE + ";charset=UTF-8", consumes = MediaType.TEXT_XML_VALUE + ";charset=UTF-8")
     public String wechatNotify(@RequestBody String xml) {
         log.info("微信支付异步通知返回参数：{}", xml);
@@ -130,7 +129,7 @@ public class PayController {
     /**
      * 订单继续微信支付
      */
-    @ApiOperation("订单继续微信支付")
+    @ApiOperation(description = "订单继续微信支付")
     @PostMapping("/wechat/pay")
     public Result<Map<String, String>> wechatPay(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq.getId());
@@ -157,7 +156,7 @@ public class PayController {
     /**
      * 微信充值支付回调接口
      */
-    @ApiIgnore
+    @ApiOperation(description = "微信充值支付回调接口")
     @RequestMapping(value = "/wechat/recharge", produces = MediaType.TEXT_XML_VALUE + ";charset=UTF-8", consumes = MediaType.TEXT_XML_VALUE + ";charset=UTF-8")
     public String recharge(@RequestBody String xml) {
         log.info("微信充值支付异步通知返回参数：{}", xml);
@@ -201,6 +200,45 @@ public class PayController {
         //返回给微信成功的消息
         log.info("充值支付通知签名验证成功，返回结果：<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
         return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+    }
+
+    /**
+     * 支付异步通知
+     * 接收到异步通知并验签通过后，一定要检查通知内容，
+     * 包括通知中的app_id、out_trade_no、total_amount是否与请求中的一致，并根据trade_status进行后续业务处理。
+     * https://docs.open.alipay.com/194/103296
+     */
+    @ApiOperation(description = "支付异步通知")
+    @RequestMapping(value = "/ali/notify", produces = MediaType.TEXT_XML_VALUE + ";charset=UTF-8", consumes = MediaType.TEXT_XML_VALUE + ";charset=UTF-8")
+    public String notify(HttpServletRequest request) {
+        log.debug("支付宝回调开始");
+        //获取支付宝POST过来反馈信息
+        Map<String, String> params = new HashMap<String, String>();
+        Map requestParams = request.getParameterMap();
+        for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
+            String name = (String) iter.next();
+            String[] values = (String[]) requestParams.get(name);
+            String valueStr = "";
+            for (int i = 0; i < values.length; i++) {
+                valueStr = (i == values.length - 1) ? valueStr + values[i]
+                        : valueStr + values[i] + ",";
+            }
+            //乱码解决，这段代码在出现乱码时使用。
+            //valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
+            params.put(name, valueStr);
+        }
+        //@TODO 业务（调用业务层的回调，那里面处理业务逻辑）
+        aliPayService.notify(params);
+        log.info("支付通知签名验证成功，返回结果：<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>");
+        return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
+    }
+
+    @ApiOperation
+    @PostMapping("/ali/refund")
+    public ResultMap refund(@RequestParam String orderNo,
+                            @RequestParam double amount,
+                            @RequestParam(required = false) String refundReason) {
+        return aliPayService.refund(orderNo, amount, refundReason);
     }
 
 }

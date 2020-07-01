@@ -6,7 +6,7 @@ import com.jingliang.mall.entity.OfflineOrder;
 import com.jingliang.mall.resp.OfflineOrderResp;
 import com.jingliang.mall.service.OfflineOrderService;
 import com.jingliang.mall.service.UserService;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -23,7 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import java.io.ByteArrayOutputStream;
@@ -44,7 +44,7 @@ import java.util.Map;
  */
 @RestController
 @Slf4j
-@Api(tags = "线下订单")
+@Api(description = "线下订单")
 public class OfflineOrderController {
 
     /**

@@ -5,8 +5,8 @@ import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Carousel;
 import com.jingliang.mall.resp.CarouselResp;
 import com.jingliang.mall.service.CarouselService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +27,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequestMapping(value = "/front/carousel")
-@Api(tags = "轮播图配置")
+@Api(description = "轮播图配置")
 public class CarouselController {
     private final CarouselService carouselService;
 
@@ -38,7 +38,7 @@ public class CarouselController {
     /**
      * 查询全部轮播图配置
      */
-    @ApiOperation(value = "查询全部轮播图配置")
+    @ApiOperation(description = "查询全部轮播图配置")
     @GetMapping("/all")
     public Result<List<CarouselResp>> pageAllCoupon() {
         log.debug("请求参数：无");
@@ -59,7 +59,7 @@ public class CarouselController {
     /**
      * 查询启动页图
      */
-    @ApiOperation(value = "查询启动页图")
+    @ApiOperation(description = "查询启动页图")
     @GetMapping("/index/img")
     public Result<CarouselResp> startAppImg() {
         Carousel carousel = carouselService.findByType(-100);

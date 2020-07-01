@@ -1,6 +1,6 @@
 package com.jingliang.mall.req;
 
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -22,26 +22,26 @@ public class MapReq extends BaseReq implements Serializable {
     /**
      * 商户id
      */
-    @ApiModelProperty(value = "商户id")
+    @ApiProperty(description = "商户id")
     private Long buyerId;
     /**
      * 地址
      */
-    @ApiModelProperty(value = "地址")
+    @ApiProperty(description = "地址")
     private String address;
     /**
      * 经度
      */
-    @ApiModelProperty(value = "经度")
+    @ApiProperty(description = "经度")
     private Double longitude;
     /**
      * 纬度
      */
-    @ApiModelProperty(value = "纬度")
+    @ApiProperty(description = "纬度")
     private Double latitude;
     /**
      * 时间
      */
-    @ApiModelProperty(value = "时间")
+    @ApiProperty(description = "时间")
     private Date createTime;
 }

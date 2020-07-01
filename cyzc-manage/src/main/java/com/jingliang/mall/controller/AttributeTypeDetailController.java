@@ -10,8 +10,8 @@ import com.jingliang.mall.common.MallPage;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.req.AttributeTypeDetailReq;
 import com.jingliang.mall.resp.AttributeTypeDetailResp;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -38,7 +38,7 @@ import java.util.Objects;
 @RequestMapping("/back/attributeTypeDetail")
 @RestController
 @Slf4j
-@Api(tags = "属性")
+@Api(description = "属性")
 public class AttributeTypeDetailController {
     /**
      * session用户Key
@@ -55,7 +55,7 @@ public class AttributeTypeDetailController {
      * 保存属性
      */
     @PostMapping("/save")
-    @ApiOperation(value = "保存属性")
+    @ApiOperation(description = "保存属性")
     public Result<AttributeTypeDetailResp> save(@RequestBody AttributeTypeDetailReq attributeTypeDetailReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", attributeTypeDetailReq);
         if (Objects.isNull(attributeTypeDetailReq.getAttributeTypeId()) || StringUtils.isBlank(attributeTypeDetailReq.getAttributeName())) {
@@ -73,7 +73,7 @@ public class AttributeTypeDetailController {
     /**
      * 分页查询全部属性
      */
-    @ApiOperation(value = "分页查询全部属性")
+    @ApiOperation(description = "分页查询全部属性")
     @GetMapping("/page/all")
     public Result<MallPage<AttributeTypeDetailResp>> pageAllCoupon(AttributeTypeDetailReq attributeTypeDetailReq) {
         log.debug("请求参数：{}", attributeTypeDetailReq);

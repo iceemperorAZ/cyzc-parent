@@ -8,8 +8,8 @@ import com.jingliang.mall.req.GroupReq;
 import com.jingliang.mall.resp.GroupResp;
 import com.jingliang.mall.service.GroupService;
 import com.jingliang.mall.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * @version 1.0.0
  * @date 2020-04-24 11:18:08
  */
-@Api(tags = "组")
+@Api(description = "组")
 @RestController
 @Slf4j
 @RequestMapping(value = "/back/group")
@@ -40,14 +40,14 @@ public class GroupController {
     }
 
     @PostMapping("/groupAll")
-    @ApiOperation(value = "查询所有可用的组")
+    @ApiOperation(description = "查询所有可用的组")
     public List<Group> groupAll() {
         List<Group> list = groupService.findGroupAll();
         return list;
     }
 
     @GetMapping("/getFatherGroup")
-    @ApiOperation(value = "查询出顶级父组")
+    @ApiOperation(description = "查询出顶级父组")
     public Result<GroupResp> getAllGroup() {
         log.debug("请求参数：先进行查询操作。");
         //获取分组表中的父级数据
@@ -65,7 +65,7 @@ public class GroupController {
     }
 
     @GetMapping("/getGroupWithFather")
-    @ApiOperation(value = "查询顶级父组的分组")
+    @ApiOperation(description = "查询顶级父组的分组")
     public Result<List<GroupResp>> getGroupWithFatherGroup(GroupReq groupReq) {
         log.debug("请求参数：{}", groupReq);
         //查询该父组下的所有分组
@@ -84,7 +84,7 @@ public class GroupController {
     }
 
     @PostMapping("/save")
-    @ApiOperation(value = "新增分组")
+    @ApiOperation(description = "新增分组")
     public Result<GroupResp> saveGroup(@RequestBody GroupReq groupReq) {
         log.debug("请求参数:{}", groupReq);
         //判断是否填写组名
@@ -127,7 +127,7 @@ public class GroupController {
     /**
      * 根据组名或编号模糊查询
      */
-    @ApiOperation(value = "根据组名或编号模糊查询")
+    @ApiOperation(description = "根据组名或编号模糊查询")
     @GetMapping("/like/search")
     public Result<List<GroupResp>> likeSearch(String search) {
         return Result.buildQueryOk(BeanMapper.mapList(groupService.likeSearch(search), GroupResp.class));
@@ -138,7 +138,7 @@ public class GroupController {
      * 合并分组(包括子组一同合并到指定的组)
      */
     @PostMapping("/merge")
-    @ApiOperation(value = "合并分组")
+    @ApiOperation(description = "合并分组")
     public Result<Boolean> mergeGroups(@RequestBody Map<String, Object> map) {
         String groupNo = (String) map.get("groupNo");
         List<String> mergeGroupNos = ((List<?>) map.get("mergeGroupNos")).stream().map(p -> String.valueOf(p.toString())).collect(Collectors.toList());

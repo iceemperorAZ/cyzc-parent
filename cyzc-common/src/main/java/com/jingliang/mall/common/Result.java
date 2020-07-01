@@ -1,11 +1,12 @@
 package com.jingliang.mall.common;
 
 
+import com.citrsw.annatation.ApiModelProperty;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiModel;
+import com.citrsw.annatation.ApiProperty;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,32 +19,32 @@ import java.util.List;
  * @date 2019-09-19 09:02:33
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(value = "MallResult", description = "返回结果")
+@ApiModel(name =  "MallResult", description = "返回结果")
 public class Result<T> implements Serializable {
     private static final long serialVersionUID = -2492072809889519824L;
 
     /**
      * 定义jackson对象
      */
-    @ApiModelProperty(hidden = true)
+    @ApiProperty(hidden = true)
     private static ObjectMapper mapper = new ObjectMapper();
 
     /**
      * 响应状态
      */
-    @ApiModelProperty(value = "响应状态")
+    @ApiProperty(description = "响应状态")
     private Integer code;
 
     /**
      * 响应消息
      */
-    @ApiModelProperty(value = "响应消息")
+    @ApiProperty(description = "响应消息")
     private String msg;
 
     /**
      * 响应数据
      */
-    @ApiModelProperty(value = "响应数据", notes = "响应数据")
+    @ApiProperty(description = "响应数据")
     private T data;
 
     public static <T> Result<T> build(Integer code, String msg, T data) {

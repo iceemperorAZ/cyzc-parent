@@ -10,8 +10,8 @@ import com.jingliang.mall.entity.Cart;
 import com.jingliang.mall.req.CartReq;
 import com.jingliang.mall.resp.CartResp;
 import com.jingliang.mall.service.CartService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -39,7 +39,7 @@ import java.util.Objects;
 @RequestMapping("/front/cart")
 @RestController
 @Slf4j
-@Api(tags = "用户购物车")
+@Api(description = "用户购物车")
 public class CartController {
     @Value("${session.buyer.key}")
     private String sessionBuyer;
@@ -52,7 +52,7 @@ public class CartController {
     /**
      * 添加购物项
      */
-    @ApiOperation(value = "添加购物项")
+    @ApiOperation(description = "添加购物项")
     @PostMapping("/save")
     public Result<CartResp> save(@RequestBody CartReq cartReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", cartReq);
@@ -78,7 +78,7 @@ public class CartController {
     /**
      * 清空购物车
      */
-    @ApiOperation(value = "清空购物车")
+    @ApiOperation(description = "清空购物车")
     @PostMapping("/empty")
     public Result<CartResp> emptyCart(@ApiIgnore HttpSession session) {
         log.debug("请求清空购物车");
@@ -91,7 +91,7 @@ public class CartController {
     /**
      * 分页查询所有购物项
      */
-    @ApiOperation(value = "分页查询所有购物项")
+    @ApiOperation(description = "分页查询所有购物项")
     @GetMapping("/page/all")
     public Result<MallPage<CartResp>> pageAllCart(CartReq cartReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", cartReq);

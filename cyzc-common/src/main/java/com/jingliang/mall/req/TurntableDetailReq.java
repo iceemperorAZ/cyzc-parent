@@ -1,8 +1,8 @@
 package com.jingliang.mall.req;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiModel;
+import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,7 +19,7 @@ import java.util.Date;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel(value = "TurntableDetailReq", description = "转盘详情")
+@ApiModel(name = "TurntableDetailReq", description = "转盘详情")
 public class TurntableDetailReq extends BaseReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -27,67 +27,67 @@ public class TurntableDetailReq extends BaseReq implements Serializable {
     /**
      * 主键Id
      */
-    @ApiModelProperty(value = "主键Id")
+    @ApiProperty(description = "主键Id")
     private Long id;
 
     /**
      * 转盘Id
      */
-    @ApiModelProperty(value = "转盘Id")
+    @ApiProperty(description = "转盘Id")
     private Long turntableId;
 
     /**
      * 奖品Id
      */
-    @ApiModelProperty(value = "奖品Id")
+    @ApiProperty(description = "奖品Id")
     private Long prizeId;
 
     /**
      * 奖品名称
      */
-    @ApiModelProperty(value = "奖品名称")
+    @ApiProperty(description = "奖品名称")
     private String prizeName;
 
     /**
      * 类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)
      */
-    @ApiModelProperty(value = "类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)")
+    @ApiProperty(description = "类型(100:谢谢惠顾,200:金币，300:返币次数，400：商品[为商品时需配置奖品Id],)")
     private Integer type;
 
     /**
      * 概率
      */
-    @ApiModelProperty(value = "概率")
+    @ApiProperty(description = "概率")
     private Integer probability;
 
     /**
      * 奖品基数
      */
-    @ApiModelProperty(value = "奖品基数")
+    @ApiProperty(description = "奖品基数")
     private Integer baseNum;
 
     /**
      * 奖品最多被抽到的次数
      */
-    @ApiModelProperty(value = "奖品最多被抽到的次数")
+    @ApiProperty(description = "奖品最多被抽到的次数")
     private Integer prizeNum;
 
     /**
      * 开始角度
      */
-    @ApiModelProperty(value = "开始角度")
+    @ApiProperty(description = "开始角度")
     private Integer startAngle;
 
     /**
      * 结束角度
      */
-    @ApiModelProperty(value = "结束角度")
+    @ApiProperty(description = "结束角度")
     private Integer endAngle;
 
     /**
      * 创建时间
      */
-    @ApiModelProperty(value = "创建时间")
+    @ApiProperty(description = "创建时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
@@ -95,25 +95,25 @@ public class TurntableDetailReq extends BaseReq implements Serializable {
     /**
      * 创建人Id
      */
-    @ApiModelProperty(value = "创建人Id")
+    @ApiProperty(description = "创建人Id")
     private Long createUserId;
 
     /**
      * 是否上架
      */
-    @ApiModelProperty(value = "是否上架")
+    @ApiProperty(description = "是否上架")
     private Boolean isShow;
 
     /**
      * 上架人Id
      */
-    @ApiModelProperty(value = "上架人Id")
+    @ApiProperty(description = "上架人Id")
     private Long showUserId;
 
     /**
      * 上架时间
      */
-    @ApiModelProperty(value = "上架时间")
+    @ApiProperty(description = "上架时间")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date showTime;
@@ -121,19 +121,19 @@ public class TurntableDetailReq extends BaseReq implements Serializable {
     /**
      * 是否可用 0：否，1：是
      */
-    @ApiModelProperty(value = "是否可用 0：否，1：是")
+    @ApiProperty(description = "是否可用 0：否，1：是")
     private Boolean isAvailable;
 
 	/**
 	 * 转盘图片
 	 */
-	@ApiModelProperty(value = "转盘图片")
+	@ApiProperty(description = "转盘图片")
 	private String img;
 
     /**
      * 转盘图片
      */
-    @ApiModelProperty(value = "转盘图片")
+    @ApiProperty(description = "转盘图片")
     private String imgBase64;
 
 }

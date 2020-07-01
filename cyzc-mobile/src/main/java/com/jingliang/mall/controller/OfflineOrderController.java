@@ -7,7 +7,7 @@ import com.jingliang.mall.req.OfflineOrderReq;
 import com.jingliang.mall.resp.OfflineOrderResp;
 import com.jingliang.mall.service.OfflineOrderService;
 import com.jingliang.mall.service.UserService;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -32,7 +32,7 @@ import java.util.List;
  */
 @RestController
 @Slf4j
-@Api(tags = "线下订单")
+@Api(description = "线下订单")
 public class OfflineOrderController {
 
     /**

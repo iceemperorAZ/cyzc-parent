@@ -1,9 +1,9 @@
 package com.jingliang.mall.req;
 
 import lombok.Data;
-import io.swagger.annotations.ApiModel;
+import com.citrsw.annatation.ApiModel;
 import lombok.EqualsAndHashCode;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiProperty;
 import java.io.Serializable;
 
 /**
@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @date 2020-04-24 11:18:08
  */
 @EqualsAndHashCode(callSuper = true)
-@ApiModel(value = "GroupReq", description = "组")
+@ApiModel(name = "GroupReq", description = "组")
 @Data
 public class GroupReq extends BaseReq implements Serializable {
 
@@ -23,37 +23,37 @@ public class GroupReq extends BaseReq implements Serializable {
 	/**
 	 * 主键Id
 	 */
-	@ApiModelProperty(value = "主键Id")
+	@ApiProperty(description = "主键Id")
 	private Long id;
 
 	/**
 	 * 组名称
 	 */
-	@ApiModelProperty(value = "组名称")
+	@ApiProperty(description = "组名称")
 	private String groupName;
 
 	/**
 	 * 父组Id
 	 */
-	@ApiModelProperty(value = "父组Id")
+	@ApiProperty(description = "父组Id")
 	private Long parentGroupId;
 
 	/**
 	 * 是否可用 0：否，1：是
 	 */
-	@ApiModelProperty(value = "是否可用 0：否，1：是")
+	@ApiProperty(description = "是否可用 0：否，1：是")
 	private Boolean isAvailable;
 
 	/**
 	 * 组编码
 	 */
-	@ApiModelProperty(value = "组编码")
+	@ApiProperty(description = "组编码")
 	private String groupNo;
 
 	/**
 	 * 是否有子节点
 	 */
-	@ApiModelProperty(value = "是否有子节点")
+	@ApiProperty(description = "是否有子节点")
 	private Boolean child;
 
 }

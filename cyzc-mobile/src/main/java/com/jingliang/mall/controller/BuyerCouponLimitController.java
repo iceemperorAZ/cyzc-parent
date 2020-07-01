@@ -1,5 +1,8 @@
 package com.jingliang.mall.controller;
 
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiOperation;
 import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.Buyer;
@@ -9,15 +12,11 @@ import com.jingliang.mall.req.BuyerCouponLimitReq;
 import com.jingliang.mall.resp.BuyerCouponLimitResp;
 import com.jingliang.mall.service.BuyerCouponLimitService;
 import com.jingliang.mall.service.ProductTypeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
  */
 @RequestMapping(value = "/front/buyerCouponLimit")
 @RestController
-@Api(tags = "用户优惠券使用限制")
+@Api(description = "用户优惠券使用限制")
 @Slf4j
 public class BuyerCouponLimitController {
     @Value("${coupon.use.limit}")
@@ -55,9 +54,8 @@ public class BuyerCouponLimitController {
     /**
      * 根据商品分类Id集合查询全部用户优惠券使用限制
      */
-    @ApiOperation(value = "根据商品分类Id集合查询全部用户优惠券使用限制")
+    @ApiOperation(description = "根据商品分类Id集合查询全部用户优惠券使用限制")
     @GetMapping("/all")
-    @ApiImplicitParam(name = "商品分类Id集合", value = "productTypeIds", required = true, paramType = "list")
     public Result<List<BuyerCouponLimitResp>> findAll(@ApiIgnore BuyerCouponLimitReq buyerCouponLimitReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponLimitReq.getBuyerId());
         if (Objects.isNull(buyerCouponLimitReq.getProductTypeIds()) || buyerCouponLimitReq.getProductTypeIds().isEmpty()) {

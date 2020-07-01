@@ -3,7 +3,7 @@ package com.jingliang.mall.controller;
 import lombok.extern.slf4j.Slf4j;
 import com.jingliang.mall.service.TurntableLogService;
 import org.springframework.web.bind.annotation.RequestMapping;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/back/turntableLog")
 @Slf4j
-@Api(tags = "转盘日志")
+@Api(description = "转盘日志")
 public class TurntableLogController {
 
 	private final TurntableLogService turntableLogService;

@@ -248,7 +248,7 @@ public abstract class BaseMallUtils {
      * @return 验证通过返回<code>true</code>,失败<code>false</code>
      */
     public static Boolean phoneCheck(String phone) {
-        String s2 = "^[1](([3|5|8][\\d])|([4][5,6,7,8,9])|([6][5,6])|([7][3,4,5,6,7,8])|([9][8,9]))[\\d]{8}$";
+        String s2 = "^[1](([1-9][\\d])|([4][5,6,7,8,9])|([6][5,6])|([7][3,4,5,6,7,8])|([9][8,9]))[\\d]{8}$";
         // 验证手机号
         Pattern p = Pattern.compile(s2);
         Matcher m = p.matcher(phone);

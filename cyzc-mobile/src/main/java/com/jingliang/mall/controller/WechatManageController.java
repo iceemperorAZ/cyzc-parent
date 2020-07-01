@@ -1,15 +1,15 @@
 package com.jingliang.mall.controller;
 
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiOperation;
+import com.citrsw.annatation.ApiParam;
 import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.Msg;
 import com.jingliang.mall.common.Result;
 import com.jingliang.mall.entity.*;
 import com.jingliang.mall.resp.BuyerResp;
 import com.jingliang.mall.service.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
@@ -32,7 +31,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @date 2019-11-01 10:40
  */
-@Api(tags = "微信管理")
+@Api(description = "微信管理")
 @RestController
 @RequestMapping("/wx")
 @Slf4j
@@ -70,7 +69,7 @@ public class WechatManageController {
      * 根据父分组分组统计组下业绩
      */
     @GetMapping("/boss/group/achievement")
-    @ApiOperation(value = "根据父分组分组统计组下业绩")
+    @ApiOperation(description = "根据父分组分组统计组下业绩")
     public Result<List<Map<String, Object>>> bossGroupAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                                   String parentGroupNo,
@@ -101,14 +100,10 @@ public class WechatManageController {
      * 分组统计分组及子分组下的销售（销售、区域经理、老板）业绩
      */
     @GetMapping("/boss/group/user/achievement")
-    @ApiOperation(value = "分组统计分组及子分组下的销售（销售、区域经理、老板）业绩")
-    @ApiImplicitParams({
-            @ApiImplicitParam(value = "开始时间", name = "createTimeStart", dataType = "date", paramType = "query", required = true),
-            @ApiImplicitParam(value = "结束时间", name = "createTimeEnd", dataType = "date", paramType = "query", required = true),
-    })
-    public Result<List<Map<String, Object>>> bossGroupUserAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                      String groupNo, HttpSession session) {
+    @ApiOperation(description = "分组统计分组及子分组下的销售（销售、区域经理、老板）业绩")
+    public Result<List<Map<String, Object>>> bossGroupUserAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "开始时间") Date startTime,
+                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "结束时间") Date endTime,
+                                                                      @ApiParam(description = "分组名称") String groupNo, HttpSession session) {
 
         if (StringUtils.isBlank(groupNo)) {
             return Result.buildQueryOk(new ArrayList<>());
@@ -143,10 +138,10 @@ public class WechatManageController {
      * 统计指定销售下商户的所产生的总绩效
      */
     @GetMapping("/boss/user/achievement")
-    @ApiOperation(value = "统计指定销售下商户的所产生的总绩效")
-    public Result<Map<String, Object>> bossUserAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                           Long saleUserId, HttpSession session) {
+    @ApiOperation(description = "统计指定销售下商户的所产生的总绩效")
+    public Result<Map<String, Object>> bossUserAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "开始时间") Date startTime,
+                                                           @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "结束时间") Date endTime,
+                                                           @ApiParam(description = "销售Id") Long saleUserId, HttpSession session) {
         //当前操作人
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -181,10 +176,10 @@ public class WechatManageController {
      * 统计指定销售下商户的所产生的绩效
      */
     @GetMapping("/boss/user/buyer/achievement")
-    @ApiOperation(value = "统计指定销售下商户的所产生的绩效")
-    public Result<List<Map<String, Object>>> bossUserBuyerAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                      Long saleUserId, HttpSession session) {
+    @ApiOperation(description = "统计指定销售下商户的所产生的绩效")
+    public Result<List<Map<String, Object>>> bossUserBuyerAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "开始时间") Date startTime,
+                                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "结束时间") Date endTime,
+                                                                      @ApiParam(description = "销售Id") Long saleUserId, HttpSession session) {
         //当前操作人
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -215,9 +210,9 @@ public class WechatManageController {
      * 统计指定商户下所有的订单产生的绩效
      */
     @GetMapping("/boss/buyer/order/achievement")
-    @ApiOperation(value = "统计指定商户下所有的订单产生的绩效")
-    public Result<List<Map<String, Object>>> bossBuyerOrderAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
+    @ApiOperation(description = "统计指定商户下所有的订单产生的绩效")
+    public Result<List<Map<String, Object>>> bossBuyerOrderAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "开始时间") Date startTime,
+                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "结束时间") Date endTime,
                                                                        Long buyerId, HttpSession session) {
         //当前操作人
         User user = (User) session.getAttribute(sessionUser);
@@ -252,10 +247,10 @@ public class WechatManageController {
      * 统计指定商户下的订单的详情产生的绩效
      */
     @GetMapping("/boss/buyer/order/detail/achievement")
-    @ApiOperation(value = "统计指定商户下所有的订单产生的绩效")
-    public Result<List<Map<String, Object>>> bossBuyerOrderDetailAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                             Long orderId, HttpSession session) {
+    @ApiOperation(description = "统计指定商户下所有的订单产生的绩效")
+    public Result<List<Map<String, Object>>> bossBuyerOrderDetailAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "开始时间") Date startTime,
+                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "结束时间") Date endTime,
+                                                                             @ApiParam(description = "订单Id") Long orderId, HttpSession session) {
         //当前操作人
         User user = (User) session.getAttribute(sessionUser);
         user = userService.findById(user.getId());
@@ -278,10 +273,10 @@ public class WechatManageController {
      * 查询分组统计各个组下的商品大类所产生的绩效
      */
     @GetMapping("/boss/group/product/type/achievement")
-    @ApiOperation(value = "查询分组统计各个组下的商品大类所产生的绩效")
-    public Result<List<Map<String, Object>>> bossGroupProductTypeAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                             String groupNo, HttpSession session) {
+    @ApiOperation(description = "查询分组统计各个组下的商品大类所产生的绩效")
+    public Result<List<Map<String, Object>>> bossGroupProductTypeAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "开始时间") Date startTime,
+                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "结束时间") Date endTime,
+                                                                             @ApiParam(description = "分组编号") String groupNo, HttpSession session) {
         if (StringUtils.isBlank(groupNo)) {
             return Result.buildQueryOk(new ArrayList<>());
         }
@@ -305,10 +300,10 @@ public class WechatManageController {
      * 查询分组统计各个组下的商品所产生的绩效
      */
     @GetMapping("/boss/group/product/achievement")
-    @ApiOperation(value = "查询分组统计各个组下的商品所产生的绩效")
-    public Result<List<Map<String, Object>>> bossGroupProductAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
-                                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
-                                                                         String groupNo, HttpSession session) {
+    @ApiOperation(description = "查询分组统计各个组下的商品所产生的绩效")
+    public Result<List<Map<String, Object>>> bossGroupProductAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "开始时间") Date startTime,
+                                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") @ApiParam(description = "结束时间") Date endTime,
+                                                                         @ApiParam(description = "分组编号") String groupNo, HttpSession session) {
         if (StringUtils.isBlank(groupNo)) {
             return Result.buildQueryOk(new ArrayList<>());
         }

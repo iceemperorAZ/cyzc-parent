@@ -11,8 +11,8 @@
 //import com.jingliang.mall.resp.ProductResp;
 //import com.jingliang.mall.server.EsKeywordService;
 //import com.jingliang.mall.server.EsProductService;
-//import io.swagger.annotations.Api;
-//import io.swagger.annotations.ApiOperation;
+//import com.citrsw.annatation.Api;
+//import com.citrsw.annatation.ApiOperation;
 //import lombok.extern.slf4j.Slf4j;
 //import org.apache.commons.lang3.StringUtils;
 //import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,7 @@
 // * @version 1.0
 // * @date 2019-09-27 22:38
 // */
-//@Api(tags = "搜索")
+//@Api(description = "搜索")
 //@RequestMapping("/front/search")
 //@RestController
 //@Slf4j
@@ -51,7 +51,7 @@
 //    /**
 //     * 分页搜索全部商品
 //     */
-//    @ApiOperation(value = "分页搜索全部商品")
+//    @ApiOperation(description = "分页搜索全部商品")
 //    @GetMapping("/product")
 //    public MallResult<MallPage<ProductResp>> searchProduct(ProductReq productReq) {
 //        log.debug("请求参数：{}", productReq);
@@ -68,7 +68,7 @@
 //    /**
 //     * 分页搜索全部搜索词
 //     */
-//    @ApiOperation(value = "分页搜索全部搜索词")
+//    @ApiOperation(description = "分页搜索全部搜索词")
 //    @GetMapping("/keyword")
 //    public MallResult<MallPage<KeywordResp>> searchKeyword(KeywordReq keywordReq) {
 //        log.debug("请求参数：{}", keywordReq);

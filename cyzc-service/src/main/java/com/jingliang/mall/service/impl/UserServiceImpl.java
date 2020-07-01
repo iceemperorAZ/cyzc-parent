@@ -159,4 +159,9 @@ public class UserServiceImpl implements UserService {
     public List<User> findAll(Specification<User> userSpecification) {
         return userRepository.findAll(userSpecification);
     }
+
+    @Override
+    public User findByPhone(String phone) {
+        return userRepository.findAllByIsAvailableAndPhone(true, phone);
+    }
 }

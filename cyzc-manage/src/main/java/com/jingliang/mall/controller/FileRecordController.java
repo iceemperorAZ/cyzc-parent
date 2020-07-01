@@ -1,7 +1,7 @@
 package com.jingliang.mall.controller;
 
 import com.jingliang.mall.service.FileRecordService;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2019-09-29 11:18:02
  */
 @RequestMapping("/front/fileRecord")
-@Api(tags = "文件记录")
+@Api(description = "文件记录")
 @RestController
 @Slf4j
 public class FileRecordController {

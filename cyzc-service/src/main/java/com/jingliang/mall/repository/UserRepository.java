@@ -139,11 +139,20 @@ public interface UserRepository extends BaseRepository<User, Long> {
     List<Map<String, Object>> findAllBySaleIdAndGroupNo(String groupNo);
 
     /**
-     * 根据手机号查询
+     * 根据手机号模糊查询
      *
      * @param phone
      * @return
      */
     @Query(value = "SELECT group_no AS groupNo,user_name AS userName,phone,id FROM tb_user WHERE phone LIKE :phone% AND is_available=1", nativeQuery = true)
     List<Map<String, Object>> findAllByPhoneLike(String phone);
+
+    /**
+     * 根据手机号查询
+     *
+     * @param isAvailable
+     * @param phone
+     * @return
+     */
+    User findAllByIsAvailableAndPhone(Boolean isAvailable, String phone);
 }

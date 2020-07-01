@@ -8,15 +8,15 @@ import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.RoleMenuReq;
 import com.jingliang.mall.resp.RoleMenuResp;
 import com.jingliang.mall.service.RoleMenuService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -32,7 +32,7 @@ import java.util.Objects;
 @RequestMapping(value = "/back/roleMenu")
 @RestController
 @Slf4j
-@Api(tags = "角色资源表")
+@Api(description = "角色资源表")
 public class RoleMenuController {
 	/**
 	 * session用户Key
@@ -49,7 +49,7 @@ public class RoleMenuController {
 	 * 保存/修改角色资源关系
 	 */
 	@PostMapping("/save")
-	@ApiOperation(value = "保存/修改角色资源关系")
+	@ApiOperation(description = "保存/修改角色资源关系")
 	public Result<RoleMenuResp> pageAllProduct(@RequestBody RoleMenuReq roleMenuReq, @ApiIgnore HttpSession session) {
 		Boolean isAvailable = roleMenuReq.getIsAvailable();
 		if (Objects.isNull(roleMenuReq.getRoleId()) || Objects.isNull(roleMenuReq.getMenuId()) || Objects.isNull(isAvailable)) {

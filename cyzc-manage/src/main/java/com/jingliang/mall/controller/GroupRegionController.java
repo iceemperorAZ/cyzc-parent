@@ -5,8 +5,8 @@ import com.jingliang.mall.entity.GroupRegion;
 import com.jingliang.mall.entity.Region;
 import com.jingliang.mall.req.GroupRegionReq;
 import com.jingliang.mall.service.GroupRegionService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +22,7 @@ import java.util.Date;
 @RestController
 @RequestMapping(value = "/back/groupRegion")
 @Slf4j
-@Api(tags = "组与区域映射关系表")
+@Api(description = "组与区域映射关系表")
 public class GroupRegionController {
 
 	private final GroupRegionService groupRegionService;
@@ -32,13 +32,13 @@ public class GroupRegionController {
 	}
 
 	@PostMapping("/getGroupRegion")
-	@ApiOperation(value = "根据组id查询映射表,获取区域id，查询对应区域")
+	@ApiOperation(description = "根据组id查询映射表,获取区域id，查询对应区域")
 	public Result<Region> getGroupRegion(@RequestParam("groupId") Long groupId){
 		return Result.buildQueryOk(groupRegionService.findRegionByGroupId(groupId));
 	}
 
 	@PostMapping("/saveGroupRegion")
-	@ApiOperation(value = "保存组与区域映射关系表")
+	@ApiOperation(description = "保存组与区域映射关系表")
 	public Result<GroupRegion> save(@RequestBody GroupRegionReq groupRegionReq){
 		//获取传递对象，并保存
 		GroupRegion groupRegion = new GroupRegion();
@@ -51,7 +51,7 @@ public class GroupRegionController {
 	}
 
 	@PostMapping("/updateGroupRegion")
-	@ApiOperation(value = "修改组与区域映射关系表")
+	@ApiOperation(description = "修改组与区域映射关系表")
 	public Result<GroupRegion> update(@RequestBody GroupRegionReq groupRegionReq){
 		//获取传递对象，并保存
 		GroupRegion groupRegion = new GroupRegion();
@@ -64,7 +64,7 @@ public class GroupRegionController {
 	}
 
 	@PutMapping("/updateIs")
-	@ApiOperation(value = "删除组和区域的绑定关系（修改可用性）")
+	@ApiOperation(description = "删除组和区域的绑定关系（修改可用性）")
 	public Result<GroupRegion> updateIs(@RequestBody GroupRegion groupRegion){
 		return Result.buildDeleteOk(groupRegionService.updateIsAvailable(groupRegion));
 	}

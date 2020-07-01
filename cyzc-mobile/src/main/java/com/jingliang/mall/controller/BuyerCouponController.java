@@ -12,8 +12,8 @@ import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerCouponService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.CouponService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 @RestController
 @Slf4j
 @RequestMapping("/front/buyerCoupon")
-@Api(tags = "用户优惠券")
+@Api(description = "用户优惠券")
 public class BuyerCouponController {
     /**
      * session用户Key
@@ -63,7 +63,7 @@ public class BuyerCouponController {
     /**
      * 领取优惠券
      */
-    @ApiOperation(value = "领取优惠券")
+    @ApiOperation(description = "领取优惠券")
     @PostMapping("/save")
     public Result<BuyerCouponResp> add(@RequestBody BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponReq);
@@ -122,7 +122,7 @@ public class BuyerCouponController {
     /**
      * 分页查询所有领取优惠券
      */
-    @ApiOperation(value = "分页查询所有领取优惠券")
+    @ApiOperation(description = "分页查询所有领取优惠券")
     @GetMapping("/page/all")
     public Result<MallPage<BuyerCouponResp>> pageAll(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponReq);
@@ -176,7 +176,7 @@ public class BuyerCouponController {
      *
      * @return
      */
-    @ApiOperation(value = "查询所有领取优惠券，按商品分类分组返回")
+    @ApiOperation(description = "查询所有领取优惠券，按商品分类分组返回")
     @GetMapping("/group/all")
     public Result<List<Map<String, Object>>> groupAll(BuyerCouponReq buyerCouponReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerCouponReq);

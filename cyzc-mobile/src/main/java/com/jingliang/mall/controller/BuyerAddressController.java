@@ -6,8 +6,8 @@ import com.jingliang.mall.entity.BuyerAddress;
 import com.jingliang.mall.req.BuyerAddressReq;
 import com.jingliang.mall.resp.BuyerAddressResp;
 import com.jingliang.mall.service.BuyerAddressService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -34,7 +34,7 @@ import java.util.Objects;
 @RequestMapping(value = "/front/buyerAddress")
 @RestController
 @Slf4j
-@Api(tags = "会员收货地址表")
+@Api(description = "会员收货地址表")
 public class BuyerAddressController {
     /**
      * session用户Key
@@ -50,7 +50,7 @@ public class BuyerAddressController {
     /**
      * 保存用户收货地址
      */
-    @ApiOperation("保存用户收货地址")
+    @ApiOperation(description = "保存用户收货地址")
     @PostMapping("/save")
     public Result<BuyerAddressResp> save(@RequestBody BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerAddressReq);
@@ -68,7 +68,7 @@ public class BuyerAddressController {
     /**
      * 分页查询所有用户收货地址
      */
-    @ApiOperation(value = "分页查询所有用户收货地址")
+    @ApiOperation(description = "分页查询所有用户收货地址")
     @GetMapping("/page/all")
     public Result<MallPage<BuyerAddressResp>> pageAllCart(BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerAddressReq);
@@ -94,7 +94,7 @@ public class BuyerAddressController {
     /**
      * 根据地址Id删除用户收货地址
      */
-    @ApiOperation("根据地址Id删除用户收货地址")
+    @ApiOperation(description = "根据地址Id删除用户收货地址")
     @PostMapping("/delete")
     public Result<BuyerAddressResp> delete(@RequestBody BuyerAddressReq buyerAddressReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerAddressReq.getId());

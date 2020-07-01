@@ -1,7 +1,7 @@
 package com.jingliang.mall.req;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiModel;
+import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +16,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ApiModel(value = "keywordReq", description = "搜索词")
+@ApiModel(name = "keywordReq", description = "搜索词")
 public class KeywordReq  extends BaseReq implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -24,6 +24,6 @@ public class KeywordReq  extends BaseReq implements Serializable {
     /**
      * 搜索词
      */
-    @ApiModelProperty(value = "搜索词")
+    @ApiProperty(description = "搜索词")
     private String keyword;
 }

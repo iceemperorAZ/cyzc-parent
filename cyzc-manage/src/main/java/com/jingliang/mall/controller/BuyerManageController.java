@@ -7,8 +7,8 @@ import com.jingliang.mall.entity.User;
 import com.jingliang.mall.service.BuyerManageService;
 import com.jingliang.mall.service.GroupService;
 import com.jingliang.mall.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * @date 2020/5/11
  * @company 晶粮
  */
-@Api(tags = "商户管理")
+@Api(description = "商户管理")
 @RestController
 @RequestMapping("/buyerManage")
 @Slf4j
@@ -65,7 +65,7 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/date/parentGroupId/achievement")
-    @ApiOperation(value = "根据父分组分组统计商户增加量")
+    @ApiOperation(description = "根据父分组分组统计商户增加量")
     public Result<List<Map<String, Object>>> dateAndGroupNoAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                                        Long parentGroupId,
@@ -96,7 +96,7 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/user/groupNo/buyerCounts")
-    @ApiOperation(value = "查询组内销售名下的商户数")
+    @ApiOperation(description = "查询组内销售名下的商户数")
     public Result<List<Map<String, Object>>> userByGroupNoAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                                       String groupNo,
@@ -120,8 +120,8 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/year/parentGroupId/buyerCounts")
-    @ApiOperation(value = "根据父id查询子区在每年的用户量")
-    public Result<?> yearByDateAndParentGroupIdAchievement(Long parentGroupId,
+    @ApiOperation(description = "根据父id查询子区在每年的用户量")
+    public Result<Map<String, Object>> yearByDateAndParentGroupIdAchievement(Long parentGroupId,
                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                            HttpSession session) {
@@ -164,8 +164,8 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/month/parentGroupId/buyerCounts")
-    @ApiOperation(value = "根据父id查询子区在每月的用户量")
-    public Result<?> monthByDateAndParentGroupIdAchievement(Long parentGroupId,
+    @ApiOperation(description = "根据父id查询子区在每月的用户量")
+    public Result<Map<String, Object>> monthByDateAndParentGroupIdAchievement(Long parentGroupId,
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                             HttpSession session) {
@@ -208,8 +208,8 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/day/parentGroupId/buyerCounts")
-    @ApiOperation(value = "根据父id查询子区在每天的用户量")
-    public Result<?> daysByDateAndParentGroupIdAchievement(Long parentGroupId,
+    @ApiOperation(description = "根据父id查询子区在每天的用户量")
+    public Result<Map<String, Object>> daysByDateAndParentGroupIdAchievement(Long parentGroupId,
                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                            HttpSession session) {
@@ -252,8 +252,8 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/year/groupNo/buyerCounts")
-    @ApiOperation(value = "根据组编号查询该组在每年的用户量")
-    public Result<?> yearByDateAndParentGroupIdAchievement(String groupNo,
+    @ApiOperation(description = "根据组编号查询该组在每年的用户量")
+    public Result<Map<String, Object>> yearByDateAndParentGroupIdAchievement(String groupNo,
                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                            HttpSession session) {
@@ -296,8 +296,8 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/month/groupNo/buyerCounts")
-    @ApiOperation(value = "根据组编号查询该组在每月的用户量")
-    public Result<?> monthByDateAndGroupNoAchievement(String groupNo,
+    @ApiOperation(description = "根据组编号查询该组在每月的用户量")
+    public Result<Map<String, Object>> monthByDateAndGroupNoAchievement(String groupNo,
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                       @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                       HttpSession session) {
@@ -340,8 +340,8 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/day/groupNo/buyerCounts")
-    @ApiOperation(value = "根据组编号查询该组在每天的用户量")
-    public Result<?> daysByDateAndGroupNoAchievement(String groupNo,
+    @ApiOperation(description = "根据组编号查询该组在每天的用户量")
+    public Result<Map<String, Object>> daysByDateAndGroupNoAchievement(String groupNo,
                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                      @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                      HttpSession session) {
@@ -383,7 +383,7 @@ public class BuyerManageController {
      * @param topNum
      * @return
      */
-    @ApiOperation(value = "当前年销售下单量top")
+    @ApiOperation(description = "当前年销售下单量top")
     @GetMapping("/topOrderCounts")
     public Result<List<Map<String, Object>>> topOfOrderCountsByUser(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
@@ -407,7 +407,7 @@ public class BuyerManageController {
      * @param topNum
      * @return
      */
-    @ApiOperation(value = "当前年商品销售量top")
+    @ApiOperation(description = "当前年商品销售量top")
     @GetMapping("/year/topProductCounts")
     public Result<List<Map<String, Object>>> yeartopOfProductCountsByOrder(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
@@ -431,7 +431,7 @@ public class BuyerManageController {
      * @param topNum
      * @return
      */
-    @ApiOperation(value = "当前月商品销售量top")
+    @ApiOperation(description = "当前月商品销售量top")
     @GetMapping("/month/topProductCounts")
     public Result<List<Map<String, Object>>> monthtopOfProductCountsByOrder(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
@@ -465,7 +465,7 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/searchAllBuyer")
-    @ApiOperation(value = "查询全部可用的销售")
+    @ApiOperation(description = "查询全部可用的销售")
     public Result<List<Map<String, Object>>> searchAllBuyer() {
         List<Map<String, Object>> maps = buyerManageService.searchAllBuyer();
         log.debug("返回参数:{}", maps);
@@ -482,7 +482,7 @@ public class BuyerManageController {
      * @return
      */
     @GetMapping("/date/groupNo/achievement")
-    @ApiOperation(value = "通过组编号查询商户总数")
+    @ApiOperation(description = "通过组编号查询商户总数")
     public Result<List<Map<String, Object>>> dateAndGroupNoAchievement(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                             String groupNo,
@@ -554,8 +554,8 @@ public class BuyerManageController {
      *  查询未绑定销售的商户数
      * * */
     @GetMapping("/searchBuyerDontHaveSale")
-    @ApiOperation(value = "查询未绑定销售的商户")
-    public Result<?> searchBuyerDontHaveSale() {
+    @ApiOperation(description = "查询未绑定销售的商户")
+    public Result<List<Map<String, Object>>> searchBuyerDontHaveSale() {
         List<Map<String, Object>> buyers = buyerManageService.searchBuyerDontHaveSale();
         log.debug("返回参数:{}", buyers);
         return Result.buildQueryOk(buyers);
@@ -566,8 +566,8 @@ public class BuyerManageController {
      *  查询绑定销售的商户数
      * * */
     @GetMapping("/searchBuyerHaveSale")
-    @ApiOperation(value = "查询未绑定销售的商户")
-    public Result<?> searchBuyerHaveSale() {
+    @ApiOperation(description = "查询未绑定销售的商户")
+    public Result<List<Map<String, Object>>> searchBuyerHaveSale() {
         List<Map<String, Object>> buyers = buyerManageService.searchBuyerHaveSale();
         log.debug("返回参数:{}", buyers);
         return Result.buildQueryOk(buyers);
@@ -577,7 +577,7 @@ public class BuyerManageController {
      * 查询销售下的商户定位
      */
     @GetMapping("/findBuyerAddressByUserId")
-    @ApiOperation(value = "查询销售下的商户定位")
+    @ApiOperation(description = "查询销售下的商户定位")
     public Result<List<Map<String, Object>>> findBuyerAddressByUserId(Long userId, HttpSession session) {
         log.debug("请求参数:{}", userId);
         List<Map<String, Object>> mapList = buyerManageService.findBuyerAddressByUserId(userId);
@@ -588,7 +588,7 @@ public class BuyerManageController {
      * 月新增商户数
      */
     @GetMapping("/month/buyerCounts")
-    @ApiOperation(value = "月新增商户数")
+    @ApiOperation(description = "月新增商户数")
     public Result<List<Map<String,Object>>> findBuyerCountsToMonth(){
         List<Map<String, Object>> mapList = buyerManageService.findBuyerCountsToMonth();
         return Result.buildQueryOk(mapList);
@@ -598,7 +598,7 @@ public class BuyerManageController {
      * 日新增商户数
      */
     @GetMapping("/day/buyerCounts")
-    @ApiOperation(value = "日新增商户数")
+    @ApiOperation(description = "日新增商户数")
     public Result<List<Map<String,Object>>> findBuyerCountsToDay(){
         List<Map<String, Object>> mapList = buyerManageService.findBuyerCountsToDay();
         return Result.buildQueryOk(mapList);

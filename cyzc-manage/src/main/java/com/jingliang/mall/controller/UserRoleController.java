@@ -8,15 +8,15 @@ import com.jingliang.mall.entity.UserRole;
 import com.jingliang.mall.req.UserRoleReq;
 import com.jingliang.mall.resp.UserRoleResp;
 import com.jingliang.mall.service.UserRoleService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -30,7 +30,7 @@ import java.util.Objects;
  * @date 2019-11-01 15:13:01
  */
 @RestController
-@Api(tags = "用户角色表")
+@Api(description = "用户角色表")
 @Slf4j
 @RequestMapping(value = "/back/userRole")
 public class UserRoleController {
@@ -49,7 +49,7 @@ public class UserRoleController {
      * 保存/修改用户角色关系
      */
     @PostMapping("/save")
-    @ApiOperation(value = "保存/修改用户角色关系")
+    @ApiOperation(description = "保存/修改用户角色关系")
     public Result<UserRoleResp> pageAllProduct(@RequestBody UserRoleReq userRoleReq, @ApiIgnore HttpSession session) {
         Boolean isAvailable = userRoleReq.getIsAvailable();
         if (Objects.isNull(userRoleReq.getUserId()) || Objects.isNull(userRoleReq.getRoleId()) || Objects.isNull(isAvailable)) {

@@ -8,8 +8,8 @@ import com.jingliang.mall.resp.ProductTypeResp;
 import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.ProductTypeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -36,7 +36,7 @@ import java.util.Objects;
 @RestController("backProductTypeController")
 @Slf4j
 @RequestMapping("/back/productType")
-@Api(tags = "商品分类")
+@Api(description = "商品分类")
 public class ProductTypeController {
     /**
      * session用户Key
@@ -57,7 +57,7 @@ public class ProductTypeController {
     /**
      * 添加商品分类
      */
-    @ApiOperation(value = "添加商品分类")
+    @ApiOperation(description = "添加商品分类")
     @PostMapping("/save")
     public Result<ProductTypeResp> saveProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productTypeReq);
@@ -100,7 +100,7 @@ public class ProductTypeController {
     /**
      * 删除商品分类
      */
-    @ApiOperation(value = "删除商品分类")
+    @ApiOperation(description = "删除商品分类")
     @PostMapping("/delete")
     public Result<ProductTypeResp> deleteProductTypeResp(@RequestBody ProductTypeReq productTypeReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productTypeReq);
@@ -131,7 +131,7 @@ public class ProductTypeController {
     /**
      * 分页查询所有商品分类
      */
-    @ApiOperation(value = "分页查询所有商品分类")
+    @ApiOperation(description = "分页查询所有商品分类")
     @GetMapping("/page/all")
     public Result<MallPage<ProductTypeResp>> pageAllProductTypeResp(ProductTypeReq productTypeReq) {
         log.debug("请求参数：{}", productTypeReq);
@@ -158,7 +158,7 @@ public class ProductTypeController {
     /**
      * 查询所有商品分类
      */
-    @ApiOperation(value = "查询所有商品分类")
+    @ApiOperation(description = "查询所有商品分类")
     @GetMapping("/all")
     public Result<List<ProductTypeResp>> pageAllProductTypeResp() {
         List<ProductType> productTypes = productTypeService.findAll();

@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.jingliang.mall.ali.service.AliPayService;
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.*;
@@ -9,8 +10,8 @@ import com.jingliang.mall.resp.OrderResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.*;
 import com.jingliang.mall.wx.service.WechatService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -39,7 +40,7 @@ import java.util.*;
  * @date 2019-09-26 11:25:09
  */
 @RequestMapping("/front/order")
-@Api(tags = "订单")
+@Api(description = "订单")
 @RestController
 @Slf4j
 public class OrderController {
@@ -63,12 +64,13 @@ public class OrderController {
     private final UserService userService;
     private final BuyerAddressService buyerAddressService;
     private final RegionService regionService;
+    private final AliPayService aliPayService;
 
     public OrderController(RedisTemplate<String, Object> redisTemplate, OrderService orderService,
                            ProductService productService, BuyerCouponService buyerCouponService, RedisService redisService,
                            BuyerService buyerService, WechatService wechatService, RabbitProducer rabbitProducer,
                            ConfigService configService, BuyerCouponLimitService buyerCouponLimitService, GoldLogService goldLogService, UserService userService,
-                           BuyerAddressService buyerAddressService, RegionService regionService) {
+                           BuyerAddressService buyerAddressService, RegionService regionService, AliPayService aliPayService) {
         this.orderService = orderService;
         this.productService = productService;
         this.buyerCouponService = buyerCouponService;
@@ -82,13 +84,14 @@ public class OrderController {
         this.userService = userService;
         this.buyerAddressService = buyerAddressService;
         this.regionService = regionService;
+        this.aliPayService = aliPayService;
     }
 
 
     /**
      * 创建订单
      */
-    @ApiOperation(value = "创建订单")
+    @ApiOperation(description = "创建订单")
     @PostMapping("/save")
     public Result<Map<String, String>> save(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
@@ -364,6 +367,26 @@ public class OrderController {
                 }
             }
         }
+/*        if (Objects.equals(order.getPayWay(), 400)) {
+            if (!order.getPayableFee().equals(0L)) {
+                //支付宝支付
+                try {
+                    // 1、验证订单是否存在
+                    if (StringUtils.isBlank(order.getOrderNo())){
+                        return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_FAIL);
+                    }
+                    // 2、创建支付宝订单
+                    for (OrderDetail detail:orderDetails){
+                        Product product = productService.findAllById(detail.getProductId());
+
+                    }
+                    String orderStr = aliPayService.createOrder(order.getOrderNo(), Double.longBitsToDouble(order.getPayableFee()/100));
+                } catch (Exception e) {
+                    log.error(e.getMessage());
+                    return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_FAIL);
+                }
+            }
+        }*/
         if (order.getPayableFee().equals(0L)) {
             order.setOrderStatus(300);
         }
@@ -431,7 +454,7 @@ public class OrderController {
     /**
      * 取消订单
      */
-    @ApiOperation(value = "取消订单")
+    @ApiOperation(description = "取消订单")
     @PostMapping("/cancel")
     public Result<OrderResp> cancel(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
@@ -456,7 +479,7 @@ public class OrderController {
     /**
      * 订单完成确认
      */
-    @ApiOperation(value = "订单完成确认")
+    @ApiOperation(description = "订单完成确认")
     @PostMapping("/confirm")
     public Result<OrderResp> confirm(@RequestBody OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
@@ -481,7 +504,7 @@ public class OrderController {
     /**
      * 分页查询全部用户订单信息
      */
-    @ApiOperation(value = "分页查询全部用户订单信息")
+    @ApiOperation(description = "分页查询全部用户订单信息")
     @GetMapping("/page/all")
     public Result<MallPage<OrderResp>> pageAll(OrderReq orderReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", orderReq);
@@ -515,7 +538,7 @@ public class OrderController {
     /**
      * 根据订单总价查询运费金额
      */
-    @ApiOperation(value = "根据订单总价查询运费金额")
+    @ApiOperation(description = "根据订单总价查询运费金额")
     @GetMapping("/find/deliverFee")
     public Result<Double> getDeliverFee(Double deliverFee) {
         Config config = configService.findByCode("100");
@@ -529,7 +552,7 @@ public class OrderController {
     /**
      * 根据订单总价查询赠品
      */
-    @ApiOperation(value = "根据订单总价查询赠品")
+    @ApiOperation(description = "根据订单总价查询赠品")
     @GetMapping("/find/gift")
     public Result<List<OrderDetailResp>> findOrderGift(Double deliverFee) {
         Config config = configService.findByCode("600");

@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.util.Date;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.swagger.annotations.ApiModel;
+import com.citrsw.annatation.ApiModel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.format.annotation.DateTimeFormat;
-import io.swagger.annotations.ApiModelProperty;
+import com.citrsw.annatation.ApiProperty;
 import java.io.Serializable;
 
 /**
@@ -20,7 +20,7 @@ import java.io.Serializable;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-@ApiModel(value = "BuyerSaleResp", description = "商户销售绑定表")
+@ApiModel(name = "BuyerSaleResp", description = "商户销售绑定表")
 public class BuyerSaleResp implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -28,28 +28,28 @@ public class BuyerSaleResp implements Serializable {
 	/**
 	 * 主键Id
 	 */
-	@ApiModelProperty(value = "主键Id")
+	@ApiProperty(description = "主键Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long id;
 
 	/**
 	 * 商户Id
 	 */
-	@ApiModelProperty(value = "商户Id")
+	@ApiProperty(description = "商户Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long buyerId;
 
 	/**
 	 * 销售Id
 	 */
-	@ApiModelProperty(value = "销售Id")
+	@ApiProperty(description = "销售Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long saleId;
 
 	/**
 	 * 绑定时间
 	 */
-	@ApiModelProperty(value = "绑定时间")
+	@ApiProperty(description = "绑定时间")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date createTime;
@@ -57,7 +57,7 @@ public class BuyerSaleResp implements Serializable {
 	/**
 	 * 解绑时间
 	 */
-	@ApiModelProperty(value = "解绑时间")
+	@ApiProperty(description = "解绑时间")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date untyingTime;
@@ -65,26 +65,26 @@ public class BuyerSaleResp implements Serializable {
 	/**
 	 * 是否可用 0：否，1：是
 	 */
-	@ApiModelProperty(value = "是否可用 0：否，1：是")
+	@ApiProperty(description = "是否可用 0：否，1：是")
 	private Boolean isAvailable;
 
 	/**
 	 * 更新人Id
 	 */
-	@ApiModelProperty(value = "更新人Id")
+	@ApiProperty(description = "更新人Id")
 	@JsonSerialize(using = ToStringSerializer.class)
 	private Long updateUserId;
 
 	/**
 	 * 更新人
 	 */
-	@ApiModelProperty(value = "更新人")
+	@ApiProperty(description = "更新人")
 	private String updateUser;
 
 	/**
 	 * 更新时间
 	 */
-	@ApiModelProperty(value = "更新时间")
+	@ApiProperty(description = "更新时间")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date updateTime;

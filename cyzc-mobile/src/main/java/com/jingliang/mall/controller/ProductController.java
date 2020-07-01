@@ -11,8 +11,8 @@ import com.jingliang.mall.req.ProductReq;
 import com.jingliang.mall.resp.ProductResp;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.utils.PageMapperUtils;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,7 +38,7 @@ import java.util.Objects;
  * @version 1.0.0
  * @date 2019-09-22 14:40:54
  */
-@Api(tags = "商品")
+@Api(description = "商品")
 @RestController
 @Slf4j
 @RequestMapping("/front/product")
@@ -59,7 +59,7 @@ public class ProductController {
      * 分页查询全部商品
      */
     @GetMapping("/page/all")
-    @ApiOperation(value = "分页查询全部商品")
+    @ApiOperation(description = "分页查询全部商品")
     public Result<MallPage<ProductResp>> pageAllProduct(ProductReq productReq, HttpSession session) {
         log.debug("请求参数：{}", productReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
@@ -116,7 +116,7 @@ public class ProductController {
     /**
      * 根据Id查询商品信息
      */
-    @ApiOperation(value = "根据Id查询商品信息")
+    @ApiOperation(description = "根据Id查询商品信息")
     @GetMapping("/id")
     public Result<ProductResp> findById(Long id) {
         log.debug("请求参数：{}", id);

@@ -7,8 +7,8 @@ import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.GoldLog;
 import com.jingliang.mall.resp.GoldLogResp;
 import com.jingliang.mall.service.GoldLogService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 @RestController
 @Slf4j
-@Api(tags = "签到日志")
+@Api(description = "签到日志")
 @RequestMapping(value = "/back/gold")
 public class GoldLogController {
 
@@ -53,7 +53,7 @@ public class GoldLogController {
      * 查询签到领取金币的记录
      */
     @GetMapping("/page/all")
-    @ApiOperation("查询签到领取金币的记录")
+    @ApiOperation(description = "查询签到领取金币的记录")
     public Result<MallPage<GoldLogResp>> signIn(@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer pageSize, Integer type, @ApiIgnore HttpSession session) {
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         PageRequest pageRequest = PageRequest.of(page, pageSize);

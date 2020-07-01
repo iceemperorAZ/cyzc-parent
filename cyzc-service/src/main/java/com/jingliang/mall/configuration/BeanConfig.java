@@ -3,8 +3,8 @@ package com.jingliang.mall.configuration;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -21,12 +21,10 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import org.thymeleaf.expression.Maps;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Bean配置
@@ -100,7 +98,7 @@ public class BeanConfig {
      */
     @Bean
     public Queue orderQueue() {
-        Map<String, Object> argsMap = Maps.newHashMap();
+        Map<String, Object> argsMap = new LinkedHashMap<>();
         argsMap.put("x-dead-letter-exchange", env.getProperty("rabbitmq.order.pay.dead.exchange"));
         argsMap.put("x-dead-letter-routing-key", env.getProperty("rabbitmq.order.pay.dead.routing.key"));
         return new Queue(Objects.requireNonNull(env.getProperty("rabbitmq.order.pay.dead.queue")), true, false, false, argsMap);
@@ -166,7 +164,7 @@ public class BeanConfig {
      */
     @Bean
     public Queue skuQueue() {
-        Map<String, Object> argsMap = Maps.newHashMap();
+        Map<String, Object> argsMap =new LinkedHashMap<>();
         argsMap.put("x-dead-letter-exchange", env.getProperty("rabbitmq.order.pay.dead.exchange"));
         argsMap.put("x-dead-letter-routing-key", env.getProperty("rabbitmq.sku.routing.key"));
         return new Queue(Objects.requireNonNull(env.getProperty("rabbitmq.sku.queue")), true, false, false, argsMap);
@@ -186,7 +184,7 @@ public class BeanConfig {
      */
     @Bean
     public Queue couponQueue() {
-        Map<String, Object> argsMap = Maps.newHashMap();
+        Map<String, Object> argsMap = new LinkedHashMap<>();
         argsMap.put("x-dead-letter-exchange", env.getProperty("rabbitmq.order.pay.dead.exchange"));
         argsMap.put("x-dead-letter-routing-key", env.getProperty("rabbitmq.coupon.routing.key"));
         return new Queue(Objects.requireNonNull(env.getProperty("rabbitmq.coupon.queue")), true, false, false, argsMap);

@@ -1,7 +1,8 @@
 package com.jingliang.mall.common;
 
-import com.google.common.collect.Lists;
+import org.apache.commons.compress.utils.Lists;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -131,15 +132,15 @@ public interface Msg {
     Integer REQUEST_FAIL = 501;
     String TEXT_REQUEST_FAIL = "请求方式错误，当前请求方式为[#nowReq#],实际支持请求方式为[#req#]";
 
-    List<String> orderExcelTitle = Lists.newArrayList("单据日期", "单据编号", "大区", "客户编号", "客户名称", "销售人员"
+    List<String> orderExcelTitle = Arrays.asList("单据日期", "单据编号", "大区", "客户编号", "客户名称", "销售人员"
             , "优惠金额", "客户承担费用", "订单金额", "本次收款", "使用金币数", "待返金币数", "已返金币数", "结算账户", "单据备注", "商品编号", "商品名称", "商品型号", "属性",
             "单位", "数量", "单价", "折扣率%", "折扣额", "金额", "税率%", "仓库", "收货地址", "备注");
 
-    List<String> buyerCountsToUserExcelTitle = Lists.newArrayList("时间", "新增数量", "销售员ID", "销售员", "区域经理", "区域");
+    List<String> buyerCountsToUserExcelTitle = Arrays.asList("时间", "新增数量", "销售员ID", "销售员", "区域经理", "区域");
 
-    List<String> offlineOrderExcelTitle = Lists.newArrayList("客户要求送货日期和时间", "商品名称", "商品规格", "单位", "数量", "单价(元)", "总价", "商铺名称", "客户姓名", "客户电话", "客户地址", "业务员姓名", "业务员电话", "备注");
-    List<String> offlineOrderExcelTitle2 = Lists.newArrayList("商铺名称", "客户姓名", "客户电话", "商品名称", "商品规格", "单位", "数量", "单价(元)", "总价(元)", "省", "市", "区/县", "客户地址", "客户要求送货日期和时间", "业务员Id", "业务员姓名", "业务员工号", "业务员电话", "备注", "创建时间", "开具发票进度", "发票类型", "单位名称", "纳税人识别码", "注册地址", "注册电话", "开户银行", "银行账号", "快递联系人", "联系电话", "快递地址");
-    List<String> buyerExcelTitle = Lists.newArrayList("主键ID", "手机号", "注册时间");
+    List<String> offlineOrderExcelTitle = Arrays.asList("客户要求送货日期和时间", "商品名称", "商品规格", "单位", "数量", "单价(元)", "总价", "商铺名称", "客户姓名", "客户电话", "客户地址", "业务员姓名", "业务员电话", "备注");
+    List<String> offlineOrderExcelTitle2 = Arrays.asList("商铺名称", "客户姓名", "客户电话", "商品名称", "商品规格", "单位", "数量", "单价(元)", "总价(元)", "省", "市", "区/县", "客户地址", "客户要求送货日期和时间", "业务员Id", "业务员姓名", "业务员工号", "业务员电话", "备注", "创建时间", "开具发票进度", "发票类型", "单位名称", "纳税人识别码", "注册地址", "注册电话", "开户银行", "银行账号", "快递联系人", "联系电话", "快递地址");
+    List<String> buyerExcelTitle = Arrays.asList("主键ID", "手机号", "注册时间");
     String EXEMPTION = "\n" +
             "厨亿直采服务协议\n" +
             "本《厨亿直采服务协议》(下称“协议”)是您与上海晶粮贸易有限公司(下称“厨亿直采”)的经营者之间就厨亿直釆服务等相关事宜所订立的契约。\n" +

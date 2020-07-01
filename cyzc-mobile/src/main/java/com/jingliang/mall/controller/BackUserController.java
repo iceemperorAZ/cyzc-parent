@@ -7,7 +7,7 @@ import com.jingliang.mall.req.UserReq;
 import com.jingliang.mall.resp.UserResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.UserService;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +56,7 @@ public class BackUserController {
     /**
      * 后台登录
      */
-    @ApiOperation(value = "后台登录")
+    @ApiOperation(description = "后台登录")
     @PostMapping("/back/login")
     public void backLogin(@RequestBody UserReq userReq, HttpServletResponse response) throws IOException {
         response.setContentType("application/json;charset=UTF-8");

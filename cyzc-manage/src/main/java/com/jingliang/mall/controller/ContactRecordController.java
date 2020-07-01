@@ -8,7 +8,7 @@ import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.ContactRecordReq;
 import com.jingliang.mall.resp.ContactRecordResp;
 import com.jingliang.mall.service.ContactRecordService;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -29,7 +29,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2020-01-15 10:17:00
  */
-@Api(tags = "商户联系记录")
+@Api(description = "商户联系记录")
 @RestController
 @Slf4j
 @RequestMapping(value = "/back/contactRecord")

@@ -12,12 +12,12 @@ import com.jingliang.mall.req.UserGroupReq;
 import com.jingliang.mall.req.UserReq;
 import com.jingliang.mall.resp.UserGroupResp;
 import com.jingliang.mall.resp.UserResp;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.annotations.Api;
+import com.citrsw.annatation.Api;
 import com.jingliang.mall.service.UserGroupService;
 
 import java.util.Objects;
@@ -32,7 +32,7 @@ import java.util.Objects;
 @RestController
 @Slf4j
 @RequestMapping(value = "/back/userGroup")
-@Api(tags = "员工与组关系映射表")
+@Api(description = "员工与组关系映射表")
 public class UserGroupController {
 
 	private final UserGroupService userGroupService;
@@ -43,7 +43,7 @@ public class UserGroupController {
 	}
 
 	@PostMapping("/save")
-	@ApiOperation(value = "更新/增加新组员")
+	@ApiOperation(description = "更新/增加新组员")
     public Result<UserGroupResp> saveGroupUser(@RequestBody UserReq userReq){
 	    log.debug("请求参数:{}",userReq);
 	    //对前台参数进行校验
@@ -61,7 +61,7 @@ public class UserGroupController {
     }
 
     @PostMapping("/delete")
-    @ApiOperation(value = "逻辑删除组员")
+    @ApiOperation(description = "逻辑删除组员")
     public Result<UserGroupResp> deleteGroupUser(@RequestBody UserGroupReq userGroupReq){
 	    log.debug("请求参数：{}",userGroupReq);
 	    if (Objects.isNull(userGroupReq)){
@@ -77,7 +77,7 @@ public class UserGroupController {
     }
 
 	@GetMapping("/getPageAll")
-	@ApiOperation(value = "分页查询分组的成员")
+	@ApiOperation(description = "分页查询分组的成员")
 	//此处需要前台传来该组的数据
 	public Result<MallPage<UserResp>> pageAllUserByGroup(GroupReq groupReq){
 		log.debug("请求参数:{}",groupReq);

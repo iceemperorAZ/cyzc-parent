@@ -7,15 +7,15 @@ import com.jingliang.mall.entity.OrderDetail;
 import com.jingliang.mall.req.OrderDetailReq;
 import com.jingliang.mall.service.CartService;
 import com.jingliang.mall.service.OrderDetailService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.servlet.http.HttpSession;
 import java.util.Date;
@@ -29,7 +29,7 @@ import java.util.Objects;
  * @version 1.0.0
  * @date 2019-09-26 09:10:24
  */
-@Api(tags = "订单详情")
+@Api(description = "订单详情")
 @RestController
 @RequestMapping("/front/orderDetail")
 @Slf4j
@@ -47,9 +47,9 @@ public class OrderDetailController {
     /**
      * 再来一单
      */
-    @ApiOperation(value = "再来一单")
+    @ApiOperation(description = "再来一单")
     @PostMapping("/again")
-    public Result<?> again(@RequestBody OrderDetailReq orderDetailReq, @ApiIgnore HttpSession session) {
+    public Result<Object> again(@RequestBody OrderDetailReq orderDetailReq, @ApiIgnore HttpSession session) {
         if (Objects.isNull(orderDetailReq.getOrderId())) {
             return Result.buildParamFail();
         }

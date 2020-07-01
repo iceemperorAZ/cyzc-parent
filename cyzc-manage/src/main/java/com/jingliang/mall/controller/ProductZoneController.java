@@ -11,8 +11,8 @@ import com.jingliang.mall.service.ProductZoneService;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.req.ProductZoneReq;
 import com.jingliang.mall.resp.ProductZoneResp;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
  */
 @RequestMapping("/back/productZone")
 @RestController
-@Api(tags = "商品区")
+@Api(description = "商品区")
 @Slf4j
 public class ProductZoneController {
     /**
@@ -61,7 +61,7 @@ public class ProductZoneController {
     /**
      * 保存商品区
      */
-    @ApiOperation(value = "添加商品区")
+    @ApiOperation(description = "添加商品区")
     @PostMapping("/save")
     public Result<ProductZoneResp> save(@RequestBody ProductZoneReq productZoneReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productZoneReq);
@@ -79,7 +79,7 @@ public class ProductZoneController {
     /**
      * 保存商品区目标列表
      */
-    @ApiOperation(value = "保存商品区目标列表")
+    @ApiOperation(description = "保存商品区目标列表")
     @PostMapping("/save/details")
     public Result<ProductZoneResp> addDetails(@RequestBody ProductZoneReq productZoneReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productZoneReq);
@@ -149,7 +149,7 @@ public class ProductZoneController {
     /**
      * 分页查询所有商品区
      */
-    @ApiOperation(value = "分页查询所有商品区")
+    @ApiOperation(description = "分页查询所有商品区")
     @GetMapping("/page/all")
     public Result<MallPage<ProductZoneResp>> pageAll(ProductZoneReq productZoneReq) {
         log.debug("请求参数：{}", productZoneReq);
@@ -179,7 +179,7 @@ public class ProductZoneController {
     /**
      * 批量删除商品区
      */
-    @ApiOperation(value = "批量删除商品区")
+    @ApiOperation(description = "批量删除商品区")
     @PostMapping("/batch/delete")
     public Result<List<ProductZoneResp>> batchDelete(@RequestParam List<Long> ids, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", ids);

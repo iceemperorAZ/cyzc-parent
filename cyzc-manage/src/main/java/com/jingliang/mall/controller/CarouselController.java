@@ -7,8 +7,8 @@ import com.jingliang.mall.req.CarouselReq;
 import com.jingliang.mall.resp.CarouselResp;
 import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.service.CarouselService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.annotations.ApiIgnore;
+import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -35,7 +35,7 @@ import java.util.Objects;
 @RestController
 @Slf4j
 @RequestMapping(value = "/back/carousel")
-@Api(tags = "轮播图配置")
+@Api(description = "轮播图配置")
 public class CarouselController {
     /**
      * session用户Key
@@ -53,7 +53,7 @@ public class CarouselController {
     /**
      * 保存/修改轮播图配置
      */
-    @ApiOperation(value = "保存/修改轮播图配置")
+    @ApiOperation(description = "保存/修改轮播图配置")
     @PostMapping("/save")
     public Result<CarouselResp> save(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", carouselReq);
@@ -86,7 +86,7 @@ public class CarouselController {
     /**
      * 分页查询全部轮播图配置
      */
-    @ApiOperation(value = "分页查询全部轮播图配置")
+    @ApiOperation(description = "分页查询全部轮播图配置")
     @GetMapping("/page/all")
     public Result<MallPage<CarouselResp>> pageAllCoupon(CarouselReq carouselReq) {
         log.debug("请求参数：{}", carouselReq);
@@ -111,7 +111,7 @@ public class CarouselController {
     /**
      * 删除轮播图配置
      */
-    @ApiOperation(value = "删除轮播图配置")
+    @ApiOperation(description = "删除轮播图配置")
     @PostMapping("/delete")
     public Result<CarouselResp> delete(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", carouselReq);
@@ -137,7 +137,7 @@ public class CarouselController {
     /**
      * 保存/修改首页图配置
      */
-    @ApiOperation(value = "保存/修改首页图配置")
+    @ApiOperation(description = "保存/修改首页图配置")
     @PostMapping("/index/img/save")
     public Result<CarouselResp> indexImg(@RequestBody CarouselReq carouselReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", carouselReq);
@@ -177,7 +177,7 @@ public class CarouselController {
     /**
      * 查询首页图配置
      */
-    @ApiOperation(value = "查询首页图配置")
+    @ApiOperation(description = "查询首页图配置")
     @GetMapping("/index/img")
     public Result<CarouselResp> indexImg() {
         return Result.buildQueryOk(BeanMapper.map(carouselService.findByType(-100), CarouselResp.class));
