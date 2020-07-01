@@ -25,7 +25,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableApi
 @ApiConfigs(
         underline = false,
-        apiConfig = {@ApiConfig(space = "厨亿直采-后端", description = "上海晶粮信息科技公司于2017年注册，公司主营项目:区块链.大数据的应用.智慧社区.新零售“微米铺”是晶粮信息科技依托市政府便民工程响应政府号召，孵化的第 一个便民、惠民、益民项目。我们以“智慧微菜场”的新服务模式进入社区。居民享受便捷的服务，以最短的距离，更快的时间购买到更安全的产品。", email = "15706058532@163.com", title = "中国IT资源分享网站",
+        apiConfig = {@ApiConfig(space = "厨亿直采-后端", description = "上海晶粮信息科技公司于2017年注册，公司主营项目:区块链.大数据的应用.智慧社区.新零售“微米铺”是晶粮信息科技依托市政府便民工程响应政府号召，孵化的第 一个便民、惠民、益民项目。我们以“智慧微菜场”的新服务模式进入社区。居民享受便捷的服务，以最短的距离，更快的时间购买到更安全的产品。", email = "15706058532@163.com", title = "厨亿直采-后端",
                 website = "https://shanghaijingliang.com", basePackages = {"com.jingliang.mall.controller"})})
 public class TobMallManageApplication {
     /**
