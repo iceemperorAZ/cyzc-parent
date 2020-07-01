@@ -49,7 +49,7 @@ public class OrderDetailController {
      */
     @ApiOperation(description = "再来一单")
     @PostMapping("/again")
-    public Result<?> again(@RequestBody OrderDetailReq orderDetailReq, @ApiIgnore HttpSession session) {
+    public Result<Object> again(@RequestBody OrderDetailReq orderDetailReq, @ApiIgnore HttpSession session) {
         if (Objects.isNull(orderDetailReq.getOrderId())) {
             return Result.buildParamFail();
         }

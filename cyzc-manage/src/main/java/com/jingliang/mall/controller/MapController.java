@@ -118,7 +118,7 @@ public class MapController {
      * @return
      */
     @GetMapping("/readMapToEndtime")
-    public Result<?> userAddressHistoryToEndTime() {
+    public Result<List<Map<String, Object>>> userAddressHistoryToEndTime() {
         List<Map<String, Object>> mapList = mapService.userAddressHistoryToEndTime();
         Map<String, Map<String, Object>> map = new HashMap<>(156);
         mapList.forEach(stringObjectMap -> {
@@ -141,7 +141,7 @@ public class MapController {
      * */
     @GetMapping("/searchSaleByGroup")
     @ApiOperation(description = "根据分区查询销售员定位的最后一条记录")
-    public Result<?> searchSaleByGroup(String groupNo) {
+    public Result<List<Map<String, Object>>> searchSaleByGroup(String groupNo) {
         List<Map<String, Object>> mapList = mapService.searchSaleByGroup(groupNo);
         Map<String, Map<String, Object>> map = new HashMap<>(156);
         mapList.forEach(stringObjectMap -> {

@@ -282,8 +282,8 @@ public class UserController {
      * 根据id逻辑删除用户
      */
     @PostMapping("/delete")
-    @ApiOperation(description = "根据id逻辑删除用户")
-    public Result<?> deleteUser(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
+   @ApiOperation(description = "根据id逻辑删除用户")
+    public Result<List<Buyer>> deleteUser(@RequestBody UserReq userReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", userReq);
         if (userReq.getId() <= 0 || userReq.getId() == null) {
             return Result.build(Msg.FAIL, "该用户可能不存在，请联系管理员核实");
@@ -294,6 +294,7 @@ public class UserController {
         List<Buyer> buyers = buyerService.findAllBySaleUserId(userReq.getId());
         //如果名下没有商户，则逻辑删除
         if (Objects.isNull(buyers) || buyers.size() <= 0) {
+            assert oldUser != null;
             oldUser.setIsAvailable(false);
             oldUser.setUpdateTime(new Date());
             oldUser.setUpdateUserId(user.getId());
@@ -305,7 +306,7 @@ public class UserController {
             Buyer buyer = buyerService.findById(u.getBuyerId());
             buyer.setIsSealUp(true);
             buyerService.save(buyer);
-            return Result.buildDeleteOk(userResp);
+            return Result.buildOk();
         }
         //名下有商户，返回失败结果和其名下所有商户信息
         return Result.build(Msg.FAIL, "该用户名下有商户，无法删除", buyers);

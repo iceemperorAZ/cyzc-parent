@@ -37,7 +37,7 @@ public class BuyerSaleController {
 
 	@GetMapping("/getAllBuyerAndSaleByTimeToHtml")
 	@ApiOperation(description = "根据时间查询商户信息和绑定的销售以及所在大区展示到前台页面")
-	public Result<?> getAllBuyerAndSaleByTime(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date startTime,
+	public Result<List<Map<String, Object>> > getAllBuyerAndSaleByTime(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date startTime,
 											  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date endTime){
 		List<Map<String, Object>> buyerSaleByTime = buyerSaleService.findBuyerSaleByTimeToHtml(startTime, endTime);
 		return  Result.buildQueryOk(buyerSaleByTime);
@@ -45,7 +45,7 @@ public class BuyerSaleController {
 
 	@GetMapping("/getAllBuyerAndSaleByTimeToExcel")
 	@ApiOperation(description = "根据时间查询商户信息和绑定的销售以及所在大区展示到前台页面")
-	public Result<?> getAllBuyerAndSaleByTimeToExcel(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date startTime,
+	public Result<Object> getAllBuyerAndSaleByTimeToExcel(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date startTime,
 											  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")Date endTime){
 		Boolean flg = buyerSaleService.findBuyerSaleByTime(startTime, endTime);
 		if (!flg){

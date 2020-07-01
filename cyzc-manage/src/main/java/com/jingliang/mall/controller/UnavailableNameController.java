@@ -37,7 +37,7 @@ public class UnavailableNameController {
 
     @GetMapping("/saveUnableName")
     @ApiOperation(description = "更新并存储不可用名称")
-    public Result<?> updatsaveUnableName() {
+    public Result<List<UnavailableName>> updatsaveUnableName() {
         return Result.buildSaveOk(unavailableNameService.update());
     }
 

@@ -126,7 +126,7 @@ public class ManagerController {
      */
     @GetMapping("/searchAchievementsByYear")
     @ApiOperation(description = "根据年份查询绩效")
-    public Result<?> searchAchievementsByYear(Long parentGroupId,
+    public Result<Map<String, Object>> searchAchievementsByYear(Long parentGroupId,
                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                               HttpSession session) {
@@ -164,7 +164,7 @@ public class ManagerController {
      */
     @GetMapping("/searchAchievementsByMonth")
     @ApiOperation(description = "根据月份查询绩效")
-    public Result<?> searchAchievementsByMonth(Long parentGroupId,
+    public Result<Map<String, Object>> searchAchievementsByMonth(Long parentGroupId,
                                                @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                HttpSession session) {
@@ -203,7 +203,7 @@ public class ManagerController {
      * 查询总绩效-日
      */
     @GetMapping("/searchAchievementsByDay")
-    public Result<?> searchAchievementsByDay(Long parentGroupId,
+    public Result<Map<String, Object>> searchAchievementsByDay(Long parentGroupId,
                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                              HttpSession session) {
@@ -241,7 +241,7 @@ public class ManagerController {
      */
     @GetMapping("/searchAchievementsByYearAndGroupNo")
     @ApiOperation(description = "根据年份查询绩效")
-    public Result<?> searchAchievementsByYearAndGroupNo(String groupNo,
+    public Result<Map<String, Object>> searchAchievementsByYearAndGroupNo(String groupNo,
                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                         HttpSession session) {
@@ -279,7 +279,7 @@ public class ManagerController {
      */
     @GetMapping("/searchAchievementsByMonthAndGroupNo")
     @ApiOperation(description = "根据月份查询绩效")
-    public Result<?> searchAchievementsByMonthAndGroupNo(String groupNo,
+    public Result<Map<String, Object>> searchAchievementsByMonthAndGroupNo(String groupNo,
                                                          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                          @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                          HttpSession session) {
@@ -318,7 +318,7 @@ public class ManagerController {
      * 查询总绩效-日
      */
     @GetMapping("/searchAchievementsByDayAndGroupNo")
-    public Result<?> searchAchievementsByDayAndGroupNo(String groupNo,
+    public Result<Map<String, Object>> searchAchievementsByDayAndGroupNo(String groupNo,
                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                        HttpSession session) {
@@ -382,7 +382,7 @@ public class ManagerController {
      * */
     @GetMapping("/findOrdersTotalByGroupAndYear")
     @ApiOperation(description = "根据年份查询订单量-折线")
-    public Result<?> findOrdersTotalByGroupAndYear(Long parentGroupId,
+    public Result<Map<String, Object>> findOrdersTotalByGroupAndYear(Long parentGroupId,
                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                    HttpSession session) {
@@ -421,7 +421,7 @@ public class ManagerController {
      * */
     @GetMapping("/findOrdersTotalByGroupAndMonth")
     @ApiOperation(description = "根据年份查询订单量-折线")
-    public Result<?> findOrdersTotalByGroupAndMonth(Long parentGroupId,
+    public Result<Map<String, Object>> findOrdersTotalByGroupAndMonth(Long parentGroupId,
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                     HttpSession session) {
@@ -461,7 +461,7 @@ public class ManagerController {
      * */
     @GetMapping("/findOrdersTotalByGroupAndDay")
     @ApiOperation(description = "根据年份查询订单量-折线")
-    public Result<?> findOrdersTotalByGroupAndDay(Long parentGroupId,
+    public Result<Map<String, Object>> findOrdersTotalByGroupAndDay(Long parentGroupId,
                                                   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date startTime,
                                                   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date endTime,
                                                   HttpSession session) {
@@ -509,7 +509,7 @@ public class ManagerController {
 
     @GetMapping("/findSaleByGroup")
     @ApiOperation(description = "查询组下的所有销售和其名下商户数")
-    public Result<?> findSaleByGroup(String groupNo) {
+    public Result<List<Map<String, Object>>> findSaleByGroup(String groupNo) {
         if (!Objects.isNull(groupNo)) {
 //            //未传父组id，查询总绩效
 //            List<User> salies = managerService.findSaleByGroup(groupNo);
@@ -522,7 +522,7 @@ public class ManagerController {
 
     @GetMapping("/findGoldDontReturn")
     @ApiOperation(description = "查询未返金币的用户并返回金币")
-    public Result<?> findGoldDontReturn(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date createTime) {
+    public Result<Map<String, Integer>> findGoldDontReturn(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") Date createTime) {
         Map<String, Integer> goldDontReturn = managerService.findGoldDontReturn(createTime);
         return Result.buildSaveOk(goldDontReturn);
     }
@@ -534,7 +534,7 @@ public class ManagerController {
      */
     @GetMapping("/findParentGroupIdTo10DayLate")
     @ApiOperation(description = "根据父组id查询前10天的绩效")
-    public Result<?> findGoldDontReturn() {
+    public Result<Map<String, Object>> findGoldDontReturn() {
         List<Map<String, Object>> achievements = managerService.findGroupAchievementWithTimeBy10DayLate();
         log.debug("返回参数:{}", achievements);
         Set<Object> date = achievements.stream().map(stringObjectMap -> stringObjectMap.get("Days")).collect(Collectors.toSet());
@@ -570,7 +570,7 @@ public class ManagerController {
      */
     @GetMapping("/findGroupNoTo10DayLate")
     @ApiOperation(description = "按组查询前10天的绩效")
-    public Result<?> findGroupNoTo10DayLate(String groupNo) {
+    public Result<Map<String, Object>> findGroupNoTo10DayLate(String groupNo) {
         List<Map<String, Object>> achievements = managerService.findGroupAchievementWithTimeByGroupNo10DayLate(groupNo.replaceAll("0*$", "") + "%");
         log.debug("返回参数:{}", achievements);
         List<Object> date = achievements.stream().map(stringObjectMap -> stringObjectMap.get("Days")).collect(Collectors.toList());
@@ -593,7 +593,7 @@ public class ManagerController {
 
     @GetMapping("/findProductTypeSalePrice")
     @ApiOperation(description = "查询各个商品种类的销售情况")
-    public Result<?> findProductTypeSalePrice(String groupNo) {
+    public Result<List<Map<String, Object>> > findProductTypeSalePrice(String groupNo) {
         List<Map<String, Object>> typePrice = new ArrayList<>();
         if (Objects.isNull(groupNo)) {
             typePrice = managerService.findProductTypeSalePrice();

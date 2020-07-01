@@ -239,7 +239,7 @@ public class BuyerController {
      */
     @ApiOperation(description = "拉黑/解封商户")
     @PostMapping("/sealUpBuyer")
-    public Result<?> sealUpBuyer(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
+    public Result<BuyerResp> sealUpBuyer(@RequestBody BuyerReq buyerReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", buyerReq);
         //获取操作者
         User user = (User) session.getAttribute(sessionUser);

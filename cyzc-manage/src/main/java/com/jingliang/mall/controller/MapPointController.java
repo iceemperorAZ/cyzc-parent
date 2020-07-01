@@ -42,7 +42,7 @@ public class MapPointController {
 
     @PostMapping("/saveMap")
     @ApiOperation(description = "保存地图信息到数据库")
-    public Result<?> saveMap(@RequestParam("mapNo") String mapNo, @RequestParam("excel") MultipartFile multipartFile, HttpSession session) {
+    public Result<List<Map<String, Object>>> saveMap(@RequestParam("mapNo") String mapNo, @RequestParam("excel") MultipartFile multipartFile, HttpSession session) {
         log.debug("请求参数:{}", mapNo);
         User user = (User) session.getAttribute(sessionUser);
         if (Objects.isNull(multipartFile)) {
@@ -55,7 +55,7 @@ public class MapPointController {
 
     @GetMapping("/updateMap")
     @ApiOperation(description = "更新地图点位信息")
-    public Result<?> updateMap(@RequestBody MapDetailReq mapDetailReq) {
+    public Result<Object> updateMap(@RequestBody MapDetailReq mapDetailReq) {
         log.debug("请求参数:{}", mapDetailReq);
         MapDetail mapDetail = BeanMapper.map(mapDetailReq, MapDetail.class);
         Boolean flg = mapPointService.updateMap(mapDetail.getId(), mapDetail.getAddressDetail());
@@ -68,7 +68,7 @@ public class MapPointController {
 
     @GetMapping("/deleteMap")
     @ApiOperation(description = "清空点位信息")
-    public Result<?> deleteMap(@RequestParam("mapNo") String mapNo) {
+    public Result<List<MapDetail>> deleteMap(@RequestParam("mapNo") String mapNo) {
         log.debug("请求参数:{}", mapNo);
         List<MapDetail> mapDetails = mapPointService.deleteMap(mapNo);
         log.debug("返回参数:{}", mapDetails);
@@ -77,7 +77,7 @@ public class MapPointController {
 
     @GetMapping("/searchPointByMapNo")
     @ApiOperation(description = "根据地图编号查询点位")
-    public Result<?> searchPoint(Long id) {
+    public Result<MapDetail> searchPoint(Long id) {
         log.debug("请求参数:{}", id);
         MapDetail mapDetail = mapPointService.searchPointByMapNo(id);
         log.debug("返回参数:{}", mapDetail);
