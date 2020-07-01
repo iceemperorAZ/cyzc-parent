@@ -380,20 +380,18 @@ public class UserController {
     }
 
     /**
-     * 查询所有用户
+     * 查询所有用户(通过名字/工号)
      */
     @GetMapping("/list/all")
-    @ApiOperation(value = "查询所有用户")
+    @ApiOperation(value = "查询所有用户(通过名字/工号)")
     public Result<List<UserResp>> listAllUser(UserReq userReq) {
         log.debug("请求参数：{}", userReq);
         Specification<User> userSpecification = (Specification<User>) (root, query, cb) -> {
             List<Predicate> predicateList = new ArrayList<>();
-            //TODO 这个地方使用名字模糊查，工号和名字一起使用实现不太行，等回头有好点子再来搞，这个地方前端也不太好搞
-//            if (StringUtils.isNotBlank(userReq.getUserNo())) {
-//                predicateList.add(cb.like(root.get("userNo"), "%" + userReq.getUserNo() + "%"));
-//            }
             if (StringUtils.isNotBlank(userReq.getSearchName())) {
-                predicateList.add(cb.like(root.get("userName"), "%" + userReq.getSearchName() + "%"));
+                predicateList.add(cb.or(cb.like(root.get("userName"), "%" + userReq.getSearchName() + "%"),
+                        cb.like(root.get("userNo"), "%" + userReq.getSearchName() + "%"),
+                        cb.like(root.get("loginName"), "%" + userReq.getSearchName() + "%")));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             query.where(cb.and(predicateList.toArray(new Predicate[0])));
