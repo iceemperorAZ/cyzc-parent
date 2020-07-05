@@ -79,8 +79,8 @@ public class ProductController {
                 predicateList.add(cb.equal(root.get("productZoneId"), productReq.getProductZoneId()));
             }
             //此处增加判断用户所在区是否能够显示该商品
-            if (Objects.nonNull(productReq.getProductArea())){
-                predicateList.add(cb.equal(root.get("productArea"),productReq.getProductArea()));
+            if (Objects.nonNull(productReq.getProductArea())) {
+                predicateList.add(cb.equal(root.get("productArea"), productReq.getProductArea()));
             }
             predicateList.add(cb.equal(root.get("isAvailable"), true));
             predicateList.add(cb.equal(root.get("isShow"), true));
@@ -91,23 +91,25 @@ public class ProductController {
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
         List<Product> productList = productPage.getContent();
         List<Product> products = new ArrayList<>();
-        for (Product product : productList){
+        for (Product product : productList) {
             //设立标志，判断是否是第一次添加
             boolean flg = false;
+            //非空判断
+            product.setProductArea(product.getProductArea() == null ? "" : product.getProductArea());
             //商户默认地址所在区
             String buyerArea = productService.getBuyerProduct(buyer.getId());
             //商品不展示的几个分区
             String[] areaCode = product.getProductArea().split("/");
-            for (String area : areaCode){
-                if (StringUtils.equals(area,buyerArea)){
+            for (String area : areaCode) {
+                if (StringUtils.equals(area, buyerArea)) {
                     flg = true;
                 }
             }
-            if (!flg){
+            if (!flg) {
                 products.add(product);
             }
         }
-        Page<Product> pageProduct = PageMapperUtils.listToPage(products,pageRequest);
+        Page<Product> pageProduct = PageMapperUtils.listToPage(products, pageRequest);
         MallPage<ProductResp> productRespPage = MUtils.toMallPage(pageProduct, ProductResp.class);
         log.debug("返回结果：{}", productRespPage);
         return Result.buildQueryOk(productRespPage);
