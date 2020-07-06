@@ -69,7 +69,7 @@ public class SkuController {
             }
             if (StringUtils.isNotBlank(skuReq.getProductName())) {
                 try {
-                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%"), cb.equal(root.get("id"), Long.parseLong(skuReq.getProductName()))));
+                    predicateList.add(cb.or(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%"), cb.equal(root.get("productId"), Long.parseLong(skuReq.getProductName()))));
                 } catch (Exception e) {
                     predicateList.add(cb.or(cb.like(root.get("productName"), "%" + skuReq.getProductName() + "%")));
                 }
