@@ -98,15 +98,7 @@ public class VerificationImage {
     public static Map<String, String> createImage(int y) {
         Map<String, String> resultMap = new HashMap<>(5);
         try {
-            List<String> imgPats = Arrays.asList("0d4fe7865eb8e835362ed8c2d680aaef_320x180.png",
-                    "10c49611026ad7ffb7800616ea6224fa_320x180.png",
-                    "35d858cd8a92efc5241fb765ede76e83_320x180.png",
-                    "1433314648d7318ebae58ba2229e4de4_320x180.png",
-                    "ac12b2552a15dcf4151e5162a92959ee_320x180.png",
-                    "c3973634ba2d400b6c7d02b9db54afad_320x180.png",
-                    "e069312ae0bb8b3b4b2536558f564a8d_320x180.png",
-                    "e848420214958134f93b5af63eba2098_320x180.png",
-                    "f1cfe3beeb4edf6e2b12ea605e43e5ea_320x180.png`");
+            List<String> imgPats = Arrays.asList("8240a880b981a6d8695a11148476bf2.png");
             Random random = new Random();
             int nextInt = random.nextInt(imgPats.size());
             ClassPathResource classPathResource = new ClassPathResource("img/" + imgPats.get(nextInt));
