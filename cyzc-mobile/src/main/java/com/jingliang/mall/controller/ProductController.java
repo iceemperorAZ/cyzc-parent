@@ -91,13 +91,14 @@ public class ProductController {
         Page<Product> productPage = productService.findAll(productSpecification, pageRequest);
         List<Product> productList = productPage.getContent();
         List<Product> products = new ArrayList<>();
+        //商户默认地址所在区
+        String buyerArea = productService.getBuyerProduct(buyer.getId());
+        //添加向用户展示的商品到list
         for (Product product : productList) {
             //设立标志，判断是否是第一次添加
             boolean flg = false;
             //非空判断
             product.setProductArea(product.getProductArea() == null ? "" : product.getProductArea());
-            //商户默认地址所在区
-            String buyerArea = productService.getBuyerProduct(buyer.getId());
             //商品不展示的几个分区
             String[] areaCode = product.getProductArea().split("/");
             for (String area : areaCode) {
