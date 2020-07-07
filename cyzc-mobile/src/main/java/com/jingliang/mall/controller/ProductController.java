@@ -62,7 +62,7 @@ public class ProductController {
      */
     @GetMapping("/page/all")
     @ApiOperation(description = "分页查询全部商品")
-    public Result<MallPage<ProductResp>> pageAllProduct(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
+    public Result<MallPage<ProductResp>> pageAllProduct(ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         PageRequest pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize());
