@@ -1,5 +1,6 @@
 package com.jingliang.mall.controller;
 
+import com.citrsw.annatation.ApiIgnore;
 import com.jingliang.mall.common.BeanMapper;
 import com.jingliang.mall.common.MUtils;
 import com.jingliang.mall.common.MallPage;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,7 +62,7 @@ public class ProductController {
      */
     @GetMapping("/page/all")
     @ApiOperation(description = "分页查询全部商品")
-    public Result<MallPage<ProductResp>> pageAllProduct(ProductReq productReq, HttpSession session) {
+    public Result<MallPage<ProductResp>> pageAllProduct(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
         Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
         PageRequest pageRequest = PageRequest.of(productReq.getPage(), productReq.getPageSize());
