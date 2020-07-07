@@ -73,6 +73,16 @@ public class ProductController {
     @ApiOperation(description = "保存商品")
     public Result<ProductResp> save(@RequestBody ProductReq productReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", productReq);
+        if (StringUtils.isNotBlank(productReq.getProductArea())) {
+            String areas = productReq.getProductArea();
+            String replace = areas.replace(",", "");
+            /*String[] area = areas.split(",");
+            String productArea = "";
+            for (String pa : area) {
+                productArea = productArea.concat(pa);
+            }*/
+            productReq.setProductArea(replace);
+        }
         if (Objects.isNull(productReq.getProductTypeId()) || StringUtils.isBlank(productReq.getProductTypeName())
                 || StringUtils.isBlank(productReq.getProductName())
                 || Objects.isNull(productReq.getSellingPrice()) || StringUtils.isBlank(productReq.getSpecs()) || productReq.getProductSort() == null
@@ -235,6 +245,7 @@ public class ProductController {
         productReq.setExamineStatus(ExamineStatus.NOT_SUBMITTED.getValue());
         product = BeanMapper.map(productReq, Product.class);
         assert product != null;
+        product.setProductArea(productReq.getProductArea() == null ? "" : productReq.getProductArea());
         product.setProductImgUris(builder.length() > 1 ? builder.substring(1) : "");
         product.setProductDetailsImgUrls(detailsBuilder.length() > 1 ? detailsBuilder.substring(1) : "");
         product.setMinNum(Objects.isNull(productReq.getMinNum()) || productReq.getMinNum() < 0 ? 0 : productReq.getMinNum());
