@@ -199,4 +199,24 @@ public interface BuyerRepository extends BaseRepository<Buyer, Long> {
      * @return
      */
     Buyer findFirstByPhoneAndIsAvailable(String phone, Boolean isAvailable);
+
+    /**
+     * 查询区域经理下的销售的待审核商户总数
+     *
+     * @param manageId
+     * @return
+     */
+    @Query(value = "SELECT b.* FROM tb_buyer b LEFT JOIN tb_user u ON b.sale_user_id=u.id AND b.is_seal_up=0 AND u.is_available=1 " +
+            "WHERE b.buyer_status=100 AND u.manager_id=:manageId ", nativeQuery = true)
+    List<Buyer> findAllByManageId(Long manageId);
+
+    /**
+     * 查询区域经理下的销售的被驳回商户总数
+     *
+     * @param manageId
+     * @return
+     */
+    @Query(value = "SELECT b.* FROM tb_buyer b LEFT JOIN tb_user u ON b.sale_user_id=u.id AND b.is_seal_up=0 AND u.is_available=1 " +
+            "WHERE b.buyer_status=150 AND u.manager_id=:manageId ", nativeQuery = true)
+    List<Buyer> findAllNotReview(Long manageId);
 }

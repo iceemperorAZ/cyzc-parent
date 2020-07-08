@@ -41,7 +41,7 @@ public class BuyerCouponServiceImpl implements BuyerCouponService {
 
     @Override
     public List<BuyerCoupon> findAll(Long buyerId) {
-        return buyerCouponRepository.findAllByBuyerIdAndIsAvailable(buyerId,true);
+        return buyerCouponRepository.findAllByBuyerIdAndIsAvailable(buyerId, true);
     }
 
     @Override
@@ -62,5 +62,20 @@ public class BuyerCouponServiceImpl implements BuyerCouponService {
     @Override
     public List<BuyerCoupon> findAll(Specification<BuyerCoupon> buyerCouponSpecification) {
         return buyerCouponRepository.findAll(buyerCouponSpecification);
+    }
+
+    @Override
+    public List<BuyerCoupon> findAllbyBuyerIdAndTime(Long buyerId) {
+        return buyerCouponRepository.findAllbyBuyerIdAndTime(buyerId, new Date());
+    }
+
+    @Override
+    public List<BuyerCoupon> findAllToUseCoupon(Long productTypeId, Long buyerId) {
+        return buyerCouponRepository.findAllToUseCoupon(productTypeId, buyerId, new Date());
+    }
+
+    @Override
+    public BuyerCoupon findbyBuyerIdAndCouponIdAndTime(Long buyerId, Long couponId) {
+        return buyerCouponRepository.findbyBuyerIdAndCouponIdAndTime(buyerId, couponId, new Date());
     }
 }

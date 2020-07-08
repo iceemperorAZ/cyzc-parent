@@ -1,11 +1,11 @@
 package com.jingliang.mall.resp;
 
+import com.citrsw.annatation.ApiModel;
+import com.citrsw.annatation.ApiProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.citrsw.annatation.ApiModel;
-import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -245,12 +245,12 @@ public class BuyerResp implements Serializable {
      * 商铺图片url集合
      */
     @ApiProperty(description = "商铺图片url集合")
-    private List<String> buyerImdUrlsList;
+    private List<String> buyerImgUrlsList;
 
     /**
      * 营业执照url集合
      */
-    @ApiProperty(description = "business_license_urls")
+    @ApiProperty(description = "营业执照url集合")
     private List<String> businessLicenseUrlsList;
 
     /**
@@ -317,18 +317,18 @@ public class BuyerResp implements Serializable {
     /**
      * 商铺图片字符串转集合
      */
-    public void setBuyerImdUrlsList(String buyerImdUrlsList) {
-        this.buyerImdUrlsList = StringUtils.isBlank(buyerImdUrlsList) ? null : Arrays.asList(buyerImdUrlsList.split(";"));
+    public void setBuyerImdUrls(String buyerImdUrls) {
+        this.buyerImgUrlsList = StringUtils.isBlank(buyerImdUrls) ? null : Arrays.asList(buyerImdUrls.split(";"));
     }
 
     /**
      * 营业执照图片字符串转集合
      */
-    public void setBusinessLicenseList(String businessLicenseUrlsList) {
-        this.businessLicenseUrlsList = StringUtils.isBlank(businessLicenseUrlsList) ? null : Arrays.asList(businessLicenseUrlsList.split(";"));
+    public void setBusinessLicenseUrls(String businessLicenseUrls) {
+        this.businessLicenseUrlsList = StringUtils.isBlank(businessLicenseUrls) ? null : Arrays.asList(businessLicenseUrls.split(";"));
     }
 
-    public void setBuyerTypeLabelList(String buyerTypeLabelList) {
-        this.buyerTypeLabelList = StringUtils.isBlank(buyerTypeLabelList) ? null : Arrays.asList(buyerTypeLabelList.split(";"));
+    public void setBuyerTypeLabel(String buyerTypeLabel) {
+        this.buyerTypeLabelList = StringUtils.isBlank(buyerTypeLabel) ? null : Arrays.asList(buyerTypeLabel.split(";"));
     }
 }

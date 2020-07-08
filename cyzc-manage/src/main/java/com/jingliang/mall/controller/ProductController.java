@@ -245,6 +245,8 @@ public class ProductController {
         productReq.setExamineStatus(ExamineStatus.NOT_SUBMITTED.getValue());
         product = BeanMapper.map(productReq, Product.class);
         assert product != null;
+        //去前后空格
+        product.setProductName(productReq.getProductName().trim());
         product.setProductArea(productReq.getProductArea() == null ? "" : productReq.getProductArea());
         product.setProductImgUris(builder.length() > 1 ? builder.substring(1) : "");
         product.setProductDetailsImgUrls(detailsBuilder.length() > 1 ? detailsBuilder.substring(1) : "");

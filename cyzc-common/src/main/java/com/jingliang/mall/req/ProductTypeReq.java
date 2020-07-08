@@ -1,14 +1,15 @@
 package com.jingliang.mall.req;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.citrsw.annatation.ApiModel;
 import com.citrsw.annatation.ApiProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 商品分类表
@@ -160,11 +161,11 @@ public class ProductTypeReq extends BaseReq implements Serializable {
      * 商品分类base64图片
      */
     @ApiProperty(description = "商品分类base64图片")
-    private String productTypeImgBase64;
+    private List<String> productTypeImgBase64;
 
     /**
      * 商品分类图片url
      */
     @ApiProperty(description = "商品分类图片url")
-    private String productTypeImgUrl;
+    private List<String> productTypeImgUrl;
 }

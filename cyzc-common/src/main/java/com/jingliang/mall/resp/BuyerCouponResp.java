@@ -1,11 +1,11 @@
 package com.jingliang.mall.resp;
 
+import com.citrsw.annatation.ApiModel;
+import com.citrsw.annatation.ApiProperty;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.citrsw.annatation.ApiModel;
-import com.citrsw.annatation.ApiProperty;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -121,6 +121,7 @@ public class BuyerCouponResp implements Serializable {
      */
     @ApiProperty(description = " -1:未开始，100：未使用，200：已使用，300：已失效")
     private Integer status;
+
     public Integer getStatus() {
         //在生效期内
         if (receiveNum <= 0) {
@@ -144,6 +145,7 @@ public class BuyerCouponResp implements Serializable {
      */
     @ApiProperty(description = " -1:未开始，100：可使用，200：已使用，300：已失效")
     private String statusView;
+
     public String getStatusView() {
         if (receiveNum <= 0) {
             //已经使用过了
@@ -167,4 +169,30 @@ public class BuyerCouponResp implements Serializable {
      */
     @ApiProperty(description = "商品分类")
     private ProductTypeResp productType;
+
+    /**
+     * 满减条件
+     */
+    @ApiProperty(description = "满减条件")
+    private Double fullDecrement;
+
+    /**
+     * 优惠金额
+     */
+    @ApiProperty(description = "优惠金额")
+    private Double preferentialPrice;
+
+    /**
+     * 该商品是否可以使用该优惠券
+     */
+    @ApiProperty(description = "该商品是否可以使用该优惠券")
+    private boolean whetherToUse;
+
+    public Double getFullDecrement() {
+        return fullDecrement / 100;
+    }
+
+    public Double getPreferentialPrice() {
+        return preferentialPrice / 100;
+    }
 }

@@ -70,8 +70,36 @@ public interface BuyerCouponService {
 
     /**
      * 查询全部
+     *
      * @param buyerCouponSpecification 条件
      * @return
      */
     List<BuyerCoupon> findAll(Specification<BuyerCoupon> buyerCouponSpecification);
+
+    /**
+     * 根据过期时间查询商户拥有的优惠券
+     *
+     * @param buyerId
+     * @return
+     */
+    List<BuyerCoupon> findAllbyBuyerIdAndTime(Long buyerId);
+
+    /**
+     * 根据商品分类id查询商户已有的优惠券
+     *
+     * @param productTypeId
+     * @param buyerId
+     * @return
+     */
+    List<BuyerCoupon> findAllToUseCoupon(Long productTypeId, Long buyerId);
+
+    /**
+     * 根据商户id，优惠券id，时间查询优惠券是否过期
+     *
+     * @param buyerId
+     * @param couponId
+     * @return
+     */
+    BuyerCoupon findbyBuyerIdAndCouponIdAndTime(Long buyerId, Long couponId);
+
 }
