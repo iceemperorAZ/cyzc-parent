@@ -91,4 +91,14 @@ public class BuyerServiceImpl implements BuyerService {
         return buyerRepository.findFirstByPhoneAndIsAvailable(phone, true);
     }
 
+    @Override
+    public List<Buyer> findAllByManageId(Long manageId) {
+        return buyerRepository.findAllByManageId(manageId);
+    }
+
+    @Override
+    public List<Buyer> findAllNotReview(Long manageId) {
+        return buyerRepository.findAllNotReview(manageId);
+    }
+
 }

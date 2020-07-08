@@ -1,5 +1,8 @@
 package com.jingliang.mall.controller;
 
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiOperation;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.ProductType;
 import com.jingliang.mall.entity.User;
@@ -8,8 +11,6 @@ import com.jingliang.mall.resp.ProductTypeResp;
 import com.jingliang.mall.server.FastdfsService;
 import com.jingliang.mall.service.ProductService;
 import com.jingliang.mall.service.ProductTypeService;
-import com.citrsw.annatation.Api;
-import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -69,28 +69,67 @@ public class ProductTypeController {
         MallUtils.addDateAndUser(productTypeReq, user);
         ProductType productType = BeanMapper.map(productTypeReq, ProductType.class);
         //判断图片是否为空
-        if (StringUtils.isBlank(productTypeReq.getProductTypeImgBase64())) {
+        if (Objects.isNull(productTypeReq.getProductTypeImgBase64()) && Objects.isNull(productTypeReq.getProductTypeImgUrl())) {
+            return Result.build(Msg.FAIL, "图片不能为空");
+        }
+        if (productTypeReq.getProductTypeImgBase64().isEmpty() && productTypeReq.getProductTypeImgUrl().isEmpty()) {
             return Result.build(Msg.FAIL, "图片不能为空");
         }
         StringBuilder builder = new StringBuilder();
         assert productType != null;
-        if (Objects.nonNull(productTypeReq.getId())) {
-            //将之前所有的图片删除重新上传一份新的
-            String productTypeImgUrl = productType.getProductTypeImgUrl();
-            if (StringUtils.isNotBlank(productTypeImgUrl)) {
-                if (!fastdfsService.deleteFile(productTypeImgUrl)) {
-                    log.error("图片删除失败：{}", productTypeImgUrl);
+        //获取本地url
+        String oldProductTypeImgUrl = null == productType.getProductTypeImgUrlList() ? "" : productType.getProductTypeImgUrlList();
+        //获取要保存的url
+        List<String> productTypeImgUrls = productTypeReq.getProductTypeImgUrl();
+        //如果没有要保存的url
+        if (Objects.isNull(productTypeReq.getProductTypeImgUrl()) || productTypeReq.getProductTypeImgUrl().isEmpty()) {
+            if (StringUtils.isNotBlank(oldProductTypeImgUrl)) {
+                String[] imgUris = oldProductTypeImgUrl.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
                 }
             }
         }
-        String imgBase = productTypeReq.getProductTypeImgBase64();
-        Base64Image base64Image = Base64Image.build(imgBase);
-        if (Objects.isNull(base64Image)) {
-            log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
-            return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
+        for (String newProductTypeImgUrl : productTypeImgUrls) {
+            builder.append(";").append(newProductTypeImgUrl);
         }
-        builder.append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
-        productType.setProductTypeImgUrl(builder.substring(0));
+        //获取要删除的url
+        if (builder.length() <= 1) {
+            String delProductImgUrls = oldProductTypeImgUrl.replaceAll(builder.substring(0), "");
+            if (StringUtils.isNotBlank(delProductImgUrls)) {
+                String[] imgUris = delProductImgUrls.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
+                }
+            }
+        } else {
+            String delProductImgUrls = oldProductTypeImgUrl.replaceAll(builder.substring(1), "");
+            if (StringUtils.isNotBlank(delProductImgUrls)) {
+                String[] imgUris = delProductImgUrls.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
+                }
+            }
+        }
+        List<Base64Image> base64Images = new ArrayList<>();
+        for (String productTypeImgBase64 : productTypeReq.getProductTypeImgBase64()) {
+            Base64Image base64Image = Base64Image.build(productTypeImgBase64);
+            if (Objects.isNull(base64Image)) {
+                log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+                return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
+            }
+            base64Images.add(base64Image);
+        }
+        for (Base64Image base64Image : base64Images) {
+            builder.append(";").append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
+        }
+        productType.setProductTypeImgUrlList(builder.length() > 1 ? builder.substring(1) : "");
         productType = productTypeService.save(productType);
         ProductTypeResp productTypeResp = BeanMapper.map(productType, ProductTypeResp.class);
         log.debug("返回结果：{}", productTypeResp);

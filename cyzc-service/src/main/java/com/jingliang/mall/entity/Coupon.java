@@ -36,7 +36,13 @@ public class Coupon implements Serializable {
 	private Long productZoneId;
 
 	/**
-	 * 使用范围（商品分类）
+	 * 特定商品的id
+	 */
+	@Column(name = "product_id")
+	private Long productId;
+
+	/**
+	 * 使用范围（商品分类）-1为全场通用
 	 */
 	@Column(name = "product_type_id")
 	private Long productTypeId;
@@ -156,4 +162,15 @@ public class Coupon implements Serializable {
 	@Column(name = "update_time")
 	private Date updateTime;
 
+	/**
+	 * 满减条件（单位：分）
+	 */
+	@Column(name = "full_decrement")
+	private Long fullDecrement;
+
+	/**
+	 * 优惠金额（单位：分）
+	 */
+	@Column(name = "preferential_price")
+	private Long preferentialPrice;
 }

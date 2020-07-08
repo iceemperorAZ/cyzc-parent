@@ -50,7 +50,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     public Coupon findById(Long couponId) {
-        return couponRepository.findAllByIdAndIsAvailable(couponId,true);
+        return couponRepository.findAllByIdAndIsAvailable(couponId, true);
     }
 
     @Override

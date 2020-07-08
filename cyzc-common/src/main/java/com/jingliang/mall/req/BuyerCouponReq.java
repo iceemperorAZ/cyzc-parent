@@ -1,8 +1,8 @@
 package com.jingliang.mall.req;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.citrsw.annatation.ApiModel;
 import com.citrsw.annatation.ApiProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,7 +18,7 @@ import java.util.List;
  * @version 1.0.0
  * @date 2019-12-18 16:50:49
  */
-@ApiModel(name =  "BuyerCouponReq", description = "用户优惠券")
+@ApiModel(name = "BuyerCouponReq", description = "用户优惠券")
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class BuyerCouponReq extends BaseReq implements Serializable {
@@ -253,4 +253,23 @@ public class BuyerCouponReq extends BaseReq implements Serializable {
     @ApiProperty(description = "商品分类Id集合")
     private List<Long> productTypeIds;
 
+    /**
+     * 满减条件
+     */
+    @ApiProperty(description = "满减条件")
+    private Double fullDecrement;
+
+    /**
+     * 优惠金额
+     */
+    @ApiProperty(description = "优惠金额")
+    private Double preferentialPrice;
+
+    public void setFullDecrement(Double fullDecrement) {
+        this.fullDecrement = fullDecrement * 100;
+    }
+
+    public void setPreferentialPrice(Double preferentialPrice) {
+        this.preferentialPrice = preferentialPrice * 100;
+    }
 }

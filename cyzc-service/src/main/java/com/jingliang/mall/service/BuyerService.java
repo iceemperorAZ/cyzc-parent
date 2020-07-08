@@ -90,4 +90,20 @@ public interface BuyerService {
      * @return
      */
     Buyer findFirstByPhone(String phone);
+
+    /**
+     * 查询区域经理下的销售的待审核商户总数
+     *
+     * @param manageId
+     * @return
+     */
+    List<Buyer> findAllByManageId(Long manageId);
+
+    /**
+     * 查询区域经理下的销售的被驳回商户总数
+     *
+     * @param manageId
+     * @return
+     */
+    List<Buyer> findAllNotReview(Long manageId);
 }
