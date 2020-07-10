@@ -29,7 +29,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
                 website = "https://shanghaijingliang.com", basePackages = {"com.jingliang.mall.controller"})})
 public class TobMallManageApplication {
     /**
-     * 使用这个main类启动请在启动参数中增加如下配置(VM options中)   测试
+     * 使用这个main类启动请在启动参数中增加如下配置(VM options中)
      * 开发环境-Dspring.profiles.active=dev
      * 测试环境-Dspring.profiles.active=test
      * 生产环境-Dspring.profiles.active=pro
