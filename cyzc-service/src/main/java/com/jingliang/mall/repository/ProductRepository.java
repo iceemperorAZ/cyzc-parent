@@ -80,7 +80,7 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
      * @return 返回查询到商品
      */
     Product findFirstByProductTypeIdAndProductSortAndIsAvailable(Long productTypeId, Integer productSort, Boolean isAvailable);
-  
+
     /**
      * 根据商品名称，规格，查询可用的商品
      *
@@ -100,6 +100,15 @@ public interface ProductRepository extends BaseRepository<Product, Long> {
      */
     Product findAllByProductTypeIdAndProductSortAndIsAvailable(Long productTypeId, Integer productSort, Boolean isAvailable);
 
-    @Query(value = " SELECT p.product_no as '商品编号',p.product_name as '商品名称',p.specs as '商品规格' from tb_product p WHERE p.is_available = 1; " ,nativeQuery=true)
+    @Query(value = " SELECT p.product_no as '商品编号',p.product_name as '商品名称',p.specs as '商品规格' from tb_product p WHERE p.is_available = 1; ", nativeQuery = true)
     List<Map<String, Object>> getAllProduct();
+
+    /**
+     * 导出excel-商品名和规格合并
+     *
+     * @return
+     */
+    @Query(value = " SELECT CONCAT_WS(\" \",ANY_VALUE(p.product_name),ANY_VALUE(p.specs)) AS productName,ANY_VALUE(p.product_no) AS productNo " +
+            "FROM tb_product p WHERE p.is_available = 1 ", nativeQuery = true)
+    List<Map<String, Object>> downExcel();
 }

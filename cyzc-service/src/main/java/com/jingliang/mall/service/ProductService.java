@@ -135,9 +135,17 @@ public interface ProductService {
 
     /**
      * 查询商户所在的大区
+     *
      * @param id
      */
     String getBuyerProduct(Long id);
 
     List<Map<String, Object>> getAllProduct();
+
+    /**
+     * 导出excel-商品名和规格合并
+     *
+     * @return
+     */
+    List<Map<String, Object>> downExcel();
 }

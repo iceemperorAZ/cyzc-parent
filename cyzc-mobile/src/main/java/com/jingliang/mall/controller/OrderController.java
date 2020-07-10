@@ -1,5 +1,8 @@
 package com.jingliang.mall.controller;
 
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiOperation;
 import com.jingliang.mall.ali.service.AliPayService;
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
@@ -10,8 +13,6 @@ import com.jingliang.mall.resp.OrderResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.*;
 import com.jingliang.mall.wx.service.WechatService;
-import com.citrsw.annatation.Api;
-import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +22,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
-import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -279,10 +279,47 @@ public class OrderController {
         //计算使用优惠券后的支付价
         //优惠总价
         double preferentialFee = 0D;
+//        if (Objects.nonNull(orderReq.getCouponIdList()) && orderReq.getCouponIdList().size() > 0) {
+//            StringBuilder builder = new StringBuilder();
+//            for (Long couponId : orderReq.getCouponIdList()) {
+//                BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(couponId, buyer.getId());
+//                if (Objects.isNull(buyerCoupon) || buyerCoupon.getReceiveNum() <= 0) {
+//                    for (OrderDetail detail : orderDetails) {
+//                        //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
+//                        redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+//                        redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detail.getProductId() + "", detail.getProductNum());
+//                    }
+//                    return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_COUPON_FAIL);
+//                }
+//                if (!productPriceMap.containsKey(buyerCoupon.getProductTypeId())) {
+//                    for (OrderDetail detail : orderDetails) {
+//                        //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
+//                        redisService.skuLineIncrement(String.valueOf(detail.getProductId()), detail.getProductNum());
+//                        redisService.decrement("PRODUCT-BUYER-LIMIT-" + buyer.getId() + detail.getProductId() + "", detail.getProductNum());
+//                    }
+//                    return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_COUPON_FAIL);
+//                }
+//                //查询优惠券的限制使用张数
+//                BuyerCouponLimit buyerCouponLimit = buyerCouponLimitService.findByBuyerIdAndProductTypeId(buyer.getId(), buyerCoupon.getProductTypeId());
+//                Integer useLimit = couponUseLimit;
+//                if (Objects.nonNull(buyerCouponLimit)) {
+//                    useLimit = buyerCouponLimit.getUseLimit();
+//                }
+//                int min = Math.min(useLimit, buyerCoupon.getReceiveNum());
+//                preferentialFee += (productPriceMap.get(buyerCoupon.getProductTypeId()) * buyerCoupon.getPercentage() * 0.01 * min);
+//                buyerCoupon.setReceiveNum(buyerCoupon.getReceiveNum() - min);
+//                //优惠券数量减少
+//                buyerCouponService.save(buyerCoupon);
+//                builder.append(buyerCoupon.getId()).append("|").append(min).append(",");
+//            }
+//            order.setCouponIds(builder.substring(0, builder.length() - 1));
+//        }
+        //使用满减优惠券
         if (Objects.nonNull(orderReq.getCouponIdList()) && orderReq.getCouponIdList().size() > 0) {
             StringBuilder builder = new StringBuilder();
             for (Long couponId : orderReq.getCouponIdList()) {
-                BuyerCoupon buyerCoupon = buyerCouponService.findByIdAndBuyerId(couponId, buyer.getId());
+                //判断优惠券是否过期
+                BuyerCoupon buyerCoupon = buyerCouponService.findbyBuyerIdAndCouponIdAndTime(buyer.getId(), couponId);
                 if (Objects.isNull(buyerCoupon) || buyerCoupon.getReceiveNum() <= 0) {
                     for (OrderDetail detail : orderDetails) {
                         //如果小于库存就把减掉的库存加回去，并返回库存不足的信息
@@ -299,18 +336,12 @@ public class OrderController {
                     }
                     return Result.build(Msg.ORDER_FAIL, Msg.TEXT_ORDER_COUPON_FAIL);
                 }
-                //查询优惠券的限制使用张数
-                BuyerCouponLimit buyerCouponLimit = buyerCouponLimitService.findByBuyerIdAndProductTypeId(buyer.getId(), buyerCoupon.getProductTypeId());
-                Integer useLimit = couponUseLimit;
-                if (Objects.nonNull(buyerCouponLimit)) {
-                    useLimit = buyerCouponLimit.getUseLimit();
-                }
-                int min = Math.min(useLimit, buyerCoupon.getReceiveNum());
-                preferentialFee += (productPriceMap.get(buyerCoupon.getProductTypeId()) * buyerCoupon.getPercentage() * 0.01 * min);
-                buyerCoupon.setReceiveNum(buyerCoupon.getReceiveNum() - min);
+                preferentialFee += buyerCoupon.getPreferentialPrice();
                 //优惠券数量减少
+                buyerCoupon.setReceiveNum(buyerCoupon.getReceiveNum() - 1);
                 buyerCouponService.save(buyerCoupon);
-                builder.append(buyerCoupon.getId()).append("|").append(min).append(",");
+                //存入优惠券使用集合
+                builder.append(buyerCoupon.getId()).append("|").append(",");
             }
             order.setCouponIds(builder.substring(0, builder.length() - 1));
         }
