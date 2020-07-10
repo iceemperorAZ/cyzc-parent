@@ -208,4 +208,9 @@ public class ProductServiceImpl implements ProductService {
         List<Map<String, Object>> product = productRepository.getAllProduct();
         return product;
     }
+
+    @Override
+    public List<Map<String, Object>> downExcel() {
+        return productRepository.downExcel();
+    }
 }

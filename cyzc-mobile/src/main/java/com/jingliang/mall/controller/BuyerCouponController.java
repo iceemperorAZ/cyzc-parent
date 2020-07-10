@@ -1,19 +1,19 @@
 package com.jingliang.mall.controller;
 
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiOperation;
 import com.jingliang.mall.amqp.producer.RabbitProducer;
 import com.jingliang.mall.common.*;
-import com.jingliang.mall.entity.Buyer;
-import com.jingliang.mall.entity.BuyerCoupon;
-import com.jingliang.mall.entity.Coupon;
-import com.jingliang.mall.entity.ProductType;
+import com.jingliang.mall.entity.*;
 import com.jingliang.mall.req.BuyerCouponReq;
+import com.jingliang.mall.req.CartReq;
 import com.jingliang.mall.resp.BuyerCouponResp;
 import com.jingliang.mall.server.RedisService;
 import com.jingliang.mall.service.BuyerCouponService;
 import com.jingliang.mall.service.BuyerService;
 import com.jingliang.mall.service.CouponService;
-import com.citrsw.annatation.Api;
-import com.citrsw.annatation.ApiOperation;
+import com.jingliang.mall.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -51,13 +50,15 @@ public class BuyerCouponController {
     private final BuyerService buyerService;
     private final RedisService redisService;
     private final RabbitProducer rabbitProducer;
+    private final ProductService productService;
 
-    public BuyerCouponController(BuyerCouponService buyerCouponService, CouponService couponService, BuyerService buyerService, RedisService redisService, RabbitProducer rabbitProducer) {
+    public BuyerCouponController(BuyerCouponService buyerCouponService, CouponService couponService, BuyerService buyerService, RedisService redisService, RabbitProducer rabbitProducer, ProductService productService) {
         this.buyerCouponService = buyerCouponService;
         this.couponService = couponService;
         this.buyerService = buyerService;
         this.redisService = redisService;
         this.rabbitProducer = rabbitProducer;
+        this.productService = productService;
     }
 
     /**
@@ -77,7 +78,7 @@ public class BuyerCouponController {
         }
         Integer residueNumber = coupon.getResidueNumber();
         Integer receiveNum = coupon.getReceiveNum();
-        coupon.setReceiveNum(Math.min(residueNumber,receiveNum));
+        coupon.setReceiveNum(Math.min(residueNumber, receiveNum));
         //判断redis中的优惠券数量是否够
         Long decrement = redisService.couponDecrement(coupon.getId() + "", coupon.getReceiveNum());
         if (decrement < 0 && decrement + coupon.getReceiveNum() < 0) {
@@ -216,5 +217,40 @@ public class BuyerCouponController {
             list.add(map);
         }
         return Result.buildQueryOk(list);
+    }
+
+    @ApiOperation(description = "查询本次购物可以使用的优惠券")
+    @GetMapping("/toUseCoupon")
+    public Result<Set<BuyerCouponResp>> toUseCoupon(CartReq cartReq, @ApiIgnore HttpSession session) {
+        log.debug("请求参数：{}", cartReq);
+        Set<BuyerCouponResp> buyerCouponResps = new HashSet<>();
+        Buyer buyer = (Buyer) session.getAttribute(sessionBuyer);
+        //查询商户拥有的所有未过期的优惠券
+        List<BuyerCoupon> buyerCoupons = buyerCouponService.findAllbyBuyerIdAndTime(buyer.getId());
+        for (BuyerCoupon buyerCoupon : buyerCoupons) {
+            BuyerCouponResp buyerCouponResp = BeanMapper.map(buyerCoupon, BuyerCouponResp.class);
+            assert buyerCouponResp != null;
+            //通过购物车中的商品id获取商品
+            Product product = productService.findAllById(cartReq.getProductId());
+            if (product.getSellingPrice() * cartReq.getProductNum() >= buyerCoupon.getFullDecrement()) {
+                //满足满减条件，判断是通用券还是分区券还是特定商品券
+                if (buyerCoupon.getProductTypeId() == -1) {
+                    buyerCouponResp.setWhetherToUse(true);
+                } else {
+                    //满足分类大区的优惠券标识为可以使用
+                    if (Objects.equals(product.getProductTypeId(), buyerCoupon.getProductTypeId())) {
+                        //判断该分类下的优惠券是否是特定商品
+                        buyerCouponResp.setWhetherToUse(null == buyerCoupon.getProductId() || Objects.equals(product.getId(), buyerCoupon.getProductId()));
+                    } else {
+                        buyerCouponResp.setWhetherToUse(false);
+                    }
+                }
+            } else {
+                buyerCouponResp.setWhetherToUse(false);
+            }
+            buyerCouponResps.add(buyerCouponResp);
+        }
+        log.debug("返回结果：{}", buyerCouponResps);
+        return Result.buildQueryOk(buyerCouponResps);
     }
 }

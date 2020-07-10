@@ -485,4 +485,64 @@ public class ProductController {
                 .contentLength(arrayOutputStream.size())
                 .body(arrayOutputStream.toByteArray());
     }
+
+    /**
+     * 导出商品表-商品名和规格合并
+     */
+    @GetMapping("/download/newExcel")
+    @ApiOperation(description = "导出商品表-商品名和规格合并")
+    public ResponseEntity<byte[]> downExcel() throws IOException {
+        List<Map<String, Object>> product = productService.downExcel();
+        // 定义一个新的工作簿
+        XSSFWorkbook productWorkbook = new XSSFWorkbook();
+        // 创建一个Sheet页
+        XSSFSheet sheet = productWorkbook.createSheet("First sheet");
+        //设置行高
+        sheet.setDefaultRowHeight((short) (2 * 256));
+        //设置列宽
+        sheet.setColumnWidth(0, 4000);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 4000);
+        XSSFFont font = productWorkbook.createFont();
+        font.setFontName("宋体");
+        font.setFontHeightInPoints((short) 16);
+        //获得表格第一行
+        XSSFRow row = sheet.createRow(0);
+        //根据需要给第一行每一列设置标题
+        XSSFCell cell = row.createCell(0);
+        cell.setCellValue("商户编码");
+        cell = row.createCell(1);
+        cell.setCellValue("商户名称+规格");
+        cell = row.createCell(2);
+        XSSFRow rows;
+        XSSFCell cells;
+        //循环拿到的数据给所有行每一列设置对应的值
+        for (int i = 0; i < product.size(); i++) {
+            // 在这个sheet页里创建一行
+            rows = sheet.createRow(i + 1);
+            // 该行创建一个单元格,在该单元格里设置值
+            String no = product.get(i).get("productNo").toString();
+            String name = product.get(i).get("productName").toString();
+            cells = rows.createCell(0);
+            cells.setCellValue(no);
+            cells = rows.createCell(1);
+            cells.setCellValue(name);
+        }
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        productWorkbook.write(arrayOutputStream);
+        String newName = URLEncoder.encode("商品编码表-" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + ".xlsx", "utf-8")
+                .replaceAll("\\+", "%20").replaceAll("%28", "\\(")
+                .replaceAll("%29", "\\)").replaceAll("%3B", ";")
+                .replaceAll("%40", "@").replaceAll("%23", "\\#")
+                .replaceAll("%26", "\\&").replaceAll("%2C", "\\,");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", newName));
+        headers.add("Expires", "0");
+        headers.add("Pragma", "no-cache");
+        return ResponseEntity.ok().headers(headers)
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentLength(arrayOutputStream.size())
+                .body(arrayOutputStream.toByteArray());
+    }
 }
