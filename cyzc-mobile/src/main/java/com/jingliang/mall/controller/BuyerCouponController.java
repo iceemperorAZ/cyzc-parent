@@ -104,7 +104,7 @@ public class BuyerCouponController {
         assert buyerCoupon != null;
         buyerCoupon.setCouponId(coupon.getId());
         buyerCoupon.setId(null);
-        buyerCoupon.setProductType(null);
+//        buyerCoupon.setProductType(null);
         buyerCoupon.setBuyerId(buyer.getId());
         buyerCoupon.setCreateTime(new Date());
         buyerCoupon.setCreateUserId(-1L);

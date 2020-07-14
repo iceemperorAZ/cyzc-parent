@@ -49,6 +49,12 @@ public class BuyerCoupon implements Serializable {
     private Long productTypeId;
 
     /**
+     * 是否是单品优惠券，0：否，1：是
+     */
+    @Column(name = "is_item")
+    private Boolean isItem;
+
+    /**
      * 商品分类
      */
     @OneToOne(targetEntity = ProductType.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)

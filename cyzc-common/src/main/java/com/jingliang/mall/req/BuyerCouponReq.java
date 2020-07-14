@@ -80,6 +80,12 @@ public class BuyerCouponReq extends BaseReq implements Serializable {
     private Long productTypeIdEnd;
 
     /**
+     * 是否是单品优惠券，0：否，1：是
+     */
+    @ApiProperty(description = "是否是单品优惠券，0：否，1：是")
+    private Boolean isItem;
+
+    /**
      * 用户Id
      */
     @ApiProperty(description = "用户Id")
