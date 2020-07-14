@@ -48,6 +48,12 @@ public class BuyerCouponResp implements Serializable {
     private Long productTypeId;
 
     /**
+     * 是否是单品优惠券，0：否，1：是
+     */
+    @ApiProperty(description = "是否是单品优惠券，0：否，1：是")
+    private Boolean isItem;
+
+    /**
      * 用户Id
      */
     @ApiProperty(description = "用户Id")

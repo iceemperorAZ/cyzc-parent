@@ -42,6 +42,12 @@ public class Coupon implements Serializable {
 	private Long productId;
 
 	/**
+	 * 是否是单品优惠券，0：否，1：是
+	 */
+	@Column(name = "is_item")
+	private Boolean isItem;
+
+	/**
 	 * 使用范围（商品分类）-1为全场通用
 	 */
 	@Column(name = "product_type_id")

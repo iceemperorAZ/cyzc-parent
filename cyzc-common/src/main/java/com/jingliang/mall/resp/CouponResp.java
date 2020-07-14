@@ -41,6 +41,19 @@ public class CouponResp implements Serializable {
     private Long productZoneId;
 
     /**
+     * 特定商品的id
+     */
+    @ApiProperty(description = "特定商品的id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long productId;
+
+    /**
+     * 是否是单品优惠券，0：否，1：是
+     */
+    @ApiProperty(description = "是否是单品优惠券，0：否，1：是")
+    private Boolean isItem;
+
+    /**
      * 使用范围（商品分类）
      */
     @ApiProperty(description = "使用范围（商品分类）")

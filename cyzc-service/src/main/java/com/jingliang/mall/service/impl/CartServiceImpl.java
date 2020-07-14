@@ -73,4 +73,9 @@ public class CartServiceImpl implements CartService {
     public Integer countAllByBuyerId(Long buyerId) {
         return cartRepository.countAllByBuyerIdAndIsAvailable(buyerId, true);
     }
+
+    @Override
+    public Cart findById(Long id) {
+        return cartRepository.findByIdAndIsAvailable(id, true);
+    }
 }

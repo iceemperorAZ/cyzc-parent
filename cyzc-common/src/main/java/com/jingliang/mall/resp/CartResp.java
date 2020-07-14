@@ -41,6 +41,13 @@ public class CartResp implements Serializable {
     private Long buyerId;
 
     /**
+     * 商品分类Id
+     */
+    @ApiProperty(description = "商品分类Id")
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long productTypeId;
+
+    /**
      * 商品Id
      */
     @ApiProperty(description = "商品Id")

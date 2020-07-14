@@ -55,4 +55,12 @@ public interface CartService {
      * @return
      */
     Integer countAllByBuyerId(Long buyerId);
+
+    /**
+     * 根据主键id和商户id查询购物车
+     *
+     * @param id
+     * @return
+     */
+    Cart findById(Long id);
 }
