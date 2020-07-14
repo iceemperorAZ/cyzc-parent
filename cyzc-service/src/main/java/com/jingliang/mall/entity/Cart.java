@@ -37,6 +37,12 @@ public class Cart implements Serializable {
     private Long buyerId;
 
     /**
+     * 商品分类Id
+     */
+    @Column(name = "product_type_id")
+    private Long productTypeId;
+
+    /**
      * 商品Id
      */
     @Column(name = "product_id")

@@ -50,4 +50,13 @@ public interface CartRepository extends BaseRepository<Cart, Long> {
      * @return
      */
     Integer countAllByBuyerIdAndIsAvailable(Long buyerId, Boolean isAvailable);
+
+    /**
+     * 根据主键id查询购物车
+     *
+     * @param id
+     * @param isAvailable
+     * @return
+     */
+    Cart findByIdAndIsAvailable(Long id, Boolean isAvailable);
 }

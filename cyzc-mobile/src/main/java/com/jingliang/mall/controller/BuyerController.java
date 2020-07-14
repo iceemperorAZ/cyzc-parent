@@ -255,9 +255,9 @@ public class BuyerController {
                 || StringUtils.isBlank(buyerReq.getUserName())) {
             return Result.buildParamFail();
         }
-//        if (Objects.isNull(buyerReq.getBuyerTypeLabelList()) || buyerReq.getBuyerTypeLabelList().isEmpty()) {
-//            return Result.build(Msg.FAIL, "标签不能为空");
-//        }
+        if (Objects.isNull(buyerReq.getBuyerTypeLabelList()) || buyerReq.getBuyerTypeLabelList().isEmpty()) {
+            return Result.build(Msg.FAIL, "标签不能为空");
+        }
         if (!unavailableNameService.findNameCount(buyerReq.getShopName())) {
             return Result.build(Msg.FAIL, Msg.TEXT_SHOP_NAME_FAIL);
         }
@@ -270,136 +270,136 @@ public class BuyerController {
         if (Objects.isNull(buyer)) {
             return Result.buildSaveFail();
         }
-//        //判断图片是否为空
-//        if ((Objects.isNull(buyerReq.getBuyerImgBase64s()) || buyerReq.getBuyerImgBase64s().isEmpty()) &&
-//                ((Objects.isNull(buyerReq.getBuyerImdUrlsList())) || buyerReq.getBuyerImdUrlsList().isEmpty())) {
-//            return Result.build(Msg.FAIL, "图片不能为空");
+        //判断图片是否为空
+        if ((Objects.isNull(buyerReq.getBuyerImgBase64s()) || buyerReq.getBuyerImgBase64s().isEmpty()) &&
+                ((Objects.isNull(buyerReq.getBuyerImdUrlsList())) || buyerReq.getBuyerImdUrlsList().isEmpty())) {
+            return Result.build(Msg.FAIL, "图片不能为空");
+        }
+//        //判断营业执照是否为空
+//        if ((Objects.isNull(buyerReq.getBusinessLicenseBase64s()) || buyerReq.getBusinessLicenseBase64s().isEmpty()) &&
+//                ((Objects.isNull(buyerReq.getBusinessLicenseUrlsList())) || buyerReq.getBusinessLicenseUrlsList().isEmpty())) {
+//            return Result.build(Msg.FAIL, "营业执照不能为空");
 //        }
-////        //判断营业执照是否为空
-////        if ((Objects.isNull(buyerReq.getBusinessLicenseBase64s()) || buyerReq.getBusinessLicenseBase64s().isEmpty()) &&
-////                ((Objects.isNull(buyerReq.getBusinessLicenseUrlsList())) || buyerReq.getBusinessLicenseUrlsList().isEmpty())) {
-////            return Result.build(Msg.FAIL, "营业执照不能为空");
-////        }
-//        StringBuilder builder = new StringBuilder();
-//        //获取本地url
-//        String oldBuyerImgUrls = StringUtils.isBlank(buyer.getBuyerImdUrls()) ? "" : buyer.getBuyerImdUrls();
-//        //获取要保存的url
-//        List<String> buyerImgUrls = buyerReq.getBuyerImdUrlsList();
-//        //如果没有要保存的url
-//        if (buyerImgUrls.isEmpty()) {
-//            if (StringUtils.isNotBlank(oldBuyerImgUrls)) {
-//                String[] imgUris = oldBuyerImgUrls.split(";");
-//                for (String imgUri : imgUris) {
-//                    if (!fastdfsService.deleteFile(imgUri)) {
-//                        log.error("图片删除失败：{}", imgUri);
-//                    }
-//                }
-//            }
-//        }
-//        for (String newBuyerImgUrls : buyerImgUrls) {
-//            builder.append(";").append(newBuyerImgUrls);
-//        }
-//        //获取要删除的url
-//        if (builder.length() <= 1) {
-//            String delBuyerImgUrls = oldBuyerImgUrls.replaceAll(builder.substring(0), "");
-//            if (StringUtils.isNotBlank(delBuyerImgUrls)) {
-//                String[] imgUris = delBuyerImgUrls.split(";");
-//                for (String imgUri : imgUris) {
-//                    if (!fastdfsService.deleteFile(imgUri)) {
-//                        log.error("图片删除失败：{}", imgUri);
-//                    }
-//                }
-//            }
-//        } else {
-//            String delBuyerImgUrls = oldBuyerImgUrls.replaceAll(builder.substring(1), "");
-//            if (StringUtils.isNotBlank(delBuyerImgUrls)) {
-//                String[] imgUris = delBuyerImgUrls.split(";");
-//                for (String imgUri : imgUris) {
-//                    if (!fastdfsService.deleteFile(imgUri)) {
-//                        log.error("图片删除失败：{}", imgUri);
-//                    }
-//                }
-//            }
-//        }
-//        //新上传的base64图片处理
-//        List<Base64Image> base64Images = new ArrayList<>();
-//        for (String buyerImg : buyerReq.getBuyerImgBase64s()) {
-//            Base64Image base64Image = Base64Image.build(buyerImg);
-//            if (Objects.isNull(base64Image)) {
-//                log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
-//                return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
-//            }
-//            base64Images.add(base64Image);
-//        }
-//        for (Base64Image base64Image : base64Images) {
-//            builder.append(";").append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
-//        }
-//        //营业执照处理
-//        StringBuilder businessLicenseBuilder = new StringBuilder();
-//        //获取本地url
-//        String oldBusinessLicenseUrls = StringUtils.isBlank(buyer.getBusinessLicenseUrls()) ? "" : buyer.getBusinessLicenseUrls();
-//        //获取要保存的url
-//        List<String> businessLicenseUrlsUrls = buyerReq.getBusinessLicenseUrlsList();
-//        //如果没有要保存的url
-//        if (businessLicenseUrlsUrls.isEmpty()) {
-//            if (StringUtils.isNotBlank(oldBusinessLicenseUrls)) {
-//                String[] imgUris = oldBusinessLicenseUrls.split(";");
-//                for (String imgUri : imgUris) {
-//                    if (!fastdfsService.deleteFile(imgUri)) {
-//                        log.error("图片删除失败：{}", imgUri);
-//                    }
-//                }
-//            }
-//        }
-//        for (String newBuyerImgUrls : businessLicenseUrlsUrls) {
-//            businessLicenseBuilder.append(";").append(newBuyerImgUrls);
-//        }
-//        //获取要删除的url
-//        if (businessLicenseBuilder.length() <= 1) {
-//            String delBuyerImgUrls = oldBusinessLicenseUrls.replaceAll(businessLicenseBuilder.substring(0), "");
-//            if (StringUtils.isNotBlank(delBuyerImgUrls)) {
-//                String[] imgUris = delBuyerImgUrls.split(";");
-//                for (String imgUri : imgUris) {
-//                    if (!fastdfsService.deleteFile(imgUri)) {
-//                        log.error("图片删除失败：{}", imgUri);
-//                    }
-//                }
-//            }
-//        } else {
-//            String delBuyerImgUrls = oldBusinessLicenseUrls.replaceAll(businessLicenseBuilder.substring(1), "");
-//            if (StringUtils.isNotBlank(delBuyerImgUrls)) {
-//                String[] imgUris = delBuyerImgUrls.split(";");
-//                for (String imgUri : imgUris) {
-//                    if (!fastdfsService.deleteFile(imgUri)) {
-//                        log.error("图片删除失败：{}", imgUri);
-//                    }
-//                }
-//            }
-//        }
-//        //新上传的base64图片处理
-//        List<Base64Image> businessLicenseBase64Images = new ArrayList<>();
-//        for (String businessLicenseImg : buyerReq.getBusinessLicenseBase64s()) {
-//            Base64Image base64Image = Base64Image.build(businessLicenseImg);
-//            if (Objects.isNull(base64Image)) {
-//                log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
-//                return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
-//            }
-//            businessLicenseBase64Images.add(base64Image);
-//        }
-//        for (Base64Image base64Image : businessLicenseBase64Images) {
-//            businessLicenseBuilder.append(";").append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
-//        }
-//        //商户标签处理
-//        StringBuilder buyerTypeLabelBuilder = new StringBuilder();
-//        for (String buyerTypeLabel : buyerReq.getBuyerTypeLabelList()) {
-//            buyerTypeLabelBuilder.append(";").append(buyerTypeLabel);
-//        }
-//        //保存标签集合
-//        buyer.setBuyerTypeLabel(buyerTypeLabelBuilder.length() > 1 ? buyerTypeLabelBuilder.substring(1) : "");
-//        //保存图片url集合
-//        buyer.setBuyerImdUrls(builder.length() > 1 ? builder.substring(1) : "");
-//        //保存营业执照url集合
-//        buyer.setBusinessLicenseUrls(businessLicenseBuilder.length() > 1 ? businessLicenseBuilder.substring(1) : "");
+        StringBuilder builder = new StringBuilder();
+        //获取本地url
+        String oldBuyerImgUrls = StringUtils.isBlank(buyer.getBuyerImdUrls()) ? "" : buyer.getBuyerImdUrls();
+        //获取要保存的url
+        List<String> buyerImgUrls = buyerReq.getBuyerImdUrlsList();
+        //如果没有要保存的url
+        if (buyerImgUrls.isEmpty()) {
+            if (StringUtils.isNotBlank(oldBuyerImgUrls)) {
+                String[] imgUris = oldBuyerImgUrls.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
+                }
+            }
+        }
+        for (String newBuyerImgUrls : buyerImgUrls) {
+            builder.append(";").append(newBuyerImgUrls);
+        }
+        //获取要删除的url
+        if (builder.length() <= 1) {
+            String delBuyerImgUrls = oldBuyerImgUrls.replaceAll(builder.substring(0), "");
+            if (StringUtils.isNotBlank(delBuyerImgUrls)) {
+                String[] imgUris = delBuyerImgUrls.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
+                }
+            }
+        } else {
+            String delBuyerImgUrls = oldBuyerImgUrls.replaceAll(builder.substring(1), "");
+            if (StringUtils.isNotBlank(delBuyerImgUrls)) {
+                String[] imgUris = delBuyerImgUrls.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
+                }
+            }
+        }
+        //新上传的base64图片处理
+        List<Base64Image> base64Images = new ArrayList<>();
+        for (String buyerImg : buyerReq.getBuyerImgBase64s()) {
+            Base64Image base64Image = Base64Image.build(buyerImg);
+            if (Objects.isNull(base64Image)) {
+                log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+                return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
+            }
+            base64Images.add(base64Image);
+        }
+        for (Base64Image base64Image : base64Images) {
+            builder.append(";").append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
+        }
+        //营业执照处理
+        StringBuilder businessLicenseBuilder = new StringBuilder();
+        //获取本地url
+        String oldBusinessLicenseUrls = StringUtils.isBlank(buyer.getBusinessLicenseUrls()) ? "" : buyer.getBusinessLicenseUrls();
+        //获取要保存的url
+        List<String> businessLicenseUrlsUrls = buyerReq.getBusinessLicenseUrlsList();
+        //如果没有要保存的url
+        if (businessLicenseUrlsUrls.isEmpty()) {
+            if (StringUtils.isNotBlank(oldBusinessLicenseUrls)) {
+                String[] imgUris = oldBusinessLicenseUrls.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
+                }
+            }
+        }
+        for (String newBuyerImgUrls : businessLicenseUrlsUrls) {
+            businessLicenseBuilder.append(";").append(newBuyerImgUrls);
+        }
+        //获取要删除的url
+        if (businessLicenseBuilder.length() <= 1) {
+            String delBuyerImgUrls = oldBusinessLicenseUrls.replaceAll(businessLicenseBuilder.substring(0), "");
+            if (StringUtils.isNotBlank(delBuyerImgUrls)) {
+                String[] imgUris = delBuyerImgUrls.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
+                }
+            }
+        } else {
+            String delBuyerImgUrls = oldBusinessLicenseUrls.replaceAll(businessLicenseBuilder.substring(1), "");
+            if (StringUtils.isNotBlank(delBuyerImgUrls)) {
+                String[] imgUris = delBuyerImgUrls.split(";");
+                for (String imgUri : imgUris) {
+                    if (!fastdfsService.deleteFile(imgUri)) {
+                        log.error("图片删除失败：{}", imgUri);
+                    }
+                }
+            }
+        }
+        //新上传的base64图片处理
+        List<Base64Image> businessLicenseBase64Images = new ArrayList<>();
+        for (String businessLicenseImg : buyerReq.getBusinessLicenseBase64s()) {
+            Base64Image base64Image = Base64Image.build(businessLicenseImg);
+            if (Objects.isNull(base64Image)) {
+                log.debug("返回结果：{}", Msg.TEXT_IMAGE_FAIL);
+                return Result.build(Msg.IMAGE_FAIL, Msg.TEXT_IMAGE_FAIL);
+            }
+            businessLicenseBase64Images.add(base64Image);
+        }
+        for (Base64Image base64Image : businessLicenseBase64Images) {
+            businessLicenseBuilder.append(";").append(fastdfsService.uploadFile(base64Image.getBytes(), base64Image.getExtName()));
+        }
+        //商户标签处理
+        StringBuilder buyerTypeLabelBuilder = new StringBuilder();
+        for (String buyerTypeLabel : buyerReq.getBuyerTypeLabelList()) {
+            buyerTypeLabelBuilder.append(";").append(buyerTypeLabel);
+        }
+        //保存标签集合
+        buyer.setBuyerTypeLabel(buyerTypeLabelBuilder.length() > 1 ? buyerTypeLabelBuilder.substring(1) : "");
+        //保存图片url集合
+        buyer.setBuyerImdUrls(builder.length() > 1 ? builder.substring(1) : "");
+        //保存营业执照url集合
+        buyer.setBusinessLicenseUrls(businessLicenseBuilder.length() > 1 ? businessLicenseBuilder.substring(1) : "");
         buyer.setSaleUserId(user.getId());
         buyer.setUpdateTime(new Date());
         //商户审核状态为待审核

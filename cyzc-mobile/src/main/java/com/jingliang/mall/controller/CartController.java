@@ -1,17 +1,14 @@
 package com.jingliang.mall.controller;
 
-import com.jingliang.mall.common.BeanMapper;
-import com.jingliang.mall.common.Msg;
-import com.jingliang.mall.common.MallPage;
-import com.jingliang.mall.common.Result;
-import com.jingliang.mall.common.MUtils;
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiOperation;
+import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Buyer;
 import com.jingliang.mall.entity.Cart;
 import com.jingliang.mall.req.CartReq;
 import com.jingliang.mall.resp.CartResp;
 import com.jingliang.mall.service.CartService;
-import com.citrsw.annatation.Api;
-import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -56,7 +52,7 @@ public class CartController {
     @PostMapping("/save")
     public Result<CartResp> save(@RequestBody CartReq cartReq, @ApiIgnore HttpSession session) {
         log.debug("请求参数：{}", cartReq);
-        if (Objects.isNull(cartReq.getProductId()) || Objects.isNull(cartReq.getProductNum())) {
+        if (Objects.isNull(cartReq.getProductId()) || Objects.isNull(cartReq.getProductNum()) || Objects.isNull(cartReq.getProductTypeId())) {
             return Result.buildParamFail();
         }
         if (Objects.isNull(cartReq.getId()) && Objects.equals(cartReq.getProductNum(), 0)) {

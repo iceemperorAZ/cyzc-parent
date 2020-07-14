@@ -61,6 +61,12 @@ public class CartReq extends BaseReq implements Serializable {
 	private Long buyerIdEnd;
 
 	/**
+	 * 商品分类Id
+	 */
+	@ApiProperty(description = "商品分类Id")
+	private Long productTypeId;
+
+	/**
 	 * 商品Id
 	 */
 	@ApiProperty(description = "商品Id")

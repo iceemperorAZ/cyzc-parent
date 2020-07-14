@@ -1,13 +1,14 @@
 package com.jingliang.mall.controller;
 
+import com.citrsw.annatation.Api;
+import com.citrsw.annatation.ApiIgnore;
+import com.citrsw.annatation.ApiOperation;
 import com.jingliang.mall.common.*;
 import com.jingliang.mall.entity.Coupon;
 import com.jingliang.mall.entity.User;
 import com.jingliang.mall.req.CouponReq;
 import com.jingliang.mall.resp.CouponResp;
 import com.jingliang.mall.service.CouponService;
-import com.citrsw.annatation.Api;
-import com.citrsw.annatation.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
-import com.citrsw.annatation.ApiIgnore;
 
 import javax.persistence.criteria.Predicate;
 import javax.servlet.http.HttpSession;
@@ -71,6 +71,8 @@ public class CouponController {
         couponReq.setProductZoneId(-1L);
         couponReq.setResidueNumber(couponReq.getTotalNumber());
         couponReq.setIsRelease(false);
+        //如果传商品id，则为单品券
+        couponReq.setIsItem(!Objects.isNull(couponReq.getProductId()));
         CouponResp couponResp = BeanMapper.map(couponService.save(BeanMapper.map(couponReq, Coupon.class)), CouponResp.class);
         log.debug("返回结果：{}", couponResp);
         return Result.buildSaveOk(couponResp);

@@ -933,9 +933,6 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * @return
      */
     @Query(value = "SELECT  " +
-            " ANY_VALUE(g.group_name) AS groupName,  " +
-            " ANY_VALUE(g.group_no) AS groupNo,  " +
-            " ANY_VALUE(g.id) AS groupId,  " +
             " count(b.id) AS counts  " +
             " FROM  tb_buyer b " +
             " WHERE DATE_FORMAT(b.create_time,'%Y-%m') BETWEEN DATE_FORMAT(:startTime,'%Y-%m') AND DATE_FORMAT(:endTime,'%Y-%m')", nativeQuery = true)
@@ -948,12 +945,8 @@ public interface GroupRepository extends BaseRepository<Group, Long> {
      * @param endTime
      * @return
      */
-    @Query(value = "SELECT  " +
-            " ANY_VALUE(g.group_name) AS groupName,  " +
-            " ANY_VALUE(g.group_no) AS groupNo,  " +
-            " ANY_VALUE(g.id) AS groupId,  " +
-            " count(b.id) AS counts  " +
-            " FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m-%d') BETWEEN DATE_FORMAT(:startTime,'%Y-%m-%d') AND DATE_FORMAT(:endTime,'%Y-%m-%d')", nativeQuery = true)
+    @Query(value = " SELECT count(b.id) AS counts " +
+            " FROM tb_buyer b WHERE DATE_FORMAT(b.create_time,'%Y-%m-%d') BETWEEN DATE_FORMAT(:startTime,'%Y-%m-%d') AND DATE_FORMAT(:endTime,'%Y-%m-%d') ", nativeQuery = true)
     List<Map<String, Object>> findBuyerCountsToDay(Date startTime, Date endTime);
 
     /**
